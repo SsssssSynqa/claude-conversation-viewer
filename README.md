@@ -1,2 +1,29 @@
-# claude-conversation-viewer
+# Claude 对话记忆查看器
+
 一个用于查看和管理Claude对话历史的工具。
+
+## 功能特点
+
+- 📊 统计对话数据(字数、消息数、时间跨度)
+- 🔍 搜索和过滤消息
+- 💾 导出选中的对话或消息
+- 🎨 自定义显示名称
+- 💭 显示AI的思考过程
+
+## 使用方法
+
+1. 从Claude导出对话数据(JSON格式)
+2. 打开 `index.html` 文件
+3. 设置你和AI的显示名称
+4. 上传JSON文件
+5. 查看、搜索、导出你的对话记忆
+
+## 如何导出Claude对话
+
+1. 在Claude对话界面点击右上角的"···"菜单
+2. 选择"Export conversation"
+3. 下载JSON文件
+
+## 开源协议
+
+MIT License
