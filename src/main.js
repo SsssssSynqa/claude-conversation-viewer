@@ -12,6 +12,7 @@ import { ConversationList } from './components/ConversationList.js';
 import { MessageView } from './components/MessageView.js';
 import { StatsPanel } from './components/StatsPanel.js';
 import { ExportDialog } from './components/ExportDialog.js';
+import { SearchBar } from './components/SearchBar.js';
 
 // ---- Theme ----
 function applyTheme(theme) {
@@ -54,9 +55,11 @@ function renderMainView() {
   title.textContent = 'Claude 对话记忆查看器';
   toolbar.appendChild(title);
 
-  const spacer = document.createElement('div');
-  spacer.className = 'toolbar-spacer';
-  toolbar.appendChild(spacer);
+  // Search bar wrapper (inside toolbar)
+  const searchWrapper = document.createElement('div');
+  searchWrapper.style.cssText = 'flex:1;display:flex;gap:8px;align-items:center;margin:0 16px;';
+  const searchBar = new SearchBar(searchWrapper);
+  toolbar.appendChild(searchWrapper);
 
   // Settings toggles
   const settingsBtn = createToolbarBtn('\u2699\uFE0F', '设置', () => toggleSettings());
