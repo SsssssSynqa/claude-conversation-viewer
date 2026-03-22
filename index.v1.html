@@ -1,0 +1,1166 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claude对话记忆查看器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: #e8e8e8;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            padding: 40px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        h1 {
+            font-size: 2.5em;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #a0a0a0;
+            font-size: 1.1em;
+            margin-top: 10px;
+        }
+
+        .name-config {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .name-config h3 {
+            color: #a0a0a0;
+            font-size: 0.9em;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .name-inputs {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .name-input-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .name-input-group label {
+            display: block;
+            color: #888;
+            font-size: 0.85em;
+            margin-bottom: 5px;
+        }
+
+        .name-input-group input {
+            width: 100%;
+            padding: 10px 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: #e8e8e8;
+            font-size: 1em;
+        }
+
+        .name-input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .name-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .name-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95em;
+            transition: all 0.3s ease;
+        }
+
+        .name-btn.save {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .name-btn.reset {
+            background: rgba(255, 255, 255, 0.1);
+            color: #e8e8e8;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .name-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .upload-section {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            border: 2px dashed rgba(255, 255, 255, 0.2);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .upload-section:hover {
+            border-color: rgba(102, 126, 234, 0.5);
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .upload-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            font-weight: 600;
+        }
+
+        .upload-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 25px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .stat-card h3 {
+            color: #a0a0a0;
+            font-size: 0.9em;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 5px;
+        }
+
+        .stat-detail {
+            color: #a0a0a0;
+            font-size: 0.85em;
+            margin-top: 10px;
+        }
+
+        .conversation-list-header {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 15px 15px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .conversation-list-header h2 {
+            color: #e8e8e8;
+            font-size: 1.3em;
+        }
+
+        .list-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-btn {
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: #e8e8e8;
+            cursor: pointer;
+            font-size: 0.95em;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn:hover {
+            background: rgba(102, 126, 234, 0.3);
+            border-color: #667eea;
+        }
+
+        .conversation-list {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 0 0 15px 15px;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .conversation-list::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .conversation-list::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .conversation-list::-webkit-scrollbar-thumb {
+            background: rgba(102, 126, 234, 0.5);
+            border-radius: 10px;
+        }
+
+        .conversation-item {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .conversation-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .conversation-item.selected {
+            background: rgba(102, 126, 234, 0.2);
+            border-left: 4px solid #667eea;
+        }
+
+        .conversation-item input[type="checkbox"] {
+            cursor: pointer;
+            width: 18px;
+            height: 18px;
+        }
+
+        .conversation-info {
+            flex: 1;
+        }
+
+        .conversation-name {
+            font-size: 1.1em;
+            color: #e8e8e8;
+            margin-bottom: 5px;
+        }
+
+        .conversation-meta {
+            font-size: 0.85em;
+            color: #888;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #888;
+        }
+
+        .empty-state-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .modal.active {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding-top: 50px;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border-radius: 20px;
+            max-width: 1200px;
+            width: 100%;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .modal-header {
+            padding: 25px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 1.5em;
+            color: #e8e8e8;
+        }
+
+        .modal-close {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: #e8e8e8;
+            font-size: 1.5em;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .modal-close:hover {
+            background: rgba(255, 59, 48, 0.3);
+        }
+
+        .modal-stats {
+            padding: 20px 25px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+        }
+
+        .modal-stat-item {
+            text-align: center;
+        }
+
+        .modal-stat-value {
+            font-size: 1.8em;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .modal-stat-label {
+            color: #888;
+            font-size: 0.85em;
+            margin-top: 5px;
+        }
+
+        .modal-controls {
+            padding: 15px 25px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .modal-search {
+            flex: 1;
+            min-width: 200px;
+            padding: 10px 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            color: #e8e8e8;
+            font-size: 0.95em;
+        }
+
+        .modal-search:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .toggle-switch {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9em;
+            color: #a0a0a0;
+        }
+
+        .toggle-switch input {
+            cursor: pointer;
+        }
+
+        .modal-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px 25px;
+        }
+
+        .modal-body::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .modal-body::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .modal-body::-webkit-scrollbar-thumb {
+            background: rgba(102, 126, 234, 0.5);
+            border-radius: 10px;
+        }
+
+        .message {
+            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .message:hover {
+            transform: translateX(5px);
+        }
+
+        .message.selected {
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.5);
+        }
+
+        .message.human {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
+            border-left: 4px solid #667eea;
+        }
+
+        .message.assistant {
+            background: rgba(255, 255, 255, 0.05);
+            border-left: 4px solid #764ba2;
+        }
+
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 0.9em;
+        }
+
+        .sender {
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        .message.assistant .sender {
+            color: #764ba2;
+        }
+
+        .timestamp {
+            color: #888;
+            font-size: 0.85em;
+        }
+
+        .message-content {
+            color: #e8e8e8;
+            line-height: 1.8;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .thinking-block {
+            background: rgba(255, 255, 255, 0.03);
+            border-left: 3px solid #764ba2;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+            font-size: 0.9em;
+            color: #a0a0a0;
+            font-style: italic;
+        }
+
+        .thinking-label {
+            color: #764ba2;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-style: normal;
+        }
+
+        .highlight {
+            background: rgba(255, 255, 0, 0.3);
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+
+        .info, .error {
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 4px solid;
+        }
+
+        .info {
+            background: rgba(102, 126, 234, 0.2);
+            color: #a8b7ff;
+            border-left-color: #667eea;
+        }
+
+        .error {
+            background: rgba(255, 59, 48, 0.2);
+            color: #ff6b6b;
+            border-left-color: #ff3b30;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1 id="mainTitle">Claude对话记忆查看器</h1>
+            <p class="subtitle">保存并重温每一次对话</p>
+        </header>
+
+        <div class="name-config">
+            <h3>自定义显示名称</h3>
+            <div class="name-inputs">
+                <div class="name-input-group">
+                    <label>用户显示名</label>
+                    <input type="text" id="userName" placeholder="例如: Synqa" />
+                </div>
+                <div class="name-input-group">
+                    <label>助手显示名</label>
+                    <input type="text" id="assistantName" placeholder="例如: Sylux" />
+                </div>
+            </div>
+            <div class="name-buttons">
+                <button class="name-btn save" onclick="saveNames()">💾 保存并应用</button>
+                <button class="name-btn reset" onclick="resetNames()">🔄 重置</button>
+            </div>
+        </div>
+
+        <div class="upload-section">
+            <input type="file" id="fileInput" class="file-input" accept=".json" />
+            <button class="upload-btn" onclick="document.getElementById('fileInput').click()">
+                📁 选择对话 JSON 文件
+            </button>
+            <p style="margin-top: 15px; color: #888;">点击按钮选择Claude导出的对话数据文件</p>
+        </div>
+
+        <div id="info" style="display: none;" class="info"></div>
+        <div id="error" style="display: none;" class="error"></div>
+
+        <div id="statsGrid" class="stats-grid" style="display: none;"></div>
+
+        <div id="conversationListContainer" style="display: none;">
+            <div class="conversation-list-header">
+                <h2>对话列表 (<span id="conversationCount">0</span>)</h2>
+                <div class="list-actions">
+                    <button class="action-btn" onclick="selectAllConversations()">✓ 全选</button>
+                    <button class="action-btn" onclick="deselectAllConversations()">✗ 取消全选</button>
+                    <button class="action-btn" onclick="exportSelectedConversations()">📥 导出选中</button>
+                </div>
+            </div>
+            <div class="conversation-list" id="conversationList">
+                <div class="empty-state">
+                    <div class="empty-state-icon">💭</div>
+                    <p>上传对话文件后，对话列表将在这里显示</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 对话详情弹窗 -->
+    <div class="modal" id="conversationModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title" id="modalTitle">对话详情</div>
+                <button class="modal-close" onclick="closeModal()">×</button>
+            </div>
+            <div class="modal-stats" id="modalStats"></div>
+            <div class="modal-controls">
+                <input type="text" class="modal-search" id="modalSearch" placeholder="🔍 搜索消息..." />
+                <div class="toggle-switch">
+                    <input type="checkbox" id="modalShowThinking" checked />
+                    <label for="modalShowThinking">显示思考过程</label>
+                </div>
+                <button class="action-btn" onclick="selectAllMessages()">✓ 全选</button>
+                <button class="action-btn" onclick="deselectAllMessages()">✗ 取消全选</button>
+                <button class="action-btn" onclick="exportModalMessages()">📥 导出选中(<span id="modalSelectedCount">0</span>)</button>
+            </div>
+            <div class="modal-body" id="modalBody"></div>
+        </div>
+    </div>
+
+    <script>
+        let allConversations = [];
+        let selectedConversations = new Set();
+        let currentModalConversation = null;
+        let selectedMessages = new Set();
+        let userName = 'User';
+        let assistantName = 'Claude';
+
+        // 从localStorage加载名字设置
+        function loadNames() {
+            const savedUserName = localStorage.getItem('userName');
+            const savedAssistantName = localStorage.getItem('assistantName');
+            if (savedUserName) {
+                userName = savedUserName;
+                document.getElementById('userName').value = savedUserName;
+            }
+            if (savedAssistantName) {
+                assistantName = savedAssistantName;
+                document.getElementById('assistantName').value = savedAssistantName;
+            }
+            updateTitle();
+        }
+
+        function saveNames() {
+            const userInput = document.getElementById('userName').value.trim();
+            const assistantInput = document.getElementById('assistantName').value.trim();
+            
+            if (userInput) userName = userInput;
+            if (assistantInput) assistantName = assistantInput;
+            
+            localStorage.setItem('userName', userName);
+            localStorage.setItem('assistantName', assistantName);
+            
+            updateTitle();
+            showInfo('名称已保存并应用');
+            
+            // 重新渲染所有内容
+            if (allConversations.length > 0) {
+                displayConversationList();
+                if (currentModalConversation) {
+                    displayModalMessages();
+                }
+            }
+        }
+
+        function resetNames() {
+            userName = 'User';
+            assistantName = 'Claude';
+            document.getElementById('userName').value = '';
+            document.getElementById('assistantName').value = '';
+            localStorage.removeItem('userName');
+            localStorage.removeItem('assistantName');
+            updateTitle();
+            showInfo('名称已重置为默认值');
+            
+            if (allConversations.length > 0) {
+                displayConversationList();
+                if (currentModalConversation) {
+                    displayModalMessages();
+                }
+            }
+        }
+
+        function updateTitle() {
+            document.getElementById('mainTitle').textContent = `${userName} & ${assistantName} 的对话记忆`;
+        }
+
+        document.getElementById('fileInput').addEventListener('change', handleFileSelect);
+        document.getElementById('modalSearch').addEventListener('input', () => displayModalMessages());
+        document.getElementById('modalShowThinking').addEventListener('change', () => displayModalMessages());
+
+        loadNames();
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            hideError();
+            hideInfo();
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    parseConversations(data);
+                    
+                    if (allConversations.length === 0) {
+                        showError('未能从文件中找到有效的对话数据');
+                        return;
+                    }
+
+                    displayGlobalStats();
+                    displayConversationList();
+                    document.getElementById('conversationListContainer').style.display = 'block';
+                    showInfo(`成功加载 ${allConversations.length} 个对话`);
+                } catch (error) {
+                    showError('文件解析失败: ' + error.message);
+                    console.error('Parse error:', error);
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function parseConversations(data) {
+            allConversations = [];
+            selectedConversations.clear();
+            
+            let rawConversations = [];
+            if (Array.isArray(data)) {
+                rawConversations = data;
+            } else if (data.conversations) {
+                rawConversations = data.conversations;
+            } else {
+                rawConversations = [data];
+            }
+
+            // 解析并过滤掉空对话
+            rawConversations.forEach((conv, index) => {
+                const messages = parseMessages(conv);
+                if (messages.length > 0) {
+                    allConversations.push({
+                        ...conv,
+                        parsedMessages: messages,
+                        index: index
+                    });
+                }
+            });
+        }
+
+        function parseMessages(conversation) {
+            if (!conversation.chat_messages || !Array.isArray(conversation.chat_messages)) {
+                return [];
+            }
+
+            return conversation.chat_messages.map((msg, index) => {
+                const sender = msg.sender || 'unknown';
+                let contentText = '';
+                let thinkingText = '';
+                
+                if (msg.content && Array.isArray(msg.content)) {
+                    for (let item of msg.content) {
+                        if (item.type === 'text' && item.text) {
+                            contentText += (contentText ? '\n\n' : '') + item.text;
+                        } else if (item.type === 'thinking' && item.text) {
+                            thinkingText += (thinkingText ? '\n\n' : '') + item.text;
+                        }
+                    }
+                } else if (msg.text) {
+                    contentText = msg.text;
+                } else if (msg.content && typeof msg.content === 'string') {
+                    contentText = msg.content;
+                }
+                
+                contentText = contentText.trim();
+                if (!contentText) return null;
+                
+                return {
+                    role: sender,
+                    content: contentText,
+                    thinking: thinkingText.trim(),
+                    timestamp: msg.created_at || msg.updated_at || new Date().toISOString(),
+                    uuid: msg.uuid || `msg_${index}`
+                };
+            }).filter(Boolean);
+        }
+
+        function displayGlobalStats() {
+            let totalMessages = 0;
+            let totalUserChars = 0;
+            let totalAssistantChars = 0;
+            let allTimestamps = [];
+
+            allConversations.forEach(conv => {
+                totalMessages += conv.parsedMessages.length;
+                conv.parsedMessages.forEach(msg => {
+                    if (msg.role === 'human') {
+                        totalUserChars += msg.content.length;
+                    } else {
+                        totalAssistantChars += msg.content.length;
+                    }
+                    allTimestamps.push(new Date(msg.timestamp));
+                });
+            });
+
+            const validTimestamps = allTimestamps.filter(d => !isNaN(d));
+            const firstDate = validTimestamps.length > 0 ? new Date(Math.min(...validTimestamps)) : null;
+            const lastDate = validTimestamps.length > 0 ? new Date(Math.max(...validTimestamps)) : null;
+            const daysDiff = firstDate && lastDate ? Math.ceil((lastDate - firstDate) / (1000 * 60 * 60 * 24)) : 0;
+
+            document.getElementById('statsGrid').innerHTML = `
+                <div class="stat-card">
+                    <h3>总对话数</h3>
+                    <div class="stat-value">${allConversations.length}</div>
+                    <div class="stat-detail">共 ${totalMessages.toLocaleString()} 条消息</div>
+                </div>
+                <div class="stat-card">
+                    <h3>${userName}</h3>
+                    <div class="stat-value">${totalUserChars.toLocaleString()}</div>
+                    <div class="stat-detail">字</div>
+                </div>
+                <div class="stat-card">
+                    <h3>${assistantName}</h3>
+                    <div class="stat-value">${totalAssistantChars.toLocaleString()}</div>
+                    <div class="stat-detail">字</div>
+                </div>
+                <div class="stat-card">
+                    <h3>时间跨度</h3>
+                    <div class="stat-value">${daysDiff}</div>
+                    <div class="stat-detail">天</div>
+                </div>
+            `;
+            document.getElementById('statsGrid').style.display = 'grid';
+        }
+
+        function displayConversationList() {
+            const listEl = document.getElementById('conversationList');
+            document.getElementById('conversationCount').textContent = allConversations.length;
+
+            if (allConversations.length === 0) {
+                listEl.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📭</div>
+                        <p>没有找到有效的对话</p>
+                    </div>
+                `;
+                return;
+            }
+
+            listEl.innerHTML = allConversations.map((conv, idx) => {
+                const name = conv.name || `对话 ${idx + 1}`;
+                const date = conv.created_at ? new Date(conv.created_at).toLocaleDateString('zh-CN') : '';
+                const msgCount = conv.parsedMessages.length;
+                const isSelected = selectedConversations.has(idx);
+                
+                return `
+                    <div class="conversation-item ${isSelected ? 'selected' : ''}" data-index="${idx}">
+                        <input type="checkbox" ${isSelected ? 'checked' : ''} 
+                               onclick="event.stopPropagation(); toggleConversationSelection(${idx})" />
+                        <div class="conversation-info" onclick="openConversationModal(${idx})">
+                            <div class="conversation-name">${name}</div>
+                            <div class="conversation-meta">${date} · ${msgCount} 条消息</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function toggleConversationSelection(index) {
+            if (selectedConversations.has(index)) {
+                selectedConversations.delete(index);
+            } else {
+                selectedConversations.add(index);
+            }
+            displayConversationList();
+        }
+
+        function selectAllConversations() {
+            allConversations.forEach((_, idx) => selectedConversations.add(idx));
+            displayConversationList();
+        }
+
+        function deselectAllConversations() {
+            selectedConversations.clear();
+            displayConversationList();
+        }
+
+        function exportSelectedConversations() {
+            if (selectedConversations.size === 0) {
+                alert('请先选择要导出的对话');
+                return;
+            }
+
+            let content = `${userName} & ${assistantName} 的对话记忆\n`;
+            content += '='.repeat(50) + '\n\n';
+
+            Array.from(selectedConversations).sort((a, b) => a - b).forEach(idx => {
+                const conv = allConversations[idx];
+                const name = conv.name || `对话 ${idx + 1}`;
+                content += `\n${'='.repeat(50)}\n`;
+                content += `对话: ${name}\n`;
+                content += `时间: ${conv.created_at ? new Date(conv.created_at).toLocaleString('zh-CN') : '未知'}\n`;
+                content += `消息数: ${conv.parsedMessages.length}\n`;
+                content += `${'='.repeat(50)}\n\n`;
+
+                conv.parsedMessages.forEach(msg => {
+                    const sender = msg.role === 'human' ? userName : assistantName;
+                    const time = new Date(msg.timestamp).toLocaleString('zh-CN');
+                    content += `[${sender}] ${time}\n`;
+                    if (msg.thinking) {
+                        content += `\n💭 思考过程:\n${msg.thinking}\n\n`;
+                    }
+                    content += `${msg.content}\n\n---\n\n`;
+                });
+            });
+
+            downloadFile(content, `对话导出_${new Date().toISOString().slice(0,10)}.txt`);
+        }
+
+        function openConversationModal(index) {
+            currentModalConversation = allConversations[index];
+            selectedMessages.clear();
+            
+            const name = currentModalConversation.name || `对话 ${index + 1}`;
+            document.getElementById('modalTitle').textContent = name;
+            
+            displayModalStats();
+            displayModalMessages();
+            
+            document.getElementById('conversationModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('conversationModal').classList.remove('active');
+            currentModalConversation = null;
+            selectedMessages.clear();
+        }
+
+        function displayModalStats() {
+            const messages = currentModalConversation.parsedMessages;
+            const userMsgs = messages.filter(m => m.role === 'human');
+            const assistantMsgs = messages.filter(m => m.role === 'assistant');
+            const userChars = userMsgs.reduce((sum, m) => sum + m.content.length, 0);
+            const assistantChars = assistantMsgs.reduce((sum, m) => sum + m.content.length, 0);
+            
+            const timestamps = messages.map(m => new Date(m.timestamp)).filter(d => !isNaN(d));
+            const firstDate = timestamps.length > 0 ? new Date(Math.min(...timestamps)) : null;
+            const lastDate = timestamps.length > 0 ? new Date(Math.max(...timestamps)) : null;
+
+            document.getElementById('modalStats').innerHTML = `
+                <div class="modal-stat-item">
+                    <div class="modal-stat-value">${messages.length}</div>
+                    <div class="modal-stat-label">总消息数</div>
+                </div>
+                <div class="modal-stat-item">
+                    <div class="modal-stat-value">${userChars.toLocaleString()}</div>
+                    <div class="modal-stat-label">${userName} (${userMsgs.length}条)</div>
+                </div>
+                <div class="modal-stat-item">
+                    <div class="modal-stat-value">${assistantChars.toLocaleString()}</div>
+                    <div class="modal-stat-label">${assistantName} (${assistantMsgs.length}条)</div>
+                </div>
+                <div class="modal-stat-item">
+                    <div class="modal-stat-value">${firstDate ? firstDate.toLocaleDateString('zh-CN', {month:'short', day:'numeric'}) : '-'}</div>
+                    <div class="modal-stat-label">开始时间</div>
+                </div>
+                <div class="modal-stat-item">
+                    <div class="modal-stat-value">${lastDate ? lastDate.toLocaleDateString('zh-CN', {month:'short', day:'numeric'}) : '-'}</div>
+                    <div class="modal-stat-label">最后时间</div>
+                </div>
+            `;
+        }
+
+        function displayModalMessages() {
+            const searchQuery = document.getElementById('modalSearch').value.toLowerCase();
+            const showThinking = document.getElementById('modalShowThinking').checked;
+            const messages = currentModalConversation.parsedMessages;
+
+            const filtered = messages.filter(msg => {
+                if (!searchQuery) return true;
+                return msg.content.toLowerCase().includes(searchQuery) ||
+                       (msg.thinking && msg.thinking.toLowerCase().includes(searchQuery));
+            });
+
+            const bodyEl = document.getElementById('modalBody');
+            if (filtered.length === 0) {
+                bodyEl.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🔍</div>
+                        <p>没有找到匹配的消息</p>
+                    </div>
+                `;
+                return;
+            }
+
+            bodyEl.innerHTML = filtered.map(msg => {
+                const senderName = msg.role === 'human' ? userName : assistantName;
+                const isSelected = selectedMessages.has(msg.uuid);
+                const time = formatTimestamp(msg.timestamp);
+                const content = highlightText(msg.content, searchQuery);
+                
+                let thinkingHtml = '';
+                if (showThinking && msg.thinking) {
+                    const thinking = highlightText(msg.thinking, searchQuery);
+                    thinkingHtml = `
+                        <div class="thinking-block">
+                            <div class="thinking-label">💭 思考过程</div>
+                            ${thinking}
+                        </div>
+                    `;
+                }
+
+                return `
+                    <div class="message ${msg.role} ${isSelected ? 'selected' : ''}" 
+                         onclick="toggleMessageSelection('${msg.uuid}')">
+                        <div class="message-header">
+                            <span class="sender">${senderName}</span>
+                            <span class="timestamp">${time}</span>
+                        </div>
+                        ${thinkingHtml}
+                        <div class="message-content">${content}</div>
+                    </div>
+                `;
+            }).join('');
+
+            updateModalSelectedCount();
+        }
+
+        function toggleMessageSelection(uuid) {
+            if (selectedMessages.has(uuid)) {
+                selectedMessages.delete(uuid);
+            } else {
+                selectedMessages.add(uuid);
+            }
+            displayModalMessages();
+        }
+
+        function selectAllMessages() {
+            currentModalConversation.parsedMessages.forEach(msg => {
+                selectedMessages.add(msg.uuid);
+            });
+            displayModalMessages();
+        }
+
+        function deselectAllMessages() {
+            selectedMessages.clear();
+            displayModalMessages();
+        }
+
+        function updateModalSelectedCount() {
+            document.getElementById('modalSelectedCount').textContent = selectedMessages.size;
+        }
+
+        function exportModalMessages() {
+            if (selectedMessages.size === 0) {
+                alert('请先选择要导出的消息(点击消息即可选中)');
+                return;
+            }
+
+            const selected = currentModalConversation.parsedMessages.filter(m => selectedMessages.has(m.uuid));
+            const showThinking = document.getElementById('modalShowThinking').checked;
+            const convName = currentModalConversation.name || '对话';
+
+            let content = `${convName}\n`;
+            content += '='.repeat(50) + '\n\n';
+            
+            selected.forEach(msg => {
+                const sender = msg.role === 'human' ? userName : assistantName;
+                const time = new Date(msg.timestamp).toLocaleString('zh-CN');
+                content += `[${sender}] ${time}\n`;
+                if (showThinking && msg.thinking) {
+                    content += `\n💭 思考过程:\n${msg.thinking}\n\n`;
+                }
+                content += `${msg.content}\n\n---\n\n`;
+            });
+
+            downloadFile(content, `${convName}_导出_${new Date().toISOString().slice(0,10)}.txt`);
+        }
+
+        function formatTimestamp(timestamp) {
+            try {
+                const date = new Date(timestamp);
+                if (isNaN(date.getTime())) return '未知时间';
+                
+                const now = new Date();
+                const diff = now - date;
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                
+                if (days === 0) {
+                    return date.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
+                } else if (days < 7) {
+                    return days + '天前';
+                } else {
+                    return date.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' });
+                }
+            } catch (e) {
+                return '未知时间';
+            }
+        }
+
+        function highlightText(text, query) {
+            if (!query) return escapeHtml(text);
+            const escaped = escapeHtml(text);
+            const regex = new RegExp(`(${escapeRegex(query)})`, 'gi');
+            return escaped.replace(regex, '<span class="highlight">$1</span>');
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function escapeRegex(text) {
+            return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        }
+
+        function downloadFile(content, filename) {
+            const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function showInfo(message) {
+            const infoDiv = document.getElementById('info');
+            infoDiv.textContent = message;
+            infoDiv.style.display = 'block';
+            setTimeout(() => hideInfo(), 3000);
+        }
+
+        function hideInfo() {
+            document.getElementById('info').style.display = 'none';
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('error');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+        }
+
+        function hideError() {
+            document.getElementById('error').style.display = 'none';
+        }
+
+        // 点击模态框外部关闭
+        document.getElementById('conversationModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>

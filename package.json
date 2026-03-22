@@ -1,0 +1,35 @@
+{
+  "name": "claude-conversation-viewer",
+  "version": "1.0.0",
+  "description": "一个用于查看和管理Claude对话历史的工具。",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SsssssSynqa/claude-conversation-viewer.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/SsssssSynqa/claude-conversation-viewer/issues"
+  },
+  "homepage": "https://github.com/SsssssSynqa/claude-conversation-viewer#readme",
+  "devDependencies": {
+    "vite": "^8.0.1",
+    "vite-plugin-singlefile": "^2.3.2"
+  },
+  "dependencies": {
+    "dompurify": "^3.3.3",
+    "highlight.js": "^11.11.1",
+    "marked": "^17.0.5"
+  }
+}

@@ -1,0 +1,141 @@
+/* ============================================
+   Clawd Crab Loading Animation
+   CSS-only pixel art crab with walking animation
+   ============================================ */
+
+.clawd-container {
+  position: relative;
+  width: 300px;
+  height: 120px;
+}
+
+/* The crab — CSS pixel art using box-shadow */
+.clawd-crab {
+  position: absolute;
+  bottom: 20px;
+  width: 8px;
+  height: 8px;
+  background: transparent;
+  /* Pixel art crab: 8x8 grid, each "pixel" is an 8px box-shadow */
+  box-shadow:
+    /* Body - row 1 (top) */
+    16px -24px 0 0 #da7756,
+    24px -24px 0 0 #da7756,
+    32px -24px 0 0 #da7756,
+    /* Body - row 2 */
+    8px -16px 0 0 #da7756,
+    16px -16px 0 0 #e59577,
+    24px -16px 0 0 #e59577,
+    32px -16px 0 0 #e59577,
+    40px -16px 0 0 #da7756,
+    /* Body - row 3 (middle) */
+    8px -8px 0 0 #da7756,
+    16px -8px 0 0 #e59577,
+    24px -8px 0 0 #f0b8a0,
+    32px -8px 0 0 #e59577,
+    40px -8px 0 0 #da7756,
+    /* Eyes */
+    16px -8px 0 0 #2d2b28,
+    32px -8px 0 0 #2d2b28,
+    /* Body - row 4 */
+    8px 0px 0 0 #da7756,
+    16px 0px 0 0 #e59577,
+    24px 0px 0 0 #e59577,
+    32px 0px 0 0 #e59577,
+    40px 0px 0 0 #da7756,
+    /* Claws - left */
+    -8px -16px 0 0 #c45a33,
+    -8px -8px 0 0 #c45a33,
+    0px -8px 0 0 #c45a33,
+    /* Claws - right */
+    48px -16px 0 0 #c45a33,
+    48px -8px 0 0 #c45a33,
+    56px -8px 0 0 #c45a33,  /* extended right pincer */
+    /* Legs */
+    0px 8px 0 0 #c45a33,
+    8px 8px 0 0 #c45a33,
+    40px 8px 0 0 #c45a33,
+    48px 8px 0 0 #c45a33;
+  animation: clawd-walk 1.5s steps(2) infinite;
+}
+
+@keyframes clawd-walk {
+  0%, 100% {
+    transform: translateX(0px);
+  }
+  50% {
+    transform: translateX(200px);
+  }
+}
+
+/* Alternate direction for fun */
+.clawd-crab {
+  animation: clawd-patrol 3s ease-in-out infinite;
+}
+
+@keyframes clawd-patrol {
+  0% { transform: translateX(0px) scaleX(1); }
+  45% { transform: translateX(220px) scaleX(1); }
+  50% { transform: translateX(220px) scaleX(-1); }
+  95% { transform: translateX(0px) scaleX(-1); }
+  100% { transform: translateX(0px) scaleX(1); }
+}
+
+/* Claw snapping animation */
+.clawd-crab::before {
+  content: '';
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: #c45a33;
+  top: -20px;
+  left: -12px;
+  animation: clawd-snap 0.6s ease-in-out infinite alternate;
+}
+
+@keyframes clawd-snap {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(-20deg); }
+}
+
+/* Bubbles */
+.clawd-bubble {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  opacity: 0.3;
+  bottom: 40px;
+  animation: clawd-bubble-rise 2s ease-in infinite;
+}
+
+.clawd-bubble:nth-child(2) { left: 60px; animation-delay: 0.4s; }
+.clawd-bubble:nth-child(3) { left: 120px; animation-delay: 0.8s; }
+.clawd-bubble:nth-child(4) { left: 180px; animation-delay: 1.2s; }
+.clawd-bubble:nth-child(5) { left: 240px; animation-delay: 1.6s; }
+.clawd-bubble:nth-child(6) { left: 300px; animation-delay: 2.0s; }
+
+@keyframes clawd-bubble-rise {
+  0% {
+    opacity: 0.4;
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-60px) scale(0.3);
+  }
+}
+
+/* Loading complete animation */
+.clawd-crab.done {
+  animation: clawd-bounce 0.5s ease-out forwards;
+}
+
+@keyframes clawd-bounce {
+  0% { transform: translateY(0); }
+  40% { transform: translateY(-30px); }
+  60% { transform: translateY(-10px); }
+  80% { transform: translateY(-20px); }
+  100% { transform: translateY(-50px); opacity: 0; }
+}
