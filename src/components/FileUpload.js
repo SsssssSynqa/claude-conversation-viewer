@@ -94,23 +94,47 @@ export class FileUpload {
 
     const names = state.get('displayNames');
 
-    const humanGroup = this.createNameInput('你的名字', names.human, (val) => {
-      const n = state.get('displayNames');
-      n.human = val;
-      state.set('displayNames', n);
-      localStorage.setItem('cv-names', JSON.stringify(n));
-    });
+    const humanGroup = this.createNameInput('用户显示名', names.human);
+    humanGroup.querySelector('input').id = 'name-human';
 
-    const assistantGroup = this.createNameInput('AI 的名字', names.assistant, (val) => {
-      const n = state.get('displayNames');
-      n.assistant = val;
-      state.set('displayNames', n);
-      localStorage.setItem('cv-names', JSON.stringify(n));
-    });
+    const assistantGroup = this.createNameInput('助手显示名', names.assistant);
+    assistantGroup.querySelector('input').id = 'name-assistant';
 
     nameInputs.appendChild(humanGroup);
     nameInputs.appendChild(assistantGroup);
     nameConfig.appendChild(nameInputs);
+
+    // Buttons row
+    const btnRow = document.createElement('div');
+    btnRow.style.cssText = 'display:flex;gap:12px;margin-top:12px;';
+
+    const saveBtn = document.createElement('button');
+    saveBtn.style.cssText = 'padding:8px 20px;border:none;border-radius:var(--radius-sm);background:var(--gradient-header);color:#fff;cursor:pointer;font-size:0.85rem;font-weight:600;display:flex;align-items:center;gap:6px;';
+    saveBtn.textContent = '\uD83D\uDCBE 保存并应用';
+    saveBtn.addEventListener('click', () => {
+      const humanVal = document.getElementById('name-human')?.value || 'Synqa';
+      const assistantVal = document.getElementById('name-assistant')?.value || 'Sylux';
+      const newNames = { human: humanVal, assistant: assistantVal };
+      state.set('displayNames', newNames);
+      localStorage.setItem('cv-names', JSON.stringify(newNames));
+      saveBtn.textContent = '\u2705 已保存';
+      setTimeout(() => { saveBtn.textContent = '\uD83D\uDCBE 保存并应用'; }, 1500);
+    });
+    btnRow.appendChild(saveBtn);
+
+    const resetBtn = document.createElement('button');
+    resetBtn.style.cssText = 'padding:8px 20px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg-input);color:var(--text-secondary);cursor:pointer;font-size:0.85rem;display:flex;align-items:center;gap:6px;';
+    resetBtn.textContent = '\uD83D\uDD04 重置';
+    resetBtn.addEventListener('click', () => {
+      const defaults = { human: 'Synqa', assistant: 'Sylux' };
+      document.getElementById('name-human').value = defaults.human;
+      document.getElementById('name-assistant').value = defaults.assistant;
+      state.set('displayNames', defaults);
+      localStorage.setItem('cv-names', JSON.stringify(defaults));
+    });
+    btnRow.appendChild(resetBtn);
+
+    nameConfig.appendChild(btnRow);
     screen.appendChild(nameConfig);
 
     // Error banner
@@ -122,7 +146,7 @@ export class FileUpload {
     this.container.appendChild(screen);
   }
 
-  createNameInput(label, defaultValue, onChange) {
+  createNameInput(label, defaultValue) {
     const group = document.createElement('div');
     group.className = 'name-input-group';
 
@@ -133,7 +157,6 @@ export class FileUpload {
     const input = document.createElement('input');
     input.type = 'text';
     input.value = defaultValue;
-    input.addEventListener('change', (e) => onChange(e.target.value || defaultValue));
     group.appendChild(input);
 
     return group;
