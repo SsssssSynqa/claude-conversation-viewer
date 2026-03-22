@@ -10,6 +10,8 @@ import { state } from './store/state.js';
 import { FileUpload } from './components/FileUpload.js';
 import { ConversationList } from './components/ConversationList.js';
 import { MessageView } from './components/MessageView.js';
+import { StatsPanel } from './components/StatsPanel.js';
+import { ExportDialog } from './components/ExportDialog.js';
 
 // ---- Theme ----
 function applyTheme(theme) {
@@ -60,8 +62,9 @@ function renderMainView() {
   const settingsBtn = createToolbarBtn('\u2699\uFE0F', '设置', () => toggleSettings());
   toolbar.appendChild(settingsBtn);
 
+  const statsPanelInstance = new StatsPanel();
   const statsBtn = createToolbarBtn('\uD83D\uDCCA', '统计', () => {
-    // TODO: stats panel
+    statsPanelInstance.toggle();
   });
   toolbar.appendChild(statsBtn);
 
