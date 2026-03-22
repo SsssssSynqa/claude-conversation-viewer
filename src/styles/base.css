@@ -23,6 +23,19 @@ body {
   overflow: hidden;
 }
 
+/* Dark theme gradient background */
+[data-theme="dark"] body,
+[data-theme="auto"] body {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  background-attachment: fixed;
+}
+
+@media (prefers-color-scheme: light) {
+  [data-theme="auto"] body {
+    background: #fafaf8;
+  }
+}
+
 /* Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
