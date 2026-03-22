@@ -66,7 +66,8 @@ function renderMainView() {
   toolbar.appendChild(statsBtn);
 
   const exportBtn = createToolbarBtn('\uD83D\uDCE5', '导出', () => {
-    // TODO: export dialog
+    const dlg = new ExportDialog();
+    dlg.show();
   });
   toolbar.appendChild(exportBtn);
 
