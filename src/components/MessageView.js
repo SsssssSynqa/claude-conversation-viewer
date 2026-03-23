@@ -7,10 +7,12 @@
 import { state } from '../store/state.js';
 import { renderMarkdown, escapeHtml } from '../utils/markdown.js';
 import { formatTimestamp, formatShortTime, getTimeDiffMinutes } from '../utils/time.js';
+import { StatsPanel } from './StatsPanel.js';
 
 export class MessageView {
   constructor(container) {
     this.container = container;
+    this.statsPanel = new StatsPanel();
     this.render();
     state.on('currentConversationIndex', () => this.renderConversation());
     state.on('showThinking', () => this.renderConversation());
@@ -25,10 +27,16 @@ export class MessageView {
 
   renderEmpty() {
     this.container.textContent = '';
-    const empty = document.createElement('div');
-    empty.style.cssText = 'display:flex;align-items:center;justify-content:center;height:100%;color:var(--text-muted);font-size:1.1rem;';
-    empty.textContent = '\u2190 选择一段对话开始阅读';
-    this.container.appendChild(empty);
+    // Show inline stats as homepage when no conversation is selected
+    const conversations = state.get('conversations') || [];
+    if (conversations.length > 0) {
+      this.statsPanel.renderInline(this.container);
+    } else {
+      const empty = document.createElement('div');
+      empty.style.cssText = 'display:flex;align-items:center;justify-content:center;height:100%;color:var(--text-muted);font-size:1.1rem;';
+      empty.textContent = '\u2190 选择一段对话开始阅读';
+      this.container.appendChild(empty);
+    }
   }
 
   renderConversation() {

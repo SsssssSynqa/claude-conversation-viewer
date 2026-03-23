@@ -1,5 +1,5 @@
 /**
- * StatsPanel — Statistics overlay with charts and fun data.
+ * StatsPanel — Statistics component that can render inline (homepage) or as overlay.
  */
 
 import { state } from '../store/state.js';
@@ -15,11 +15,32 @@ export class StatsPanel {
     if (this.overlay) {
       this.hide();
     } else {
-      this.show();
+      this.showOverlay();
     }
   }
 
-  show() {
+  /**
+   * Render stats inline into a container element (for homepage).
+   */
+  renderInline(container) {
+    const conversations = state.get('conversations') || [];
+    if (conversations.length === 0) return;
+
+    const stats = this.computeStats(conversations);
+    container.textContent = '';
+    container.style.cssText = 'flex:1;overflow-y:auto;padding:32px 24px;';
+
+    const inner = document.createElement('div');
+    inner.style.cssText = 'max-width:800px;margin:0 auto;';
+
+    this.buildStatsContent(inner, stats);
+    container.appendChild(inner);
+  }
+
+  /**
+   * Show stats as overlay popup (for toolbar button).
+   */
+  showOverlay() {
     const conversations = state.get('conversations') || [];
     if (conversations.length === 0) return;
 
@@ -34,17 +55,42 @@ export class StatsPanel {
     const panel = document.createElement('div');
     panel.style.cssText = 'max-width:800px;margin:0 auto;background:var(--bg-card);border-radius:var(--radius-lg);padding:32px;box-shadow:var(--shadow);';
 
+    this.buildStatsContent(panel, stats);
+
+    // Close button
+    const closeBtn = document.createElement('button');
+    closeBtn.style.cssText = 'display:block;margin:16px auto 0;padding:10px 32px;border:1px solid var(--border);border-radius:var(--radius-sm);background:transparent;color:var(--text-secondary);cursor:pointer;font-size:0.9rem;';
+    closeBtn.textContent = '关闭';
+    closeBtn.addEventListener('click', () => this.hide());
+    panel.appendChild(closeBtn);
+
+    this.overlay.appendChild(panel);
+    document.body.appendChild(this.overlay);
+  }
+
+  hide() {
+    if (this.overlay) {
+      this.overlay.remove();
+      this.overlay = null;
+    }
+  }
+
+  /**
+   * Build all stats DOM into a parent element.
+   */
+  buildStatsContent(parent, stats) {
+    const names = state.get('displayNames');
+
     // Title
     const title = document.createElement('h2');
     title.style.cssText = 'font-size:1.4rem;margin-bottom:24px;background:var(--gradient-header);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;';
     title.textContent = '对话统计';
-    panel.appendChild(title);
+    parent.appendChild(title);
 
     // Basic stats cards
     const cardsGrid = document.createElement('div');
     cardsGrid.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:32px;';
 
-    const names = state.get('displayNames');
     const basicStats = [
       { label: '总对话数', value: stats.totalConversations },
       { label: '总消息数', value: stats.totalMessages.toLocaleString() },
@@ -72,13 +118,13 @@ export class StatsPanel {
 
       cardsGrid.appendChild(card);
     }
-    panel.appendChild(cardsGrid);
+    parent.appendChild(cardsGrid);
 
     // Top 5 longest conversations
     const topTitle = document.createElement('h3');
     topTitle.style.cssText = 'font-size:1rem;margin-bottom:12px;color:var(--text-primary);';
     topTitle.textContent = 'TOP 5 最长对话';
-    panel.appendChild(topTitle);
+    parent.appendChild(topTitle);
 
     const topList = document.createElement('div');
     topList.style.cssText = 'margin-bottom:32px;';
@@ -86,7 +132,7 @@ export class StatsPanel {
     for (let i = 0; i < Math.min(5, stats.topConversations.length); i++) {
       const conv = stats.topConversations[i];
       const item = document.createElement('div');
-      item.style.cssText = 'display:flex;justify-content:space-between;padding:8px 12px;border-bottom:1px solid var(--separator-color);font-size:0.85rem;cursor:pointer;';
+      item.style.cssText = 'display:flex;justify-content:space-between;padding:8px 12px;border-bottom:1px solid var(--separator-color);font-size:0.85rem;cursor:pointer;border-radius:var(--radius-sm);';
       item.addEventListener('mouseenter', () => item.style.background = 'var(--bg-card-hover)');
       item.addEventListener('mouseleave', () => item.style.background = '');
 
@@ -105,26 +151,25 @@ export class StatsPanel {
         const idx = allConvs.findIndex(c => c.uuid === conv.uuid);
         if (idx >= 0) {
           state.set('currentConversationIndex', idx);
-          this.hide();
+          this.hide(); // close overlay if open
         }
       });
 
       topList.appendChild(item);
     }
-    panel.appendChild(topList);
+    parent.appendChild(topList);
 
     // Monthly conversation chart
     if (stats.monthlyData.labels.length > 1) {
       const chartTitle1 = document.createElement('h3');
       chartTitle1.style.cssText = 'font-size:1rem;margin-bottom:12px;color:var(--text-primary);';
       chartTitle1.textContent = '每月对话频率';
-      panel.appendChild(chartTitle1);
+      parent.appendChild(chartTitle1);
 
       const canvas1 = document.createElement('canvas');
       canvas1.style.cssText = 'width:100%;height:200px;margin-bottom:32px;';
-      panel.appendChild(canvas1);
+      parent.appendChild(canvas1);
 
-      // Need to wait for DOM insert before drawing
       requestAnimationFrame(() => {
         drawLineChart(canvas1, {
           labels: stats.monthlyData.labels,
@@ -136,11 +181,11 @@ export class StatsPanel {
       const chartTitle2 = document.createElement('h3');
       chartTitle2.style.cssText = 'font-size:1rem;margin-bottom:12px;color:var(--text-primary);';
       chartTitle2.textContent = '每月字数';
-      panel.appendChild(chartTitle2);
+      parent.appendChild(chartTitle2);
 
       const canvas2 = document.createElement('canvas');
       canvas2.style.cssText = 'width:100%;height:200px;margin-bottom:16px;';
-      panel.appendChild(canvas2);
+      parent.appendChild(canvas2);
 
       requestAnimationFrame(() => {
         drawBarChart(canvas2, {
@@ -153,21 +198,38 @@ export class StatsPanel {
       });
     }
 
-    // Close button
-    const closeBtn = document.createElement('button');
-    closeBtn.style.cssText = 'display:block;margin:16px auto 0;padding:10px 32px;border:1px solid var(--border);border-radius:var(--radius-sm);background:transparent;color:var(--text-secondary);cursor:pointer;font-size:0.9rem;';
-    closeBtn.textContent = '关闭';
-    closeBtn.addEventListener('click', () => this.hide());
-    panel.appendChild(closeBtn);
+    // Hourly activity heatmap
+    if (stats.hourlyActivity && stats.hourlyActivity.some(v => v > 0)) {
+      const heatTitle = document.createElement('h3');
+      heatTitle.style.cssText = 'font-size:1rem;margin-bottom:12px;color:var(--text-primary);';
+      heatTitle.textContent = '每日活跃时段';
+      parent.appendChild(heatTitle);
 
-    this.overlay.appendChild(panel);
-    document.body.appendChild(this.overlay);
-  }
+      const heatmap = document.createElement('div');
+      heatmap.style.cssText = 'display:grid;grid-template-columns:repeat(24,1fr);gap:3px;margin-bottom:32px;';
 
-  hide() {
-    if (this.overlay) {
-      this.overlay.remove();
-      this.overlay = null;
+      const maxActivity = Math.max(...stats.hourlyActivity);
+      for (let h = 0; h < 24; h++) {
+        const cell = document.createElement('div');
+        const intensity = maxActivity > 0 ? stats.hourlyActivity[h] / maxActivity : 0;
+        const alpha = Math.max(0.08, intensity * 0.8);
+        cell.style.cssText = `aspect-ratio:1;border-radius:3px;background:var(--accent);opacity:${alpha};position:relative;`;
+        cell.title = `${h}:00 — ${stats.hourlyActivity[h]} 条消息`;
+        heatmap.appendChild(cell);
+      }
+
+      parent.appendChild(heatmap);
+
+      // Hour labels
+      const hourLabels = document.createElement('div');
+      hourLabels.style.cssText = 'display:grid;grid-template-columns:repeat(24,1fr);gap:3px;margin-top:-28px;margin-bottom:32px;';
+      for (let h = 0; h < 24; h++) {
+        const label = document.createElement('div');
+        label.style.cssText = 'text-align:center;font-size:0.6rem;color:var(--text-muted);';
+        label.textContent = h % 3 === 0 ? h + '' : '';
+        hourLabels.appendChild(label);
+      }
+      parent.appendChild(hourLabels);
     }
   }
 
@@ -180,6 +242,7 @@ export class StatsPanel {
     let lateNightConvs = 0;
     const allDates = [];
     const monthlyMap = new Map();
+    const hourlyActivity = new Array(24).fill(0);
 
     const sorted = [...conversations].sort((a, b) => {
       if (!a.createdAt || !b.createdAt) return 0;
@@ -195,17 +258,16 @@ export class StatsPanel {
 
       if (conv.createdAt) allDates.push(new Date(conv.createdAt));
 
-      // Check for late-night messages
       let hasLateNight = false;
       for (const msg of conv.messages) {
         if (msg.createdAt) {
           const hour = getHourOfDay(msg.createdAt);
-          if (hour >= 0 && hour < 5) { hasLateNight = true; break; }
+          hourlyActivity[hour]++;
+          if (hour >= 0 && hour < 5) { hasLateNight = true; }
         }
       }
       if (hasLateNight) lateNightConvs++;
 
-      // Monthly aggregation
       const mk = formatMonthKey(conv.createdAt);
       if (!monthlyMap.has(mk)) {
         monthlyMap.set(mk, { convCount: 0, humanChars: 0, assistantChars: 0 });
@@ -216,7 +278,6 @@ export class StatsPanel {
       m.assistantChars += conv.stats.assistantChars;
     }
 
-    // Day span
     let daySpan = 0;
     if (allDates.length >= 2) {
       const earliest = Math.min(...allDates.map(d => d.getTime()));
@@ -224,7 +285,6 @@ export class StatsPanel {
       daySpan = Math.ceil((latest - earliest) / (1000 * 60 * 60 * 24));
     }
 
-    // Monthly data arrays (sorted by month)
     const monthKeys = [...monthlyMap.keys()].sort();
     const monthlyData = {
       labels: monthKeys.map(k => {
@@ -236,7 +296,6 @@ export class StatsPanel {
       assistantChars: monthKeys.map(k => monthlyMap.get(k).assistantChars),
     };
 
-    // Top conversations by message count
     const topConversations = [...conversations]
       .sort((a, b) => b.stats.messageCount - a.stats.messageCount)
       .slice(0, 5);
@@ -252,6 +311,7 @@ export class StatsPanel {
       lateNightConvs,
       topConversations,
       monthlyData,
+      hourlyActivity,
     };
   }
 
