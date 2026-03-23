@@ -141,6 +141,7 @@ export class ConversationList {
         item.appendChild(meta);
 
         item.addEventListener('click', () => {
+          state.set('viewMode', 'conversation');
           state.set('currentConversationIndex', index);
         });
 

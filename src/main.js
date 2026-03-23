@@ -12,7 +12,7 @@ import { ConversationList } from './components/ConversationList.js';
 import { MessageView } from './components/MessageView.js';
 import { StatsPanel } from './components/StatsPanel.js';
 import { ExportDialog } from './components/ExportDialog.js';
-import { SearchBar } from './components/SearchBar.js';
+import { SearchPanel } from './components/SearchPanel.js';
 
 // ---- Theme ----
 function applyTheme(theme) {
@@ -36,7 +36,7 @@ applyTheme(state.get('theme'));
 
 // ---- App ----
 const app = document.getElementById('app');
-let fileUpload, conversationList, messageView;
+let fileUpload, conversationList, messageView, searchPanel;
 
 function renderUploadScreen() {
   app.textContent = '';
@@ -45,8 +45,9 @@ function renderUploadScreen() {
 
 function renderMainView() {
   app.textContent = '';
+  searchPanel = new SearchPanel();
 
-  // Toolbar — simplified, just title + search
+  // Toolbar — title only (search moved to sidebar button + full panel)
   const toolbar = document.createElement('div');
   toolbar.className = 'toolbar';
 
@@ -55,11 +56,10 @@ function renderMainView() {
   title.textContent = 'Claude 对话记忆查看器';
   toolbar.appendChild(title);
 
-  // Search bar (in toolbar)
-  const searchWrapper = document.createElement('div');
-  searchWrapper.style.cssText = 'flex:1;display:flex;gap:8px;align-items:center;margin:0 16px;';
-  const searchBar = new SearchBar(searchWrapper);
-  toolbar.appendChild(searchWrapper);
+  // Spacer
+  const spacer = document.createElement('div');
+  spacer.style.flex = '1';
+  toolbar.appendChild(spacer);
 
   app.appendChild(toolbar);
 
@@ -77,8 +77,16 @@ function renderMainView() {
   sidebarActions.className = 'sidebar-actions';
   sidebarActions.style.cssText = 'padding:12px;border-bottom:1px solid var(--border);display:flex;flex-direction:column;gap:4px;';
 
+  // Search button — opens search panel in content area
+  const searchBtn = createSidebarBtn('\uD83D\uDD0D', '搜索', () => {
+    state.set('viewMode', 'search');
+  });
+  searchBtn.id = 'sidebar-search-btn';
+  sidebarActions.appendChild(searchBtn);
+
   // Stats button — go back to homepage stats
   const statsBtn = createSidebarBtn('\uD83D\uDCCA', '统计总览', () => {
+    state.set('viewMode', 'conversation');
     state.set('currentConversationIndex', -1);
   });
   sidebarActions.appendChild(statsBtn);
@@ -198,13 +206,36 @@ function renderMainView() {
   // Components
   conversationList = new ConversationList(sidebar);
   messageView = new MessageView(contentArea);
+
+  // ---- View Mode switching ----
+  state.on('viewMode', (mode) => {
+    const area = document.getElementById('content-area');
+    if (!area) return;
+
+    // Update sidebar button active state
+    const searchBtnEl = document.getElementById('sidebar-search-btn');
+    if (searchBtnEl) {
+      searchBtnEl.style.background = mode === 'search' ? 'var(--sidebar-hover)' : '';
+    }
+
+    if (mode === 'search') {
+      searchPanel.render(area);
+    } else {
+      // Re-render current conversation or stats
+      messageView = new MessageView(area);
+    }
+  });
 }
 
 function createSidebarBtn(icon, label, onClick) {
   const btn = document.createElement('button');
   btn.style.cssText = 'display:flex;align-items:center;gap:10px;width:100%;padding:8px 10px;border:none;border-radius:var(--radius-sm);background:transparent;color:var(--sidebar-text);cursor:pointer;font-size:0.85rem;text-align:left;transition:background 0.15s;';
-  btn.addEventListener('mouseenter', () => btn.style.background = 'var(--sidebar-hover)');
-  btn.addEventListener('mouseleave', () => btn.style.background = '');
+  btn.addEventListener('mouseenter', () => {
+    if (btn.dataset.active !== 'true') btn.style.background = 'var(--sidebar-hover)';
+  });
+  btn.addEventListener('mouseleave', () => {
+    if (btn.dataset.active !== 'true') btn.style.background = '';
+  });
 
   const iconSpan = document.createElement('span');
   iconSpan.className = 'sidebar-btn-icon';

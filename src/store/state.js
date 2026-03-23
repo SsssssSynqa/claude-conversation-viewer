@@ -57,6 +57,7 @@ export const state = new Store({
   showThinking: true,
   showToolUse: true,
   showFlags: false,
+  viewMode: 'conversation', // 'conversation' | 'search'
   loading: false,
   loadingProgress: { current: 0, total: 0 },
   selectedConversations: new Set(),
