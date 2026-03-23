@@ -88,9 +88,13 @@
 }
 
 /* Claude theme toolbar — warm background */
-/* Claude theme: section titles slightly darker */
-[data-theme="claude"] .name-config-title {
-  color: var(--text-secondary);
+/* Claude theme: unified section title color */
+[data-theme="claude"] .name-config-title,
+[data-theme="claude"] .upload-screen div[style*="font-weight:600"] {
+  color: #969696 !important;
+}
+[data-theme="claude"] {
+  --section-title-color: #969696;
 }
 
 [data-theme="claude"] .toolbar {

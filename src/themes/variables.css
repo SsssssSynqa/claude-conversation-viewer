@@ -111,7 +111,7 @@
   --code-bg: #dcdce0;
   --backdrop-blur: none;
   --gradient-header: linear-gradient(135deg, #d4714a 0%, #e08a60 100%);
-  --btn-primary-bg: #8a8a90;
+  --btn-primary-bg: var(--accent);
   --btn-primary-text: #fff;
 }
 
@@ -157,7 +157,7 @@
   --code-bg: #f1f0ea;
   --backdrop-blur: none;
   --gradient-header: linear-gradient(135deg, #D97757 0%, #e08a68 100%);
-  --btn-primary-bg: #9a9189;
+  --btn-primary-bg: #3B3B3B;
   --btn-primary-text: #fff;
 }
 
@@ -203,7 +203,7 @@
     --code-bg: #dcdce0;
     --backdrop-blur: none;
     --gradient-header: linear-gradient(135deg, #d4714a 0%, #e08a60 100%);
-    --btn-primary-bg: #8a8a90;
+    --btn-primary-bg: var(--accent);
     --btn-primary-text: #fff;
   }
 }

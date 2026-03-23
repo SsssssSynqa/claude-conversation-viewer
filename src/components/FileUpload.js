@@ -392,7 +392,7 @@ export class FileUpload {
 
     const info_div = document.createElement('div');
     const title = document.createElement('div');
-    title.style.cssText = 'font-size:13px;font-weight:600;color:var(--text-muted);margin-bottom:3px;';
+    title.style.cssText = 'font-size:13px;font-weight:600;color:var(--section-title-color, var(--text-muted));margin-bottom:3px;';
     title.textContent = '发现上次的数据缓存';
     info_div.appendChild(title);
 
