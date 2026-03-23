@@ -41,11 +41,11 @@
   --accent-bg: rgba(224, 120, 72, 0.12);
   --border: rgba(255, 255, 255, 0.04);
   --border-strong: rgba(255, 255, 255, 0.08);
-  /* Neumorphic shadows */
-  --shadow: 6px 6px 12px #1e1e21, -6px -6px 12px #36363b;
-  --shadow-sm: 3px 3px 6px #1e1e21, -3px -3px 6px #36363b;
-  --shadow-xs: 2px 2px 4px #1e1e21, -2px -2px 4px #36363b;
-  --shadow-inset: inset 3px 3px 6px #1e1e21, inset -3px -3px 6px #36363b;
+  /* Neumorphic shadows — soft */
+  --shadow: 4px 4px 10px #1e1e21, -4px -4px 10px #36363b;
+  --shadow-sm: 5px 5px 12px #1e1e21, -5px -5px 12px #36363b;
+  --shadow-xs: 2px 2px 5px #1e1e21, -2px -2px 5px #36363b;
+  --shadow-inset: inset 2px 2px 5px #1e1e21, inset -2px -2px 5px #36363b;
   --sidebar-bg: #242428;
   --sidebar-text: #c8c8d0;
   --sidebar-hover: #303034;
@@ -86,11 +86,11 @@
   --accent-bg: rgba(212, 113, 74, 0.1);
   --border: rgba(0, 0, 0, 0.04);
   --border-strong: rgba(0, 0, 0, 0.08);
-  /* Neumorphic shadows */
-  --shadow: 6px 6px 12px #c8c8cc, -6px -6px 12px #ffffff;
-  --shadow-sm: 3px 3px 6px #c8c8cc, -3px -3px 6px #ffffff;
-  --shadow-xs: 2px 2px 4px #c8c8cc, -2px -2px 4px #ffffff;
-  --shadow-inset: inset 3px 3px 6px #c8c8cc, inset -3px -3px 6px #ffffff;
+  /* Neumorphic shadows — soft */
+  --shadow: 4px 4px 10px #cdcdd1, -4px -4px 10px #ffffff;
+  --shadow-sm: 5px 5px 12px #cdcdd1, -5px -5px 12px #ffffff;
+  --shadow-xs: 2px 2px 5px #cdcdd1, -2px -2px 5px #ffffff;
+  --shadow-inset: inset 2px 2px 5px #cdcdd1, inset -2px -2px 5px #ffffff;
   --sidebar-bg: #dddde1;
   --sidebar-text: #3a3a3c;
   --sidebar-hover: #e8e8ec;
@@ -179,10 +179,10 @@
     --accent-bg: rgba(212, 113, 74, 0.1);
     --border: rgba(0, 0, 0, 0.04);
     --border-strong: rgba(0, 0, 0, 0.08);
-    --shadow: 6px 6px 12px #c8c8cc, -6px -6px 12px #ffffff;
-    --shadow-sm: 3px 3px 6px #c8c8cc, -3px -3px 6px #ffffff;
-    --shadow-xs: 2px 2px 4px #c8c8cc, -2px -2px 4px #ffffff;
-    --shadow-inset: inset 3px 3px 6px #c8c8cc, inset -3px -3px 6px #ffffff;
+    --shadow: 4px 4px 10px #cdcdd1, -4px -4px 10px #ffffff;
+    --shadow-sm: 5px 5px 12px #cdcdd1, -5px -5px 12px #ffffff;
+    --shadow-xs: 2px 2px 5px #cdcdd1, -2px -2px 5px #ffffff;
+    --shadow-inset: inset 2px 2px 5px #cdcdd1, inset -2px -2px 5px #ffffff;
     --sidebar-bg: #dddde1;
     --sidebar-text: #3a3a3c;
     --sidebar-hover: #e8e8ec;
@@ -224,10 +224,10 @@
     --accent-bg: rgba(224, 120, 72, 0.12);
     --border: rgba(255, 255, 255, 0.04);
     --border-strong: rgba(255, 255, 255, 0.08);
-    --shadow: 6px 6px 12px #1e1e21, -6px -6px 12px #36363b;
-    --shadow-sm: 3px 3px 6px #1e1e21, -3px -3px 6px #36363b;
-    --shadow-xs: 2px 2px 4px #1e1e21, -2px -2px 4px #36363b;
-    --shadow-inset: inset 3px 3px 6px #1e1e21, inset -3px -3px 6px #36363b;
+    --shadow: 4px 4px 10px #1e1e21, -4px -4px 10px #36363b;
+    --shadow-sm: 5px 5px 12px #1e1e21, -5px -5px 12px #36363b;
+    --shadow-xs: 2px 2px 5px #1e1e21, -2px -2px 5px #36363b;
+    --shadow-inset: inset 2px 2px 5px #1e1e21, inset -2px -2px 5px #36363b;
     --sidebar-bg: #242428;
     --sidebar-text: #c8c8d0;
     --sidebar-hover: #303034;

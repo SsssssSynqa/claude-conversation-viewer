@@ -183,7 +183,7 @@ body {
   justify-content: center;
   min-height: 100vh;
   padding: 48px 24px;
-  gap: 12px;
+  gap: 16px;
   overflow-y: auto;
 }
 

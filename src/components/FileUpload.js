@@ -192,7 +192,7 @@ export class FileUpload {
 
     // Theme switcher (at bottom)
     const themeSwitcher = document.createElement('div');
-    themeSwitcher.style.cssText = 'display:flex;gap:6px;padding:4px;border-radius:var(--radius);border:1px solid var(--border);background:var(--bg-card);';
+    themeSwitcher.style.cssText = 'display:flex;gap:6px;padding:5px;border-radius:20px;border:none;background:var(--bg-primary);box-shadow:var(--shadow-xs);';
 
     const themes = [
       { id: 'light', iconName: 'sun' },
