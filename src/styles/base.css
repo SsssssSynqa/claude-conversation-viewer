@@ -115,8 +115,8 @@ body {
 
 .toolbar-title {
   font-family: var(--font-display);
-  font-size: 0.95rem;
-  font-weight: 400;
+  font-size: 1.2rem;
+  font-weight: 700;
   letter-spacing: -0.01em;
   background: var(--gradient-header);
   -webkit-background-clip: text;

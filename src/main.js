@@ -91,6 +91,7 @@ function renderMainView() {
     state.set('viewMode', 'conversation');
     state.set('currentConversationIndex', -1);
   });
+  statsBtn.id = 'sidebar-stats-btn';
   sidebarActions.appendChild(statsBtn);
 
   // Export button — opens export panel
@@ -249,10 +250,16 @@ function renderMainView() {
     if (!area) return;
 
     // Update sidebar button active states
-    const searchBtnEl = document.getElementById('sidebar-search-btn');
-    const exportBtnEl = document.getElementById('sidebar-export-btn');
-    if (searchBtnEl) searchBtnEl.style.background = mode === 'search' ? 'var(--sidebar-hover)' : '';
-    if (exportBtnEl) exportBtnEl.style.background = mode === 'export' ? 'var(--sidebar-hover)' : '';
+    const allBtns = ['sidebar-search-btn', 'sidebar-export-btn', 'sidebar-stats-btn'];
+    const activeMap = { search: 'sidebar-search-btn', export: 'sidebar-export-btn', conversation: null };
+    for (const id of allBtns) {
+      const el = document.getElementById(id);
+      if (!el) continue;
+      const isActive = activeMap[mode] === id;
+      el.style.background = isActive ? 'var(--sidebar-active)' : '';
+      el.style.color = isActive ? 'var(--accent)' : '';
+      el.style.fontWeight = isActive ? '600' : '';
+    }
 
     if (mode === 'search') {
       searchPanel.render(area);
