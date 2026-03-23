@@ -57,6 +57,8 @@ export const state = new Store({
   showThinking: true,
   showToolUse: true,
   showFlags: false,
+  desensitize: false, // Data masking mode
+  desensitizeWords: loadDesensitizeWords(),
   viewMode: 'conversation', // 'conversation' | 'search' | 'export'
   loading: false,
   loadingProgress: { current: 0, total: 0 },
@@ -67,6 +69,18 @@ export const state = new Store({
   // Export collection ("精选集")
   exportCollection: loadExportCollection(),
 });
+
+function loadDesensitizeWords() {
+  try {
+    const saved = localStorage.getItem('cv-desensitize-words');
+    if (saved) return JSON.parse(saved);
+  } catch (e) { /* ignore */ }
+  return [];
+}
+
+export function saveDesensitizeWords(words) {
+  localStorage.setItem('cv-desensitize-words', JSON.stringify(words));
+}
 
 function loadExportCollection() {
   try {

@@ -6,6 +6,7 @@
 import { state, saveExportCollection } from '../store/state.js';
 import { renderMarkdown, escapeHtml } from '../utils/markdown.js';
 import { formatTimestamp, formatShortTime, formatDate, getTimeDiffMinutes } from '../utils/time.js';
+import { desensitize } from '../utils/desensitize.js';
 import { StatsPanel } from './StatsPanel.js';
 
 export class MessageView {
@@ -20,6 +21,8 @@ export class MessageView {
     state.on('showToolUse', () => this.renderConversation());
     state.on('showFlags', () => this.renderConversation());
     state.on('displayNames', () => this.renderConversation());
+    state.on('desensitize', () => this.renderConversation());
+    state.on('desensitizeWords', () => { if (state.get('desensitize')) this.renderConversation(); });
   }
 
   render() {
@@ -586,7 +589,7 @@ export class MessageView {
     const div = document.createElement('div');
     div.className = 'message-text';
     div.style.cssText = 'line-height:1.7;word-break:break-word;';
-    const safeHtml = renderMarkdown(block.text);
+    const safeHtml = renderMarkdown(desensitize(block.text));
     const template = document.createElement('template');
     template.innerHTML = safeHtml;
     div.appendChild(template.content);
@@ -619,7 +622,7 @@ export class MessageView {
     details.appendChild(summary);
     const content = document.createElement('div');
     content.style.cssText = 'padding:12px 16px;font-size:0.85rem;line-height:1.6;color:var(--text-secondary);white-space:pre-wrap;word-break:break-word;max-height:400px;overflow-y:auto;';
-    content.textContent = block.thinking;
+    content.textContent = desensitize(block.thinking);
     details.appendChild(content);
     parent.appendChild(details);
   }

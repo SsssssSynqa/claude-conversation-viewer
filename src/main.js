@@ -6,7 +6,7 @@ import './themes/variables.css';
 import './styles/base.css';
 import './styles/components.css';
 import './styles/clawd.css';
-import { state } from './store/state.js';
+import { state, saveDesensitizeWords } from './store/state.js';
 import { FileUpload } from './components/FileUpload.js';
 import { ConversationList } from './components/ConversationList.js';
 import { MessageView } from './components/MessageView.js';
@@ -129,6 +129,7 @@ function renderMainView() {
     { id: 'toggle-thinking', label: '思考过程', key: 'showThinking' },
     { id: 'toggle-tools', label: '工具调用', key: 'showToolUse' },
     { id: 'toggle-flags', label: '系统标记', key: 'showFlags' },
+    { id: 'toggle-desensitize', label: '数据脱敏', key: 'desensitize' },
   ];
 
   for (const t of toggles) {
@@ -144,6 +145,35 @@ function renderMainView() {
     labelEl.appendChild(document.createTextNode(t.label));
     settingsSection.appendChild(labelEl);
   }
+
+  // Desensitize word input (shown when desensitize is on)
+  const desensitizeSection = document.createElement('div');
+  desensitizeSection.id = 'desensitize-section';
+  desensitizeSection.style.cssText = 'margin-top:6px;display:' + (state.get('desensitize') ? 'block' : 'none') + ';';
+
+  const dsInput = document.createElement('input');
+  dsInput.type = 'text';
+  dsInput.placeholder = '输入敏感词，逗号分隔';
+  dsInput.value = (state.get('desensitizeWords') || []).join(', ');
+  dsInput.style.cssText = 'width:100%;padding:4px 8px;background:var(--bg-input);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);font-size:0.75rem;font-family:var(--font-family);';
+  dsInput.addEventListener('input', () => {
+    const words = dsInput.value.split(/[,，]/).map(w => w.trim()).filter(Boolean);
+    state.set('desensitizeWords', words);
+    saveDesensitizeWords(words);
+  });
+  desensitizeSection.appendChild(dsInput);
+
+  const dsHint = document.createElement('div');
+  dsHint.style.cssText = 'font-size:0.65rem;color:var(--text-muted);margin-top:2px;';
+  dsHint.textContent = '开启后，这些词会在界面和导出中被替换为 ***';
+  desensitizeSection.appendChild(dsHint);
+
+  settingsSection.appendChild(desensitizeSection);
+
+  state.on('desensitize', (val) => {
+    const sec = document.getElementById('desensitize-section');
+    if (sec) sec.style.display = val ? 'block' : 'none';
+  });
 
   // Name config in sidebar
   const nameSection = document.createElement('div');

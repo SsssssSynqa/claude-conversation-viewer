@@ -6,6 +6,7 @@
 import { state, saveExportCollection } from '../store/state.js';
 import { exportAsText, exportAsMarkdown, exportAsHTML, downloadFile } from '../utils/export.js';
 import { formatTimestamp, formatDate } from '../utils/time.js';
+import JSZip from 'jszip';
 
 export class ExportPanel {
   constructor() {
@@ -14,6 +15,9 @@ export class ExportPanel {
       includeThinking: true,
       includeToolUse: false,
       includeFlags: false,
+      addBOM: false,
+      filePrefix: '',
+      fileSuffix: '',
     };
   }
 
@@ -77,6 +81,7 @@ export class ExportPanel {
       { key: 'includeThinking', label: '含思考' },
       { key: 'includeToolUse', label: '含工具' },
       { key: 'includeFlags', label: '含标记' },
+      { key: 'addBOM', label: 'BOM (Excel兼容)' },
     ];
     for (const opt of optToggles) {
       const label = document.createElement('label');
@@ -92,6 +97,36 @@ export class ExportPanel {
     }
 
     header.appendChild(configRow);
+
+    // File naming row
+    const nameRow = document.createElement('div');
+    nameRow.style.cssText = 'display:flex;gap:8px;align-items:center;margin-top:10px;';
+
+    const prefixLabel = document.createElement('span');
+    prefixLabel.style.cssText = 'font-size:0.8rem;color:var(--text-muted);';
+    prefixLabel.textContent = '文件名前缀:';
+    nameRow.appendChild(prefixLabel);
+
+    const prefixInput = document.createElement('input');
+    prefixInput.type = 'text';
+    prefixInput.placeholder = '可选';
+    prefixInput.style.cssText = 'padding:4px 8px;background:var(--bg-input);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);font-size:0.8rem;width:100px;';
+    prefixInput.addEventListener('input', () => { this.options.filePrefix = prefixInput.value; });
+    nameRow.appendChild(prefixInput);
+
+    const suffixLabel = document.createElement('span');
+    suffixLabel.style.cssText = 'font-size:0.8rem;color:var(--text-muted);';
+    suffixLabel.textContent = '后缀:';
+    nameRow.appendChild(suffixLabel);
+
+    const suffixInput = document.createElement('input');
+    suffixInput.type = 'text';
+    suffixInput.placeholder = '可选';
+    suffixInput.style.cssText = 'padding:4px 8px;background:var(--bg-input);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);font-size:0.8rem;width:100px;';
+    suffixInput.addEventListener('input', () => { this.options.fileSuffix = suffixInput.value; });
+    nameRow.appendChild(suffixInput);
+
+    header.appendChild(nameRow);
     container.appendChild(header);
 
     // Scrollable content
@@ -116,6 +151,14 @@ export class ExportPanel {
       () => this._doExport(conversations)
     );
     quickRow.appendChild(exportAllBtn);
+
+    // ZIP export
+    const exportZipBtn = this._createExportBtn(
+      '\uD83D\uDCE6 批量导出 ZIP',
+      conversations.length + ' 段对话，每段一个文件',
+      () => this._doZipExport(conversations)
+    );
+    quickRow.appendChild(exportZipBtn);
 
     const filtered = state.get('filteredConversations') || [];
     if (filtered.length !== conversations.length) {
@@ -396,40 +439,63 @@ export class ExportPanel {
     return result;
   }
 
-  _doExport(conversations) {
-    const options = {
-      ...this.options,
-      displayNames: state.get('displayNames'),
-    };
-
-    let content, filename, mimeType;
+  _buildFilename(nameBase) {
     const dateSuffix = new Date().toISOString().slice(0, 10);
-    const nameBase = conversations.length === 1 ? (conversations[0].name || '对话') : '对话导出';
+    const prefix = this.options.filePrefix ? this.options.filePrefix + '_' : '';
+    const suffix = this.options.fileSuffix ? '_' + this.options.fileSuffix : '';
+    const extMap = { md: '.md', txt: '.txt', html: '.html', json: '.json' };
+    return `${prefix}${nameBase}_${dateSuffix}${suffix}${extMap[this.format] || '.md'}`;
+  }
 
+  _exportContent(conversations) {
+    const options = { ...this.options, displayNames: state.get('displayNames') };
     switch (this.format) {
-      case 'txt':
-        content = exportAsText(conversations, options);
-        filename = `${nameBase}_${dateSuffix}.txt`;
-        mimeType = 'text/plain;charset=utf-8';
-        break;
-      case 'md':
-        content = exportAsMarkdown(conversations, options);
-        filename = `${nameBase}_${dateSuffix}.md`;
-        mimeType = 'text/markdown;charset=utf-8';
-        break;
-      case 'html':
-        content = exportAsHTML(conversations, options);
-        filename = `${nameBase}_${dateSuffix}.html`;
-        mimeType = 'text/html;charset=utf-8';
-        break;
-      case 'json':
-        content = JSON.stringify(conversations, null, 2);
-        filename = `${nameBase}_${dateSuffix}.json`;
-        mimeType = 'application/json;charset=utf-8';
-        break;
+      case 'txt': return exportAsText(conversations, options);
+      case 'html': return exportAsHTML(conversations, options);
+      case 'json': return JSON.stringify(conversations, null, 2);
+      default: return exportAsMarkdown(conversations, options);
+    }
+  }
+
+  _addBOM(content) {
+    return this.options.addBOM ? '\uFEFF' + content : content;
+  }
+
+  _doExport(conversations) {
+    const nameBase = conversations.length === 1 ? (conversations[0].name || '对话') : '对话导出';
+    const content = this._addBOM(this._exportContent(conversations));
+    const filename = this._buildFilename(nameBase);
+    const mimeMap = { md: 'text/markdown', txt: 'text/plain', html: 'text/html', json: 'application/json' };
+    downloadFile(content, filename, (mimeMap[this.format] || 'text/plain') + ';charset=utf-8');
+  }
+
+  async _doZipExport(conversations) {
+    const zip = new JSZip();
+    const options = { ...this.options, displayNames: state.get('displayNames') };
+    const extMap = { md: '.md', txt: '.txt', html: '.html', json: '.json' };
+    const ext = extMap[this.format] || '.md';
+
+    for (let i = 0; i < conversations.length; i++) {
+      const conv = conversations[i];
+      const name = (conv.name || '未命名_' + i).replace(/[/\\?%*:|"<>]/g, '_');
+      let content;
+      switch (this.format) {
+        case 'txt': content = exportAsText([conv], options); break;
+        case 'html': content = exportAsHTML([conv], options); break;
+        case 'json': content = JSON.stringify([conv], null, 2); break;
+        default: content = exportAsMarkdown([conv], options); break;
+      }
+      if (this.options.addBOM) content = '\uFEFF' + content;
+      zip.file(name + ext, content);
     }
 
-    downloadFile(content, filename, mimeType);
+    const blob = await zip.generateAsync({ type: 'blob' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = '对话导出_' + new Date().toISOString().slice(0, 10) + '.zip';
+    a.click();
+    URL.revokeObjectURL(url);
   }
 
   _sectionTitle(text) {

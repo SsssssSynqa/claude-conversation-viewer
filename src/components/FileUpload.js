@@ -3,6 +3,7 @@
  */
 
 import { state } from '../store/state.js';
+import { saveToCache, getCacheInfo, loadFromCache, clearCache } from '../utils/cache.js';
 import ParseWorker from '../parser/worker.js?worker&inline';
 
 export class FileUpload {
@@ -144,6 +145,9 @@ export class FileUpload {
     screen.appendChild(errorBanner);
 
     this.container.appendChild(screen);
+
+    // Check for cached data
+    this.checkCache(screen);
   }
 
   createNameInput(label, defaultValue) {
@@ -185,6 +189,11 @@ export class FileUpload {
             case 'done':
               state.set('loading', false);
               state.set('conversations', data.conversations);
+              // Cache parsed data for next visit
+              saveToCache(data.conversations, {
+                fileName: file.name,
+                fileSize: file.size,
+              }).catch(() => {});
               worker.terminate();
               break;
             case 'error':
@@ -266,6 +275,75 @@ export class FileUpload {
   showUploadScreen() {
     this.container.textContent = '';
     this.render();
+  }
+
+  async checkCache(screen) {
+    const info = await getCacheInfo();
+    if (!info) return;
+
+    // Insert cache banner before the upload zone
+    const banner = document.createElement('div');
+    banner.style.cssText = 'width:100%;max-width:560px;background:var(--accent-bg);border:1px solid var(--accent);border-radius:var(--radius);padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;';
+
+    const info_div = document.createElement('div');
+    const title = document.createElement('div');
+    title.style.cssText = 'font-size:0.9rem;font-weight:600;color:var(--accent);margin-bottom:4px;';
+    title.textContent = '发现上次的数据缓存';
+    info_div.appendChild(title);
+
+    const detail = document.createElement('div');
+    detail.style.cssText = 'font-size:0.78rem;color:var(--text-secondary);';
+    const date = new Date(info.parseDate);
+    const sizeStr = info.fileSize > 1024 * 1024
+      ? (info.fileSize / (1024 * 1024)).toFixed(1) + ' MB'
+      : (info.fileSize / 1024).toFixed(0) + ' KB';
+    detail.textContent = `${info.convCount} 段对话 · ${sizeStr} · ${date.toLocaleString('zh-CN')}`;
+    info_div.appendChild(detail);
+    banner.appendChild(info_div);
+
+    const btnGroup = document.createElement('div');
+    btnGroup.style.cssText = 'display:flex;gap:8px;flex-shrink:0;';
+
+    const loadBtn = document.createElement('button');
+    loadBtn.style.cssText = 'padding:8px 16px;border:none;border-radius:var(--radius-sm);background:var(--accent);color:#fff;cursor:pointer;font-size:0.85rem;font-weight:600;';
+    loadBtn.textContent = '加载缓存';
+    loadBtn.addEventListener('click', async () => {
+      loadBtn.textContent = '加载中...';
+      loadBtn.disabled = true;
+      try {
+        const cached = await loadFromCache();
+        if (cached && cached.conversations.length > 0) {
+          state.set('loading', false);
+          state.set('conversations', cached.conversations);
+        } else {
+          this.showError('缓存数据损坏，请重新上传');
+        }
+      } catch (e) {
+        this.showError('加载缓存失败: ' + e.message);
+        loadBtn.textContent = '加载缓存';
+        loadBtn.disabled = false;
+      }
+    });
+    btnGroup.appendChild(loadBtn);
+
+    const clearBtn = document.createElement('button');
+    clearBtn.style.cssText = 'padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);background:transparent;color:var(--text-muted);cursor:pointer;font-size:0.8rem;';
+    clearBtn.textContent = '清除';
+    clearBtn.addEventListener('click', async () => {
+      await clearCache();
+      banner.remove();
+    });
+    btnGroup.appendChild(clearBtn);
+
+    banner.appendChild(btnGroup);
+
+    // Insert before upload zone
+    const uploadZone = screen.querySelector('.upload-zone');
+    if (uploadZone) {
+      screen.insertBefore(banner, uploadZone);
+    } else {
+      screen.appendChild(banner);
+    }
   }
 
   showError(message) {

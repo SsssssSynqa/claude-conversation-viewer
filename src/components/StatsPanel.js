@@ -5,6 +5,8 @@
 import { state } from '../store/state.js';
 import { drawLineChart, drawBarChart } from '../utils/charts.js';
 import { formatMonthKey, formatMonthLabel, formatTimestamp, getHourOfDay } from '../utils/time.js';
+import html2canvas from 'html2canvas';
+import { desensitize } from '../utils/desensitize.js';
 
 export class StatsPanel {
   constructor() {
@@ -49,11 +51,43 @@ export class StatsPanel {
   buildStatsContent(parent, stats, conversations) {
     const names = state.get('displayNames');
 
-    // Title
+    // Title row with screenshot button
+    const titleRow = document.createElement('div');
+    titleRow.style.cssText = 'display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;';
+
     const title = document.createElement('h2');
-    title.style.cssText = 'font-size:1.4rem;margin-bottom:24px;background:var(--gradient-header);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;';
+    title.style.cssText = 'font-size:1.4rem;background:var(--gradient-header);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;';
     title.textContent = '对话统计';
-    parent.appendChild(title);
+    titleRow.appendChild(title);
+
+    const screenshotBtn = document.createElement('button');
+    screenshotBtn.style.cssText = 'padding:6px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);background:transparent;color:var(--text-secondary);cursor:pointer;font-size:0.8rem;transition:all 0.15s;white-space:nowrap;';
+    screenshotBtn.textContent = '\uD83D\uDCF7 保存为图片';
+    screenshotBtn.addEventListener('mouseenter', () => { screenshotBtn.style.borderColor = 'var(--accent)'; screenshotBtn.style.color = 'var(--accent)'; });
+    screenshotBtn.addEventListener('mouseleave', () => { screenshotBtn.style.borderColor = 'var(--border)'; screenshotBtn.style.color = 'var(--text-secondary)'; });
+    screenshotBtn.addEventListener('click', async () => {
+      screenshotBtn.textContent = '截图中...';
+      screenshotBtn.disabled = true;
+      try {
+        const canvas = await html2canvas(parent, {
+          backgroundColor: getComputedStyle(document.body).backgroundColor,
+          scale: 2,
+          useCORS: true,
+        });
+        const link = document.createElement('a');
+        link.download = '对话统计_' + new Date().toISOString().slice(0, 10) + '.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+        screenshotBtn.textContent = '\u2713 已保存';
+        setTimeout(() => { screenshotBtn.textContent = '\uD83D\uDCF7 保存为图片'; screenshotBtn.disabled = false; }, 1500);
+      } catch (e) {
+        screenshotBtn.textContent = '截图失败';
+        setTimeout(() => { screenshotBtn.textContent = '\uD83D\uDCF7 保存为图片'; screenshotBtn.disabled = false; }, 1500);
+      }
+    });
+    titleRow.appendChild(screenshotBtn);
+
+    parent.appendChild(titleRow);
 
     // ---- Basic Stats Cards ----
     const cardsGrid = document.createElement('div');
@@ -96,6 +130,43 @@ export class StatsPanel {
       milestoneRow.appendChild(this._milestoneCard('最近一段对话', stats.lastConv.name || '未命名', formatTimestamp(stats.lastConv.createdAt)));
 
       parent.appendChild(milestoneRow);
+    }
+
+    // ---- Year Overview ----
+    if (stats.yearlyData && stats.yearlyData.length > 0) {
+      parent.appendChild(this._sectionTitle('年度总览'));
+      const yearGrid = document.createElement('div');
+      yearGrid.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:28px;';
+      for (const yr of stats.yearlyData) {
+        const card = document.createElement('div');
+        card.style.cssText = 'background:var(--bg-secondary);padding:16px;border-radius:var(--radius-sm);';
+        const yearLabel = document.createElement('div');
+        yearLabel.style.cssText = 'font-size:1.2rem;font-weight:700;color:var(--accent);margin-bottom:10px;';
+        yearLabel.textContent = yr.year + ' 年';
+        card.appendChild(yearLabel);
+        const rows = [
+          ['对话数', yr.convCount],
+          ['消息数', yr.msgCount.toLocaleString()],
+          ['总字数', (yr.humanChars + yr.assistantChars).toLocaleString()],
+          ['活跃天数', yr.activeDays + ' 天'],
+          ['思考次数', yr.thinkingCount.toLocaleString()],
+        ];
+        for (const [label, value] of rows) {
+          const row = document.createElement('div');
+          row.style.cssText = 'display:flex;justify-content:space-between;font-size:0.8rem;padding:2px 0;';
+          const l = document.createElement('span');
+          l.style.color = 'var(--text-muted)';
+          l.textContent = label;
+          row.appendChild(l);
+          const v = document.createElement('span');
+          v.style.cssText = 'color:var(--text-primary);font-weight:500;';
+          v.textContent = value;
+          row.appendChild(v);
+          card.appendChild(row);
+        }
+        yearGrid.appendChild(card);
+      }
+      parent.appendChild(yearGrid);
     }
 
     // ---- GitHub-style Heatmap ----
@@ -480,6 +551,26 @@ export class StatsPanel {
       .slice(0, 15)
       .map(([emoji, count]) => ({ emoji, count }));
 
+    // Yearly data
+    const yearMap = new Map();
+    for (const conv of sorted) {
+      if (!conv.createdAt) continue;
+      const year = new Date(conv.createdAt).getFullYear();
+      if (!yearMap.has(year)) yearMap.set(year, { year, convCount: 0, msgCount: 0, humanChars: 0, assistantChars: 0, thinkingCount: 0, activeDaysSet: new Set() });
+      const yr = yearMap.get(year);
+      yr.convCount++;
+      yr.msgCount += conv.stats.messageCount;
+      yr.humanChars += conv.stats.humanChars;
+      yr.assistantChars += conv.stats.assistantChars;
+      yr.thinkingCount += conv.stats.thinkingCount || 0;
+      for (const msg of conv.messages) {
+        if (msg.createdAt) yr.activeDaysSet.add(new Date(msg.createdAt).toISOString().slice(0, 10));
+      }
+    }
+    const yearlyData = [...yearMap.values()]
+      .sort((a, b) => b.year - a.year)
+      .map(yr => ({ ...yr, activeDays: yr.activeDaysSet.size, activeDaysSet: undefined }));
+
     // First and last conversation
     const firstConv = sorted[0] || null;
     const lastConv = sorted[sorted.length - 1] || null;
@@ -493,7 +584,7 @@ export class StatsPanel {
       monthlyData, hourlyActivity, weekdayActivity, dateHeatmap,
       topHumanWords, topAssistantWords, allHumanWords, allAssistantWords,
       topTitleWords, allTitleWords, topEmojis,
-      firstConv, lastConv,
+      yearlyData, firstConv, lastConv,
     };
   }
 
