@@ -34,8 +34,8 @@
   --bg-card-hover: #303034;
   --bg-input: #252528;
   --text-primary: #f0f0f0;
-  --text-secondary: #a0a0a8;
-  --text-muted: #85858c;
+  --text-secondary: #b8b8c0;
+  --text-muted: #9a9aa0;
   --accent: #e07848;
   --accent-light: #f09060;
   --accent-bg: rgba(224, 120, 72, 0.12);
@@ -217,8 +217,8 @@
     --bg-card-hover: #303034;
     --bg-input: #252528;
     --text-primary: #f0f0f0;
-    --text-secondary: #a0a0a8;
-    --text-muted: #85858c;
+    --text-secondary: #b8b8c0;
+    --text-muted: #9a9aa0;
     --accent: #e07848;
     --accent-light: #f09060;
     --accent-bg: rgba(224, 120, 72, 0.12);
