@@ -233,11 +233,9 @@ body {
 }
 
 .name-config-title {
-  font-size: 0.72rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
+  font-size: 13px;
   color: var(--text-muted);
-  margin-bottom: var(--space-md);
+  margin-bottom: 12px;
   font-weight: 500;
 }
 
@@ -252,20 +250,20 @@ body {
 
 .name-input-group label {
   display: block;
-  font-size: 0.82rem;
+  font-size: 13px;
   color: var(--text-secondary);
-  margin-bottom: var(--space-xs);
+  margin-bottom: 4px;
   font-weight: 500;
 }
 
 .name-input-group input {
   width: 100%;
-  padding: 10px 14px;
+  padding: 8px 12px;
   background: var(--bg-input);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   color: var(--text-primary);
-  font-size: 0.9rem;
+  font-size: 12px;
   font-family: var(--font-family);
   transition: border-color var(--transition-fast);
 }

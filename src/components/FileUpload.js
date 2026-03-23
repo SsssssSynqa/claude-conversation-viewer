@@ -47,7 +47,7 @@ export class FileUpload {
 
     // Text area (fake placeholder)
     const fakeInput = document.createElement('div');
-    fakeInput.style.cssText = 'padding:22px 24px 12px;font-size:15px;color:var(--text-muted);line-height:1.4;';
+    fakeInput.style.cssText = 'padding:22px 24px 12px;font-size:14px;color:var(--text-muted);line-height:1.4;';
     fakeInput.textContent = '点击选择 或拖拽 conversations.json 到这里';
     zone.appendChild(fakeInput);
 
@@ -150,7 +150,7 @@ export class FileUpload {
     btnRow.style.cssText = 'display:flex;gap:12px;margin-top:12px;';
 
     const saveBtn = document.createElement('button');
-    saveBtn.style.cssText = 'padding:8px 20px;border:none;border-radius:var(--radius-sm);background:var(--btn-primary-bg, var(--text-secondary));color:var(--btn-primary-text, #fff);cursor:pointer;font-size:0.85rem;font-weight:500;display:flex;align-items:center;gap:6px;transition:all 0.2s;box-shadow:var(--shadow-xs);';
+    saveBtn.style.cssText = 'padding:7px 16px;border:none;border-radius:var(--radius-sm);background:var(--btn-primary-bg, var(--text-secondary));color:var(--btn-primary-text, #fff);cursor:pointer;font-size:13px;font-weight:500;display:flex;align-items:center;gap:5px;transition:all 0.2s;box-shadow:var(--shadow-xs);';
     saveBtn.addEventListener('mouseenter', () => { saveBtn.style.opacity = '0.85'; saveBtn.style.transform = 'translateY(-1px)'; saveBtn.style.boxShadow = 'var(--shadow-sm)'; });
     saveBtn.addEventListener('mouseleave', () => { saveBtn.style.opacity = '1'; saveBtn.style.transform = ''; saveBtn.style.boxShadow = 'var(--shadow-xs)'; });
     saveBtn.appendChild(createIcon('save', 14));
@@ -173,7 +173,7 @@ export class FileUpload {
     btnRow.appendChild(saveBtn);
 
     const resetBtn = document.createElement('button');
-    resetBtn.style.cssText = 'padding:8px 20px;border:none;border-radius:var(--radius-sm);background:var(--bg-input);color:var(--text-secondary);cursor:pointer;font-size:0.85rem;display:flex;align-items:center;gap:6px;transition:all 0.2s;box-shadow:var(--shadow-xs);';
+    resetBtn.style.cssText = 'padding:7px 16px;border:none;border-radius:var(--radius-sm);background:var(--bg-input);color:var(--text-secondary);cursor:pointer;font-size:13px;display:flex;align-items:center;gap:5px;transition:all 0.2s;box-shadow:var(--shadow-xs);';
     resetBtn.addEventListener('mouseenter', () => { resetBtn.style.transform = 'translateY(-1px)'; resetBtn.style.boxShadow = 'var(--shadow-sm)'; });
     resetBtn.addEventListener('mouseleave', () => { resetBtn.style.transform = ''; resetBtn.style.boxShadow = 'var(--shadow-xs)'; });
     resetBtn.appendChild(createIcon('reset', 14));
@@ -391,12 +391,12 @@ export class FileUpload {
 
     const info_div = document.createElement('div');
     const title = document.createElement('div');
-    title.style.cssText = 'font-size:0.9rem;font-weight:600;color:var(--text-primary);margin-bottom:4px;';
+    title.style.cssText = 'font-size:13px;font-weight:600;color:var(--text-primary);margin-bottom:3px;';
     title.textContent = '发现上次的数据缓存';
     info_div.appendChild(title);
 
     const detail = document.createElement('div');
-    detail.style.cssText = 'font-size:0.78rem;color:var(--text-secondary);';
+    detail.style.cssText = 'font-size:12px;color:var(--text-muted);';
     const date = new Date(info.parseDate);
     const sizeStr = info.fileSize > 1024 * 1024
       ? (info.fileSize / (1024 * 1024)).toFixed(1) + ' MB'
@@ -409,7 +409,7 @@ export class FileUpload {
     btnGroup.style.cssText = 'display:flex;gap:8px;flex-shrink:0;';
 
     const loadBtn = document.createElement('button');
-    loadBtn.style.cssText = 'padding:8px 16px;border:none;border-radius:var(--radius-sm);background:var(--btn-primary-bg, var(--text-secondary));color:var(--btn-primary-text, #fff);cursor:pointer;font-size:0.85rem;font-weight:500;transition:all 0.2s;box-shadow:var(--shadow-xs);';
+    loadBtn.style.cssText = 'padding:7px 14px;border:none;border-radius:var(--radius-sm);background:var(--btn-primary-bg, var(--text-secondary));color:var(--btn-primary-text, #fff);cursor:pointer;font-size:13px;font-weight:500;transition:all 0.2s;box-shadow:var(--shadow-xs);';
     loadBtn.addEventListener('mouseenter', () => { loadBtn.style.opacity = '0.85'; loadBtn.style.transform = 'translateY(-1px)'; loadBtn.style.boxShadow = 'var(--shadow-sm)'; });
     loadBtn.addEventListener('mouseleave', () => { loadBtn.style.opacity = '1'; loadBtn.style.transform = ''; loadBtn.style.boxShadow = 'var(--shadow-xs)'; });
     loadBtn.textContent = '加载缓存';
@@ -433,7 +433,7 @@ export class FileUpload {
     btnGroup.appendChild(loadBtn);
 
     const clearBtn = document.createElement('button');
-    clearBtn.style.cssText = 'padding:8px 12px;border:none;border-radius:var(--radius-sm);background:var(--bg-input);color:var(--text-muted);cursor:pointer;font-size:0.8rem;transition:all 0.2s;box-shadow:var(--shadow-xs);';
+    clearBtn.style.cssText = 'padding:7px 14px;border:none;border-radius:var(--radius-sm);background:var(--bg-input);color:var(--text-muted);cursor:pointer;font-size:13px;transition:all 0.2s;box-shadow:var(--shadow-xs);';
     clearBtn.addEventListener('mouseenter', () => { clearBtn.style.transform = 'translateY(-1px)'; clearBtn.style.boxShadow = 'var(--shadow-sm)'; });
     clearBtn.addEventListener('mouseleave', () => { clearBtn.style.transform = ''; clearBtn.style.boxShadow = 'var(--shadow-xs)'; });
     clearBtn.textContent = '清除';
