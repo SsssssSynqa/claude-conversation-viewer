@@ -132,14 +132,15 @@
 .message-text h2,
 .message-text h3,
 .message-text h4 {
+  font-family: var(--font-display);
   margin-top: 16px;
   margin-bottom: 8px;
-  font-weight: 600;
+  font-weight: 400;
 }
 
-.message-text h1 { font-size: 1.4rem; }
-.message-text h2 { font-size: 1.2rem; }
-.message-text h3 { font-size: 1.05rem; }
+.message-text h1 { font-size: 1.5rem; }
+.message-text h2 { font-size: 1.25rem; }
+.message-text h3 { font-size: 1.1rem; font-weight: 600; font-family: var(--font-family); }
 
 .message-text p {
   margin-bottom: 8px;
