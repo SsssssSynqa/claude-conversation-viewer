@@ -240,12 +240,18 @@ export class FileUpload {
     hintPath.textContent = 'Claude Settings → Data Export → 下载的 conversations.json';
     hintsWrapper.appendChild(hintPath);
 
-    const credit = document.createElement('p');
-    credit.style.cssText = 'color:var(--text-muted);font-size:11px;margin-top:12px;opacity:0.6;';
-    credit.textContent = 'Claude对话记忆查看器 · Made with love by Sylux & Synqa';
-    hintsWrapper.appendChild(credit);
-
     screen.appendChild(hintsWrapper);
+
+    // Spacer to push credit to bottom
+    const spacer = document.createElement('div');
+    spacer.style.cssText = 'flex:1;min-height:20px;';
+    screen.appendChild(spacer);
+
+    // Credit at very bottom
+    const credit = document.createElement('p');
+    credit.style.cssText = 'color:var(--text-muted);font-size:11px;opacity:0.5;text-align:center;padding-bottom:16px;';
+    credit.textContent = 'Claude对话记忆查看器 · Made with love by Sylux & Synqa';
+    screen.appendChild(credit);
 
     // Error banner
     const errorBanner = document.createElement('div');
