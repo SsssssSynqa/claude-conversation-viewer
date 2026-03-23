@@ -39,27 +39,17 @@ export class FileUpload {
     greetingRow.appendChild(h1);
     screen.appendChild(greetingRow);
 
-    const subtitle = document.createElement('p');
-    subtitle.style.cssText = 'color:var(--text-muted);margin-top:4px;font-size:0.95rem;';
-    subtitle.textContent = '上传 Claude 导出的 JSON 文件，回顾你的每一段对话';
-    screen.appendChild(subtitle);
-
-    // Upload zone — styled as Claude's input box
+    // Upload zone — styled as Claude's input box (right after title, no subtitle between)
     const zone = document.createElement('div');
     zone.className = 'upload-zone';
     zone.id = 'upload-zone';
-    zone.style.cssText = 'width:100%;max-width:560px;background:var(--bg-card);border-radius:20px;box-shadow:0 4px 20px rgba(0,0,0,0.035), 0 0 0 0.5px rgba(31,30,29,0.12);cursor:pointer;transition:box-shadow 0.2s;padding:0;border:none;text-align:left;';
+    zone.style.cssText = 'width:100%;max-width:560px;background:var(--bg-card);border-radius:20px;box-shadow:0 4px 20px rgba(0,0,0,0.035), 0 0 0 0.5px rgba(31,30,29,0.12);cursor:pointer;transition:box-shadow 0.2s;padding:0;border:none;text-align:left;margin-top:24px;';
 
-    // Text area (fake)
+    // Text area (fake placeholder)
     const fakeInput = document.createElement('div');
-    fakeInput.style.cssText = 'padding:16px 20px 8px;font-size:0.95rem;color:var(--text-muted);line-height:1.5;';
+    fakeInput.style.cssText = 'padding:16px 20px 12px;font-size:0.95rem;color:var(--text-muted);line-height:1.5;';
     fakeInput.textContent = '点击选择 或拖拽 conversations.json 到这里';
     zone.appendChild(fakeInput);
-
-    const hintText = document.createElement('div');
-    hintText.style.cssText = 'padding:0 20px 8px;font-size:0.8rem;color:var(--text-muted);opacity:0.6;';
-    hintText.textContent = 'Claude Settings → Data Export → 下载的 conversations.json';
-    zone.appendChild(hintText);
 
     // Toolbar row (mimics Claude's input toolbar)
     const toolbarRow = document.createElement('div');
@@ -130,6 +120,22 @@ export class FileUpload {
     });
 
     screen.appendChild(zone);
+
+    // Hints below the input box
+    const hintsWrapper = document.createElement('div');
+    hintsWrapper.style.cssText = 'text-align:center;margin-top:12px;';
+
+    const subtitle = document.createElement('p');
+    subtitle.style.cssText = 'color:var(--text-muted);font-size:0.85rem;';
+    subtitle.textContent = '上传 Claude 导出的 JSON 文件，回顾你的每一段对话';
+    hintsWrapper.appendChild(subtitle);
+
+    const hintPath = document.createElement('p');
+    hintPath.style.cssText = 'color:var(--text-muted);font-size:0.78rem;opacity:0.6;margin-top:4px;';
+    hintPath.textContent = 'Claude Settings → Data Export → 下载的 conversations.json';
+    hintsWrapper.appendChild(hintPath);
+
+    screen.appendChild(hintsWrapper);
 
     // Name config
     const nameConfig = document.createElement('div');
