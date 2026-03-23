@@ -47,20 +47,20 @@ export class FileUpload {
 
     // Text area (fake placeholder)
     const fakeInput = document.createElement('div');
-    fakeInput.style.cssText = 'padding:14px 18px 8px;font-size:16px;color:var(--text-muted);line-height:1.5;';
+    fakeInput.style.cssText = 'padding:22px 24px 12px;font-size:15px;color:var(--text-muted);line-height:1.4;';
     fakeInput.textContent = '点击选择 或拖拽 conversations.json 到这里';
     zone.appendChild(fakeInput);
 
     // Toolbar row (mimics Claude's input toolbar)
     const toolbarRow = document.createElement('div');
-    toolbarRow.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:8px 12px 12px;';
+    toolbarRow.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:12px 16px 16px;';
 
     // Left: + button
     const leftBtns = document.createElement('div');
     leftBtns.style.cssText = 'display:flex;align-items:center;gap:4px;';
     const plusBtn = document.createElement('div');
-    plusBtn.style.cssText = 'display:flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:4px;color:var(--text-muted);';
-    plusBtn.appendChild(createIcon('plus', 18));
+    plusBtn.style.cssText = 'display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:6px;color:var(--text-muted);';
+    plusBtn.appendChild(createIcon('plus', 20));
     leftBtns.appendChild(plusBtn);
     toolbarRow.appendChild(leftBtns);
 
@@ -69,12 +69,12 @@ export class FileUpload {
     rightBtns.style.cssText = 'display:flex;align-items:center;gap:8px;';
 
     const modelSelector = document.createElement('div');
-    modelSelector.style.cssText = 'display:flex;align-items:center;gap:4px;padding:4px 10px;border-radius:8px;font-size:13px;color:var(--text-secondary);';
+    modelSelector.style.cssText = 'display:flex;align-items:center;gap:4px;padding:4px 10px;border-radius:8px;font-size:14px;color:var(--text-secondary);';
     const modelName = document.createElement('span');
-    modelName.style.cssText = 'font-weight:500;color:var(--text-secondary);';
+    modelName.style.cssText = 'font-weight:430;color:var(--text-secondary);';
     modelName.textContent = 'Opus 4.6';
     const modelMode = document.createElement('span');
-    modelMode.style.cssText = 'color:var(--text-secondary);margin-left:4px;font-size:13px;opacity:0.7;';
+    modelMode.style.cssText = 'color:var(--text-muted);margin-left:4px;font-size:14px;font-weight:430;';
     modelMode.textContent = 'Extended';
     modelSelector.appendChild(modelName);
     modelSelector.appendChild(modelMode);
