@@ -88,6 +88,11 @@
 }
 
 /* Claude theme toolbar — warm background */
+/* Claude theme: section titles slightly darker */
+[data-theme="claude"] .name-config-title {
+  color: var(--text-secondary);
+}
+
 [data-theme="claude"] .toolbar {
   background: var(--bg-primary);
   border-bottom-color: rgba(0, 0, 0, 0.06);
