@@ -34,7 +34,7 @@ export class FileUpload {
     greetingRow.appendChild(sparkEl);
 
     const h1 = document.createElement('h1');
-    h1.style.cssText = 'font-family:var(--font-display);font-size:30px;font-weight:330;color:#3d3d3a;line-height:45px;';
+    h1.style.cssText = 'font-family:var(--font-display);font-size:30px;font-weight:330;color:var(--text-secondary);line-height:45px;';
     h1.textContent = 'Claude 对话记忆查看器';
     greetingRow.appendChild(h1);
     screen.appendChild(greetingRow);
@@ -43,11 +43,11 @@ export class FileUpload {
     const zone = document.createElement('div');
     zone.className = 'upload-zone';
     zone.id = 'upload-zone';
-    zone.style.cssText = 'padding:0;text-align:left;margin-top:24px;max-width:504px;';
+    zone.style.cssText = 'padding:0;text-align:left;margin-top:21px;max-width:504px;';
 
     // Text area (fake placeholder)
     const fakeInput = document.createElement('div');
-    fakeInput.style.cssText = 'padding:16px 20px 12px;font-size:0.95rem;color:var(--text-muted);line-height:1.5;';
+    fakeInput.style.cssText = 'padding:14px 18px 8px;font-size:16px;color:var(--text-muted);line-height:1.5;';
     fakeInput.textContent = '点击选择 或拖拽 conversations.json 到这里';
     zone.appendChild(fakeInput);
 
