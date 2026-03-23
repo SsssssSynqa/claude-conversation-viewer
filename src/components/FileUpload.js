@@ -43,17 +43,17 @@ export class FileUpload {
     const zone = document.createElement('div');
     zone.className = 'upload-zone';
     zone.id = 'upload-zone';
-    zone.style.cssText = 'padding:0;text-align:left;margin-top:16px;max-width:504px;';
+    zone.style.cssText = 'padding:0;text-align:left;max-width:504px;';
 
     // Text area (fake placeholder)
     const fakeInput = document.createElement('div');
-    fakeInput.style.cssText = 'padding:22px 24px 12px;font-size:14px;color:var(--text-muted);line-height:1.4;';
+    fakeInput.style.cssText = 'padding:18px 20px 10px;font-size:14px;color:var(--text-muted);line-height:1.4;';
     fakeInput.textContent = '点击选择 或拖拽 conversations.json 到这里';
     zone.appendChild(fakeInput);
 
     // Toolbar row (mimics Claude's input toolbar)
     const toolbarRow = document.createElement('div');
-    toolbarRow.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:12px 16px 16px;';
+    toolbarRow.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:10px 14px 14px;';
 
     // Left: + button
     const leftBtns = document.createElement('div');
@@ -385,7 +385,7 @@ export class FileUpload {
 
     // Insert cache banner before the upload zone
     const banner = document.createElement('div');
-    banner.style.cssText = 'width:100%;max-width:504px;background:var(--bg-card);border:none;border-radius:20px;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;box-shadow:var(--shadow);transition:box-shadow 0.2s,transform 0.2s;';
+    banner.style.cssText = 'width:100%;max-width:504px;background:var(--bg-card);border:none;border-radius:20px;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;box-shadow:var(--shadow);transition:box-shadow 0.2s,transform 0.2s;';
     banner.addEventListener('mouseenter', () => { banner.style.boxShadow = 'var(--shadow-sm)'; banner.style.transform = 'translateY(-1px)'; });
     banner.addEventListener('mouseleave', () => { banner.style.boxShadow = 'var(--shadow)'; banner.style.transform = ''; });
 

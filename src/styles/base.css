@@ -182,8 +182,8 @@ body {
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  padding: var(--space-2xl) var(--space-lg);
-  gap: var(--space-lg);
+  padding: 48px 24px;
+  gap: 12px;
   overflow-y: auto;
 }
 
@@ -220,7 +220,7 @@ body {
   width: 100%;
   max-width: 504px;
   background: var(--bg-card);
-  padding: var(--space-lg) var(--space-xl);
+  padding: 16px 20px;
   border-radius: 20px;
   border: none;
   box-shadow: var(--shadow);
