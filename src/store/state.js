@@ -57,8 +57,26 @@ export const state = new Store({
   showThinking: true,
   showToolUse: true,
   showFlags: false,
-  viewMode: 'conversation', // 'conversation' | 'search'
+  viewMode: 'conversation', // 'conversation' | 'search' | 'export'
   loading: false,
   loadingProgress: { current: 0, total: 0 },
   selectedConversations: new Set(),
+  // Message selection within a conversation
+  selectedMessages: new Set(), // Set of "convUuid:msgIndex" strings
+  selectionMode: false,
+  // Export collection ("精选集")
+  exportCollection: loadExportCollection(),
 });
+
+function loadExportCollection() {
+  try {
+    const saved = localStorage.getItem('cv-export-collection');
+    if (saved) return JSON.parse(saved);
+  } catch (e) { /* ignore */ }
+  return []; // Array of { convUuid, convName, msgIndex, sender, preview, timestamp }
+}
+
+export function saveExportCollection() {
+  const collection = state.get('exportCollection');
+  localStorage.setItem('cv-export-collection', JSON.stringify(collection));
+}

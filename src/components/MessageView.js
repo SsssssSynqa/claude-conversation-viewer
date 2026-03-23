@@ -1,33 +1,36 @@
 /**
  * MessageView — Right panel showing messages for selected conversation.
- * Handles all 6 content types with proper rendering.
- * All HTML content is sanitized through DOMPurify before DOM insertion.
+ * Features: all 6 content types, message-level copy/select, selection toolbar.
  */
 
-import { state } from '../store/state.js';
+import { state, saveExportCollection } from '../store/state.js';
 import { renderMarkdown, escapeHtml } from '../utils/markdown.js';
-import { formatTimestamp, formatShortTime, getTimeDiffMinutes } from '../utils/time.js';
+import { formatTimestamp, formatShortTime, formatDate, getTimeDiffMinutes } from '../utils/time.js';
 import { StatsPanel } from './StatsPanel.js';
 
 export class MessageView {
   constructor(container) {
     this.container = container;
     this.statsPanel = new StatsPanel();
+    this.selectedIndices = new Set();
+    this.selectionToolbar = null;
     this.render();
-    state.on('currentConversationIndex', () => this.renderConversation());
+    state.on('currentConversationIndex', () => { this.selectedIndices.clear(); this.renderConversation(); });
     state.on('showThinking', () => this.renderConversation());
     state.on('showToolUse', () => this.renderConversation());
     state.on('showFlags', () => this.renderConversation());
+    state.on('displayNames', () => this.renderConversation());
   }
 
   render() {
-    this.container.style.cssText = 'flex:1;overflow:hidden;display:flex;flex-direction:column;';
+    this.container.style.cssText = 'flex:1;overflow:hidden;display:flex;flex-direction:column;position:relative;';
     this.renderEmpty();
   }
 
   renderEmpty() {
     this.container.textContent = '';
-    // Show inline stats as homepage when no conversation is selected
+    this.selectedIndices.clear();
+    this._removeSelectionToolbar();
     const conversations = state.get('conversations') || [];
     if (conversations.length > 0) {
       this.statsPanel.renderInline(this.container);
@@ -54,34 +57,60 @@ export class MessageView {
     const showFlags = state.get('showFlags');
 
     this.container.textContent = '';
+    this._removeSelectionToolbar();
 
-    // Header
+    // Header with time span and export button
     const header = document.createElement('div');
     header.className = 'conv-header';
     header.style.cssText = 'padding:16px 24px;border-bottom:1px solid var(--border);flex-shrink:0;';
 
+    const headerTop = document.createElement('div');
+    headerTop.style.cssText = 'display:flex;justify-content:space-between;align-items:flex-start;gap:12px;';
+
+    const titleSection = document.createElement('div');
+    titleSection.style.cssText = 'flex:1;min-width:0;';
+
     const titleEl = document.createElement('h2');
     titleEl.style.cssText = 'font-size:1.2rem;font-weight:600;margin-bottom:4px;';
     titleEl.textContent = conv.name || '未命名对话';
-    header.appendChild(titleEl);
+    titleSection.appendChild(titleEl);
+
+    // Time span
+    const timeSpan = document.createElement('div');
+    timeSpan.style.cssText = 'font-size:0.78rem;color:var(--text-muted);margin-bottom:4px;';
+    const firstMsg = conv.messages[0];
+    const lastMsg = conv.messages[conv.messages.length - 1];
+    if (firstMsg?.createdAt && lastMsg?.createdAt) {
+      timeSpan.textContent = formatTimestamp(firstMsg.createdAt) + ' \u2014 ' + formatTimestamp(lastMsg.createdAt);
+    }
+    titleSection.appendChild(timeSpan);
 
     const metaEl = document.createElement('div');
     metaEl.style.cssText = 'font-size:0.8rem;color:var(--text-muted);display:flex;gap:16px;flex-wrap:wrap;';
-
     const stats = [
       conv.stats.messageCount + ' 条消息',
       (names.human || 'Human') + ': ' + conv.stats.humanChars.toLocaleString() + ' 字',
       (names.assistant || 'Assistant') + ': ' + conv.stats.assistantChars.toLocaleString() + ' 字',
     ];
-    if (conv.stats.hasThinking) {
-      stats.push('\uD83D\uDCAD ' + conv.stats.thinkingCount + ' 次思考');
-    }
+    if (conv.stats.hasThinking) stats.push('\uD83D\uDCAD ' + conv.stats.thinkingCount + ' 次思考');
     for (const s of stats) {
       const span = document.createElement('span');
       span.textContent = s;
       metaEl.appendChild(span);
     }
-    header.appendChild(metaEl);
+    titleSection.appendChild(metaEl);
+    headerTop.appendChild(titleSection);
+
+    // Export this conversation button
+    const exportBtn = document.createElement('button');
+    exportBtn.style.cssText = 'padding:6px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);background:transparent;color:var(--text-secondary);cursor:pointer;font-size:0.8rem;white-space:nowrap;transition:all 0.15s;flex-shrink:0;';
+    exportBtn.textContent = '\uD83D\uDCE5 导出此对话';
+    exportBtn.addEventListener('mouseenter', () => { exportBtn.style.borderColor = 'var(--accent)'; exportBtn.style.color = 'var(--accent)'; });
+    exportBtn.addEventListener('mouseleave', () => { exportBtn.style.borderColor = 'var(--border)'; exportBtn.style.color = 'var(--text-secondary)'; });
+    exportBtn.addEventListener('click', () => this._quickExportConversation(conv));
+    headerTop.appendChild(exportBtn);
+
+    header.appendChild(headerTop);
     this.container.appendChild(header);
 
     // Messages scroll container
@@ -91,7 +120,9 @@ export class MessageView {
 
     let prevTimestamp = null;
 
-    for (const msg of conv.messages) {
+    for (let mi = 0; mi < conv.messages.length; mi++) {
+      const msg = conv.messages[mi];
+
       // Time separator
       if (prevTimestamp && msg.createdAt) {
         const diffMinutes = getTimeDiffMinutes(prevTimestamp, msg.createdAt);
@@ -100,22 +131,43 @@ export class MessageView {
           sep.className = 'time-separator';
           sep.style.cssText = 'text-align:center;padding:16px 0;color:var(--text-muted);font-size:0.8rem;';
           const hours = Math.floor(diffMinutes / 60);
-          let timeText = '';
-          if (hours > 24) timeText = Math.floor(hours / 24) + ' 天后';
-          else timeText = hours + ' 小时后';
-          sep.textContent = '\u2014 ' + timeText + ' \u2014';
+          sep.textContent = '\u2014 ' + (hours > 24 ? Math.floor(hours / 24) + ' 天后' : hours + ' 小时后') + ' \u2014';
           scrollContainer.appendChild(sep);
         }
       }
       prevTimestamp = msg.createdAt;
 
-      // Message block — using CSS classes for theme-specific styling
       const isHuman = msg.sender === 'human';
       const msgEl = document.createElement('div');
       msgEl.className = 'message-block ' + (isHuman ? 'message-human' : 'message-assistant');
-      msgEl.style.cssText = 'padding:12px 24px;background:' + (isHuman ? 'var(--message-human-bg)' : 'var(--message-assistant-bg)') + ';border-bottom:1px solid var(--separator-color);';
+      msgEl.dataset.msgIndex = mi;
+      msgEl.style.cssText = 'padding:12px 24px;background:' + (isHuman ? 'var(--message-human-bg)' : 'var(--message-assistant-bg)') + ';border-bottom:1px solid var(--separator-color);position:relative;';
 
-      // Message header (sender name + time)
+      // Selection checkbox (left side)
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.className = 'msg-select-checkbox';
+      checkbox.checked = this.selectedIndices.has(mi);
+      checkbox.style.cssText = 'position:absolute;left:4px;top:16px;accent-color:var(--accent);cursor:pointer;opacity:0.3;transition:opacity 0.15s;z-index:2;';
+      checkbox.addEventListener('change', () => this._toggleSelect(mi, conv, checkbox));
+      msgEl.appendChild(checkbox);
+
+      // Make checkbox more visible on hover
+      msgEl.addEventListener('mouseenter', () => {
+        checkbox.style.opacity = '1';
+        actionsBar.style.opacity = '1';
+      });
+      msgEl.addEventListener('mouseleave', () => {
+        if (!this.selectedIndices.has(mi)) checkbox.style.opacity = '0.3';
+        actionsBar.style.opacity = '0';
+      });
+      if (this.selectedIndices.has(mi)) {
+        checkbox.style.opacity = '1';
+        msgEl.style.outline = '2px solid var(--accent)';
+        msgEl.style.outlineOffset = '-2px';
+      }
+
+      // Message header (sender name + time + action buttons)
       const msgHeader = document.createElement('div');
       msgHeader.className = 'message-header';
       msgHeader.style.cssText = 'display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;';
@@ -126,19 +178,36 @@ export class MessageView {
       senderEl.textContent = isHuman ? (names.human || 'Human') : (names.assistant || 'Assistant');
       msgHeader.appendChild(senderEl);
 
+      // Actions bar (copy, select-to-here, add to collection)
+      const actionsBar = document.createElement('div');
+      actionsBar.style.cssText = 'display:flex;gap:4px;opacity:0;transition:opacity 0.15s;align-items:center;';
+
+      // Copy button
+      const copyBtn = this._createActionBtn('复制', () => this._copyMessage(msg));
+      actionsBar.appendChild(copyBtn);
+
+      // Select to here
+      const selectToBtn = this._createActionBtn('选择到这里', () => this._selectToHere(mi, conv));
+      actionsBar.appendChild(selectToBtn);
+
+      // Add to collection
+      const addBtn = this._createActionBtn('+精选', () => this._addToCollection(conv, mi, msg));
+      actionsBar.appendChild(addBtn);
+
+      // Timestamp
       const timeEl = document.createElement('span');
       timeEl.className = 'message-time';
-      timeEl.style.cssText = 'font-size:0.75rem;color:var(--text-muted);';
+      timeEl.style.cssText = 'font-size:0.75rem;color:var(--text-muted);margin-left:8px;';
       timeEl.textContent = formatTimestamp(msg.createdAt);
-      msgHeader.appendChild(timeEl);
 
+      actionsBar.appendChild(timeEl);
+      msgHeader.appendChild(actionsBar);
       msgEl.appendChild(msgHeader);
 
-      // Message bubble wrapper (for Claude theme bubble positioning)
+      // Message bubble
       const bubble = document.createElement('div');
       bubble.className = 'message-bubble';
 
-      // File attachments
       if (msg.files.length > 0) {
         const filesEl = document.createElement('div');
         filesEl.style.cssText = 'margin-bottom:8px;display:flex;gap:8px;flex-wrap:wrap;';
@@ -151,26 +220,13 @@ export class MessageView {
         bubble.appendChild(filesEl);
       }
 
-      // Content blocks
       for (const block of msg.contentBlocks) {
         switch (block.type) {
-          case 'text':
-            this.renderTextBlock(bubble, block);
-            break;
-          case 'thinking':
-            if (showThinking) this.renderThinkingBlock(bubble, block);
-            break;
-          case 'tool_use':
-            if (showToolUse) this.renderToolBlock(bubble, block);
-            break;
-          case 'tool_result':
-            if (showToolUse) this.renderToolResultBlock(bubble, block);
-            break;
-          case 'flag':
-            if (showFlags) this.renderFlagBlock(bubble, block);
-            break;
-          case 'token_budget':
-            break;
+          case 'text': this.renderTextBlock(bubble, block); break;
+          case 'thinking': if (showThinking) this.renderThinkingBlock(bubble, block); break;
+          case 'tool_use': if (showToolUse) this.renderToolBlock(bubble, block); break;
+          case 'tool_result': if (showToolUse) this.renderToolResultBlock(bubble, block); break;
+          case 'flag': if (showFlags) this.renderFlagBlock(bubble, block); break;
         }
       }
 
@@ -179,13 +235,262 @@ export class MessageView {
     }
 
     this.container.appendChild(scrollContainer);
+    this._updateSelectionToolbar(conv);
   }
+
+  // ---- Action Buttons ----
+
+  _createActionBtn(text, onClick) {
+    const btn = document.createElement('button');
+    btn.style.cssText = 'padding:2px 8px;border:1px solid var(--border);border-radius:4px;background:var(--bg-card);color:var(--text-muted);cursor:pointer;font-size:0.7rem;transition:all 0.15s;white-space:nowrap;';
+    btn.textContent = text;
+    btn.addEventListener('mouseenter', () => { btn.style.borderColor = 'var(--accent)'; btn.style.color = 'var(--accent)'; });
+    btn.addEventListener('mouseleave', () => { btn.style.borderColor = 'var(--border)'; btn.style.color = 'var(--text-muted)'; });
+    btn.addEventListener('click', (e) => { e.stopPropagation(); onClick(); });
+    return btn;
+  }
+
+  _copyMessage(msg) {
+    let text = '';
+    for (const block of msg.contentBlocks) {
+      if (block.type === 'text') text += block.text + '\n';
+      else if (block.type === 'thinking' && block.thinking) text += '\n[思考过程]\n' + block.thinking + '\n';
+    }
+    navigator.clipboard.writeText(text.trim()).catch(() => {});
+  }
+
+  _toggleSelect(mi, conv, checkbox) {
+    if (this.selectedIndices.has(mi)) {
+      this.selectedIndices.delete(mi);
+    } else {
+      this.selectedIndices.add(mi);
+    }
+    // Update visual state without full re-render
+    const msgEl = this.container.querySelector(`[data-msg-index="${mi}"]`);
+    if (msgEl) {
+      if (this.selectedIndices.has(mi)) {
+        msgEl.style.outline = '2px solid var(--accent)';
+        msgEl.style.outlineOffset = '-2px';
+        checkbox.style.opacity = '1';
+      } else {
+        msgEl.style.outline = 'none';
+        checkbox.style.opacity = '0.3';
+      }
+    }
+    this._updateSelectionToolbar(conv);
+  }
+
+  _selectToHere(mi, conv) {
+    // Find the last selected index before this one, or start from 0
+    let startIdx = 0;
+    for (const idx of this.selectedIndices) {
+      if (idx < mi && idx >= startIdx) startIdx = idx;
+    }
+    // If nothing selected before, start from 0
+    if (this.selectedIndices.size === 0) startIdx = 0;
+
+    // Select all messages from startIdx to mi
+    for (let i = startIdx; i <= mi; i++) {
+      this.selectedIndices.add(i);
+    }
+    // Update checkboxes visually
+    const checkboxes = this.container.querySelectorAll('.msg-select-checkbox');
+    checkboxes.forEach((cb, idx) => {
+      cb.checked = this.selectedIndices.has(idx);
+      const msgEl = cb.closest('.message-block');
+      if (msgEl) {
+        if (this.selectedIndices.has(idx)) {
+          msgEl.style.outline = '2px solid var(--accent)';
+          msgEl.style.outlineOffset = '-2px';
+          cb.style.opacity = '1';
+        } else {
+          msgEl.style.outline = 'none';
+        }
+      }
+    });
+    this._updateSelectionToolbar(conv);
+  }
+
+  _addToCollection(conv, mi, msg) {
+    const collection = state.get('exportCollection') || [];
+    const key = conv.uuid + ':' + mi;
+    // Avoid duplicates
+    if (collection.some(item => item.key === key)) return;
+
+    const preview = (msg.searchText || '').substring(0, 80);
+    collection.push({
+      key,
+      convUuid: conv.uuid,
+      convName: conv.name || '未命名',
+      msgIndex: mi,
+      sender: msg.sender,
+      preview,
+      timestamp: msg.createdAt,
+    });
+    state.set('exportCollection', collection);
+    saveExportCollection();
+  }
+
+  // ---- Selection Toolbar (bottom bar) ----
+
+  _updateSelectionToolbar(conv) {
+    if (this.selectedIndices.size === 0) {
+      this._removeSelectionToolbar();
+      return;
+    }
+    this._removeSelectionToolbar();
+
+    const toolbar = document.createElement('div');
+    toolbar.id = 'selection-toolbar';
+    toolbar.style.cssText = `
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 12px 24px;
+      background: var(--bg-secondary);
+      border-top: 2px solid var(--accent);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      z-index: 50;
+      box-shadow: 0 -4px 12px rgba(0,0,0,0.15);
+    `;
+
+    const info = document.createElement('span');
+    info.style.cssText = 'font-size:0.85rem;color:var(--text-primary);font-weight:600;';
+    info.textContent = '已选择 ' + this.selectedIndices.size + ' 条消息';
+    toolbar.appendChild(info);
+
+    const spacer = document.createElement('div');
+    spacer.style.flex = '1';
+    toolbar.appendChild(spacer);
+
+    // Copy selected
+    const copyBtn = this._createToolbarBtn('复制', () => {
+      const msgs = conv.messages;
+      let text = '';
+      const sorted = [...this.selectedIndices].sort((a, b) => a - b);
+      const names = state.get('displayNames');
+      for (const idx of sorted) {
+        const msg = msgs[idx];
+        const sender = msg.sender === 'human' ? (names.human || 'Human') : (names.assistant || 'Assistant');
+        text += `[${sender}] ${formatTimestamp(msg.createdAt)}\n`;
+        for (const block of msg.contentBlocks) {
+          if (block.type === 'text') text += block.text + '\n';
+          else if (block.type === 'thinking' && block.thinking) text += '\n[思考过程]\n' + block.thinking + '\n';
+        }
+        text += '\n---\n\n';
+      }
+      navigator.clipboard.writeText(text.trim()).catch(() => {});
+    });
+    toolbar.appendChild(copyBtn);
+
+    // Add all to collection
+    const addBtn = this._createToolbarBtn('加入精选集', () => {
+      const collection = state.get('exportCollection') || [];
+      const sorted = [...this.selectedIndices].sort((a, b) => a - b);
+      for (const idx of sorted) {
+        const msg = conv.messages[idx];
+        const key = conv.uuid + ':' + idx;
+        if (collection.some(item => item.key === key)) continue;
+        collection.push({
+          key,
+          convUuid: conv.uuid,
+          convName: conv.name || '未命名',
+          msgIndex: idx,
+          sender: msg.sender,
+          preview: (msg.searchText || '').substring(0, 80),
+          timestamp: msg.createdAt,
+        });
+      }
+      state.set('exportCollection', collection);
+      saveExportCollection();
+      addBtn.textContent = '\u2713 已加入';
+      setTimeout(() => { addBtn.textContent = '加入精选集'; }, 1200);
+    });
+    toolbar.appendChild(addBtn);
+
+    // Export selected directly
+    const exportBtn = this._createToolbarBtn('直接导出', () => {
+      const sorted = [...this.selectedIndices].sort((a, b) => a - b);
+      const selectedMsgs = sorted.map(idx => conv.messages[idx]);
+      this._exportMessages(conv, selectedMsgs);
+    });
+    exportBtn.style.background = 'var(--accent)';
+    exportBtn.style.color = '#fff';
+    exportBtn.style.borderColor = 'var(--accent)';
+    toolbar.appendChild(exportBtn);
+
+    // Clear selection
+    const clearBtn = this._createToolbarBtn('取消选择', () => {
+      this.selectedIndices.clear();
+      this.renderConversation();
+    });
+    toolbar.appendChild(clearBtn);
+
+    this.container.appendChild(toolbar);
+    this.selectionToolbar = toolbar;
+  }
+
+  _removeSelectionToolbar() {
+    const existing = document.getElementById('selection-toolbar');
+    if (existing) existing.remove();
+    this.selectionToolbar = null;
+  }
+
+  _createToolbarBtn(text, onClick) {
+    const btn = document.createElement('button');
+    btn.style.cssText = 'padding:6px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);background:transparent;color:var(--text-secondary);cursor:pointer;font-size:0.82rem;transition:all 0.15s;white-space:nowrap;';
+    btn.textContent = text;
+    btn.addEventListener('click', onClick);
+    return btn;
+  }
+
+  // ---- Quick Export ----
+
+  _quickExportConversation(conv) {
+    import('../utils/export.js').then(({ exportAsMarkdown, downloadFile }) => {
+      const options = {
+        includeThinking: state.get('showThinking'),
+        includeToolUse: state.get('showToolUse'),
+        includeFlags: state.get('showFlags'),
+        displayNames: state.get('displayNames'),
+      };
+      const content = exportAsMarkdown([conv], options);
+      const dateSuffix = new Date().toISOString().slice(0, 10);
+      downloadFile(content, `${conv.name || '对话'}_${dateSuffix}.md`, 'text/markdown;charset=utf-8');
+    });
+  }
+
+  _exportMessages(conv, messages) {
+    import('../utils/export.js').then(({ downloadFile }) => {
+      const names = state.get('displayNames');
+      let output = `# ${conv.name || '未命名对话'}（节选）\n\n`;
+      for (const msg of messages) {
+        const sender = msg.sender === 'human' ? (names.human || 'Human') : (names.assistant || 'Assistant');
+        output += `## ${sender} (${formatTimestamp(msg.createdAt)})\n\n`;
+        for (const block of msg.contentBlocks) {
+          if (block.type === 'text') output += block.text + '\n\n';
+          else if (block.type === 'thinking' && block.thinking) {
+            output += `> \uD83D\uDCAD **思考过程**\n>\n`;
+            for (const line of block.thinking.split('\n')) output += `> ${line}\n`;
+            output += '\n';
+          }
+        }
+        output += '---\n\n';
+      }
+      const dateSuffix = new Date().toISOString().slice(0, 10);
+      downloadFile(output, `${conv.name || '对话'}_节选_${dateSuffix}.md`, 'text/markdown;charset=utf-8');
+    });
+  }
+
+  // ---- Content Renderers (unchanged) ----
 
   renderTextBlock(parent, block) {
     const div = document.createElement('div');
     div.className = 'message-text';
     div.style.cssText = 'line-height:1.7;word-break:break-word;';
-    // renderMarkdown() already sanitizes through DOMPurify
     const safeHtml = renderMarkdown(block.text);
     const template = document.createElement('template');
     template.innerHTML = safeHtml;
@@ -197,37 +502,30 @@ export class MessageView {
     const details = document.createElement('details');
     details.className = 'thinking-block';
     details.style.cssText = 'margin:8px 0;background:var(--thinking-bg);border:1px solid var(--thinking-border);border-radius:var(--radius-sm);overflow:hidden;';
-
     const summary = document.createElement('summary');
     summary.style.cssText = 'padding:8px 12px;cursor:pointer;display:flex;align-items:center;gap:8px;font-size:0.85rem;color:var(--thinking-text);user-select:none;';
     summary.appendChild(document.createTextNode('\uD83D\uDCAD '));
-
     const label = document.createElement('span');
     label.style.fontWeight = '600';
     label.textContent = '思考过程';
     summary.appendChild(label);
-
     if (block.durationText) {
       const dur = document.createElement('span');
       dur.className = 'badge badge-thinking';
       dur.textContent = block.durationText;
       summary.appendChild(dur);
     }
-
     if (block.summaries && block.summaries.length > 0) {
       const summaryText = document.createElement('span');
       summaryText.style.cssText = 'color:var(--text-muted);font-size:0.8rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;';
       summaryText.textContent = '\u2014 ' + block.summaries[0];
       summary.appendChild(summaryText);
     }
-
     details.appendChild(summary);
-
     const content = document.createElement('div');
     content.style.cssText = 'padding:12px 16px;font-size:0.85rem;line-height:1.6;color:var(--text-secondary);white-space:pre-wrap;word-break:break-word;max-height:400px;overflow-y:auto;';
-    content.textContent = block.thinking; // textContent: safe, no XSS
+    content.textContent = block.thinking;
     details.appendChild(content);
-
     parent.appendChild(details);
   }
 
@@ -235,39 +533,32 @@ export class MessageView {
     const details = document.createElement('details');
     details.className = 'tool-block';
     details.style.cssText = 'margin:8px 0;background:var(--tool-bg);border:1px solid var(--tool-border);border-radius:var(--radius-sm);overflow:hidden;';
-
     const summary = document.createElement('summary');
     summary.style.cssText = 'padding:8px 12px;cursor:pointer;font-size:0.85rem;color:var(--text-secondary);user-select:none;';
     summary.textContent = '\uD83D\uDD27 ' + (block.toolName || 'Tool');
     details.appendChild(summary);
-
     const content = document.createElement('div');
     content.style.cssText = 'padding:12px 16px;font-size:0.8rem;';
-
     if (block.toolInput && Object.keys(block.toolInput).length > 0) {
       const inputLabel = document.createElement('div');
       inputLabel.style.cssText = 'font-weight:600;margin-bottom:4px;color:var(--text-muted);';
       inputLabel.textContent = 'Input:';
       content.appendChild(inputLabel);
-
       const inputPre = document.createElement('pre');
       inputPre.style.cssText = 'background:var(--code-bg);padding:8px;border-radius:4px;overflow-x:auto;font-family:var(--font-mono);font-size:0.8rem;color:var(--text-secondary);';
       inputPre.textContent = JSON.stringify(block.toolInput, null, 2);
       content.appendChild(inputPre);
     }
-
     if (block.result) {
       const resultLabel = document.createElement('div');
       resultLabel.style.cssText = 'font-weight:600;margin:8px 0 4px;color:var(--text-muted);';
       resultLabel.textContent = 'Result:';
       content.appendChild(resultLabel);
-
       const resultPre = document.createElement('pre');
       resultPre.style.cssText = 'background:var(--code-bg);padding:8px;border-radius:4px;overflow-x:auto;font-family:var(--font-mono);font-size:0.8rem;color:var(--text-secondary);max-height:200px;overflow-y:auto;';
       resultPre.textContent = typeof block.result === 'string' ? block.result : JSON.stringify(block.result, null, 2);
       content.appendChild(resultPre);
     }
-
     details.appendChild(content);
     parent.appendChild(details);
   }
@@ -276,17 +567,14 @@ export class MessageView {
     const div = document.createElement('div');
     div.className = 'tool-result-block';
     div.style.cssText = 'margin:8px 0;background:var(--tool-bg);border:1px solid var(--tool-border);border-radius:var(--radius-sm);padding:12px 16px;';
-
     const label = document.createElement('div');
     label.style.cssText = 'font-size:0.8rem;font-weight:600;color:var(--text-muted);margin-bottom:4px;';
     label.textContent = '\uD83D\uDD27 Tool Result';
     div.appendChild(label);
-
     const pre = document.createElement('pre');
     pre.style.cssText = 'background:var(--code-bg);padding:8px;border-radius:4px;font-family:var(--font-mono);font-size:0.8rem;color:var(--text-secondary);max-height:200px;overflow:auto;';
     pre.textContent = typeof block.result === 'string' ? block.result : JSON.stringify(block.result, null, 2);
     div.appendChild(pre);
-
     parent.appendChild(div);
   }
 
@@ -294,19 +582,16 @@ export class MessageView {
     const div = document.createElement('div');
     div.className = 'flag-block';
     div.style.cssText = 'margin:8px 0;background:var(--flag-bg);border:1px solid var(--flag-border);border-radius:var(--radius-sm);padding:8px 12px;display:flex;align-items:center;gap:8px;';
-
     const badge = document.createElement('span');
     badge.className = 'badge badge-flag';
     badge.textContent = '\u26A0\uFE0F ' + (block.flagType || 'flag');
     div.appendChild(badge);
-
     if (block.helpline) {
       const helpText = document.createElement('span');
       helpText.style.cssText = 'font-size:0.8rem;color:var(--text-muted);';
       helpText.textContent = block.helpline.name || '';
       div.appendChild(helpText);
     }
-
     parent.appendChild(div);
   }
 }

@@ -11,7 +11,7 @@ import { FileUpload } from './components/FileUpload.js';
 import { ConversationList } from './components/ConversationList.js';
 import { MessageView } from './components/MessageView.js';
 import { StatsPanel } from './components/StatsPanel.js';
-import { ExportDialog } from './components/ExportDialog.js';
+import { ExportPanel } from './components/ExportPanel.js';
 import { SearchPanel } from './components/SearchPanel.js';
 
 // ---- Theme ----
@@ -36,7 +36,7 @@ applyTheme(state.get('theme'));
 
 // ---- App ----
 const app = document.getElementById('app');
-let fileUpload, conversationList, messageView, searchPanel;
+let fileUpload, conversationList, messageView, searchPanel, exportPanel;
 
 function renderUploadScreen() {
   app.textContent = '';
@@ -46,6 +46,7 @@ function renderUploadScreen() {
 function renderMainView() {
   app.textContent = '';
   searchPanel = new SearchPanel();
+  exportPanel = new ExportPanel();
 
   // Toolbar — title only (search moved to sidebar button + full panel)
   const toolbar = document.createElement('div');
@@ -91,11 +92,11 @@ function renderMainView() {
   });
   sidebarActions.appendChild(statsBtn);
 
-  // Export button
-  const exportBtn = createSidebarBtn('\uD83D\uDCE5', '导出对话', () => {
-    const dlg = new ExportDialog();
-    dlg.show();
+  // Export button — opens export panel
+  const exportBtn = createSidebarBtn('\uD83D\uDCE5', '导出中心', () => {
+    state.set('viewMode', 'export');
   });
+  exportBtn.id = 'sidebar-export-btn';
   sidebarActions.appendChild(exportBtn);
 
   // Theme switcher
@@ -212,14 +213,16 @@ function renderMainView() {
     const area = document.getElementById('content-area');
     if (!area) return;
 
-    // Update sidebar button active state
+    // Update sidebar button active states
     const searchBtnEl = document.getElementById('sidebar-search-btn');
-    if (searchBtnEl) {
-      searchBtnEl.style.background = mode === 'search' ? 'var(--sidebar-hover)' : '';
-    }
+    const exportBtnEl = document.getElementById('sidebar-export-btn');
+    if (searchBtnEl) searchBtnEl.style.background = mode === 'search' ? 'var(--sidebar-hover)' : '';
+    if (exportBtnEl) exportBtnEl.style.background = mode === 'export' ? 'var(--sidebar-hover)' : '';
 
     if (mode === 'search') {
       searchPanel.render(area);
+    } else if (mode === 'export') {
+      exportPanel.render(area);
     } else {
       // Re-render current conversation or stats
       messageView = new MessageView(area);
