@@ -66,6 +66,8 @@
   --code-bg: #242428;
   --backdrop-blur: none;
   --gradient-header: linear-gradient(135deg, #e07848 0%, #f09060 100%);
+  --btn-primary-bg: var(--accent);
+  --btn-primary-text: #fff;
 }
 
 /* ---- Light Theme (开灯版 — 新拟态亮色) ---- */
@@ -109,6 +111,8 @@
   --code-bg: #dcdce0;
   --backdrop-blur: none;
   --gradient-header: linear-gradient(135deg, #d4714a 0%, #e08a60 100%);
+  --btn-primary-bg: #6b6b70;
+  --btn-primary-text: #fff;
 }
 
 /* ---- Claude Theme (怀旧版 — 精确还原Claude官网) ---- */
@@ -153,6 +157,8 @@
   --code-bg: #f1f0ea;
   --backdrop-blur: none;
   --gradient-header: linear-gradient(135deg, #D97757 0%, #e08a68 100%);
+  --btn-primary-bg: var(--text-primary);
+  --btn-primary-text: var(--bg-primary);
 }
 
 /* ---- Auto Theme (follow system preference) ---- */
@@ -197,6 +203,8 @@
     --code-bg: #dcdce0;
     --backdrop-blur: none;
     --gradient-header: linear-gradient(135deg, #d4714a 0%, #e08a60 100%);
+    --btn-primary-bg: #6b6b70;
+    --btn-primary-text: #fff;
   }
 }
 
@@ -240,5 +248,7 @@
     --code-bg: #242428;
     --backdrop-blur: none;
     --gradient-header: linear-gradient(135deg, #e07848 0%, #f09060 100%);
+    --btn-primary-bg: var(--accent);
+    --btn-primary-text: #fff;
   }
 }

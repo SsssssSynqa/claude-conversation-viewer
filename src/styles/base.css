@@ -33,7 +33,15 @@ body {
   background: #2a2a2e;
 }
 
-/* Neumorphic input style for light/dark */
+/* Neumorphic styles for light/dark */
+[data-theme="light"] .upload-zone,
+[data-theme="light"] .name-config,
+[data-theme="dark"] .upload-zone,
+[data-theme="dark"] .name-config {
+  background: var(--bg-primary);
+  box-shadow: var(--shadow);
+}
+
 [data-theme="light"] .name-input-group input,
 [data-theme="dark"] .name-input-group input {
   border: none;

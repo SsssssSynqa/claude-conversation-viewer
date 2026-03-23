@@ -126,8 +126,8 @@ export class FileUpload {
     btnRow.style.cssText = 'display:flex;gap:12px;margin-top:12px;';
 
     const saveBtn = document.createElement('button');
-    saveBtn.style.cssText = 'padding:8px 20px;border:none;border-radius:var(--radius-sm);background:var(--text-primary);color:var(--bg-primary);cursor:pointer;font-size:0.85rem;font-weight:500;display:flex;align-items:center;gap:6px;transition:opacity 0.15s;';
-    saveBtn.addEventListener('mouseenter', () => saveBtn.style.opacity = '0.8');
+    saveBtn.style.cssText = 'padding:8px 20px;border:none;border-radius:var(--radius-sm);background:var(--btn-primary-bg, var(--text-secondary));color:var(--btn-primary-text, #fff);cursor:pointer;font-size:0.85rem;font-weight:500;display:flex;align-items:center;gap:6px;transition:opacity 0.15s;';
+    saveBtn.addEventListener('mouseenter', () => saveBtn.style.opacity = '0.85');
     saveBtn.addEventListener('mouseleave', () => saveBtn.style.opacity = '1');
     saveBtn.appendChild(createIcon('save', 14));
     saveBtn.appendChild(document.createTextNode(' 保存并应用'));
@@ -368,8 +368,8 @@ export class FileUpload {
     btnGroup.style.cssText = 'display:flex;gap:8px;flex-shrink:0;';
 
     const loadBtn = document.createElement('button');
-    loadBtn.style.cssText = 'padding:8px 16px;border:none;border-radius:var(--radius-sm);background:var(--text-primary);color:var(--bg-primary);cursor:pointer;font-size:0.85rem;font-weight:500;transition:opacity 0.15s;';
-    loadBtn.addEventListener('mouseenter', () => loadBtn.style.opacity = '0.8');
+    loadBtn.style.cssText = 'padding:8px 16px;border:none;border-radius:var(--radius-sm);background:var(--btn-primary-bg, var(--text-secondary));color:var(--btn-primary-text, #fff);cursor:pointer;font-size:0.85rem;font-weight:500;transition:opacity 0.15s;';
+    loadBtn.addEventListener('mouseenter', () => loadBtn.style.opacity = '0.85');
     loadBtn.addEventListener('mouseleave', () => loadBtn.style.opacity = '1');
     loadBtn.textContent = '加载缓存';
     loadBtn.addEventListener('click', async () => {
