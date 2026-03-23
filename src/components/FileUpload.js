@@ -59,8 +59,8 @@ export class FileUpload {
     const leftBtns = document.createElement('div');
     leftBtns.style.cssText = 'display:flex;align-items:center;gap:4px;';
     const plusBtn = document.createElement('div');
-    plusBtn.style.cssText = 'display:flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:8px;color:var(--text-muted);';
-    plusBtn.appendChild(createIcon('plus', 20));
+    plusBtn.style.cssText = 'display:flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:50%;color:var(--text-muted);border:1.5px solid var(--border-strong);';
+    plusBtn.appendChild(createIcon('plus', 16));
     leftBtns.appendChild(plusBtn);
     toolbarRow.appendChild(leftBtns);
 
@@ -73,21 +73,23 @@ export class FileUpload {
     const modelName = document.createElement('span');
     modelName.style.cssText = 'font-weight:500;color:var(--text-primary);';
     modelName.textContent = 'Opus 4.6';
-    modelSelector.appendChild(modelName);
     const modelMode = document.createElement('span');
-    modelMode.style.cssText = 'color:var(--text-muted);margin-left:2px;';
+    modelMode.style.cssText = 'color:var(--text-muted);margin-left:4px;font-size:13px;';
     modelMode.textContent = 'Extended';
+    modelSelector.appendChild(modelName);
     modelSelector.appendChild(modelMode);
-    modelSelector.appendChild(createIcon('chevronDown', 14));
+    const chevron = createIcon('chevronDown', 14);
+    chevron.style.color = 'var(--text-muted)';
+    modelSelector.appendChild(chevron);
     rightBtns.appendChild(modelSelector);
 
-    // Voice bars icon (decorative)
+    // Voice bars icon (6 bars like Clover's actual icon)
     const voiceIcon = document.createElement('div');
-    voiceIcon.style.cssText = 'display:flex;align-items:center;justify-content:center;width:32px;height:32px;color:var(--text-muted);gap:1.5px;';
-    for (let i = 0; i < 5; i++) {
+    voiceIcon.style.cssText = 'display:flex;align-items:center;justify-content:center;width:32px;height:32px;color:var(--text-muted);gap:2px;';
+    const barHeights = [6, 10, 16, 10, 16, 6];
+    for (let i = 0; i < 6; i++) {
       const bar = document.createElement('div');
-      const heights = [6, 10, 16, 10, 6];
-      bar.style.cssText = `width:2px;height:${heights[i]}px;background:currentColor;border-radius:1px;`;
+      bar.style.cssText = `width:1.5px;height:${barHeights[i]}px;background:currentColor;border-radius:0.75px;`;
       voiceIcon.appendChild(bar);
     }
     rightBtns.appendChild(voiceIcon);
@@ -120,22 +122,6 @@ export class FileUpload {
     });
 
     screen.appendChild(zone);
-
-    // Hints below the input box
-    const hintsWrapper = document.createElement('div');
-    hintsWrapper.style.cssText = 'text-align:center;margin-top:12px;';
-
-    const subtitle = document.createElement('p');
-    subtitle.style.cssText = 'color:var(--text-muted);font-size:0.85rem;';
-    subtitle.textContent = '上传 Claude 导出的 JSON 文件，回顾你的每一段对话';
-    hintsWrapper.appendChild(subtitle);
-
-    const hintPath = document.createElement('p');
-    hintPath.style.cssText = 'color:var(--text-muted);font-size:0.78rem;opacity:0.6;margin-top:4px;';
-    hintPath.textContent = 'Claude Settings → Data Export → 下载的 conversations.json';
-    hintsWrapper.appendChild(hintPath);
-
-    screen.appendChild(hintsWrapper);
 
     // Name config
     const nameConfig = document.createElement('div');
@@ -240,6 +226,19 @@ export class FileUpload {
       themeSwitcher.appendChild(btn);
     }
     screen.appendChild(themeSwitcher);
+
+    // Hints at the very bottom
+    const hintsWrapper = document.createElement('div');
+    hintsWrapper.style.cssText = 'text-align:center;margin-top:8px;';
+    const subtitle = document.createElement('p');
+    subtitle.style.cssText = 'color:var(--text-muted);font-size:0.82rem;';
+    subtitle.textContent = '上传 Claude 导出的 JSON 文件，回顾你的每一段对话';
+    hintsWrapper.appendChild(subtitle);
+    const hintPath = document.createElement('p');
+    hintPath.style.cssText = 'color:var(--text-muted);font-size:0.75rem;opacity:0.5;margin-top:4px;';
+    hintPath.textContent = 'Claude Settings → Data Export → 下载的 conversations.json';
+    hintsWrapper.appendChild(hintPath);
+    screen.appendChild(hintsWrapper);
 
     // Error banner
     const errorBanner = document.createElement('div');
