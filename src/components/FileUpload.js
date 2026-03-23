@@ -59,8 +59,8 @@ export class FileUpload {
     const leftBtns = document.createElement('div');
     leftBtns.style.cssText = 'display:flex;align-items:center;gap:4px;';
     const plusBtn = document.createElement('div');
-    plusBtn.style.cssText = 'display:flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:50%;color:var(--text-muted);border:1.5px solid var(--border-strong);';
-    plusBtn.appendChild(createIcon('plus', 16));
+    plusBtn.style.cssText = 'display:flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:8px;color:var(--text-muted);';
+    plusBtn.appendChild(createIcon('plus', 20));
     leftBtns.appendChild(plusBtn);
     toolbarRow.appendChild(leftBtns);
 
@@ -71,10 +71,10 @@ export class FileUpload {
     const modelSelector = document.createElement('div');
     modelSelector.style.cssText = 'display:flex;align-items:center;gap:4px;padding:4px 10px;border-radius:8px;font-size:13px;color:var(--text-secondary);';
     const modelName = document.createElement('span');
-    modelName.style.cssText = 'font-weight:500;color:var(--text-primary);';
+    modelName.style.cssText = 'font-weight:500;color:var(--text-secondary);';
     modelName.textContent = 'Opus 4.6';
     const modelMode = document.createElement('span');
-    modelMode.style.cssText = 'color:var(--text-muted);margin-left:4px;font-size:13px;';
+    modelMode.style.cssText = 'color:var(--text-secondary);margin-left:4px;font-size:13px;opacity:0.7;';
     modelMode.textContent = 'Extended';
     modelSelector.appendChild(modelName);
     modelSelector.appendChild(modelMode);
@@ -83,13 +83,13 @@ export class FileUpload {
     modelSelector.appendChild(chevron);
     rightBtns.appendChild(modelSelector);
 
-    // Voice bars icon (6 bars like Clover's actual icon)
+    // Voice bars icon (6 bars, uniform width)
     const voiceIcon = document.createElement('div');
-    voiceIcon.style.cssText = 'display:flex;align-items:center;justify-content:center;width:32px;height:32px;color:var(--text-muted);gap:2px;';
+    voiceIcon.style.cssText = 'display:flex;align-items:center;justify-content:center;width:32px;height:32px;color:var(--text-muted);gap:2.5px;';
     const barHeights = [6, 10, 16, 10, 16, 6];
     for (let i = 0; i < 6; i++) {
       const bar = document.createElement('div');
-      bar.style.cssText = `width:1.5px;height:${barHeights[i]}px;background:currentColor;border-radius:0.75px;`;
+      bar.style.cssText = `width:2px;height:${barHeights[i]}px;background:currentColor;border-radius:1px;`;
       voiceIcon.appendChild(bar);
     }
     rightBtns.appendChild(voiceIcon);
@@ -385,7 +385,9 @@ export class FileUpload {
 
     // Insert cache banner before the upload zone
     const banner = document.createElement('div');
-    banner.style.cssText = 'width:100%;max-width:560px;background:var(--bg-secondary);border:none;border-radius:var(--radius-lg);padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;box-shadow:var(--shadow-xs);';
+    banner.style.cssText = 'width:100%;max-width:560px;background:var(--bg-card);border:none;border-radius:20px;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;box-shadow:0 4px 20px rgba(0,0,0,0.035), 0 0 0 0.5px rgba(31,30,29,0.12);transition:box-shadow 0.2s;';
+    banner.addEventListener('mouseenter', () => { banner.style.boxShadow = '0 4px 20px rgba(0,0,0,0.07), 0 0 0 0.5px rgba(31,30,29,0.25)'; });
+    banner.addEventListener('mouseleave', () => { banner.style.boxShadow = '0 4px 20px rgba(0,0,0,0.035), 0 0 0 0.5px rgba(31,30,29,0.12)'; });
 
     const info_div = document.createElement('div');
     const title = document.createElement('div');

@@ -216,9 +216,14 @@ body {
   max-width: 560px;
   background: var(--bg-card);
   padding: var(--space-lg) var(--space-xl);
-  border-radius: var(--radius-xl);
+  border-radius: 20px;
   border: none;
-  box-shadow: var(--shadow);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.035), 0 0 0 0.5px rgba(31,30,29,0.12);
+  transition: box-shadow 0.2s;
+}
+
+.name-config:hover {
+  box-shadow: 0 4px 20px rgba(0,0,0,0.07), 0 0 0 0.5px rgba(31,30,29,0.25);
 }
 
 .name-config-title {
