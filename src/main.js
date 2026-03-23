@@ -14,6 +14,7 @@ import { StatsPanel } from './components/StatsPanel.js';
 import { ExportPanel } from './components/ExportPanel.js';
 import { SearchPanel } from './components/SearchPanel.js';
 import { createIcon } from './utils/icons.js';
+import { createSparkIcon } from './utils/spark.js';
 
 // ---- Theme ----
 function applyTheme(theme) {
@@ -53,10 +54,14 @@ function renderMainView() {
   const toolbar = document.createElement('div');
   toolbar.className = 'toolbar';
 
+  const titleWrapper = document.createElement('div');
+  titleWrapper.style.cssText = 'display:flex;align-items:center;gap:8px;';
+  titleWrapper.appendChild(createSparkIcon(20));
   const title = document.createElement('span');
   title.className = 'toolbar-title';
   title.textContent = 'Claude 对话记忆查看器';
-  toolbar.appendChild(title);
+  titleWrapper.appendChild(title);
+  toolbar.appendChild(titleWrapper);
 
   // Spacer
   const spacer = document.createElement('div');
