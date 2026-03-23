@@ -2,6 +2,98 @@
    Component Styles
    ============================================ */
 
+/* ---- Claude Theme Message Overrides ---- */
+[data-theme="claude"] .message-block {
+  background: none !important;
+  border-bottom: none !important;
+  padding: 6px 24px;
+  max-width: 768px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+[data-theme="claude"] .message-block.message-human {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+[data-theme="claude"] .message-block.message-human .message-bubble {
+  background: var(--message-human-bg);
+  color: var(--message-human-text);
+  padding: 14px 18px;
+  border-radius: 20px 20px 4px 20px;
+  max-width: 75%;
+  word-break: break-word;
+}
+
+[data-theme="claude"] .message-block.message-human .message-bubble .message-text {
+  color: var(--message-human-text);
+}
+
+[data-theme="claude"] .message-block.message-human .message-bubble .message-text a {
+  color: #e8c8a0;
+}
+
+[data-theme="claude"] .message-block.message-human .message-bubble .message-text code {
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--message-human-text);
+}
+
+[data-theme="claude"] .message-block.message-human .message-bubble .message-text pre {
+  background: rgba(0, 0, 0, 0.25);
+}
+
+[data-theme="claude"] .message-block.message-assistant {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+[data-theme="claude"] .message-block.message-assistant .message-bubble {
+  max-width: 100%;
+  padding: 8px 0;
+}
+
+[data-theme="claude"] .message-header {
+  display: none !important;
+}
+
+[data-theme="claude"] .time-separator {
+  max-width: 768px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* Claude theme thinking — minimal gray style like Claude's */
+[data-theme="claude"] .thinking-block {
+  background: rgba(0, 0, 0, 0.03) !important;
+  border: 1px solid rgba(0, 0, 0, 0.06) !important;
+  border-radius: 8px !important;
+}
+
+[data-theme="claude"] .thinking-block summary {
+  color: #8b8580 !important;
+  font-size: 0.82rem !important;
+}
+
+[data-theme="claude"] .thinking-block .badge-thinking {
+  background: rgba(0, 0, 0, 0.05) !important;
+  color: #8b8580 !important;
+  border-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Claude theme toolbar — warm background */
+[data-theme="claude"] .toolbar {
+  background: var(--bg-primary);
+  border-bottom-color: rgba(0, 0, 0, 0.06);
+}
+
+/* Claude theme scrollbar in messages */
+[data-theme="claude"] .messages-scroll {
+  background: var(--bg-primary);
+}
+
 /* Settings Panel */
 .settings-panel {
   position: absolute;

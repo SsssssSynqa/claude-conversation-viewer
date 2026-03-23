@@ -49,6 +49,7 @@ export class MessageView {
 
     // Header
     const header = document.createElement('div');
+    header.className = 'conv-header';
     header.style.cssText = 'padding:16px 24px;border-bottom:1px solid var(--border);flex-shrink:0;';
 
     const titleEl = document.createElement('h2');
@@ -77,6 +78,7 @@ export class MessageView {
 
     // Messages scroll container
     const scrollContainer = document.createElement('div');
+    scrollContainer.className = 'messages-scroll';
     scrollContainer.style.cssText = 'flex:1;overflow-y:auto;padding:16px 0;';
 
     let prevTimestamp = null;
@@ -87,6 +89,7 @@ export class MessageView {
         const diffMinutes = getTimeDiffMinutes(prevTimestamp, msg.createdAt);
         if (diffMinutes > 60) {
           const sep = document.createElement('div');
+          sep.className = 'time-separator';
           sep.style.cssText = 'text-align:center;padding:16px 0;color:var(--text-muted);font-size:0.8rem;';
           const hours = Math.floor(diffMinutes / 60);
           let timeText = '';
@@ -98,26 +101,34 @@ export class MessageView {
       }
       prevTimestamp = msg.createdAt;
 
-      // Message block
-      const msgEl = document.createElement('div');
+      // Message block — using CSS classes for theme-specific styling
       const isHuman = msg.sender === 'human';
-      msgEl.style.cssText = 'padding:16px 24px;background:' + (isHuman ? 'var(--message-human-bg)' : 'var(--message-assistant-bg)') + ';border-bottom:1px solid var(--separator-color);';
+      const msgEl = document.createElement('div');
+      msgEl.className = 'message-block ' + (isHuman ? 'message-human' : 'message-assistant');
+      msgEl.style.cssText = 'padding:12px 24px;background:' + (isHuman ? 'var(--message-human-bg)' : 'var(--message-assistant-bg)') + ';border-bottom:1px solid var(--separator-color);';
 
-      // Message header
+      // Message header (sender name + time)
       const msgHeader = document.createElement('div');
+      msgHeader.className = 'message-header';
       msgHeader.style.cssText = 'display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;';
 
       const senderEl = document.createElement('span');
+      senderEl.className = 'message-sender';
       senderEl.style.cssText = 'font-weight:600;font-size:0.9rem;color:' + (isHuman ? 'var(--accent)' : 'var(--text-primary)') + ';';
       senderEl.textContent = isHuman ? (names.human || 'Human') : (names.assistant || 'Assistant');
       msgHeader.appendChild(senderEl);
 
       const timeEl = document.createElement('span');
+      timeEl.className = 'message-time';
       timeEl.style.cssText = 'font-size:0.75rem;color:var(--text-muted);';
       timeEl.textContent = formatTimestamp(msg.createdAt);
       msgHeader.appendChild(timeEl);
 
       msgEl.appendChild(msgHeader);
+
+      // Message bubble wrapper (for Claude theme bubble positioning)
+      const bubble = document.createElement('div');
+      bubble.className = 'message-bubble';
 
       // File attachments
       if (msg.files.length > 0) {
@@ -129,32 +140,33 @@ export class MessageView {
           fileTag.textContent = '\uD83D\uDCCE ' + fileName;
           filesEl.appendChild(fileTag);
         }
-        msgEl.appendChild(filesEl);
+        bubble.appendChild(filesEl);
       }
 
       // Content blocks
       for (const block of msg.contentBlocks) {
         switch (block.type) {
           case 'text':
-            this.renderTextBlock(msgEl, block);
+            this.renderTextBlock(bubble, block);
             break;
           case 'thinking':
-            if (showThinking) this.renderThinkingBlock(msgEl, block);
+            if (showThinking) this.renderThinkingBlock(bubble, block);
             break;
           case 'tool_use':
-            if (showToolUse) this.renderToolBlock(msgEl, block);
+            if (showToolUse) this.renderToolBlock(bubble, block);
             break;
           case 'tool_result':
-            if (showToolUse) this.renderToolResultBlock(msgEl, block);
+            if (showToolUse) this.renderToolResultBlock(bubble, block);
             break;
           case 'flag':
-            if (showFlags) this.renderFlagBlock(msgEl, block);
+            if (showFlags) this.renderFlagBlock(bubble, block);
             break;
           case 'token_budget':
             break;
         }
       }
 
+      msgEl.appendChild(bubble);
       scrollContainer.appendChild(msgEl);
     }
 
@@ -175,6 +187,7 @@ export class MessageView {
 
   renderThinkingBlock(parent, block) {
     const details = document.createElement('details');
+    details.className = 'thinking-block';
     details.style.cssText = 'margin:8px 0;background:var(--thinking-bg);border:1px solid var(--thinking-border);border-radius:var(--radius-sm);overflow:hidden;';
 
     const summary = document.createElement('summary');
@@ -212,6 +225,7 @@ export class MessageView {
 
   renderToolBlock(parent, block) {
     const details = document.createElement('details');
+    details.className = 'tool-block';
     details.style.cssText = 'margin:8px 0;background:var(--tool-bg);border:1px solid var(--tool-border);border-radius:var(--radius-sm);overflow:hidden;';
 
     const summary = document.createElement('summary');
@@ -252,6 +266,7 @@ export class MessageView {
 
   renderToolResultBlock(parent, block) {
     const div = document.createElement('div');
+    div.className = 'tool-result-block';
     div.style.cssText = 'margin:8px 0;background:var(--tool-bg);border:1px solid var(--tool-border);border-radius:var(--radius-sm);padding:12px 16px;';
 
     const label = document.createElement('div');
@@ -269,6 +284,7 @@ export class MessageView {
 
   renderFlagBlock(parent, block) {
     const div = document.createElement('div');
+    div.className = 'flag-block';
     div.style.cssText = 'margin:8px 0;background:var(--flag-bg);border:1px solid var(--flag-border);border-radius:var(--radius-sm);padding:8px 12px;display:flex;align-items:center;gap:8px;';
 
     const badge = document.createElement('span');

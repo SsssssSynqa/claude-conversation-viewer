@@ -96,42 +96,43 @@
 
 /* ---- Claude Theme (怀旧版 — Claude UI) ---- */
 [data-theme="claude"] {
-  --bg-primary: #f9f5ef;
-  --bg-secondary: #f3ede4;
-  --bg-tertiary: #ebe4d8;
+  --bg-primary: #f5efe6;
+  --bg-secondary: #ece5da;
+  --bg-tertiary: #e3dbd0;
   --bg-card: #ffffff;
-  --bg-card-hover: #faf8f5;
-  --bg-input: #f5f1ea;
+  --bg-card-hover: #f8f5f0;
+  --bg-input: #eae5dc;
   --text-primary: #2d2926;
   --text-secondary: #6b635a;
   --text-muted: #9a9189;
-  --accent: #da7756;
-  --accent-light: #e59577;
+  --accent: #c96442;
+  --accent-light: #da7756;
   --accent-bg: rgba(218, 119, 86, 0.08);
-  --border: rgba(0, 0, 0, 0.08);
-  --border-strong: rgba(0, 0, 0, 0.15);
+  --border: rgba(0, 0, 0, 0.06);
+  --border-strong: rgba(0, 0, 0, 0.12);
   --shadow: 0 1px 8px rgba(0, 0, 0, 0.06);
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04);
-  --sidebar-bg: #2d2b28;
+  --sidebar-bg: #2f2d2a;
   --sidebar-text: #d4cfc8;
   --sidebar-hover: rgba(255, 255, 255, 0.06);
-  --sidebar-active: rgba(218, 119, 86, 0.2);
-  --message-human-bg: transparent;
+  --sidebar-active: rgba(218, 119, 86, 0.25);
+  --message-human-bg: #3d3929;
+  --message-human-text: #f5f0e8;
   --message-assistant-bg: transparent;
-  --thinking-bg: rgba(218, 119, 86, 0.06);
-  --thinking-border: rgba(218, 119, 86, 0.25);
-  --thinking-text: #c45a33;
-  --tool-bg: rgba(107, 99, 90, 0.06);
-  --tool-border: rgba(107, 99, 90, 0.2);
+  --thinking-bg: rgba(0, 0, 0, 0.03);
+  --thinking-border: rgba(0, 0, 0, 0.08);
+  --thinking-text: #8b8580;
+  --tool-bg: rgba(0, 0, 0, 0.03);
+  --tool-border: rgba(0, 0, 0, 0.08);
   --flag-bg: rgba(244, 67, 54, 0.06);
   --flag-border: rgba(244, 67, 54, 0.3);
   --flag-text: #c62828;
-  --separator-color: rgba(0, 0, 0, 0.05);
+  --separator-color: rgba(0, 0, 0, 0.04);
   --scrollbar-thumb: rgba(0, 0, 0, 0.12);
   --scrollbar-track: transparent;
-  --code-bg: #f6f3ee;
+  --code-bg: #eee9e1;
   --backdrop-blur: none;
-  --gradient-header: linear-gradient(135deg, #da7756 0%, #e59577 100%);
+  --gradient-header: linear-gradient(135deg, #c96442 0%, #da7756 100%);
 }
 
 /* ---- Auto Theme (follow system preference) ---- */
