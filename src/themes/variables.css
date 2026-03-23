@@ -106,46 +106,46 @@
   --gradient-header: linear-gradient(135deg, #d4714a 0%, #e08a60 100%);
 }
 
-/* ---- Claude Theme (怀旧版 — Claude UI) ---- */
+/* ---- Claude Theme (怀旧版 — 精确还原Claude官网) ---- */
 [data-theme="claude"] {
-  --bg-primary: #f5f0e8;
-  --bg-secondary: #ede7dd;
-  --bg-tertiary: #e4ddd3;
+  --bg-primary: #faf9f5;
+  --bg-secondary: #f1f0ea;
+  --bg-tertiary: #eae8e1;
   --bg-card: #ffffff;
-  --bg-card-hover: #faf7f2;
-  --bg-input: #ebe5db;
-  --text-primary: #2d2926;
-  --text-secondary: #6b635a;
-  --text-muted: #9a9189;
-  --accent: #c96442;
-  --accent-light: #da7756;
-  --accent-bg: rgba(218, 119, 86, 0.07);
-  --border: rgba(0, 0, 0, 0.05);
-  --border-strong: rgba(0, 0, 0, 0.1);
-  --shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
+  --bg-card-hover: #f5f4ee;
+  --bg-input: #f1f0ea;
+  --text-primary: #141413;
+  --text-secondary: #3d3d3a;
+  --text-muted: #9b9b97;
+  --accent: #D97757;
+  --accent-light: #e08a68;
+  --accent-bg: rgba(217, 119, 87, 0.08);
+  --border: #e3e2dc;
+  --border-strong: #d4d3cc;
+  --shadow: 0 1px 6px rgba(0, 0, 0, 0.04);
   --shadow-sm: 0 0.5px 2px rgba(0, 0, 0, 0.03);
   --shadow-xs: 0 0.5px 1px rgba(0, 0, 0, 0.02);
-  --sidebar-bg: #2c2a27;
-  --sidebar-text: #d4cfc8;
-  --sidebar-hover: rgba(255, 255, 255, 0.05);
-  --sidebar-active: rgba(218, 119, 86, 0.2);
-  --message-human-bg: #3d3929;
-  --message-human-text: #f5f0e8;
+  --sidebar-bg: #faf9f5;
+  --sidebar-text: #3d3d3a;
+  --sidebar-hover: #f1f0ea;
+  --sidebar-active: #eae8e1;
+  --message-human-bg: #f1f0ea;
+  --message-human-text: #141413;
   --message-assistant-bg: transparent;
   --thinking-bg: rgba(0, 0, 0, 0.02);
-  --thinking-border: rgba(0, 0, 0, 0.06);
-  --thinking-text: #8b8580;
+  --thinking-border: #e3e2dc;
+  --thinking-text: #6b6b69;
   --tool-bg: rgba(0, 0, 0, 0.02);
-  --tool-border: rgba(0, 0, 0, 0.06);
-  --flag-bg: rgba(244, 67, 54, 0.05);
-  --flag-border: rgba(244, 67, 54, 0.2);
+  --tool-border: #e3e2dc;
+  --flag-bg: rgba(244, 67, 54, 0.04);
+  --flag-border: rgba(244, 67, 54, 0.15);
   --flag-text: #c62828;
-  --separator-color: rgba(0, 0, 0, 0.03);
-  --scrollbar-thumb: rgba(0, 0, 0, 0.1);
+  --separator-color: #e3e2dc;
+  --scrollbar-thumb: #d4d3cc;
   --scrollbar-track: transparent;
-  --code-bg: #ede8e0;
+  --code-bg: #f1f0ea;
   --backdrop-blur: none;
-  --gradient-header: linear-gradient(135deg, #c96442 0%, #e08a68 100%);
+  --gradient-header: linear-gradient(135deg, #D97757 0%, #e08a68 100%);
 }
 
 /* ---- Auto Theme (follow system preference) ---- */

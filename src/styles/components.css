@@ -32,16 +32,16 @@
 }
 
 [data-theme="claude"] .message-block.message-human .message-bubble .message-text a {
-  color: #e8c8a0;
+  color: var(--accent);
 }
 
 [data-theme="claude"] .message-block.message-human .message-bubble .message-text code {
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(0, 0, 0, 0.06);
   color: var(--message-human-text);
 }
 
 [data-theme="claude"] .message-block.message-human .message-bubble .message-text pre {
-  background: rgba(0, 0, 0, 0.25);
+  background: rgba(0, 0, 0, 0.04);
 }
 
 [data-theme="claude"] .message-block.message-assistant {
