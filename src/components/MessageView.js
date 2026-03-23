@@ -7,6 +7,7 @@ import { state, saveExportCollection } from '../store/state.js';
 import { renderMarkdown, escapeHtml } from '../utils/markdown.js';
 import { formatTimestamp, formatShortTime, formatDate, getTimeDiffMinutes } from '../utils/time.js';
 import { desensitize } from '../utils/desensitize.js';
+import { createIcon } from '../utils/icons.js';
 import { StatsPanel } from './StatsPanel.js';
 
 export class MessageView {
@@ -111,7 +112,8 @@ export class MessageView {
     // Add all to collection button
     const addAllBtn = document.createElement('button');
     addAllBtn.style.cssText = 'padding:6px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);background:transparent;color:var(--text-secondary);cursor:pointer;font-size:0.8rem;white-space:nowrap;transition:all 0.15s;';
-    addAllBtn.textContent = '\u2B50 加入精选集';
+    addAllBtn.appendChild(createIcon('star', 14));
+    addAllBtn.appendChild(document.createTextNode(' 加入精选集'));
     addAllBtn.addEventListener('mouseenter', () => { addAllBtn.style.borderColor = 'var(--accent)'; addAllBtn.style.color = 'var(--accent)'; });
     addAllBtn.addEventListener('mouseleave', () => { addAllBtn.style.borderColor = 'var(--border)'; addAllBtn.style.color = 'var(--text-secondary)'; });
     addAllBtn.addEventListener('click', () => {
@@ -132,8 +134,14 @@ export class MessageView {
       }
       state.set('exportCollection', collection);
       saveExportCollection();
-      addAllBtn.textContent = '\u2713 已加入';
-      setTimeout(() => { addAllBtn.textContent = '\u2B50 加入精选集'; }, 1200);
+      addAllBtn.textContent = '';
+      addAllBtn.appendChild(createIcon('check', 14));
+      addAllBtn.appendChild(document.createTextNode(' 已加入'));
+      setTimeout(() => {
+        addAllBtn.textContent = '';
+        addAllBtn.appendChild(createIcon('star', 14));
+        addAllBtn.appendChild(document.createTextNode(' 加入精选集'));
+      }, 1200);
     });
     headerBtns.appendChild(addAllBtn);
 
@@ -143,7 +151,8 @@ export class MessageView {
 
     const exportBtn = document.createElement('button');
     exportBtn.style.cssText = 'padding:6px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);background:transparent;color:var(--text-secondary);cursor:pointer;font-size:0.8rem;white-space:nowrap;transition:all 0.15s;';
-    exportBtn.textContent = '\uD83D\uDCE5 导出此对话 \u25BE';
+    exportBtn.appendChild(createIcon('export', 14));
+    exportBtn.appendChild(document.createTextNode(' 导出此对话 \u25BE'));
     exportBtn.addEventListener('mouseenter', () => { exportBtn.style.borderColor = 'var(--accent)'; exportBtn.style.color = 'var(--accent)'; });
     exportBtn.addEventListener('mouseleave', () => { if (!exportWrapper.querySelector('.export-dropdown:not(.hidden)')) { exportBtn.style.borderColor = 'var(--border)'; exportBtn.style.color = 'var(--text-secondary)'; }});
     exportBtn.addEventListener('click', (e) => {

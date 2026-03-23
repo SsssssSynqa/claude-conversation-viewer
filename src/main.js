@@ -22,7 +22,7 @@ function applyTheme(theme) {
 }
 
 const THEMES = ['dark', 'light', 'claude'];
-const THEME_ICONS = { dark: '\u{1F319}', light: '\u{2600}\u{FE0F}', claude: '\u{1F3F5}\u{FE0F}' };
+const THEME_ICON_NAMES = { dark: 'moon', light: 'sun', claude: 'flower' };
 const THEME_LABELS = { dark: '关灯版', light: '开灯版', claude: '怀旧版' };
 
 function cycleTheme() {
@@ -80,21 +80,21 @@ function renderMainView() {
   sidebarActions.style.cssText = 'padding:12px;border-bottom:1px solid var(--border);display:flex;flex-direction:column;gap:4px;';
 
   // Search button — opens search panel in content area
-  const searchBtn = createSidebarBtn('\uD83D\uDD0D', '搜索', () => {
+  const searchBtn = createSidebarBtn('search', '搜索', () => {
     state.set('viewMode', 'search');
   });
   searchBtn.id = 'sidebar-search-btn';
   sidebarActions.appendChild(searchBtn);
 
   // Stats button — go back to homepage stats
-  const statsBtn = createSidebarBtn('\uD83D\uDCCA', '统计总览', () => {
+  const statsBtn = createSidebarBtn('stats', '统计总览', () => {
     state.set('viewMode', 'conversation');
     state.set('currentConversationIndex', -1);
   });
   sidebarActions.appendChild(statsBtn);
 
   // Export button — opens export panel
-  const exportBtn = createSidebarBtn('\uD83D\uDCE5', '导出中心', () => {
+  const exportBtn = createSidebarBtn('export', '导出中心', () => {
     state.set('viewMode', 'export');
   });
   exportBtn.id = 'sidebar-export-btn';
@@ -102,7 +102,7 @@ function renderMainView() {
 
   // Theme switcher
   const themeBtn = createSidebarBtn(
-    THEME_ICONS[state.get('theme')] || '\u{1F319}',
+    THEME_ICON_NAMES[state.get('theme')] || 'moon',
     THEME_LABELS[state.get('theme')] || '主题',
     cycleTheme
   );
@@ -112,7 +112,11 @@ function renderMainView() {
   state.on('theme', (t) => {
     const btn = document.getElementById('sidebar-theme-btn');
     if (btn) {
-      btn.querySelector('.sidebar-btn-icon').textContent = THEME_ICONS[t] || '\u{1F319}';
+      const oldIcon = btn.querySelector('.sidebar-btn-icon');
+      const newIcon = createIcon(THEME_ICON_NAMES[t] || 'moon', 18);
+      newIcon.className = 'sidebar-btn-icon';
+      newIcon.style.cssText += 'color:var(--text-muted);';
+      if (oldIcon) oldIcon.replaceWith(newIcon);
       btn.querySelector('.sidebar-btn-label').textContent = THEME_LABELS[t] || '主题';
     }
   });
@@ -261,9 +265,9 @@ function renderMainView() {
   });
 }
 
-function createSidebarBtn(icon, label, onClick) {
+function createSidebarBtn(iconName, label, onClick) {
   const btn = document.createElement('button');
-  btn.style.cssText = 'display:flex;align-items:center;gap:10px;width:100%;padding:8px 10px;border:none;border-radius:var(--radius-sm);background:transparent;color:var(--sidebar-text);cursor:pointer;font-size:0.85rem;text-align:left;transition:background 0.15s;';
+  btn.style.cssText = 'display:flex;align-items:center;gap:10px;width:100%;padding:8px 10px;border:none;border-radius:var(--radius-sm);background:transparent;color:var(--sidebar-text);cursor:pointer;font-size:0.85rem;text-align:left;transition:background var(--transition-fast),color var(--transition-fast);';
   btn.addEventListener('mouseenter', () => {
     if (btn.dataset.active !== 'true') btn.style.background = 'var(--sidebar-hover)';
   });
@@ -271,11 +275,10 @@ function createSidebarBtn(icon, label, onClick) {
     if (btn.dataset.active !== 'true') btn.style.background = '';
   });
 
-  const iconSpan = document.createElement('span');
-  iconSpan.className = 'sidebar-btn-icon';
-  iconSpan.style.cssText = 'font-size:1rem;width:20px;text-align:center;';
-  iconSpan.textContent = icon;
-  btn.appendChild(iconSpan);
+  const iconEl = createIcon(iconName, 18);
+  iconEl.className = 'sidebar-btn-icon';
+  iconEl.style.cssText += 'color:var(--text-muted);';
+  btn.appendChild(iconEl);
 
   const labelSpan = document.createElement('span');
   labelSpan.className = 'sidebar-btn-label';
