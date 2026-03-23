@@ -4,6 +4,7 @@
 
 import { state } from '../store/state.js';
 import { saveToCache, getCacheInfo, loadFromCache, clearCache } from '../utils/cache.js';
+import { createIcon } from '../utils/icons.js';
 import ParseWorker from '../parser/worker.js?worker&inline';
 
 // Claude spark logo SVG (hardcoded asset, safe)
@@ -124,21 +125,29 @@ export class FileUpload {
 
     const saveBtn = document.createElement('button');
     saveBtn.style.cssText = 'padding:8px 20px;border:none;border-radius:var(--radius-sm);background:var(--gradient-header);color:#fff;cursor:pointer;font-size:0.85rem;font-weight:600;display:flex;align-items:center;gap:6px;';
-    saveBtn.textContent = '\uD83D\uDCBE 保存并应用';
+    saveBtn.appendChild(createIcon('save', 14));
+    saveBtn.appendChild(document.createTextNode(' 保存并应用'));
     saveBtn.addEventListener('click', () => {
       const humanVal = document.getElementById('name-human')?.value || 'Synqa';
       const assistantVal = document.getElementById('name-assistant')?.value || 'Sylux';
       const newNames = { human: humanVal, assistant: assistantVal };
       state.set('displayNames', newNames);
       localStorage.setItem('cv-names', JSON.stringify(newNames));
-      saveBtn.textContent = '\u2705 已保存';
-      setTimeout(() => { saveBtn.textContent = '\uD83D\uDCBE 保存并应用'; }, 1500);
+      saveBtn.textContent = '';
+      saveBtn.appendChild(createIcon('check', 14));
+      saveBtn.appendChild(document.createTextNode(' 已保存'));
+      setTimeout(() => {
+        saveBtn.textContent = '';
+        saveBtn.appendChild(createIcon('save', 14));
+        saveBtn.appendChild(document.createTextNode(' 保存并应用'));
+      }, 1500);
     });
     btnRow.appendChild(saveBtn);
 
     const resetBtn = document.createElement('button');
     resetBtn.style.cssText = 'padding:8px 20px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg-input);color:var(--text-secondary);cursor:pointer;font-size:0.85rem;display:flex;align-items:center;gap:6px;';
-    resetBtn.textContent = '\uD83D\uDD04 重置';
+    resetBtn.appendChild(createIcon('reset', 14));
+    resetBtn.appendChild(document.createTextNode(' 重置'));
     resetBtn.addEventListener('click', () => {
       const defaults = { human: 'Synqa', assistant: 'Sylux' };
       document.getElementById('name-human').value = defaults.human;
@@ -296,7 +305,7 @@ export class FileUpload {
 
     // Insert cache banner before the upload zone
     const banner = document.createElement('div');
-    banner.style.cssText = 'width:100%;max-width:560px;background:var(--accent-bg);border:1px solid var(--accent);border-radius:var(--radius);padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;';
+    banner.style.cssText = 'width:100%;max-width:480px;background:var(--accent-bg);border:1px solid var(--accent);border-radius:var(--radius);padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;';
 
     const info_div = document.createElement('div');
     const title = document.createElement('div');
