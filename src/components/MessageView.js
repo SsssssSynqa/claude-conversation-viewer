@@ -134,14 +134,51 @@ export class MessageView {
     });
     headerBtns.appendChild(addAllBtn);
 
-    // Export this conversation button
+    // Export this conversation button with format dropdown
+    const exportWrapper = document.createElement('div');
+    exportWrapper.style.cssText = 'position:relative;flex-shrink:0;';
+
     const exportBtn = document.createElement('button');
     exportBtn.style.cssText = 'padding:6px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);background:transparent;color:var(--text-secondary);cursor:pointer;font-size:0.8rem;white-space:nowrap;transition:all 0.15s;';
-    exportBtn.textContent = '\uD83D\uDCE5 导出此对话';
+    exportBtn.textContent = '\uD83D\uDCE5 导出此对话 \u25BE';
     exportBtn.addEventListener('mouseenter', () => { exportBtn.style.borderColor = 'var(--accent)'; exportBtn.style.color = 'var(--accent)'; });
-    exportBtn.addEventListener('mouseleave', () => { exportBtn.style.borderColor = 'var(--border)'; exportBtn.style.color = 'var(--text-secondary)'; });
-    exportBtn.addEventListener('click', () => this._quickExportConversation(conv));
-    headerBtns.appendChild(exportBtn);
+    exportBtn.addEventListener('mouseleave', () => { if (!exportWrapper.querySelector('.export-dropdown:not(.hidden)')) { exportBtn.style.borderColor = 'var(--border)'; exportBtn.style.color = 'var(--text-secondary)'; }});
+    exportBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const dropdown = exportWrapper.querySelector('.export-dropdown');
+      dropdown.classList.toggle('hidden');
+    });
+    exportWrapper.appendChild(exportBtn);
+
+    const dropdown = document.createElement('div');
+    dropdown.className = 'export-dropdown hidden';
+    dropdown.style.cssText = 'position:absolute;right:0;top:100%;margin-top:4px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);box-shadow:var(--shadow);z-index:100;min-width:160px;overflow:hidden;';
+
+    const formats = [
+      { key: 'md', label: 'Markdown (.md)' },
+      { key: 'txt', label: '纯文本 (.txt)' },
+      { key: 'html', label: 'HTML (.html)' },
+      { key: 'json', label: 'JSON (.json)' },
+    ];
+    for (const fmt of formats) {
+      const item = document.createElement('div');
+      item.style.cssText = 'padding:8px 14px;cursor:pointer;font-size:0.82rem;color:var(--text-secondary);transition:background 0.15s;';
+      item.textContent = fmt.label;
+      item.addEventListener('mouseenter', () => item.style.background = 'var(--bg-card-hover)');
+      item.addEventListener('mouseleave', () => item.style.background = '');
+      item.addEventListener('click', (e) => {
+        e.stopPropagation();
+        dropdown.classList.add('hidden');
+        this._quickExportConversation(conv, fmt.key);
+      });
+      dropdown.appendChild(item);
+    }
+    exportWrapper.appendChild(dropdown);
+
+    // Close dropdown on outside click
+    document.addEventListener('click', () => dropdown.classList.add('hidden'));
+
+    headerBtns.appendChild(exportWrapper);
 
     headerTop.appendChild(headerBtns);
 
@@ -484,7 +521,7 @@ export class MessageView {
 
   // ---- Quick Export ----
 
-  _quickExportConversation(conv) {
+  _quickExportConversation(conv, format = 'md') {
     import('../utils/export.js').then(({ exportAsText, exportAsMarkdown, exportAsHTML, downloadFile }) => {
       const options = {
         includeThinking: state.get('showThinking'),
@@ -494,9 +531,30 @@ export class MessageView {
       };
       const dateSuffix = new Date().toISOString().slice(0, 10);
       const nameBase = conv.name || '对话';
-      // Use markdown as default for quick export
-      const content = exportAsMarkdown([conv], options);
-      downloadFile(content, `${nameBase}_${dateSuffix}.md`, 'text/markdown;charset=utf-8');
+      let content, filename, mimeType;
+      switch (format) {
+        case 'txt':
+          content = exportAsText([conv], options);
+          filename = `${nameBase}_${dateSuffix}.txt`;
+          mimeType = 'text/plain;charset=utf-8';
+          break;
+        case 'html':
+          content = exportAsHTML([conv], options);
+          filename = `${nameBase}_${dateSuffix}.html`;
+          mimeType = 'text/html;charset=utf-8';
+          break;
+        case 'json':
+          content = JSON.stringify([conv], null, 2);
+          filename = `${nameBase}_${dateSuffix}.json`;
+          mimeType = 'application/json;charset=utf-8';
+          break;
+        default:
+          content = exportAsMarkdown([conv], options);
+          filename = `${nameBase}_${dateSuffix}.md`;
+          mimeType = 'text/markdown;charset=utf-8';
+          break;
+      }
+      downloadFile(content, filename, mimeType);
     });
   }
 
