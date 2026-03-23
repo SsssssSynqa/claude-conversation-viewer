@@ -91,24 +91,26 @@ export class FileUpload {
     zone.className = 'upload-zone';
     zone.id = 'upload-zone';
 
-    const icon = document.createElement('div');
-    icon.className = 'upload-zone-icon';
-    icon.textContent = '\uD83D\uDCC1';
-    zone.appendChild(icon);
+    // Upload icon (SVG line art)
+    const iconWrapper = document.createElement('div');
+    iconWrapper.style.cssText = 'color:var(--text-muted);margin-bottom:16px;';
+    iconWrapper.appendChild(createIcon('file', 48));
+    zone.appendChild(iconWrapper);
 
     const text = document.createElement('div');
     text.className = 'upload-zone-text';
 
     const line1 = document.createElement('p');
+    line1.style.cssText = 'font-size:0.95rem;color:var(--text-secondary);';
     const strong = document.createElement('strong');
+    strong.style.color = 'var(--accent)';
     strong.textContent = '点击选择';
     line1.appendChild(strong);
     line1.appendChild(document.createTextNode(' 或拖拽 JSON 文件到这里'));
     text.appendChild(line1);
 
     const line2 = document.createElement('p');
-    line2.style.fontSize = '0.85rem';
-    line2.style.marginTop = '8px';
+    line2.style.cssText = 'font-size:0.82rem;margin-top:8px;color:var(--text-muted);';
     line2.textContent = 'Claude Settings → Data Export → 下载的 conversations.json';
     text.appendChild(line2);
 
@@ -347,7 +349,7 @@ export class FileUpload {
 
     // Insert cache banner before the upload zone
     const banner = document.createElement('div');
-    banner.style.cssText = 'width:100%;max-width:480px;background:var(--accent-bg);border:1px solid var(--accent);border-radius:var(--radius);padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;';
+    banner.style.cssText = 'width:100%;max-width:520px;background:var(--accent-bg);border:none;border-radius:var(--radius-lg);padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;box-shadow:0 0 0 0.5px var(--accent);';
 
     const info_div = document.createElement('div');
     const title = document.createElement('div');
