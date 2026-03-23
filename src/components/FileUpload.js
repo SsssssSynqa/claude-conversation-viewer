@@ -47,7 +47,7 @@ export class FileUpload {
 
     // Text area (fake placeholder)
     const fakeInput = document.createElement('div');
-    fakeInput.style.cssText = 'padding:18px 20px 10px;font-size:14px;color:var(--text-muted);line-height:1.4;';
+    fakeInput.style.cssText = 'padding:18px 20px 10px;font-size:12px;color:var(--text-muted);line-height:1.4;';
     fakeInput.textContent = '点击选择 或拖拽 conversations.json 到这里';
     zone.appendChild(fakeInput);
 
@@ -192,7 +192,7 @@ export class FileUpload {
 
     // Theme switcher (at bottom)
     const themeSwitcher = document.createElement('div');
-    themeSwitcher.style.cssText = 'display:flex;gap:6px;padding:5px;border-radius:20px;border:none;background:var(--bg-primary);box-shadow:var(--shadow-xs);';
+    themeSwitcher.style.cssText = 'display:flex;gap:6px;padding:6px;border-radius:18px;border:none;background:var(--bg-primary);box-shadow:var(--shadow-xs);';
 
     const themes = [
       { id: 'light', iconName: 'sun' },
@@ -204,7 +204,7 @@ export class FileUpload {
       const btn = document.createElement('button');
       btn.dataset.theme = t.id;
       const isActive = state.get('theme') === t.id;
-      btn.style.cssText = `display:flex;align-items:center;justify-content:center;width:36px;height:36px;border:none;border-radius:8px;cursor:pointer;transition:all 0.15s;background:${isActive ? 'var(--accent-bg)' : 'transparent'};color:${isActive ? 'var(--accent)' : 'var(--text-muted)'};`;
+      btn.style.cssText = `display:flex;align-items:center;justify-content:center;width:36px;height:36px;border:none;border-radius:12px;cursor:pointer;transition:all 0.15s;color:${isActive ? 'var(--accent)' : 'var(--text-muted)'};${isActive ? 'background:var(--accent-bg);box-shadow:var(--shadow-inset);' : 'background:transparent;'}`;
       if (t.iconName) {
         btn.appendChild(createIcon(t.iconName, 18));
       } else {
@@ -220,6 +220,7 @@ export class FileUpload {
         themeSwitcher.querySelectorAll('button').forEach(b => {
           const active = b.dataset.theme === t.id;
           b.style.background = active ? 'var(--accent-bg)' : 'transparent';
+          b.style.boxShadow = active ? 'var(--shadow-inset)' : 'none';
           b.style.color = active ? 'var(--accent)' : 'var(--text-muted)';
         });
       });
@@ -231,11 +232,11 @@ export class FileUpload {
     const hintsWrapper = document.createElement('div');
     hintsWrapper.style.cssText = 'text-align:center;margin-top:8px;';
     const subtitle = document.createElement('p');
-    subtitle.style.cssText = 'color:var(--text-muted);font-size:0.82rem;';
+    subtitle.style.cssText = 'color:var(--text-muted);font-size:12px;';
     subtitle.textContent = '上传 Claude 导出的 JSON 文件，回顾你的每一段对话';
     hintsWrapper.appendChild(subtitle);
     const hintPath = document.createElement('p');
-    hintPath.style.cssText = 'color:var(--text-muted);font-size:0.75rem;opacity:0.5;margin-top:4px;';
+    hintPath.style.cssText = 'color:var(--text-muted);font-size:12px;margin-top:4px;';
     hintPath.textContent = 'Claude Settings → Data Export → 下载的 conversations.json';
     hintsWrapper.appendChild(hintPath);
     screen.appendChild(hintsWrapper);
@@ -391,7 +392,7 @@ export class FileUpload {
 
     const info_div = document.createElement('div');
     const title = document.createElement('div');
-    title.style.cssText = 'font-size:13px;font-weight:600;color:var(--text-primary);margin-bottom:3px;';
+    title.style.cssText = 'font-size:13px;font-weight:600;color:var(--text-muted);margin-bottom:3px;';
     title.textContent = '发现上次的数据缓存';
     info_div.appendChild(title);
 
