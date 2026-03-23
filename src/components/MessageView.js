@@ -96,14 +96,26 @@ export class MessageView {
     const headerBtns = document.createElement('div');
     headerBtns.style.cssText = 'display:flex;gap:6px;flex-shrink:0;align-items:center;';
 
-    // Select mode toggle
-    const modeBtn = this._headerBtn(this.selectMode ? '查看模式' : '选择模式', this.selectMode ? 'check' : 'selectAll', () => {
+    // Select mode toggle switch
+    const toggleWrapper = document.createElement('div');
+    toggleWrapper.style.cssText = 'display:flex;align-items:center;gap:0;border-radius:20px;overflow:hidden;border:1px solid var(--border);cursor:pointer;flex-shrink:0;height:30px;';
+
+    const viewLabel = document.createElement('span');
+    viewLabel.style.cssText = `padding:4px 12px;font-size:0.72rem;font-weight:600;transition:all 0.2s;user-select:none;height:100%;display:flex;align-items:center;${!this.selectMode ? 'background:var(--accent);color:#fff;' : 'background:transparent;color:var(--text-muted);'}`;
+    viewLabel.textContent = '查看';
+
+    const selectLabel = document.createElement('span');
+    selectLabel.style.cssText = `padding:4px 12px;font-size:0.72rem;font-weight:600;transition:all 0.2s;user-select:none;height:100%;display:flex;align-items:center;${this.selectMode ? 'background:var(--accent);color:#fff;' : 'background:transparent;color:var(--text-muted);'}`;
+    selectLabel.textContent = '选择';
+
+    toggleWrapper.appendChild(viewLabel);
+    toggleWrapper.appendChild(selectLabel);
+    toggleWrapper.addEventListener('click', () => {
       this.selectMode = !this.selectMode;
       if (!this.selectMode) this.selectedIndices.clear();
       this.renderConversation();
     });
-    if (this.selectMode) { modeBtn.style.background = 'var(--accent-bg)'; modeBtn.style.color = 'var(--accent)'; modeBtn.style.borderColor = 'var(--accent)'; }
-    headerBtns.appendChild(modeBtn);
+    headerBtns.appendChild(toggleWrapper);
 
     // Add all to collection
     const addAllBtn = this._headerBtn('加入精选集', 'star', () => {
