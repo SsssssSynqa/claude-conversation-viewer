@@ -43,7 +43,7 @@ export class FileUpload {
     const zone = document.createElement('div');
     zone.className = 'upload-zone';
     zone.id = 'upload-zone';
-    zone.style.cssText = 'width:100%;max-width:560px;background:var(--bg-card);border-radius:20px;box-shadow:0 4px 20px rgba(0,0,0,0.035), 0 0 0 0.5px rgba(31,30,29,0.12);cursor:pointer;transition:box-shadow 0.2s;padding:0;border:none;text-align:left;margin-top:24px;';
+    zone.style.cssText = 'padding:0;text-align:left;margin-top:24px;';
 
     // Text area (fake placeholder)
     const fakeInput = document.createElement('div');
@@ -106,13 +106,11 @@ export class FileUpload {
     zone.appendChild(fileInput);
 
     zone.addEventListener('click', () => fileInput.click());
-    zone.addEventListener('mouseenter', () => { zone.style.boxShadow = '0 4px 20px rgba(0,0,0,0.07), 0 0 0 0.5px rgba(31,30,29,0.25)'; });
-    zone.addEventListener('mouseleave', () => { zone.style.boxShadow = '0 4px 20px rgba(0,0,0,0.035), 0 0 0 0.5px rgba(31,30,29,0.12)'; });
-    zone.addEventListener('dragover', (e) => { e.preventDefault(); zone.style.boxShadow = '0 4px 20px rgba(0,0,0,0.07), 0 0 0 0.5px rgba(31,30,29,0.25)'; });
-    zone.addEventListener('dragleave', () => { zone.style.boxShadow = '0 4px 20px rgba(0,0,0,0.035), 0 0 0 0.5px rgba(31,30,29,0.12)'; });
+    zone.addEventListener('dragover', (e) => { e.preventDefault(); zone.classList.add('dragover'); });
+    zone.addEventListener('dragleave', () => zone.classList.remove('dragover'));
     zone.addEventListener('drop', (e) => {
       e.preventDefault();
-      zone.style.boxShadow = '0 4px 20px rgba(0,0,0,0.035), 0 0 0 0.5px rgba(31,30,29,0.12)';
+      zone.classList.remove('dragover');
       const file = e.dataTransfer.files[0];
       if (file) this.handleFile(file);
     });
@@ -385,9 +383,9 @@ export class FileUpload {
 
     // Insert cache banner before the upload zone
     const banner = document.createElement('div');
-    banner.style.cssText = 'width:100%;max-width:560px;background:var(--bg-card);border:none;border-radius:20px;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;box-shadow:0 4px 20px rgba(0,0,0,0.035), 0 0 0 0.5px rgba(31,30,29,0.12);transition:box-shadow 0.2s;';
-    banner.addEventListener('mouseenter', () => { banner.style.boxShadow = '0 4px 20px rgba(0,0,0,0.07), 0 0 0 0.5px rgba(31,30,29,0.25)'; });
-    banner.addEventListener('mouseleave', () => { banner.style.boxShadow = '0 4px 20px rgba(0,0,0,0.035), 0 0 0 0.5px rgba(31,30,29,0.12)'; });
+    banner.style.cssText = 'width:100%;max-width:560px;background:var(--bg-card);border:none;border-radius:20px;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;box-shadow:var(--shadow);transition:box-shadow 0.2s,transform 0.2s;';
+    banner.addEventListener('mouseenter', () => { banner.style.boxShadow = 'var(--shadow-sm)'; banner.style.transform = 'translateY(-1px)'; });
+    banner.addEventListener('mouseleave', () => { banner.style.boxShadow = 'var(--shadow)'; banner.style.transform = ''; });
 
     const info_div = document.createElement('div');
     const title = document.createElement('div');
