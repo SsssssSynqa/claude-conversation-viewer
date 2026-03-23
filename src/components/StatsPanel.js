@@ -613,11 +613,9 @@ export class StatsPanel {
     for (const week of weeks) {
       const m = week.weekStart.getMonth();
       const label = document.createElement('div');
-      label.style.cssText = `width:${CELL}px;font-size:0.6rem;color:var(--text-muted);text-align:left;flex-shrink:0;`;
+      label.style.cssText = `width:${CELL}px;font-size:0.6rem;color:var(--text-muted);text-align:left;flex-shrink:0;overflow:visible;white-space:nowrap;`;
       if (m !== lastMonth) {
         label.textContent = monthNames[m];
-        label.style.width = 'auto';
-        label.style.minWidth = CELL + 'px';
         lastMonth = m;
       }
       monthRow.appendChild(label);
@@ -660,8 +658,6 @@ export class StatsPanel {
 
     wrapper.appendChild(gridArea);
     container.appendChild(wrapper);
-
-    container.appendChild(grid);
     return container;
   }
 
