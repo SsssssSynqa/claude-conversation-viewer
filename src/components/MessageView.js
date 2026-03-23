@@ -101,14 +101,49 @@ export class MessageView {
     titleSection.appendChild(metaEl);
     headerTop.appendChild(titleSection);
 
+    // Header buttons
+    const headerBtns = document.createElement('div');
+    headerBtns.style.cssText = 'display:flex;gap:8px;flex-shrink:0;';
+
+    // Add all to collection button
+    const addAllBtn = document.createElement('button');
+    addAllBtn.style.cssText = 'padding:6px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);background:transparent;color:var(--text-secondary);cursor:pointer;font-size:0.8rem;white-space:nowrap;transition:all 0.15s;';
+    addAllBtn.textContent = '\u2B50 加入精选集';
+    addAllBtn.addEventListener('mouseenter', () => { addAllBtn.style.borderColor = 'var(--accent)'; addAllBtn.style.color = 'var(--accent)'; });
+    addAllBtn.addEventListener('mouseleave', () => { addAllBtn.style.borderColor = 'var(--border)'; addAllBtn.style.color = 'var(--text-secondary)'; });
+    addAllBtn.addEventListener('click', () => {
+      const collection = state.get('exportCollection') || [];
+      for (let i = 0; i < conv.messages.length; i++) {
+        const msg = conv.messages[i];
+        const key = conv.uuid + ':' + i;
+        if (collection.some(item => item.key === key)) continue;
+        collection.push({
+          key,
+          convUuid: conv.uuid,
+          convName: conv.name || '未命名',
+          msgIndex: i,
+          sender: msg.sender,
+          preview: (msg.searchText || '').substring(0, 80),
+          timestamp: msg.createdAt,
+        });
+      }
+      state.set('exportCollection', collection);
+      saveExportCollection();
+      addAllBtn.textContent = '\u2713 已加入';
+      setTimeout(() => { addAllBtn.textContent = '\u2B50 加入精选集'; }, 1200);
+    });
+    headerBtns.appendChild(addAllBtn);
+
     // Export this conversation button
     const exportBtn = document.createElement('button');
-    exportBtn.style.cssText = 'padding:6px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);background:transparent;color:var(--text-secondary);cursor:pointer;font-size:0.8rem;white-space:nowrap;transition:all 0.15s;flex-shrink:0;';
+    exportBtn.style.cssText = 'padding:6px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);background:transparent;color:var(--text-secondary);cursor:pointer;font-size:0.8rem;white-space:nowrap;transition:all 0.15s;';
     exportBtn.textContent = '\uD83D\uDCE5 导出此对话';
     exportBtn.addEventListener('mouseenter', () => { exportBtn.style.borderColor = 'var(--accent)'; exportBtn.style.color = 'var(--accent)'; });
     exportBtn.addEventListener('mouseleave', () => { exportBtn.style.borderColor = 'var(--border)'; exportBtn.style.color = 'var(--text-secondary)'; });
     exportBtn.addEventListener('click', () => this._quickExportConversation(conv));
-    headerTop.appendChild(exportBtn);
+    headerBtns.appendChild(exportBtn);
+
+    headerTop.appendChild(headerBtns);
 
     header.appendChild(headerTop);
     this.container.appendChild(header);
