@@ -34,7 +34,7 @@ export class FileUpload {
     greetingRow.appendChild(sparkEl);
 
     const h1 = document.createElement('h1');
-    h1.style.cssText = 'font-family:var(--font-display);font-size:30px;font-weight:330;color:var(--text-secondary);line-height:45px;';
+    h1.style.cssText = 'font-family:var(--font-display);font-size:28px;font-weight:330;color:var(--text-secondary);line-height:1.3;';
     h1.textContent = 'Claude 对话记忆查看器';
     greetingRow.appendChild(h1);
     screen.appendChild(greetingRow);
@@ -43,7 +43,7 @@ export class FileUpload {
     const zone = document.createElement('div');
     zone.className = 'upload-zone';
     zone.id = 'upload-zone';
-    zone.style.cssText = 'padding:0;text-align:left;margin-top:21px;max-width:504px;';
+    zone.style.cssText = 'padding:0;text-align:left;margin-top:16px;max-width:504px;';
 
     // Text area (fake placeholder)
     const fakeInput = document.createElement('div');
