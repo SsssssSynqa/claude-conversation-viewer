@@ -493,43 +493,105 @@ export class StatsPanel {
     const dates = Object.keys(dateHeatmap).sort();
     if (dates.length === 0) return container;
 
-    // Go back ~365 days from the latest date
     const latest = new Date(dates[dates.length - 1]);
     const start = new Date(latest);
     start.setDate(start.getDate() - 364);
-    // Align to Sunday
-    start.setDate(start.getDate() - start.getDay());
+    start.setDate(start.getDate() - start.getDay()); // Align to Sunday
 
     const maxCount = Math.max(...Object.values(dateHeatmap), 1);
+    const CELL = 11, GAP = 2;
+    const weekdays = ['', '周一', '', '周三', '', '周五', ''];
 
-    const grid = document.createElement('div');
-    grid.style.cssText = 'display:flex;gap:2px;';
+    // Outer wrapper with weekday labels on the left
+    const wrapper = document.createElement('div');
+    wrapper.style.cssText = 'display:flex;gap:4px;';
 
+    // Weekday labels column
+    const weekdayLabels = document.createElement('div');
+    weekdayLabels.style.cssText = `display:flex;flex-direction:column;gap:${GAP}px;justify-content:flex-start;padding-top:${CELL + GAP + 4}px;`;
+    for (let d = 0; d < 7; d++) {
+      const label = document.createElement('div');
+      label.style.cssText = `height:${CELL}px;font-size:0.6rem;color:var(--text-muted);display:flex;align-items:center;line-height:1;`;
+      label.textContent = weekdays[d];
+      weekdayLabels.appendChild(label);
+    }
+    wrapper.appendChild(weekdayLabels);
+
+    // Grid area (month labels + cells)
+    const gridArea = document.createElement('div');
+    gridArea.style.cssText = 'display:flex;flex-direction:column;';
+
+    // Month labels row
+    const monthRow = document.createElement('div');
+    monthRow.style.cssText = `display:flex;gap:${GAP}px;margin-bottom:4px;`;
+    const monthNames = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+
+    // Pre-calculate weeks and their months
+    const weeks = [];
     let current = new Date(start);
     while (current <= latest) {
-      const week = document.createElement('div');
-      week.style.cssText = 'display:flex;flex-direction:column;gap:2px;';
-
+      const weekStart = new Date(current);
+      const cells = [];
       for (let d = 0; d < 7; d++) {
         const dayKey = current.toISOString().slice(0, 10);
-        const count = dateHeatmap[dayKey] || 0;
-        const cell = document.createElement('div');
-        const intensity = count / maxCount;
-        let bg;
-        if (count === 0) bg = 'var(--bg-secondary)';
-        else if (intensity < 0.25) bg = 'var(--accent)'; // will use opacity
-        else if (intensity < 0.5) bg = 'var(--accent)';
-        else if (intensity < 0.75) bg = 'var(--accent)';
-        else bg = 'var(--accent)';
-
-        const opacity = count === 0 ? '0.15' : (0.25 + intensity * 0.75).toFixed(2);
-        cell.style.cssText = `width:11px;height:11px;border-radius:2px;background:${count === 0 ? 'var(--bg-secondary)' : 'var(--accent)'};opacity:${opacity};`;
-        cell.title = dayKey + ': ' + count + ' 条消息';
-        week.appendChild(cell);
+        cells.push({ dayKey, count: dateHeatmap[dayKey] || 0, date: new Date(current) });
         current.setDate(current.getDate() + 1);
       }
-      grid.appendChild(week);
+      weeks.push({ weekStart, cells });
     }
+
+    // Build month labels — show label at the first week of each month
+    let lastMonth = -1;
+    for (const week of weeks) {
+      const m = week.weekStart.getMonth();
+      const label = document.createElement('div');
+      label.style.cssText = `width:${CELL}px;font-size:0.6rem;color:var(--text-muted);text-align:left;flex-shrink:0;`;
+      if (m !== lastMonth) {
+        label.textContent = monthNames[m];
+        label.style.width = 'auto';
+        label.style.minWidth = CELL + 'px';
+        lastMonth = m;
+      }
+      monthRow.appendChild(label);
+    }
+    gridArea.appendChild(monthRow);
+
+    // Cell grid
+    const grid = document.createElement('div');
+    grid.style.cssText = `display:flex;gap:${GAP}px;`;
+
+    for (const week of weeks) {
+      const weekCol = document.createElement('div');
+      weekCol.style.cssText = `display:flex;flex-direction:column;gap:${GAP}px;`;
+
+      for (const cell of week.cells) {
+        const el = document.createElement('div');
+        const intensity = cell.count / maxCount;
+        const opacity = cell.count === 0 ? '0.15' : (0.25 + intensity * 0.75).toFixed(2);
+        el.style.cssText = `width:${CELL}px;height:${CELL}px;border-radius:2px;background:${cell.count === 0 ? 'var(--bg-secondary)' : 'var(--accent)'};opacity:${opacity};`;
+        el.title = cell.dayKey + ': ' + cell.count + ' 条消息';
+        weekCol.appendChild(el);
+      }
+      grid.appendChild(weekCol);
+    }
+
+    gridArea.appendChild(grid);
+
+    // Legend
+    const legend = document.createElement('div');
+    legend.style.cssText = 'display:flex;align-items:center;gap:4px;margin-top:8px;justify-content:flex-end;font-size:0.6rem;color:var(--text-muted);';
+    legend.appendChild(document.createTextNode('Less'));
+    const levels = [0.15, 0.35, 0.55, 0.75, 1.0];
+    for (const lv of levels) {
+      const box = document.createElement('div');
+      box.style.cssText = `width:${CELL}px;height:${CELL}px;border-radius:2px;background:${lv === 0.15 ? 'var(--bg-secondary)' : 'var(--accent)'};opacity:${lv};`;
+      legend.appendChild(box);
+    }
+    legend.appendChild(document.createTextNode('More'));
+    gridArea.appendChild(legend);
+
+    wrapper.appendChild(gridArea);
+    container.appendChild(wrapper);
 
     container.appendChild(grid);
     return container;
