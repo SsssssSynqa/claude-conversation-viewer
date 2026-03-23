@@ -223,7 +223,7 @@ export class StatsPanel {
     }
 
     // ---- Word Cloud (Top Words) ----
-    if (stats.topWords.length > 0) {
+    if (stats.topHumanWords.length > 0 || stats.topAssistantWords.length > 0) {
       const wordSection = document.createElement('div');
       wordSection.style.cssText = 'margin-bottom:28px;';
 
@@ -238,16 +238,40 @@ export class StatsPanel {
       resetBtn.textContent = '重置隐藏';
       resetBtn.addEventListener('click', () => {
         localStorage.removeItem('cv-hidden-words');
-        const hiddenWords = new Set();
-        const refreshed = stats.allWords.filter(w => !hiddenWords.has(w.text)).slice(0, 40);
-        this._renderWordCloud(cloudContainer, refreshed, stats.allWords, 'word');
+        const empty = new Set();
+        this._renderWordCloud(humanCloudContainer, stats.allHumanWords.filter(w => !empty.has(w.text)).slice(0, 40), stats.allHumanWords, 'word');
+        this._renderWordCloud(assistantCloudContainer, stats.allAssistantWords.filter(w => !empty.has(w.text)).slice(0, 40), stats.allAssistantWords, 'word');
       });
       wordTitleRow.appendChild(resetBtn);
       wordSection.appendChild(wordTitleRow);
 
-      const cloudContainer = document.createElement('div');
-      this._renderWordCloud(cloudContainer, stats.topWords, stats.allWords, 'word');
-      wordSection.appendChild(cloudContainer);
+      // Two columns
+      const columns = document.createElement('div');
+      columns.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:12px;';
+
+      // Human words
+      const humanCol = document.createElement('div');
+      const humanLabel = document.createElement('div');
+      humanLabel.style.cssText = 'font-size:0.8rem;font-weight:600;color:var(--accent);margin-bottom:8px;text-align:center;';
+      humanLabel.textContent = (names.human || 'Human') + ' 的高频词';
+      humanCol.appendChild(humanLabel);
+      const humanCloudContainer = document.createElement('div');
+      this._renderWordCloud(humanCloudContainer, stats.topHumanWords, stats.allHumanWords, 'word');
+      humanCol.appendChild(humanCloudContainer);
+      columns.appendChild(humanCol);
+
+      // Assistant words
+      const assistantCol = document.createElement('div');
+      const assistantLabel = document.createElement('div');
+      assistantLabel.style.cssText = 'font-size:0.8rem;font-weight:600;color:var(--text-primary);margin-bottom:8px;text-align:center;';
+      assistantLabel.textContent = (names.assistant || 'Assistant') + ' 的高频词';
+      assistantCol.appendChild(assistantLabel);
+      const assistantCloudContainer = document.createElement('div');
+      this._renderWordCloud(assistantCloudContainer, stats.topAssistantWords, stats.allAssistantWords, 'word');
+      assistantCol.appendChild(assistantCloudContainer);
+      columns.appendChild(assistantCol);
+
+      wordSection.appendChild(columns);
       parent.appendChild(wordSection);
     }
 
@@ -322,7 +346,8 @@ export class StatsPanel {
     const monthlyMap = new Map();
     const hourlyActivity = new Array(24).fill(0);
     const weekdayActivity = new Array(7).fill(0);
-    const wordFreq = new Map();
+    const humanWordFreq = new Map();
+    const assistantWordFreq = new Map();
     const emojiFreq = new Map();
     const titleWords = new Map();
     const deepNightConvs = [];
@@ -367,15 +392,14 @@ export class StatsPanel {
           if (hour >= 2 && hour < 5) lateCount++;
         }
 
-        // Word frequency (from human messages only, for relevance)
-        if (msg.sender === 'human') {
-          for (const block of msg.contentBlocks) {
-            if (block.type === 'text' && block.text) {
-              const words = this._extractWords(block.text);
-              for (const w of words) wordFreq.set(w, (wordFreq.get(w) || 0) + 1);
-              const emojis = this._extractEmojis(block.text);
-              for (const e of emojis) emojiFreq.set(e, (emojiFreq.get(e) || 0) + 1);
-            }
+        // Word frequency — split by sender
+        const freqMap = msg.sender === 'human' ? humanWordFreq : assistantWordFreq;
+        for (const block of msg.contentBlocks) {
+          if (block.type === 'text' && block.text) {
+            const words = this._extractWords(block.text);
+            for (const w of words) freqMap.set(w, (freqMap.get(w) || 0) + 1);
+            const emojis = this._extractEmojis(block.text);
+            for (const e of emojis) emojiFreq.set(e, (emojiFreq.get(e) || 0) + 1);
           }
         }
 
@@ -426,8 +450,14 @@ export class StatsPanel {
 
     // Top words (filter stop words)
     const stopWords = new Set(['的', '了', '是', '我', '你', '在', '有', '不', '这', '就', '都', '也', '和', '人', '吗', '啊', '好', '那', '很', '说', '会', '对', '到', '要', '一', '个', '上', '么', '他', '她', '它', '们', '去', '来', '着', '过', '还', '呢', '被', '把', '但', '又', '而', '所以', '如果', '因为', '可以', '什么', '没有', '自己', '知道', '觉得', '其实', '这个', '那个', '时候', '已经', '然后', 'the', 'a', 'an', 'is', 'are', 'was', 'were', 'to', 'of', 'in', 'and', 'or', 'for', 'on', 'at', 'with', 'that', 'this', 'it', 'be', 'as', 'by', 'from', 'not', 'but', 'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'can', 'could', 'should', 'may', 'might', 'i', 'you', 'we', 'they', 'he', 'she']);
-    // Keep a large pool, display will filter by hidden words
-    const allWords = [...wordFreq.entries()]
+    // Keep a large pool per sender, display will filter by hidden words
+    const allHumanWords = [...humanWordFreq.entries()]
+      .filter(([w]) => !stopWords.has(w) && w.length >= 2)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 200)
+      .map(([text, count]) => ({ text, count }));
+
+    const allAssistantWords = [...assistantWordFreq.entries()]
       .filter(([w]) => !stopWords.has(w) && w.length >= 2)
       .sort((a, b) => b[1] - a[1])
       .slice(0, 200)
@@ -440,7 +470,8 @@ export class StatsPanel {
       .map(([text, count]) => ({ text, count }));
 
     const hiddenWords = this._loadHiddenWords();
-    const topWords = allWords.filter(w => !hiddenWords.has(w.text)).slice(0, 40);
+    const topHumanWords = allHumanWords.filter(w => !hiddenWords.has(w.text)).slice(0, 40);
+    const topAssistantWords = allAssistantWords.filter(w => !hiddenWords.has(w.text)).slice(0, 40);
     const topTitleWords = allTitleWords.filter(w => !hiddenWords.has(w.text)).slice(0, 20);
 
     // Top emojis
@@ -460,7 +491,8 @@ export class StatsPanel {
       daySpan, longestStreak, lateNightConvs, totalFlags,
       topConversations, deepNightConvs,
       monthlyData, hourlyActivity, weekdayActivity, dateHeatmap,
-      topWords, topTitleWords, allWords, allTitleWords, topEmojis,
+      topHumanWords, topAssistantWords, allHumanWords, allAssistantWords,
+      topTitleWords, allTitleWords, topEmojis,
       firstConv, lastConv,
     };
   }
