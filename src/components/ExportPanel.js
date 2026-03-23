@@ -296,9 +296,27 @@ export class ExportPanel {
 
     const conversations = state.get('conversations') || [];
     const names = state.get('displayNames');
-    let output = '# 精选集导出\n\n';
+    const dateSuffix = new Date().toISOString().slice(0, 10);
 
-    // Group by conversation
+    // JSON format — export raw message data
+    if (this.format === 'json') {
+      const jsonData = this._buildCollectionData(collection, conversations);
+      downloadFile(JSON.stringify(jsonData, null, 2), `精选集_${dateSuffix}.json`, 'application/json;charset=utf-8');
+      return;
+    }
+
+    // HTML format
+    if (this.format === 'html') {
+      const fakeConvs = this._buildCollectionAsConversations(collection, conversations);
+      const content = exportAsHTML(fakeConvs, { ...this.options, displayNames: names });
+      downloadFile(content, `精选集_${dateSuffix}.html`, 'text/html;charset=utf-8');
+      return;
+    }
+
+    // Text and Markdown formats
+    const isTxt = this.format === 'txt';
+    let output = isTxt ? '精选集导出\n' + '='.repeat(40) + '\n\n' : '# 精选集导出\n\n';
+
     const grouped = new Map();
     for (const item of collection) {
       if (!grouped.has(item.convUuid)) grouped.set(item.convUuid, []);
@@ -308,27 +326,74 @@ export class ExportPanel {
     for (const [convUuid, items] of grouped) {
       const conv = conversations.find(c => c.uuid === convUuid);
       if (!conv) continue;
-      output += `## ${conv.name || '未命名对话'}\n\n`;
+      output += isTxt
+        ? (conv.name || '未命名对话') + '\n' + '-'.repeat(30) + '\n\n'
+        : `## ${conv.name || '未命名对话'}\n\n`;
+
       const sortedItems = items.sort((a, b) => a.msgIndex - b.msgIndex);
       for (const item of sortedItems) {
         const msg = conv.messages[item.msgIndex];
         if (!msg) continue;
         const sender = msg.sender === 'human' ? (names.human || 'Human') : (names.assistant || 'Assistant');
-        output += `### ${sender} (${formatTimestamp(msg.createdAt)})\n\n`;
+
+        if (isTxt) {
+          output += `[${sender}] ${formatTimestamp(msg.createdAt)}\n`;
+        } else {
+          output += `### ${sender} (${formatTimestamp(msg.createdAt)})\n\n`;
+        }
+
         for (const block of msg.contentBlocks) {
-          if (block.type === 'text') output += block.text + '\n\n';
-          else if (block.type === 'thinking' && this.options.includeThinking && block.thinking) {
-            output += `> \uD83D\uDCAD **思考过程**\n>\n`;
-            for (const line of block.thinking.split('\n')) output += `> ${line}\n`;
-            output += '\n';
+          if (block.type === 'text') {
+            output += block.text + '\n' + (isTxt ? '' : '\n');
+          } else if (block.type === 'thinking' && this.options.includeThinking && block.thinking) {
+            if (isTxt) {
+              output += '\n--- 思考过程 ---\n' + block.thinking + '\n--- 思考结束 ---\n';
+            } else {
+              output += `> \uD83D\uDCAD **思考过程**\n>\n`;
+              for (const line of block.thinking.split('\n')) output += `> ${line}\n`;
+              output += '\n';
+            }
           }
         }
-        output += '---\n\n';
+        output += isTxt ? '\n---\n\n' : '---\n\n';
       }
     }
 
-    const dateSuffix = new Date().toISOString().slice(0, 10);
-    downloadFile(output, `精选集_${dateSuffix}.md`, 'text/markdown;charset=utf-8');
+    const ext = isTxt ? 'txt' : 'md';
+    const mime = isTxt ? 'text/plain;charset=utf-8' : 'text/markdown;charset=utf-8';
+    downloadFile(output, `精选集_${dateSuffix}.${ext}`, mime);
+  }
+
+  _buildCollectionData(collection, conversations) {
+    const result = [];
+    const grouped = new Map();
+    for (const item of collection) {
+      if (!grouped.has(item.convUuid)) grouped.set(item.convUuid, []);
+      grouped.get(item.convUuid).push(item);
+    }
+    for (const [convUuid, items] of grouped) {
+      const conv = conversations.find(c => c.uuid === convUuid);
+      if (!conv) continue;
+      const msgs = items.sort((a, b) => a.msgIndex - b.msgIndex).map(item => conv.messages[item.msgIndex]).filter(Boolean);
+      result.push({ name: conv.name, uuid: conv.uuid, messages: msgs });
+    }
+    return result;
+  }
+
+  _buildCollectionAsConversations(collection, conversations) {
+    const grouped = new Map();
+    for (const item of collection) {
+      if (!grouped.has(item.convUuid)) grouped.set(item.convUuid, []);
+      grouped.get(item.convUuid).push(item);
+    }
+    const result = [];
+    for (const [convUuid, items] of grouped) {
+      const conv = conversations.find(c => c.uuid === convUuid);
+      if (!conv) continue;
+      const msgs = items.sort((a, b) => a.msgIndex - b.msgIndex).map(item => conv.messages[item.msgIndex]).filter(Boolean);
+      result.push({ ...conv, messages: msgs, stats: { ...conv.stats, messageCount: msgs.length } });
+    }
+    return result;
   }
 
   _doExport(conversations) {
