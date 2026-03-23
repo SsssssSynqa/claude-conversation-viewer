@@ -224,22 +224,31 @@ export class StatsPanel {
 
     // ---- Word Cloud (Top Words) ----
     if (stats.topWords.length > 0) {
-      parent.appendChild(this._sectionTitle('高频词'));
+      const wordSection = document.createElement('div');
+      wordSection.style.cssText = 'margin-bottom:28px;';
+
+      const wordTitleRow = document.createElement('div');
+      wordTitleRow.style.cssText = 'display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;';
+      const wordTitle = this._sectionTitle('高频词');
+      wordTitle.style.marginBottom = '0';
+      wordTitleRow.appendChild(wordTitle);
+
+      const resetBtn = document.createElement('button');
+      resetBtn.style.cssText = 'padding:3px 10px;border:1px solid var(--border);border-radius:4px;background:transparent;color:var(--text-muted);cursor:pointer;font-size:0.7rem;';
+      resetBtn.textContent = '重置隐藏';
+      resetBtn.addEventListener('click', () => {
+        localStorage.removeItem('cv-hidden-words');
+        const hiddenWords = new Set();
+        const refreshed = stats.allWords.filter(w => !hiddenWords.has(w.text)).slice(0, 40);
+        this._renderWordCloud(cloudContainer, refreshed, stats.allWords, 'word');
+      });
+      wordTitleRow.appendChild(resetBtn);
+      wordSection.appendChild(wordTitleRow);
+
       const cloudContainer = document.createElement('div');
-      cloudContainer.style.cssText = 'display:flex;flex-wrap:wrap;gap:8px;margin-bottom:28px;padding:16px;background:var(--bg-secondary);border-radius:var(--radius-sm);justify-content:center;';
-      const maxFreq = stats.topWords[0].count;
-      for (const word of stats.topWords) {
-        const tag = document.createElement('span');
-        const size = 0.7 + (word.count / maxFreq) * 1.6;
-        const opacity = 0.4 + (word.count / maxFreq) * 0.6;
-        tag.style.cssText = `font-size:${size}rem;color:var(--accent);opacity:${opacity};padding:2px 6px;cursor:default;transition:opacity 0.15s;`;
-        tag.textContent = word.text;
-        tag.title = word.count + ' 次';
-        tag.addEventListener('mouseenter', () => tag.style.opacity = '1');
-        tag.addEventListener('mouseleave', () => tag.style.opacity = String(opacity));
-        cloudContainer.appendChild(tag);
-      }
-      parent.appendChild(cloudContainer);
+      this._renderWordCloud(cloudContainer, stats.topWords, stats.allWords, 'word');
+      wordSection.appendChild(cloudContainer);
+      parent.appendChild(wordSection);
     }
 
     // ---- Emoji Ranking ----
@@ -292,20 +301,13 @@ export class StatsPanel {
 
     // ---- Title Word Cloud ----
     if (stats.topTitleWords.length > 0) {
-      parent.appendChild(this._sectionTitle('对话标题高频词'));
-      const titleCloud = document.createElement('div');
-      titleCloud.style.cssText = 'display:flex;flex-wrap:wrap;gap:8px;margin-bottom:28px;padding:16px;background:var(--bg-secondary);border-radius:var(--radius-sm);justify-content:center;';
-      const maxTitleFreq = stats.topTitleWords[0].count;
-      for (const word of stats.topTitleWords) {
-        const tag = document.createElement('span');
-        const size = 0.8 + (word.count / maxTitleFreq) * 2;
-        const opacity = 0.4 + (word.count / maxTitleFreq) * 0.6;
-        tag.style.cssText = `font-size:${size}rem;color:var(--accent);opacity:${opacity};padding:2px 6px;`;
-        tag.textContent = word.text;
-        tag.title = word.count + ' 次';
-        titleCloud.appendChild(tag);
-      }
-      parent.appendChild(titleCloud);
+      const titleSection = document.createElement('div');
+      titleSection.style.cssText = 'margin-bottom:28px;';
+      titleSection.appendChild(this._sectionTitle('对话标题高频词'));
+      const titleCloudContainer = document.createElement('div');
+      this._renderWordCloud(titleCloudContainer, stats.topTitleWords, stats.allTitleWords, 'title');
+      titleSection.appendChild(titleCloudContainer);
+      parent.appendChild(titleSection);
     }
   }
 
@@ -424,18 +426,22 @@ export class StatsPanel {
 
     // Top words (filter stop words)
     const stopWords = new Set(['的', '了', '是', '我', '你', '在', '有', '不', '这', '就', '都', '也', '和', '人', '吗', '啊', '好', '那', '很', '说', '会', '对', '到', '要', '一', '个', '上', '么', '他', '她', '它', '们', '去', '来', '着', '过', '还', '呢', '被', '把', '但', '又', '而', '所以', '如果', '因为', '可以', '什么', '没有', '自己', '知道', '觉得', '其实', '这个', '那个', '时候', '已经', '然后', 'the', 'a', 'an', 'is', 'are', 'was', 'were', 'to', 'of', 'in', 'and', 'or', 'for', 'on', 'at', 'with', 'that', 'this', 'it', 'be', 'as', 'by', 'from', 'not', 'but', 'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'can', 'could', 'should', 'may', 'might', 'i', 'you', 'we', 'they', 'he', 'she']);
-    const topWords = [...wordFreq.entries()]
+    // Keep a large pool, display will filter by hidden words
+    const allWords = [...wordFreq.entries()]
       .filter(([w]) => !stopWords.has(w) && w.length >= 2)
       .sort((a, b) => b[1] - a[1])
-      .slice(0, 40)
+      .slice(0, 200)
       .map(([text, count]) => ({ text, count }));
 
-    // Top title words
-    const topTitleWords = [...titleWords.entries()]
+    const allTitleWords = [...titleWords.entries()]
       .filter(([w]) => !stopWords.has(w) && w.length >= 2)
       .sort((a, b) => b[1] - a[1])
-      .slice(0, 20)
+      .slice(0, 60)
       .map(([text, count]) => ({ text, count }));
+
+    const hiddenWords = this._loadHiddenWords();
+    const topWords = allWords.filter(w => !hiddenWords.has(w.text)).slice(0, 40);
+    const topTitleWords = allTitleWords.filter(w => !hiddenWords.has(w.text)).slice(0, 20);
 
     // Top emojis
     const topEmojis = [...emojiFreq.entries()]
@@ -454,12 +460,74 @@ export class StatsPanel {
       daySpan, longestStreak, lateNightConvs, totalFlags,
       topConversations, deepNightConvs,
       monthlyData, hourlyActivity, weekdayActivity, dateHeatmap,
-      topWords, topTitleWords, topEmojis,
+      topWords, topTitleWords, allWords, allTitleWords, topEmojis,
       firstConv, lastConv,
     };
   }
 
   // ---- Helpers ----
+
+  _renderWordCloud(container, visibleWords, allWords, type) {
+    container.textContent = '';
+    container.style.cssText = 'display:flex;flex-wrap:wrap;gap:6px;padding:16px;background:var(--bg-secondary);border-radius:var(--radius-sm);justify-content:center;align-items:center;';
+
+    if (visibleWords.length === 0) {
+      const empty = document.createElement('span');
+      empty.style.cssText = 'color:var(--text-muted);font-size:0.85rem;';
+      empty.textContent = '全部隐藏了，点击"重置隐藏"恢复';
+      container.appendChild(empty);
+      return;
+    }
+
+    const maxFreq = visibleWords[0].count;
+    for (const word of visibleWords) {
+      const tag = document.createElement('span');
+      tag.style.cssText = 'display:inline-flex;align-items:center;gap:2px;position:relative;';
+
+      const size = type === 'title'
+        ? 0.8 + (word.count / maxFreq) * 2
+        : 0.7 + (word.count / maxFreq) * 1.6;
+      const opacity = 0.5 + (word.count / maxFreq) * 0.5;
+
+      const text = document.createElement('span');
+      text.style.cssText = `font-size:${size}rem;color:var(--accent);opacity:${opacity};padding:2px 4px;cursor:default;transition:opacity 0.15s;`;
+      text.textContent = word.text;
+      text.title = word.count + ' 次';
+      tag.appendChild(text);
+
+      // Delete button (visible on hover)
+      const delBtn = document.createElement('span');
+      delBtn.style.cssText = 'font-size:0.6rem;color:var(--text-muted);cursor:pointer;opacity:0;transition:opacity 0.15s;padding:0 2px;vertical-align:super;';
+      delBtn.textContent = '\u2715';
+      delBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const hidden = this._loadHiddenWords();
+        hidden.add(word.text);
+        this._saveHiddenWords(hidden);
+        const displayCount = type === 'title' ? 20 : 40;
+        const refreshed = allWords.filter(w => !hidden.has(w.text)).slice(0, displayCount);
+        this._renderWordCloud(container, refreshed, allWords, type);
+      });
+      tag.appendChild(delBtn);
+
+      tag.addEventListener('mouseenter', () => { text.style.opacity = '1'; delBtn.style.opacity = '1'; });
+      tag.addEventListener('mouseleave', () => { text.style.opacity = String(opacity); delBtn.style.opacity = '0'; });
+
+      container.appendChild(tag);
+    }
+  }
+
+  _loadHiddenWords() {
+    try {
+      const saved = localStorage.getItem('cv-hidden-words');
+      if (saved) return new Set(JSON.parse(saved));
+    } catch (e) { /* ignore */ }
+    return new Set();
+  }
+
+  _saveHiddenWords(hiddenSet) {
+    localStorage.setItem('cv-hidden-words', JSON.stringify([...hiddenSet]));
+  }
 
   _sectionTitle(text) {
     const el = document.createElement('h3');
