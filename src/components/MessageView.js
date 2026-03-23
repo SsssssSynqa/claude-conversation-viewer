@@ -96,26 +96,29 @@ export class MessageView {
     const headerBtns = document.createElement('div');
     headerBtns.style.cssText = 'display:flex;gap:6px;flex-shrink:0;align-items:center;';
 
-    // Select mode toggle switch
-    const toggleWrapper = document.createElement('div');
-    toggleWrapper.style.cssText = 'display:flex;align-items:center;gap:0;border-radius:20px;overflow:hidden;border:1px solid var(--border);cursor:pointer;flex-shrink:0;height:30px;';
+    // Toggle switch — pill shape with sliding circle
+    const toggleOuter = document.createElement('div');
+    toggleOuter.style.cssText = 'display:flex;align-items:center;gap:8px;flex-shrink:0;cursor:pointer;';
 
-    const viewLabel = document.createElement('span');
-    viewLabel.style.cssText = `padding:4px 12px;font-size:0.72rem;font-weight:600;transition:all 0.2s;user-select:none;height:100%;display:flex;align-items:center;${!this.selectMode ? 'background:var(--accent);color:#fff;' : 'background:transparent;color:var(--text-muted);'}`;
-    viewLabel.textContent = '查看';
+    const toggleLabel = document.createElement('span');
+    toggleLabel.style.cssText = 'font-size:0.75rem;color:var(--text-muted);user-select:none;';
+    toggleLabel.textContent = this.selectMode ? '选择' : '查看';
 
-    const selectLabel = document.createElement('span');
-    selectLabel.style.cssText = `padding:4px 12px;font-size:0.72rem;font-weight:600;transition:all 0.2s;user-select:none;height:100%;display:flex;align-items:center;${this.selectMode ? 'background:var(--accent);color:#fff;' : 'background:transparent;color:var(--text-muted);'}`;
-    selectLabel.textContent = '选择';
+    const toggleTrack = document.createElement('div');
+    toggleTrack.style.cssText = `width:44px;height:24px;border-radius:12px;position:relative;transition:background 0.2s;${this.selectMode ? 'background:var(--accent);' : 'background:var(--border-strong);'}`;
 
-    toggleWrapper.appendChild(viewLabel);
-    toggleWrapper.appendChild(selectLabel);
-    toggleWrapper.addEventListener('click', () => {
+    const toggleThumb = document.createElement('div');
+    toggleThumb.style.cssText = `width:20px;height:20px;border-radius:50%;background:#fff;position:absolute;top:2px;transition:left 0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.2);${this.selectMode ? 'left:22px;' : 'left:2px;'}`;
+    toggleTrack.appendChild(toggleThumb);
+
+    toggleOuter.appendChild(toggleLabel);
+    toggleOuter.appendChild(toggleTrack);
+    toggleOuter.addEventListener('click', () => {
       this.selectMode = !this.selectMode;
       if (!this.selectMode) this.selectedIndices.clear();
       this.renderConversation();
     });
-    headerBtns.appendChild(toggleWrapper);
+    headerBtns.appendChild(toggleOuter);
 
     // Add all to collection
     const addAllBtn = this._headerBtn('加入精选集', 'star', () => {
