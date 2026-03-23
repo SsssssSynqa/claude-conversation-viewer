@@ -150,9 +150,9 @@ export class FileUpload {
     btnRow.style.cssText = 'display:flex;gap:12px;margin-top:12px;';
 
     const saveBtn = document.createElement('button');
-    saveBtn.style.cssText = 'padding:8px 20px;border:none;border-radius:var(--radius-sm);background:var(--btn-primary-bg, var(--text-secondary));color:var(--btn-primary-text, #fff);cursor:pointer;font-size:0.85rem;font-weight:500;display:flex;align-items:center;gap:6px;transition:opacity 0.15s;';
-    saveBtn.addEventListener('mouseenter', () => saveBtn.style.opacity = '0.85');
-    saveBtn.addEventListener('mouseleave', () => saveBtn.style.opacity = '1');
+    saveBtn.style.cssText = 'padding:8px 20px;border:none;border-radius:var(--radius-sm);background:var(--btn-primary-bg, var(--text-secondary));color:var(--btn-primary-text, #fff);cursor:pointer;font-size:0.85rem;font-weight:500;display:flex;align-items:center;gap:6px;transition:all 0.2s;box-shadow:var(--shadow-xs);';
+    saveBtn.addEventListener('mouseenter', () => { saveBtn.style.opacity = '0.85'; saveBtn.style.transform = 'translateY(-1px)'; saveBtn.style.boxShadow = 'var(--shadow-sm)'; });
+    saveBtn.addEventListener('mouseleave', () => { saveBtn.style.opacity = '1'; saveBtn.style.transform = ''; saveBtn.style.boxShadow = 'var(--shadow-xs)'; });
     saveBtn.appendChild(createIcon('save', 14));
     saveBtn.appendChild(document.createTextNode(' 保存并应用'));
     saveBtn.addEventListener('click', () => {
@@ -173,7 +173,9 @@ export class FileUpload {
     btnRow.appendChild(saveBtn);
 
     const resetBtn = document.createElement('button');
-    resetBtn.style.cssText = 'padding:8px 20px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg-input);color:var(--text-secondary);cursor:pointer;font-size:0.85rem;display:flex;align-items:center;gap:6px;';
+    resetBtn.style.cssText = 'padding:8px 20px;border:none;border-radius:var(--radius-sm);background:var(--bg-input);color:var(--text-secondary);cursor:pointer;font-size:0.85rem;display:flex;align-items:center;gap:6px;transition:all 0.2s;box-shadow:var(--shadow-xs);';
+    resetBtn.addEventListener('mouseenter', () => { resetBtn.style.transform = 'translateY(-1px)'; resetBtn.style.boxShadow = 'var(--shadow-sm)'; });
+    resetBtn.addEventListener('mouseleave', () => { resetBtn.style.transform = ''; resetBtn.style.boxShadow = 'var(--shadow-xs)'; });
     resetBtn.appendChild(createIcon('reset', 14));
     resetBtn.appendChild(document.createTextNode(' 重置'));
     resetBtn.addEventListener('click', () => {
@@ -407,9 +409,9 @@ export class FileUpload {
     btnGroup.style.cssText = 'display:flex;gap:8px;flex-shrink:0;';
 
     const loadBtn = document.createElement('button');
-    loadBtn.style.cssText = 'padding:8px 16px;border:none;border-radius:var(--radius-sm);background:var(--btn-primary-bg, var(--text-secondary));color:var(--btn-primary-text, #fff);cursor:pointer;font-size:0.85rem;font-weight:500;transition:opacity 0.15s;';
-    loadBtn.addEventListener('mouseenter', () => loadBtn.style.opacity = '0.85');
-    loadBtn.addEventListener('mouseleave', () => loadBtn.style.opacity = '1');
+    loadBtn.style.cssText = 'padding:8px 16px;border:none;border-radius:var(--radius-sm);background:var(--btn-primary-bg, var(--text-secondary));color:var(--btn-primary-text, #fff);cursor:pointer;font-size:0.85rem;font-weight:500;transition:all 0.2s;box-shadow:var(--shadow-xs);';
+    loadBtn.addEventListener('mouseenter', () => { loadBtn.style.opacity = '0.85'; loadBtn.style.transform = 'translateY(-1px)'; loadBtn.style.boxShadow = 'var(--shadow-sm)'; });
+    loadBtn.addEventListener('mouseleave', () => { loadBtn.style.opacity = '1'; loadBtn.style.transform = ''; loadBtn.style.boxShadow = 'var(--shadow-xs)'; });
     loadBtn.textContent = '加载缓存';
     loadBtn.addEventListener('click', async () => {
       loadBtn.textContent = '加载中...';
@@ -431,7 +433,9 @@ export class FileUpload {
     btnGroup.appendChild(loadBtn);
 
     const clearBtn = document.createElement('button');
-    clearBtn.style.cssText = 'padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);background:transparent;color:var(--text-muted);cursor:pointer;font-size:0.8rem;';
+    clearBtn.style.cssText = 'padding:8px 12px;border:none;border-radius:var(--radius-sm);background:var(--bg-input);color:var(--text-muted);cursor:pointer;font-size:0.8rem;transition:all 0.2s;box-shadow:var(--shadow-xs);';
+    clearBtn.addEventListener('mouseenter', () => { clearBtn.style.transform = 'translateY(-1px)'; clearBtn.style.boxShadow = 'var(--shadow-sm)'; });
+    clearBtn.addEventListener('mouseleave', () => { clearBtn.style.transform = ''; clearBtn.style.boxShadow = 'var(--shadow-xs)'; });
     clearBtn.textContent = '清除';
     clearBtn.addEventListener('click', async () => {
       await clearCache();
