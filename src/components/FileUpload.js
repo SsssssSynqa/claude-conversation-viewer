@@ -380,7 +380,7 @@ export class FileUpload {
 
     // Insert cache banner before the upload zone
     const banner = document.createElement('div');
-    banner.style.cssText = 'width:100%;max-width:520px;background:var(--bg-secondary);border:none;border-radius:var(--radius-lg);padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;box-shadow:var(--shadow-xs);';
+    banner.style.cssText = 'width:100%;max-width:560px;background:var(--bg-secondary);border:none;border-radius:var(--radius-lg);padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;box-shadow:var(--shadow-xs);';
 
     const info_div = document.createElement('div');
     const title = document.createElement('div');

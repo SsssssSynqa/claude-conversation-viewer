@@ -213,7 +213,7 @@ body {
 
 .name-config {
   width: 100%;
-  max-width: 520px;
+  max-width: 560px;
   background: var(--bg-card);
   padding: var(--space-lg) var(--space-xl);
   border-radius: var(--radius-xl);
