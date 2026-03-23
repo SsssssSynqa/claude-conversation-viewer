@@ -33,7 +33,7 @@ export class FileUpload {
     greetingRow.appendChild(sparkEl);
 
     const h1 = document.createElement('h1');
-    h1.style.cssText = 'font-family:var(--font-display);font-size:2.4rem;font-weight:330;color:var(--text-secondary);line-height:1.3;';
+    h1.style.cssText = 'font-family:var(--font-display);font-size:2.5rem;font-weight:400;color:var(--text-primary);line-height:1.3;';
     h1.textContent = 'Claude 对话记忆查看器';
     greetingRow.appendChild(h1);
     screen.appendChild(greetingRow);
