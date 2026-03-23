@@ -189,7 +189,7 @@ body {
 
 .upload-zone {
   width: 100%;
-  max-width: 560px;
+  max-width: 504px;
   border: none;
   border-radius: 20px;
   text-align: center;
@@ -218,7 +218,7 @@ body {
 
 .name-config {
   width: 100%;
-  max-width: 560px;
+  max-width: 504px;
   background: var(--bg-card);
   padding: var(--space-lg) var(--space-xl);
   border-radius: 20px;

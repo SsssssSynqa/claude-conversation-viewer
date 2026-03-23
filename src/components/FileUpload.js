@@ -23,18 +23,18 @@ export class FileUpload {
 
     // Title — Claude greeting style with spark logo
     const greetingRow = document.createElement('div');
-    greetingRow.style.cssText = 'display:flex;align-items:center;gap:14px;justify-content:center;';
+    greetingRow.style.cssText = 'display:flex;align-items:center;gap:9px;justify-content:center;';
 
     // Spark logo (hardcoded SVG asset, safe for innerHTML)
     const sparkEl = document.createElement('span');
-    sparkEl.style.cssText = 'width:42px;height:42px;display:inline-flex;color:var(--accent);flex-shrink:0;';
+    sparkEl.style.cssText = 'width:24px;height:24px;display:inline-flex;color:var(--accent);flex-shrink:0;';
     const sparkTemplate = document.createElement('template');
     sparkTemplate.innerHTML = SPARK_SVG; // Safe: hardcoded constant, not user input
     sparkEl.appendChild(sparkTemplate.content);
     greetingRow.appendChild(sparkEl);
 
     const h1 = document.createElement('h1');
-    h1.style.cssText = 'font-family:var(--font-display);font-size:2.5rem;font-weight:400;color:var(--text-primary);line-height:1.3;';
+    h1.style.cssText = 'font-family:var(--font-display);font-size:30px;font-weight:330;color:#3d3d3a;line-height:45px;';
     h1.textContent = 'Claude 对话记忆查看器';
     greetingRow.appendChild(h1);
     screen.appendChild(greetingRow);
@@ -43,7 +43,7 @@ export class FileUpload {
     const zone = document.createElement('div');
     zone.className = 'upload-zone';
     zone.id = 'upload-zone';
-    zone.style.cssText = 'padding:0;text-align:left;margin-top:24px;';
+    zone.style.cssText = 'padding:0;text-align:left;margin-top:24px;max-width:504px;';
 
     // Text area (fake placeholder)
     const fakeInput = document.createElement('div');
@@ -59,8 +59,8 @@ export class FileUpload {
     const leftBtns = document.createElement('div');
     leftBtns.style.cssText = 'display:flex;align-items:center;gap:4px;';
     const plusBtn = document.createElement('div');
-    plusBtn.style.cssText = 'display:flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:8px;color:var(--text-muted);';
-    plusBtn.appendChild(createIcon('plus', 20));
+    plusBtn.style.cssText = 'display:flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:4px;color:var(--text-muted);';
+    plusBtn.appendChild(createIcon('plus', 18));
     leftBtns.appendChild(plusBtn);
     toolbarRow.appendChild(leftBtns);
 
@@ -385,7 +385,7 @@ export class FileUpload {
 
     // Insert cache banner before the upload zone
     const banner = document.createElement('div');
-    banner.style.cssText = 'width:100%;max-width:560px;background:var(--bg-card);border:none;border-radius:20px;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;box-shadow:var(--shadow);transition:box-shadow 0.2s,transform 0.2s;';
+    banner.style.cssText = 'width:100%;max-width:504px;background:var(--bg-card);border:none;border-radius:20px;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;box-shadow:var(--shadow);transition:box-shadow 0.2s,transform 0.2s;';
     banner.addEventListener('mouseenter', () => { banner.style.boxShadow = 'var(--shadow-sm)'; banner.style.transform = 'translateY(-1px)'; });
     banner.addEventListener('mouseleave', () => { banner.style.boxShadow = 'var(--shadow)'; banner.style.transform = ''; });
 
