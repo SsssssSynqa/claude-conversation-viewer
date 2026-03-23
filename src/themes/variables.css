@@ -131,9 +131,9 @@
   --accent-bg: rgba(217, 119, 87, 0.08);
   --border: rgba(31, 30, 29, 0.08);
   --border-strong: rgba(31, 30, 29, 0.12);
-  /* Claude official shadow: exact values from claude.ai */
-  --shadow: 0 3px 15px rgba(0, 0, 0, 0.075), 0 0 0 0.5px rgba(31, 30, 29, 0.3);
-  --shadow-sm: 0 3px 15px rgba(0, 0, 0, 0.1), 0 0 0 0.5px rgba(31, 30, 29, 0.4);
+  /* Claude official shadow: exact values from claude.ai, border thinned */
+  --shadow: 0 3px 15px rgba(0, 0, 0, 0.05), 0 0 0 0.5px rgba(31, 30, 29, 0.12);
+  --shadow-sm: 0 3px 15px rgba(0, 0, 0, 0.08), 0 0 0 0.5px rgba(31, 30, 29, 0.2);
   --shadow-xs: 0 0 0 0.5px rgba(31, 30, 29, 0.08);
   --shadow-inset: inset 0 0 0 0.5px rgba(31, 30, 29, 0.1);
   --sidebar-bg: #faf9f5;

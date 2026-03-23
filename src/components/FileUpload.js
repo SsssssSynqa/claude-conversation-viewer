@@ -233,12 +233,18 @@ export class FileUpload {
     hintsWrapper.style.cssText = 'text-align:center;margin-top:8px;';
     const subtitle = document.createElement('p');
     subtitle.style.cssText = 'color:var(--text-muted);font-size:12px;';
-    subtitle.textContent = '上传 Claude 导出的 JSON 文件，回顾你的每一段对话';
+    subtitle.textContent = '上传 Claude 导出的 JSON 文件，回顾和整理你与Claude的每一段对话';
     hintsWrapper.appendChild(subtitle);
     const hintPath = document.createElement('p');
     hintPath.style.cssText = 'color:var(--text-muted);font-size:12px;margin-top:4px;';
     hintPath.textContent = 'Claude Settings → Data Export → 下载的 conversations.json';
     hintsWrapper.appendChild(hintPath);
+
+    const credit = document.createElement('p');
+    credit.style.cssText = 'color:var(--text-muted);font-size:11px;margin-top:12px;opacity:0.6;';
+    credit.textContent = 'Claude对话记忆查看器 · Made with love by Sylux & Synqa';
+    hintsWrapper.appendChild(credit);
+
     screen.appendChild(hintsWrapper);
 
     // Error banner
