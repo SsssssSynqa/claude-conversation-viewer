@@ -1,5 +1,6 @@
 /* ============================================
-   Base Styles — Reset, Typography, Layout
+   Base Styles — Apple-level aesthetics
+   Minimalism · Typography · Whitespace · Hierarchy
    ============================================ */
 
 *, *::before, *::after {
@@ -12,6 +13,7 @@ html {
   font-size: 16px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 body {
@@ -21,41 +23,49 @@ body {
   min-height: 100vh;
   transition: background-color var(--transition), color var(--transition);
   overflow: hidden;
+  letter-spacing: -0.01em;
+  line-height: 1.5;
 }
 
-/* Dark theme gradient background */
+/* Dark theme solid background */
 [data-theme="dark"] body,
 [data-theme="auto"] body {
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-  background-attachment: fixed;
+  background: #1a1a1e;
 }
 
 @media (prefers-color-scheme: light) {
   [data-theme="auto"] body {
-    background: #fafaf8;
+    background: var(--bg-primary);
   }
 }
 
-/* Scrollbar */
+/* Scrollbar — ultra-thin, subtle */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--scrollbar-track);
+  background: transparent;
 }
 ::-webkit-scrollbar-thumb {
   background: var(--scrollbar-thumb);
-  border-radius: 3px;
+  border-radius: 10px;
 }
 ::-webkit-scrollbar-thumb:hover {
   background: var(--accent);
 }
 
-/* Focus */
+/* Focus — subtle ring */
 :focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* Selection color */
+::selection {
+  background: var(--accent-bg);
+  color: var(--text-primary);
 }
 
 /* ---- App Shell ---- */
@@ -65,55 +75,30 @@ body {
   flex-direction: column;
 }
 
-/* ---- Toolbar ---- */
+/* ---- Toolbar — minimal, barely-there ---- */
 .toolbar {
   height: var(--toolbar-height);
   display: flex;
   align-items: center;
-  padding: 0 16px;
+  padding: 0 var(--space-lg);
   background: var(--bg-secondary);
   border-bottom: 1px solid var(--border);
-  gap: 12px;
+  gap: var(--space-md);
   flex-shrink: 0;
   z-index: 100;
+  backdrop-filter: var(--backdrop-blur);
+  -webkit-backdrop-filter: var(--backdrop-blur);
 }
 
 .toolbar-title {
-  font-size: 1.1rem;
+  font-size: 0.9rem;
   font-weight: 600;
+  letter-spacing: -0.02em;
   background: var(--gradient-header);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   white-space: nowrap;
-}
-
-.toolbar-spacer {
-  flex: 1;
-}
-
-.toolbar-btn {
-  background: none;
-  border: none;
-  color: var(--text-secondary);
-  cursor: pointer;
-  padding: 8px;
-  border-radius: var(--radius-sm);
-  font-size: 1.2rem;
-  transition: all var(--transition);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.toolbar-btn:hover {
-  background: var(--bg-card-hover);
-  color: var(--text-primary);
-}
-
-.toolbar-btn.active {
-  color: var(--accent);
-  background: var(--accent-bg);
 }
 
 /* ---- Two-Panel Layout ---- */
@@ -154,64 +139,68 @@ body {
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  padding: 40px 20px;
-  gap: 24px;
+  padding: var(--space-2xl) var(--space-lg);
+  gap: var(--space-lg);
   overflow-y: auto;
 }
 
 .upload-zone {
   width: 100%;
-  max-width: 560px;
-  padding: 60px 40px;
-  border: 2px dashed var(--border-strong);
+  max-width: 480px;
+  padding: var(--space-2xl) var(--space-xl);
+  border: 1.5px dashed var(--border-strong);
   border-radius: var(--radius-lg);
   text-align: center;
   cursor: pointer;
   transition: all var(--transition);
-  background: var(--bg-card);
+  background: transparent;
 }
 
 .upload-zone:hover,
 .upload-zone.dragover {
   border-color: var(--accent);
   background: var(--accent-bg);
+  transform: translateY(-1px);
 }
 
 .upload-zone-icon {
-  font-size: 3rem;
-  margin-bottom: 16px;
+  font-size: 2.4rem;
+  margin-bottom: var(--space-md);
+  opacity: 0.7;
 }
 
 .upload-zone-text {
   color: var(--text-secondary);
-  font-size: 1rem;
-  line-height: 1.6;
+  font-size: 0.9rem;
+  line-height: 1.7;
 }
 
 .upload-zone-text strong {
   color: var(--accent);
+  font-weight: 500;
 }
 
 .name-config {
   width: 100%;
-  max-width: 560px;
+  max-width: 480px;
   background: var(--bg-card);
-  padding: 20px 24px;
+  padding: var(--space-lg);
   border-radius: var(--radius);
   border: 1px solid var(--border);
 }
 
 .name-config-title {
-  font-size: 0.8rem;
+  font-size: 0.72rem;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 0.08em;
   color: var(--text-muted);
-  margin-bottom: 12px;
+  margin-bottom: var(--space-md);
+  font-weight: 500;
 }
 
 .name-inputs {
   display: flex;
-  gap: 12px;
+  gap: var(--space-md);
 }
 
 .name-input-group {
@@ -220,21 +209,22 @@ body {
 
 .name-input-group label {
   display: block;
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   color: var(--text-secondary);
-  margin-bottom: 4px;
+  margin-bottom: var(--space-xs);
+  font-weight: 500;
 }
 
 .name-input-group input {
   width: 100%;
-  padding: 8px 12px;
+  padding: 10px 14px;
   background: var(--bg-input);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   color: var(--text-primary);
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   font-family: var(--font-family);
-  transition: border-color var(--transition);
+  transition: border-color var(--transition-fast);
 }
 
 .name-input-group input:focus {
@@ -249,17 +239,19 @@ body {
   align-items: center;
   justify-content: center;
   height: 100vh;
-  gap: 32px;
+  gap: var(--space-xl);
 }
 
 .loading-text {
   color: var(--text-secondary);
-  font-size: 1rem;
+  font-size: 0.9rem;
+  font-weight: 400;
+  letter-spacing: -0.01em;
 }
 
 .loading-progress {
-  width: 300px;
-  height: 4px;
+  width: 240px;
+  height: 3px;
   background: var(--bg-card);
   border-radius: 2px;
   overflow: hidden;
@@ -279,10 +271,11 @@ body {
   display: inline-flex;
   align-items: center;
   padding: 2px 8px;
-  border-radius: 10px;
-  font-size: 0.75rem;
+  border-radius: 6px;
+  font-size: 0.72rem;
   font-weight: 500;
   gap: 4px;
+  letter-spacing: 0;
 }
 
 .badge-thinking {
@@ -305,10 +298,10 @@ body {
 
 /* ---- Error / Info Banners ---- */
 .banner {
-  padding: 12px 20px;
+  padding: var(--space-md) var(--space-lg);
   border-radius: var(--radius-sm);
-  font-size: 0.9rem;
-  margin: 12px;
+  font-size: 0.85rem;
+  margin: var(--space-md);
 }
 
 .banner-error {
@@ -323,6 +316,12 @@ body {
   color: var(--accent-light);
 }
 
+/* ---- Buttons — refined ---- */
+button {
+  font-family: var(--font-family);
+  letter-spacing: -0.01em;
+}
+
 /* ---- Responsive ---- */
 @media (max-width: 768px) {
   .sidebar {
@@ -332,13 +331,13 @@ body {
     bottom: 0;
     z-index: 50;
     width: 85vw;
-    max-width: 360px;
+    max-width: 340px;
     transform: translateX(-100%);
     transition: transform var(--transition);
   }
   .sidebar.open {
     transform: translateX(0);
-    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.3);
+    box-shadow: 8px 0 32px rgba(0, 0, 0, 0.2);
   }
   .sidebar.collapsed {
     width: 85vw;

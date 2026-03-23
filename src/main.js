@@ -13,6 +13,7 @@ import { MessageView } from './components/MessageView.js';
 import { StatsPanel } from './components/StatsPanel.js';
 import { ExportPanel } from './components/ExportPanel.js';
 import { SearchPanel } from './components/SearchPanel.js';
+import { createIcon } from './utils/icons.js';
 
 // ---- Theme ----
 function applyTheme(theme) {
