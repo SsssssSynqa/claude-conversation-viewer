@@ -379,9 +379,8 @@ export class StatsPanel {
 
         // Longest thinking
         for (const block of msg.contentBlocks) {
-          if (block.type === 'thinking' && block.startTimestamp && block.stopTimestamp) {
-            const dur = new Date(block.stopTimestamp) - new Date(block.startTimestamp);
-            if (dur > longestThinkingMs) longestThinkingMs = dur;
+          if (block.type === 'thinking' && block.durationMs > 0) {
+            if (block.durationMs > longestThinkingMs) longestThinkingMs = block.durationMs;
           }
         }
       }
