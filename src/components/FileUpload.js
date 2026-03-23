@@ -44,6 +44,48 @@ export class FileUpload {
     subtitle.textContent = '上传 Claude 导出的 JSON 文件，回顾你的每一段对话';
     screen.appendChild(subtitle);
 
+    // Theme switcher
+    const themeSwitcher = document.createElement('div');
+    themeSwitcher.style.cssText = 'display:flex;gap:6px;margin-top:12px;padding:4px;border-radius:var(--radius);border:1px solid var(--border);background:var(--bg-card);';
+
+    const themes = [
+      { id: 'light', iconName: 'sun' },
+      { id: 'dark', iconName: 'moon' },
+      { id: 'claude', iconName: null }, // uses spark SVG
+    ];
+
+    for (const t of themes) {
+      const btn = document.createElement('button');
+      btn.dataset.theme = t.id;
+      const isActive = state.get('theme') === t.id;
+      btn.style.cssText = `display:flex;align-items:center;justify-content:center;width:36px;height:36px;border:none;border-radius:${parseInt(getComputedStyle(document.documentElement).getPropertyValue('--radius-sm')) || 8}px;cursor:pointer;transition:all var(--transition-fast);background:${isActive ? 'var(--accent-bg)' : 'transparent'};color:${isActive ? 'var(--accent)' : 'var(--text-muted)'};`;
+
+      if (t.iconName) {
+        btn.appendChild(createIcon(t.iconName, 18));
+      } else {
+        // Spark logo for Claude theme
+        const sparkSmall = document.createElement('span');
+        sparkSmall.style.cssText = 'width:18px;height:18px;display:inline-flex;';
+        const st = document.createElement('template');
+        st.innerHTML = SPARK_SVG; // Safe: hardcoded constant
+        sparkSmall.appendChild(st.content);
+        btn.appendChild(sparkSmall);
+      }
+
+      btn.addEventListener('click', () => {
+        state.set('theme', t.id);
+        // Update active states
+        themeSwitcher.querySelectorAll('button').forEach(b => {
+          const active = b.dataset.theme === t.id;
+          b.style.background = active ? 'var(--accent-bg)' : 'transparent';
+          b.style.color = active ? 'var(--accent)' : 'var(--text-muted)';
+        });
+      });
+
+      themeSwitcher.appendChild(btn);
+    }
+    screen.appendChild(themeSwitcher);
+
     // Upload zone
     const zone = document.createElement('div');
     zone.className = 'upload-zone';
