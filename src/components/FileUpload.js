@@ -434,7 +434,7 @@ export class FileUpload {
     btnGroup.appendChild(loadBtn);
 
     const clearBtn = document.createElement('button');
-    clearBtn.style.cssText = 'padding:7px 14px;border:none;border-radius:var(--radius-sm);background:var(--bg-input);color:var(--text-muted);cursor:pointer;font-size:12px;transition:all 0.2s;box-shadow:var(--shadow-xs);';
+    clearBtn.style.cssText = 'padding:7px 14px;border:none;border-radius:var(--radius-sm);background:var(--bg-input);color:var(--text-secondary);cursor:pointer;font-size:12px;transition:all 0.2s;box-shadow:var(--shadow-xs);';
     clearBtn.addEventListener('mouseenter', () => { clearBtn.style.transform = 'translateY(-1px)'; clearBtn.style.boxShadow = 'var(--shadow-sm)'; });
     clearBtn.addEventListener('mouseleave', () => { clearBtn.style.transform = ''; clearBtn.style.boxShadow = 'var(--shadow-xs)'; });
     clearBtn.textContent = '清除';

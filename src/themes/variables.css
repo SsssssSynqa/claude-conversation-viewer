@@ -35,7 +35,7 @@
   --bg-input: #252528;
   --text-primary: #f0f0f0;
   --text-secondary: #a0a0a8;
-  --text-muted: #68686f;
+  --text-muted: #85858c;
   --accent: #e07848;
   --accent-light: #f09060;
   --accent-bg: rgba(224, 120, 72, 0.12);
@@ -66,8 +66,8 @@
   --code-bg: #242428;
   --backdrop-blur: none;
   --gradient-header: linear-gradient(135deg, #e07848 0%, #f09060 100%);
-  --btn-primary-bg: var(--accent);
-  --btn-primary-text: #fff;
+  --btn-primary-bg: var(--accent-bg);
+  --btn-primary-text: var(--accent);
 }
 
 /* ---- Light Theme (开灯版 — 新拟态亮色) ---- */
@@ -111,8 +111,8 @@
   --code-bg: #dcdce0;
   --backdrop-blur: none;
   --gradient-header: linear-gradient(135deg, #d4714a 0%, #e08a60 100%);
-  --btn-primary-bg: var(--accent);
-  --btn-primary-text: #fff;
+  --btn-primary-bg: var(--accent-bg);
+  --btn-primary-text: var(--accent);
 }
 
 /* ---- Claude Theme (怀旧版 — 精确还原Claude官网) ---- */
@@ -203,8 +203,8 @@
     --code-bg: #dcdce0;
     --backdrop-blur: none;
     --gradient-header: linear-gradient(135deg, #d4714a 0%, #e08a60 100%);
-    --btn-primary-bg: var(--accent);
-    --btn-primary-text: #fff;
+    --btn-primary-bg: var(--accent-bg);
+    --btn-primary-text: var(--accent);
   }
 }
 
@@ -218,7 +218,7 @@
     --bg-input: #252528;
     --text-primary: #f0f0f0;
     --text-secondary: #a0a0a8;
-    --text-muted: #68686f;
+    --text-muted: #85858c;
     --accent: #e07848;
     --accent-light: #f09060;
     --accent-bg: rgba(224, 120, 72, 0.12);
@@ -248,7 +248,7 @@
     --code-bg: #242428;
     --backdrop-blur: none;
     --gradient-header: linear-gradient(135deg, #e07848 0%, #f09060 100%);
-    --btn-primary-bg: var(--accent);
-    --btn-primary-text: #fff;
+    --btn-primary-bg: var(--accent-bg);
+    --btn-primary-text: var(--accent);
   }
 }
