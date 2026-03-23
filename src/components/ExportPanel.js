@@ -46,6 +46,7 @@ export class ExportPanel {
       { value: 'md', label: 'Markdown' },
       { value: 'txt', label: '纯文本' },
       { value: 'html', label: 'HTML' },
+      { value: 'json', label: 'JSON' },
     ];
     for (const fmt of formats) {
       const btn = document.createElement('button');
@@ -355,6 +356,11 @@ export class ExportPanel {
         content = exportAsHTML(conversations, options);
         filename = `${nameBase}_${dateSuffix}.html`;
         mimeType = 'text/html;charset=utf-8';
+        break;
+      case 'json':
+        content = JSON.stringify(conversations, null, 2);
+        filename = `${nameBase}_${dateSuffix}.json`;
+        mimeType = 'application/json;charset=utf-8';
         break;
     }
 

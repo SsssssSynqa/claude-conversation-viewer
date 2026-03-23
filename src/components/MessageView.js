@@ -485,16 +485,18 @@ export class MessageView {
   // ---- Quick Export ----
 
   _quickExportConversation(conv) {
-    import('../utils/export.js').then(({ exportAsMarkdown, downloadFile }) => {
+    import('../utils/export.js').then(({ exportAsText, exportAsMarkdown, exportAsHTML, downloadFile }) => {
       const options = {
         includeThinking: state.get('showThinking'),
         includeToolUse: state.get('showToolUse'),
         includeFlags: state.get('showFlags'),
         displayNames: state.get('displayNames'),
       };
-      const content = exportAsMarkdown([conv], options);
       const dateSuffix = new Date().toISOString().slice(0, 10);
-      downloadFile(content, `${conv.name || '对话'}_${dateSuffix}.md`, 'text/markdown;charset=utf-8');
+      const nameBase = conv.name || '对话';
+      // Use markdown as default for quick export
+      const content = exportAsMarkdown([conv], options);
+      downloadFile(content, `${nameBase}_${dateSuffix}.md`, 'text/markdown;charset=utf-8');
     });
   }
 
