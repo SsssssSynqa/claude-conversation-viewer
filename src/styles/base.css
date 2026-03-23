@@ -27,10 +27,33 @@ body {
   line-height: 1.5;
 }
 
-/* Dark theme solid background */
+/* Theme backgrounds */
 [data-theme="dark"] body,
 [data-theme="auto"] body {
-  background: #1a1a1e;
+  background: #2a2a2e;
+}
+
+/* Neumorphic card style for light/dark (not claude theme) */
+[data-theme="light"] .name-config,
+[data-theme="light"] .upload-zone,
+[data-theme="dark"] .name-config,
+[data-theme="dark"] .upload-zone {
+  border: none;
+  box-shadow: var(--shadow);
+}
+
+[data-theme="light"] .name-input-group input,
+[data-theme="dark"] .name-input-group input {
+  border: none;
+  box-shadow: var(--shadow-inset);
+}
+
+[data-theme="light"] .upload-zone:hover,
+[data-theme="light"] .upload-zone.dragover,
+[data-theme="dark"] .upload-zone:hover,
+[data-theme="dark"] .upload-zone.dragover {
+  border: none;
+  box-shadow: var(--shadow-inset);
 }
 
 @media (prefers-color-scheme: light) {
