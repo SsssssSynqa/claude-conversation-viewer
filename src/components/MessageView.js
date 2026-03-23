@@ -1,6 +1,6 @@
 /**
  * MessageView — Right panel showing messages for selected conversation.
- * Features: all 6 content types, message-level copy/select, selection toolbar.
+ * Two modes: View (default) and Select (for batch operations).
  */
 
 import { state, saveExportCollection } from '../store/state.js';
@@ -15,9 +15,9 @@ export class MessageView {
     this.container = container;
     this.statsPanel = new StatsPanel();
     this.selectedIndices = new Set();
-    this.selectionToolbar = null;
+    this.selectMode = false;
     this.render();
-    state.on('currentConversationIndex', () => { this.selectedIndices.clear(); this.renderConversation(); });
+    state.on('currentConversationIndex', () => { this.selectedIndices.clear(); this.selectMode = false; this.renderConversation(); });
     state.on('showThinking', () => this.renderConversation());
     state.on('showToolUse', () => this.renderConversation());
     state.on('showFlags', () => this.renderConversation());
@@ -49,10 +49,7 @@ export class MessageView {
   renderConversation() {
     const index = state.get('currentConversationIndex');
     const conversations = state.get('filteredConversations') || [];
-    if (index < 0 || index >= conversations.length) {
-      this.renderEmpty();
-      return;
-    }
+    if (index < 0 || index >= conversations.length) { this.renderEmpty(); return; }
 
     const conv = conversations[index];
     const names = state.get('displayNames');
@@ -63,9 +60,8 @@ export class MessageView {
     this.container.textContent = '';
     this._removeSelectionToolbar();
 
-    // Header with time span and export button
+    // ---- Header ----
     const header = document.createElement('div');
-    header.className = 'conv-header';
     header.style.cssText = 'padding:16px 24px;border-bottom:1px solid var(--border);flex-shrink:0;';
 
     const headerTop = document.createElement('div');
@@ -73,131 +69,85 @@ export class MessageView {
 
     const titleSection = document.createElement('div');
     titleSection.style.cssText = 'flex:1;min-width:0;';
-
     const titleEl = document.createElement('h2');
-    titleEl.style.cssText = 'font-size:1.2rem;font-weight:600;margin-bottom:4px;';
+    titleEl.style.cssText = 'font-family:var(--font-display);font-size:1.2rem;font-weight:400;margin-bottom:4px;';
     titleEl.textContent = conv.name || '未命名对话';
     titleSection.appendChild(titleEl);
 
     // Time span
-    const timeSpan = document.createElement('div');
-    timeSpan.style.cssText = 'font-size:0.78rem;color:var(--text-muted);margin-bottom:4px;';
     const firstMsg = conv.messages[0];
     const lastMsg = conv.messages[conv.messages.length - 1];
     if (firstMsg?.createdAt && lastMsg?.createdAt) {
+      const timeSpan = document.createElement('div');
+      timeSpan.style.cssText = 'font-size:0.78rem;color:var(--text-muted);margin-bottom:4px;';
       timeSpan.textContent = formatTimestamp(firstMsg.createdAt) + ' \u2014 ' + formatTimestamp(lastMsg.createdAt);
+      titleSection.appendChild(timeSpan);
     }
-    titleSection.appendChild(timeSpan);
 
     const metaEl = document.createElement('div');
-    metaEl.style.cssText = 'font-size:0.8rem;color:var(--text-muted);display:flex;gap:16px;flex-wrap:wrap;';
-    const stats = [
-      conv.stats.messageCount + ' 条消息',
-      (names.human || 'Human') + ': ' + conv.stats.humanChars.toLocaleString() + ' 字',
-      (names.assistant || 'Assistant') + ': ' + conv.stats.assistantChars.toLocaleString() + ' 字',
-    ];
-    if (conv.stats.hasThinking) stats.push('\uD83D\uDCAD ' + conv.stats.thinkingCount + ' 次思考');
-    for (const s of stats) {
-      const span = document.createElement('span');
-      span.textContent = s;
-      metaEl.appendChild(span);
-    }
+    metaEl.style.cssText = 'font-size:0.78rem;color:var(--text-muted);display:flex;gap:12px;flex-wrap:wrap;';
+    const statItems = [conv.stats.messageCount + ' 条消息', (names.human || 'Human') + ': ' + conv.stats.humanChars.toLocaleString() + ' 字', (names.assistant || 'Assistant') + ': ' + conv.stats.assistantChars.toLocaleString() + ' 字'];
+    if (conv.stats.hasThinking) statItems.push(conv.stats.thinkingCount + ' 次思考');
+    for (const s of statItems) { const sp = document.createElement('span'); sp.textContent = s; metaEl.appendChild(sp); }
     titleSection.appendChild(metaEl);
     headerTop.appendChild(titleSection);
 
     // Header buttons
     const headerBtns = document.createElement('div');
-    headerBtns.style.cssText = 'display:flex;gap:8px;flex-shrink:0;';
+    headerBtns.style.cssText = 'display:flex;gap:6px;flex-shrink:0;align-items:center;';
 
-    // Add all to collection button
-    const addAllBtn = document.createElement('button');
-    addAllBtn.style.cssText = 'padding:6px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);background:transparent;color:var(--text-secondary);cursor:pointer;font-size:0.8rem;white-space:nowrap;transition:all 0.15s;';
-    addAllBtn.appendChild(createIcon('star', 14));
-    addAllBtn.appendChild(document.createTextNode(' 加入精选集'));
-    addAllBtn.addEventListener('mouseenter', () => { addAllBtn.style.borderColor = 'var(--accent)'; addAllBtn.style.color = 'var(--accent)'; });
-    addAllBtn.addEventListener('mouseleave', () => { addAllBtn.style.borderColor = 'var(--border)'; addAllBtn.style.color = 'var(--text-secondary)'; });
-    addAllBtn.addEventListener('click', () => {
+    // Select mode toggle
+    const modeBtn = this._headerBtn(this.selectMode ? '查看模式' : '选择模式', this.selectMode ? 'check' : 'selectAll', () => {
+      this.selectMode = !this.selectMode;
+      if (!this.selectMode) this.selectedIndices.clear();
+      this.renderConversation();
+    });
+    if (this.selectMode) { modeBtn.style.background = 'var(--accent-bg)'; modeBtn.style.color = 'var(--accent)'; modeBtn.style.borderColor = 'var(--accent)'; }
+    headerBtns.appendChild(modeBtn);
+
+    // Add all to collection
+    const addAllBtn = this._headerBtn('加入精选集', 'star', () => {
       const collection = state.get('exportCollection') || [];
       for (let i = 0; i < conv.messages.length; i++) {
         const msg = conv.messages[i];
         const key = conv.uuid + ':' + i;
         if (collection.some(item => item.key === key)) continue;
-        collection.push({
-          key,
-          convUuid: conv.uuid,
-          convName: conv.name || '未命名',
-          msgIndex: i,
-          sender: msg.sender,
-          preview: (msg.searchText || '').substring(0, 80),
-          timestamp: msg.createdAt,
-        });
+        collection.push({ key, convUuid: conv.uuid, convName: conv.name || '未命名', msgIndex: i, sender: msg.sender, preview: (msg.searchText || '').substring(0, 80), timestamp: msg.createdAt });
       }
       state.set('exportCollection', collection);
       saveExportCollection();
-      addAllBtn.textContent = '';
-      addAllBtn.appendChild(createIcon('check', 14));
-      addAllBtn.appendChild(document.createTextNode(' 已加入'));
-      setTimeout(() => {
-        addAllBtn.textContent = '';
-        addAllBtn.appendChild(createIcon('star', 14));
-        addAllBtn.appendChild(document.createTextNode(' 加入精选集'));
-      }, 1200);
     });
     headerBtns.appendChild(addAllBtn);
 
-    // Export this conversation button with format dropdown
+    // Export dropdown
     const exportWrapper = document.createElement('div');
-    exportWrapper.style.cssText = 'position:relative;flex-shrink:0;';
-
-    const exportBtn = document.createElement('button');
-    exportBtn.style.cssText = 'padding:6px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);background:transparent;color:var(--text-secondary);cursor:pointer;font-size:0.8rem;white-space:nowrap;transition:all 0.15s;';
-    exportBtn.appendChild(createIcon('export', 14));
-    exportBtn.appendChild(document.createTextNode(' 导出此对话 \u25BE'));
-    exportBtn.addEventListener('mouseenter', () => { exportBtn.style.borderColor = 'var(--accent)'; exportBtn.style.color = 'var(--accent)'; });
-    exportBtn.addEventListener('mouseleave', () => { if (!exportWrapper.querySelector('.export-dropdown:not(.hidden)')) { exportBtn.style.borderColor = 'var(--border)'; exportBtn.style.color = 'var(--text-secondary)'; }});
-    exportBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const dropdown = exportWrapper.querySelector('.export-dropdown');
-      dropdown.classList.toggle('hidden');
-    });
+    exportWrapper.style.cssText = 'position:relative;';
+    const exportBtn = this._headerBtn('导出此对话', 'export');
+    exportBtn.appendChild(document.createTextNode(' \u25BE'));
+    exportBtn.addEventListener('click', (e) => { e.stopPropagation(); exportWrapper.querySelector('.export-dropdown').classList.toggle('hidden'); });
     exportWrapper.appendChild(exportBtn);
 
     const dropdown = document.createElement('div');
     dropdown.className = 'export-dropdown hidden';
     dropdown.style.cssText = 'position:absolute;right:0;top:100%;margin-top:4px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);box-shadow:var(--shadow);z-index:100;min-width:160px;overflow:hidden;';
-
-    const formats = [
-      { key: 'md', label: 'Markdown (.md)' },
-      { key: 'txt', label: '纯文本 (.txt)' },
-      { key: 'html', label: 'HTML (.html)' },
-      { key: 'json', label: 'JSON (.json)' },
-    ];
-    for (const fmt of formats) {
+    for (const fmt of [{key:'md',label:'Markdown'},{key:'txt',label:'纯文本'},{key:'html',label:'HTML'},{key:'json',label:'JSON'}]) {
       const item = document.createElement('div');
       item.style.cssText = 'padding:8px 14px;cursor:pointer;font-size:0.82rem;color:var(--text-secondary);transition:background 0.15s;';
       item.textContent = fmt.label;
       item.addEventListener('mouseenter', () => item.style.background = 'var(--bg-card-hover)');
       item.addEventListener('mouseleave', () => item.style.background = '');
-      item.addEventListener('click', (e) => {
-        e.stopPropagation();
-        dropdown.classList.add('hidden');
-        this._quickExportConversation(conv, fmt.key);
-      });
+      item.addEventListener('click', (e) => { e.stopPropagation(); dropdown.classList.add('hidden'); this._quickExportConversation(conv, fmt.key); });
       dropdown.appendChild(item);
     }
     exportWrapper.appendChild(dropdown);
-
-    // Close dropdown on outside click
     document.addEventListener('click', () => dropdown.classList.add('hidden'));
-
     headerBtns.appendChild(exportWrapper);
 
     headerTop.appendChild(headerBtns);
-
     header.appendChild(headerTop);
     this.container.appendChild(header);
 
-    // Messages scroll container
+    // ---- Messages ----
     const scrollContainer = document.createElement('div');
     scrollContainer.className = 'messages-scroll';
     scrollContainer.style.cssText = 'flex:1;overflow-y:auto;padding:16px 0;';
@@ -227,68 +177,36 @@ export class MessageView {
       msgEl.dataset.msgIndex = mi;
       msgEl.style.cssText = 'padding:12px 24px;background:' + (isHuman ? 'var(--message-human-bg)' : 'var(--message-assistant-bg)') + ';border-bottom:1px solid var(--separator-color);position:relative;';
 
-      // Selection checkbox (left side)
-      const checkbox = document.createElement('input');
-      checkbox.type = 'checkbox';
-      checkbox.className = 'msg-select-checkbox';
-      checkbox.checked = this.selectedIndices.has(mi);
-      checkbox.style.cssText = 'position:absolute;left:4px;top:16px;accent-color:var(--accent);cursor:pointer;opacity:0.3;transition:opacity 0.15s;z-index:2;';
-      checkbox.addEventListener('change', () => this._toggleSelect(mi, conv, checkbox));
-      msgEl.appendChild(checkbox);
-
-      // Make checkbox more visible on hover
-      msgEl.addEventListener('mouseenter', () => {
-        checkbox.style.opacity = '1';
-        actionsBar.style.opacity = '1';
-      });
-      msgEl.addEventListener('mouseleave', () => {
-        if (!this.selectedIndices.has(mi)) checkbox.style.opacity = '0.3';
-        actionsBar.style.opacity = '0';
-      });
-      if (this.selectedIndices.has(mi)) {
-        checkbox.style.opacity = '1';
-        msgEl.style.outline = '2px solid var(--accent)';
-        msgEl.style.outlineOffset = '-2px';
+      // Selection checkbox (only in select mode)
+      if (this.selectMode) {
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.checked = this.selectedIndices.has(mi);
+        checkbox.style.cssText = 'position:absolute;left:6px;top:14px;accent-color:var(--accent);cursor:pointer;z-index:2;';
+        checkbox.addEventListener('change', () => {
+          if (checkbox.checked) this.selectedIndices.add(mi);
+          else this.selectedIndices.delete(mi);
+          this._updateSelectionToolbar(conv);
+          // Visual feedback
+          msgEl.style.outline = checkbox.checked ? '2px solid var(--accent)' : 'none';
+          msgEl.style.outlineOffset = '-2px';
+        });
+        msgEl.appendChild(checkbox);
+        if (this.selectedIndices.has(mi)) {
+          msgEl.style.outline = '2px solid var(--accent)';
+          msgEl.style.outlineOffset = '-2px';
+        }
       }
 
-      // Message header (sender name + time + action buttons)
-      const msgHeader = document.createElement('div');
-      msgHeader.className = 'message-header';
-      msgHeader.style.cssText = 'display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;';
-
-      const senderEl = document.createElement('span');
+      // Sender name
+      const senderEl = document.createElement('div');
       senderEl.className = 'message-sender';
-      senderEl.style.cssText = 'font-weight:600;font-size:0.9rem;color:' + (isHuman ? 'var(--accent)' : 'var(--text-primary)') + ';';
-      senderEl.textContent = isHuman ? (names.human || 'Human') : (names.assistant || 'Assistant');
-      msgHeader.appendChild(senderEl);
+      senderEl.style.cssText = 'font-weight:600;font-size:0.85rem;margin-bottom:6px;display:flex;align-items:center;gap:6px;color:' + (isHuman ? 'var(--accent)' : 'var(--text-primary)') + ';';
+      senderEl.appendChild(createIcon(isHuman ? 'user' : 'bot', 14));
+      senderEl.appendChild(document.createTextNode(isHuman ? (names.human || 'Human') : (names.assistant || 'Assistant')));
+      msgEl.appendChild(senderEl);
 
-      // Actions bar (copy, select-to-here, add to collection)
-      const actionsBar = document.createElement('div');
-      actionsBar.style.cssText = 'display:flex;gap:4px;opacity:0;transition:opacity 0.15s;align-items:center;';
-
-      // Copy button
-      const copyBtn = this._createActionBtn('复制', () => this._copyMessage(msg));
-      actionsBar.appendChild(copyBtn);
-
-      // Select to here
-      const selectToBtn = this._createActionBtn('选择到这里', () => this._selectToHere(mi, conv));
-      actionsBar.appendChild(selectToBtn);
-
-      // Add to collection
-      const addBtn = this._createActionBtn('+精选', () => this._addToCollection(conv, mi, msg));
-      actionsBar.appendChild(addBtn);
-
-      // Timestamp
-      const timeEl = document.createElement('span');
-      timeEl.className = 'message-time';
-      timeEl.style.cssText = 'font-size:0.75rem;color:var(--text-muted);margin-left:8px;';
-      timeEl.textContent = formatTimestamp(msg.createdAt);
-
-      actionsBar.appendChild(timeEl);
-      msgHeader.appendChild(actionsBar);
-      msgEl.appendChild(msgHeader);
-
-      // Message bubble
+      // Message content
       const bubble = document.createElement('div');
       bubble.className = 'message-bubble';
 
@@ -298,7 +216,7 @@ export class MessageView {
         for (const fileName of msg.files) {
           const fileTag = document.createElement('span');
           fileTag.className = 'badge badge-tool';
-          fileTag.textContent = '\uD83D\uDCCE ' + fileName;
+          fileTag.textContent = fileName;
           filesEl.appendChild(fileTag);
         }
         bubble.appendChild(filesEl);
@@ -313,17 +231,63 @@ export class MessageView {
           case 'flag': if (showFlags) this.renderFlagBlock(bubble, block); break;
         }
       }
-
       msgEl.appendChild(bubble);
+
+      // ---- Message Footer: timestamp + action buttons ----
+      const footer = document.createElement('div');
+      footer.style.cssText = 'display:flex;justify-content:space-between;align-items:center;margin-top:8px;opacity:0;transition:opacity 0.15s;';
+
+      const timeEl = document.createElement('span');
+      timeEl.style.cssText = 'font-size:0.72rem;color:var(--text-muted);';
+      timeEl.textContent = formatTimestamp(msg.createdAt);
+      footer.appendChild(timeEl);
+
+      const actionBtns = document.createElement('div');
+      actionBtns.style.cssText = 'display:flex;gap:4px;';
+
+      actionBtns.appendChild(this._createActionBtn('复制', () => this._copyMessage(msg)));
+      actionBtns.appendChild(this._createActionBtn('+精选', () => {
+        this._addToCollection(conv, mi, msg);
+        // Auto enter select mode and select this message
+        if (!this.selectMode) {
+          this.selectMode = true;
+          this.selectedIndices.add(mi);
+          this.renderConversation();
+        }
+      }));
+      actionBtns.appendChild(this._createActionBtn('选择到这里', () => {
+        if (!this.selectMode) { this.selectMode = true; }
+        this._selectToHere(mi, conv);
+        this.renderConversation();
+      }));
+
+      footer.appendChild(actionBtns);
+      msgEl.appendChild(footer);
+
+      // Show footer on hover
+      msgEl.addEventListener('mouseenter', () => footer.style.opacity = '1');
+      msgEl.addEventListener('mouseleave', () => footer.style.opacity = '0');
+
       scrollContainer.appendChild(msgEl);
     }
 
     this.container.appendChild(scrollContainer);
-    this._updateSelectionToolbar(conv);
+    if (this.selectMode) this._updateSelectionToolbar(conv);
+  }
+
+  // ---- Header Button Helper ----
+  _headerBtn(text, iconName, onClick) {
+    const btn = document.createElement('button');
+    btn.style.cssText = 'padding:5px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);background:transparent;color:var(--text-secondary);cursor:pointer;font-size:0.78rem;white-space:nowrap;transition:all 0.15s;display:flex;align-items:center;gap:4px;';
+    if (iconName) btn.appendChild(createIcon(iconName, 13));
+    btn.appendChild(document.createTextNode(' ' + text));
+    btn.addEventListener('mouseenter', () => { btn.style.borderColor = 'var(--accent)'; btn.style.color = 'var(--accent)'; });
+    btn.addEventListener('mouseleave', () => { if (!btn.dataset.active) { btn.style.borderColor = 'var(--border)'; btn.style.color = 'var(--text-secondary)'; }});
+    if (onClick) btn.addEventListener('click', onClick);
+    return btn;
   }
 
   // ---- Action Buttons ----
-
   _createActionBtn(text, onClick) {
     const btn = document.createElement('button');
     btn.style.cssText = 'padding:2px 8px;border:1px solid var(--border);border-radius:4px;background:var(--bg-card);color:var(--text-muted);cursor:pointer;font-size:0.7rem;transition:all 0.15s;white-space:nowrap;';
@@ -343,187 +307,76 @@ export class MessageView {
     navigator.clipboard.writeText(text.trim()).catch(() => {});
   }
 
-  _toggleSelect(mi, conv, checkbox) {
-    if (this.selectedIndices.has(mi)) {
-      this.selectedIndices.delete(mi);
-    } else {
-      this.selectedIndices.add(mi);
-    }
-    // Update visual state without full re-render
-    const msgEl = this.container.querySelector(`[data-msg-index="${mi}"]`);
-    if (msgEl) {
-      if (this.selectedIndices.has(mi)) {
-        msgEl.style.outline = '2px solid var(--accent)';
-        msgEl.style.outlineOffset = '-2px';
-        checkbox.style.opacity = '1';
-      } else {
-        msgEl.style.outline = 'none';
-        checkbox.style.opacity = '0.3';
-      }
-    }
-    this._updateSelectionToolbar(conv);
-  }
-
   _selectToHere(mi, conv) {
-    // Find the last selected index before this one, or start from 0
     let startIdx = 0;
-    for (const idx of this.selectedIndices) {
-      if (idx < mi && idx >= startIdx) startIdx = idx;
-    }
-    // If nothing selected before, start from 0
+    for (const idx of this.selectedIndices) { if (idx < mi && idx >= startIdx) startIdx = idx; }
     if (this.selectedIndices.size === 0) startIdx = 0;
-
-    // Select all messages from startIdx to mi
-    for (let i = startIdx; i <= mi; i++) {
-      this.selectedIndices.add(i);
-    }
-    // Update checkboxes visually
-    const checkboxes = this.container.querySelectorAll('.msg-select-checkbox');
-    checkboxes.forEach((cb, idx) => {
-      cb.checked = this.selectedIndices.has(idx);
-      const msgEl = cb.closest('.message-block');
-      if (msgEl) {
-        if (this.selectedIndices.has(idx)) {
-          msgEl.style.outline = '2px solid var(--accent)';
-          msgEl.style.outlineOffset = '-2px';
-          cb.style.opacity = '1';
-        } else {
-          msgEl.style.outline = 'none';
-        }
-      }
-    });
-    this._updateSelectionToolbar(conv);
+    for (let i = startIdx; i <= mi; i++) this.selectedIndices.add(i);
   }
 
   _addToCollection(conv, mi, msg) {
     const collection = state.get('exportCollection') || [];
     const key = conv.uuid + ':' + mi;
-    // Avoid duplicates
     if (collection.some(item => item.key === key)) return;
-
-    const preview = (msg.searchText || '').substring(0, 80);
-    collection.push({
-      key,
-      convUuid: conv.uuid,
-      convName: conv.name || '未命名',
-      msgIndex: mi,
-      sender: msg.sender,
-      preview,
-      timestamp: msg.createdAt,
-    });
+    collection.push({ key, convUuid: conv.uuid, convName: conv.name || '未命名', msgIndex: mi, sender: msg.sender, preview: (msg.searchText || '').substring(0, 80), timestamp: msg.createdAt });
     state.set('exportCollection', collection);
     saveExportCollection();
   }
 
-  // ---- Selection Toolbar (bottom bar) ----
-
+  // ---- Selection Toolbar (bottom bar, only in select mode) ----
   _updateSelectionToolbar(conv) {
-    if (this.selectedIndices.size === 0) {
-      this._removeSelectionToolbar();
-      return;
-    }
     this._removeSelectionToolbar();
+    if (!this.selectMode || this.selectedIndices.size === 0) return;
 
     const toolbar = document.createElement('div');
     toolbar.id = 'selection-toolbar';
-    toolbar.style.cssText = `
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      padding: 12px 24px;
-      background: var(--bg-secondary);
-      border-top: 2px solid var(--accent);
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      z-index: 50;
-      box-shadow: 0 -4px 12px rgba(0,0,0,0.15);
-    `;
+    toolbar.style.cssText = 'position:absolute;bottom:0;left:0;right:0;padding:12px 24px;background:var(--bg-secondary);border-top:2px solid var(--accent);display:flex;align-items:center;gap:12px;z-index:50;box-shadow:0 -4px 12px rgba(0,0,0,0.1);';
 
     const info = document.createElement('span');
     info.style.cssText = 'font-size:0.85rem;color:var(--text-primary);font-weight:600;';
-    info.textContent = '已选择 ' + this.selectedIndices.size + ' 条消息';
+    info.textContent = '已选 ' + this.selectedIndices.size + ' 条';
     toolbar.appendChild(info);
 
-    const spacer = document.createElement('div');
-    spacer.style.flex = '1';
-    toolbar.appendChild(spacer);
+    toolbar.appendChild(Object.assign(document.createElement('div'), { style: 'flex:1;' }));
 
-    // Copy selected
-    const copyBtn = this._createToolbarBtn('复制', () => {
-      const msgs = conv.messages;
-      let text = '';
+    toolbar.appendChild(this._toolbarBtn('复制', () => {
       const sorted = [...this.selectedIndices].sort((a, b) => a - b);
       const names = state.get('displayNames');
+      let text = '';
       for (const idx of sorted) {
-        const msg = msgs[idx];
+        const msg = conv.messages[idx];
         const sender = msg.sender === 'human' ? (names.human || 'Human') : (names.assistant || 'Assistant');
         text += `[${sender}] ${formatTimestamp(msg.createdAt)}\n`;
-        for (const block of msg.contentBlocks) {
-          if (block.type === 'text') text += block.text + '\n';
-          else if (block.type === 'thinking' && block.thinking) text += '\n[思考过程]\n' + block.thinking + '\n';
-        }
+        for (const block of msg.contentBlocks) { if (block.type === 'text') text += block.text + '\n'; }
         text += '\n---\n\n';
       }
       navigator.clipboard.writeText(text.trim()).catch(() => {});
-    });
-    toolbar.appendChild(copyBtn);
+    }));
 
-    // Add all to collection
-    const addBtn = this._createToolbarBtn('加入精选集', () => {
+    toolbar.appendChild(this._toolbarBtn('加入精选集', () => {
       const collection = state.get('exportCollection') || [];
-      const sorted = [...this.selectedIndices].sort((a, b) => a - b);
-      for (const idx of sorted) {
+      for (const idx of this.selectedIndices) {
         const msg = conv.messages[idx];
         const key = conv.uuid + ':' + idx;
         if (collection.some(item => item.key === key)) continue;
-        collection.push({
-          key,
-          convUuid: conv.uuid,
-          convName: conv.name || '未命名',
-          msgIndex: idx,
-          sender: msg.sender,
-          preview: (msg.searchText || '').substring(0, 80),
-          timestamp: msg.createdAt,
-        });
+        collection.push({ key, convUuid: conv.uuid, convName: conv.name || '未命名', msgIndex: idx, sender: msg.sender, preview: (msg.searchText || '').substring(0, 80), timestamp: msg.createdAt });
       }
       state.set('exportCollection', collection);
       saveExportCollection();
-      addBtn.textContent = '\u2713 已加入';
-      setTimeout(() => { addBtn.textContent = '加入精选集'; }, 1200);
-    });
-    toolbar.appendChild(addBtn);
+    }));
 
-    // Export selected directly
-    const exportBtn = this._createToolbarBtn('直接导出', () => {
-      const sorted = [...this.selectedIndices].sort((a, b) => a - b);
-      const selectedMsgs = sorted.map(idx => conv.messages[idx]);
-      this._exportMessages(conv, selectedMsgs);
-    });
-    exportBtn.style.background = 'var(--accent)';
-    exportBtn.style.color = '#fff';
-    exportBtn.style.borderColor = 'var(--accent)';
+    const exportBtn = this._toolbarBtn('导出选中', () => this._exportMessages(conv, [...this.selectedIndices].sort((a, b) => a - b).map(idx => conv.messages[idx])));
+    exportBtn.style.background = 'var(--accent)'; exportBtn.style.color = '#fff'; exportBtn.style.borderColor = 'var(--accent)';
     toolbar.appendChild(exportBtn);
 
-    // Clear selection
-    const clearBtn = this._createToolbarBtn('取消选择', () => {
-      this.selectedIndices.clear();
-      this.renderConversation();
-    });
-    toolbar.appendChild(clearBtn);
+    toolbar.appendChild(this._toolbarBtn('取消', () => { this.selectMode = false; this.selectedIndices.clear(); this.renderConversation(); }));
 
     this.container.appendChild(toolbar);
-    this.selectionToolbar = toolbar;
   }
 
-  _removeSelectionToolbar() {
-    const existing = document.getElementById('selection-toolbar');
-    if (existing) existing.remove();
-    this.selectionToolbar = null;
-  }
+  _removeSelectionToolbar() { document.getElementById('selection-toolbar')?.remove(); }
 
-  _createToolbarBtn(text, onClick) {
+  _toolbarBtn(text, onClick) {
     const btn = document.createElement('button');
     btn.style.cssText = 'padding:6px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);background:transparent;color:var(--text-secondary);cursor:pointer;font-size:0.82rem;transition:all 0.15s;white-space:nowrap;';
     btn.textContent = text;
@@ -532,39 +385,17 @@ export class MessageView {
   }
 
   // ---- Quick Export ----
-
   _quickExportConversation(conv, format = 'md') {
     import('../utils/export.js').then(({ exportAsText, exportAsMarkdown, exportAsHTML, downloadFile }) => {
-      const options = {
-        includeThinking: state.get('showThinking'),
-        includeToolUse: state.get('showToolUse'),
-        includeFlags: state.get('showFlags'),
-        displayNames: state.get('displayNames'),
-      };
+      const options = { includeThinking: state.get('showThinking'), includeToolUse: state.get('showToolUse'), includeFlags: state.get('showFlags'), displayNames: state.get('displayNames') };
       const dateSuffix = new Date().toISOString().slice(0, 10);
       const nameBase = conv.name || '对话';
       let content, filename, mimeType;
       switch (format) {
-        case 'txt':
-          content = exportAsText([conv], options);
-          filename = `${nameBase}_${dateSuffix}.txt`;
-          mimeType = 'text/plain;charset=utf-8';
-          break;
-        case 'html':
-          content = exportAsHTML([conv], options);
-          filename = `${nameBase}_${dateSuffix}.html`;
-          mimeType = 'text/html;charset=utf-8';
-          break;
-        case 'json':
-          content = JSON.stringify([conv], null, 2);
-          filename = `${nameBase}_${dateSuffix}.json`;
-          mimeType = 'application/json;charset=utf-8';
-          break;
-        default:
-          content = exportAsMarkdown([conv], options);
-          filename = `${nameBase}_${dateSuffix}.md`;
-          mimeType = 'text/markdown;charset=utf-8';
-          break;
+        case 'txt': content = exportAsText([conv], options); filename = `${nameBase}_${dateSuffix}.txt`; mimeType = 'text/plain;charset=utf-8'; break;
+        case 'html': content = exportAsHTML([conv], options); filename = `${nameBase}_${dateSuffix}.html`; mimeType = 'text/html;charset=utf-8'; break;
+        case 'json': content = JSON.stringify([conv], null, 2); filename = `${nameBase}_${dateSuffix}.json`; mimeType = 'application/json;charset=utf-8'; break;
+        default: content = exportAsMarkdown([conv], options); filename = `${nameBase}_${dateSuffix}.md`; mimeType = 'text/markdown;charset=utf-8'; break;
       }
       downloadFile(content, filename, mimeType);
     });
@@ -579,11 +410,7 @@ export class MessageView {
         output += `## ${sender} (${formatTimestamp(msg.createdAt)})\n\n`;
         for (const block of msg.contentBlocks) {
           if (block.type === 'text') output += block.text + '\n\n';
-          else if (block.type === 'thinking' && block.thinking) {
-            output += `> \uD83D\uDCAD **思考过程**\n>\n`;
-            for (const line of block.thinking.split('\n')) output += `> ${line}\n`;
-            output += '\n';
-          }
+          else if (block.type === 'thinking' && block.thinking) { output += `> 思考过程\n>\n`; for (const line of block.thinking.split('\n')) output += `> ${line}\n`; output += '\n'; }
         }
         output += '---\n\n';
       }
@@ -592,8 +419,7 @@ export class MessageView {
     });
   }
 
-  // ---- Content Renderers (unchanged) ----
-
+  // ---- Content Renderers ----
   renderTextBlock(parent, block) {
     const div = document.createElement('div');
     div.className = 'message-text';
@@ -611,23 +437,13 @@ export class MessageView {
     details.style.cssText = 'margin:8px 0;background:var(--thinking-bg);border:1px solid var(--thinking-border);border-radius:var(--radius-sm);overflow:hidden;';
     const summary = document.createElement('summary');
     summary.style.cssText = 'padding:8px 12px;cursor:pointer;display:flex;align-items:center;gap:8px;font-size:0.85rem;color:var(--thinking-text);user-select:none;';
-    summary.appendChild(document.createTextNode('\uD83D\uDCAD '));
+    summary.appendChild(createIcon('thought', 14));
     const label = document.createElement('span');
     label.style.fontWeight = '600';
     label.textContent = '思考过程';
     summary.appendChild(label);
-    if (block.durationText) {
-      const dur = document.createElement('span');
-      dur.className = 'badge badge-thinking';
-      dur.textContent = block.durationText;
-      summary.appendChild(dur);
-    }
-    if (block.summaries && block.summaries.length > 0) {
-      const summaryText = document.createElement('span');
-      summaryText.style.cssText = 'color:var(--text-muted);font-size:0.8rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;';
-      summaryText.textContent = '\u2014 ' + block.summaries[0];
-      summary.appendChild(summaryText);
-    }
+    if (block.durationText) { const dur = document.createElement('span'); dur.className = 'badge badge-thinking'; dur.textContent = block.durationText; summary.appendChild(dur); }
+    if (block.summaries && block.summaries.length > 0) { const st = document.createElement('span'); st.style.cssText = 'color:var(--text-muted);font-size:0.8rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;'; st.textContent = '\u2014 ' + block.summaries[0]; summary.appendChild(st); }
     details.appendChild(summary);
     const content = document.createElement('div');
     content.style.cssText = 'padding:12px 16px;font-size:0.85rem;line-height:1.6;color:var(--text-secondary);white-space:pre-wrap;word-break:break-word;max-height:400px;overflow-y:auto;';
@@ -641,30 +457,19 @@ export class MessageView {
     details.className = 'tool-block';
     details.style.cssText = 'margin:8px 0;background:var(--tool-bg);border:1px solid var(--tool-border);border-radius:var(--radius-sm);overflow:hidden;';
     const summary = document.createElement('summary');
-    summary.style.cssText = 'padding:8px 12px;cursor:pointer;font-size:0.85rem;color:var(--text-secondary);user-select:none;';
-    summary.textContent = '\uD83D\uDD27 ' + (block.toolName || 'Tool');
+    summary.style.cssText = 'padding:8px 12px;cursor:pointer;font-size:0.85rem;color:var(--text-secondary);user-select:none;display:flex;align-items:center;gap:6px;';
+    summary.appendChild(createIcon('tool', 14));
+    summary.appendChild(document.createTextNode(block.toolName || 'Tool'));
     details.appendChild(summary);
     const content = document.createElement('div');
     content.style.cssText = 'padding:12px 16px;font-size:0.8rem;';
     if (block.toolInput && Object.keys(block.toolInput).length > 0) {
-      const inputLabel = document.createElement('div');
-      inputLabel.style.cssText = 'font-weight:600;margin-bottom:4px;color:var(--text-muted);';
-      inputLabel.textContent = 'Input:';
-      content.appendChild(inputLabel);
-      const inputPre = document.createElement('pre');
-      inputPre.style.cssText = 'background:var(--code-bg);padding:8px;border-radius:4px;overflow-x:auto;font-family:var(--font-mono);font-size:0.8rem;color:var(--text-secondary);';
-      inputPre.textContent = JSON.stringify(block.toolInput, null, 2);
-      content.appendChild(inputPre);
+      const il = document.createElement('div'); il.style.cssText = 'font-weight:600;margin-bottom:4px;color:var(--text-muted);'; il.textContent = 'Input:'; content.appendChild(il);
+      const ip = document.createElement('pre'); ip.style.cssText = 'background:var(--code-bg);padding:8px;border-radius:4px;overflow-x:auto;font-family:var(--font-mono);font-size:0.8rem;color:var(--text-secondary);'; ip.textContent = JSON.stringify(block.toolInput, null, 2); content.appendChild(ip);
     }
     if (block.result) {
-      const resultLabel = document.createElement('div');
-      resultLabel.style.cssText = 'font-weight:600;margin:8px 0 4px;color:var(--text-muted);';
-      resultLabel.textContent = 'Result:';
-      content.appendChild(resultLabel);
-      const resultPre = document.createElement('pre');
-      resultPre.style.cssText = 'background:var(--code-bg);padding:8px;border-radius:4px;overflow-x:auto;font-family:var(--font-mono);font-size:0.8rem;color:var(--text-secondary);max-height:200px;overflow-y:auto;';
-      resultPre.textContent = typeof block.result === 'string' ? block.result : JSON.stringify(block.result, null, 2);
-      content.appendChild(resultPre);
+      const rl = document.createElement('div'); rl.style.cssText = 'font-weight:600;margin:8px 0 4px;color:var(--text-muted);'; rl.textContent = 'Result:'; content.appendChild(rl);
+      const rp = document.createElement('pre'); rp.style.cssText = 'background:var(--code-bg);padding:8px;border-radius:4px;overflow-x:auto;font-family:var(--font-mono);font-size:0.8rem;color:var(--text-secondary);max-height:200px;overflow-y:auto;'; rp.textContent = typeof block.result === 'string' ? block.result : JSON.stringify(block.result, null, 2); content.appendChild(rp);
     }
     details.appendChild(content);
     parent.appendChild(details);
@@ -675,8 +480,9 @@ export class MessageView {
     div.className = 'tool-result-block';
     div.style.cssText = 'margin:8px 0;background:var(--tool-bg);border:1px solid var(--tool-border);border-radius:var(--radius-sm);padding:12px 16px;';
     const label = document.createElement('div');
-    label.style.cssText = 'font-size:0.8rem;font-weight:600;color:var(--text-muted);margin-bottom:4px;';
-    label.textContent = '\uD83D\uDD27 Tool Result';
+    label.style.cssText = 'font-size:0.8rem;font-weight:600;color:var(--text-muted);margin-bottom:4px;display:flex;align-items:center;gap:6px;';
+    label.appendChild(createIcon('tool', 14));
+    label.appendChild(document.createTextNode('Tool Result'));
     div.appendChild(label);
     const pre = document.createElement('pre');
     pre.style.cssText = 'background:var(--code-bg);padding:8px;border-radius:4px;font-family:var(--font-mono);font-size:0.8rem;color:var(--text-secondary);max-height:200px;overflow:auto;';
@@ -691,14 +497,10 @@ export class MessageView {
     div.style.cssText = 'margin:8px 0;background:var(--flag-bg);border:1px solid var(--flag-border);border-radius:var(--radius-sm);padding:8px 12px;display:flex;align-items:center;gap:8px;';
     const badge = document.createElement('span');
     badge.className = 'badge badge-flag';
-    badge.textContent = '\u26A0\uFE0F ' + (block.flagType || 'flag');
+    badge.appendChild(createIcon('flag', 12));
+    badge.appendChild(document.createTextNode(' ' + (block.flagType || 'flag')));
     div.appendChild(badge);
-    if (block.helpline) {
-      const helpText = document.createElement('span');
-      helpText.style.cssText = 'font-size:0.8rem;color:var(--text-muted);';
-      helpText.textContent = block.helpline.name || '';
-      div.appendChild(helpText);
-    }
+    if (block.helpline) { const ht = document.createElement('span'); ht.style.cssText = 'font-size:0.8rem;color:var(--text-muted);'; ht.textContent = block.helpline.name || ''; div.appendChild(ht); }
     parent.appendChild(div);
   }
 }
