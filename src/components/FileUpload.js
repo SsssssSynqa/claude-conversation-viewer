@@ -44,36 +44,68 @@ export class FileUpload {
     subtitle.textContent = '上传 Claude 导出的 JSON 文件，回顾你的每一段对话';
     screen.appendChild(subtitle);
 
-    // Upload zone
+    // Upload zone — styled as Claude's input box
     const zone = document.createElement('div');
     zone.className = 'upload-zone';
     zone.id = 'upload-zone';
+    zone.style.cssText = 'width:100%;max-width:560px;background:var(--bg-card);border-radius:20px;box-shadow:0 4px 20px rgba(0,0,0,0.035), 0 0 0 0.5px rgba(31,30,29,0.12);cursor:pointer;transition:box-shadow 0.2s;padding:0;border:none;text-align:left;';
 
-    // Upload icon (SVG line art)
-    const iconWrapper = document.createElement('div');
-    iconWrapper.style.cssText = 'color:var(--text-muted);margin-bottom:16px;';
-    iconWrapper.appendChild(createIcon('file', 48));
-    zone.appendChild(iconWrapper);
+    // Text area (fake)
+    const fakeInput = document.createElement('div');
+    fakeInput.style.cssText = 'padding:16px 20px 8px;font-size:0.95rem;color:var(--text-muted);line-height:1.5;';
+    fakeInput.textContent = '点击选择 或拖拽 conversations.json 到这里';
+    zone.appendChild(fakeInput);
 
-    const text = document.createElement('div');
-    text.className = 'upload-zone-text';
+    const hintText = document.createElement('div');
+    hintText.style.cssText = 'padding:0 20px 8px;font-size:0.8rem;color:var(--text-muted);opacity:0.6;';
+    hintText.textContent = 'Claude Settings → Data Export → 下载的 conversations.json';
+    zone.appendChild(hintText);
 
-    const line1 = document.createElement('p');
-    line1.style.cssText = 'font-size:0.95rem;color:var(--text-secondary);';
-    const strong = document.createElement('strong');
-    strong.style.color = 'var(--accent)';
-    strong.textContent = '点击选择';
-    line1.appendChild(strong);
-    line1.appendChild(document.createTextNode(' 或拖拽 JSON 文件到这里'));
-    text.appendChild(line1);
+    // Toolbar row (mimics Claude's input toolbar)
+    const toolbarRow = document.createElement('div');
+    toolbarRow.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:8px 12px 12px;';
 
-    const line2 = document.createElement('p');
-    line2.style.cssText = 'font-size:0.82rem;margin-top:8px;color:var(--text-muted);';
-    line2.textContent = 'Claude Settings → Data Export → 下载的 conversations.json';
-    text.appendChild(line2);
+    // Left: + button
+    const leftBtns = document.createElement('div');
+    leftBtns.style.cssText = 'display:flex;align-items:center;gap:4px;';
+    const plusBtn = document.createElement('div');
+    plusBtn.style.cssText = 'display:flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:8px;color:var(--text-muted);';
+    plusBtn.appendChild(createIcon('plus', 20));
+    leftBtns.appendChild(plusBtn);
+    toolbarRow.appendChild(leftBtns);
 
-    zone.appendChild(text);
+    // Right: model name + voice icon
+    const rightBtns = document.createElement('div');
+    rightBtns.style.cssText = 'display:flex;align-items:center;gap:8px;';
 
+    const modelSelector = document.createElement('div');
+    modelSelector.style.cssText = 'display:flex;align-items:center;gap:4px;padding:4px 10px;border-radius:8px;font-size:13px;color:var(--text-secondary);';
+    const modelName = document.createElement('span');
+    modelName.style.cssText = 'font-weight:500;color:var(--text-primary);';
+    modelName.textContent = 'Opus 4.6';
+    modelSelector.appendChild(modelName);
+    const modelMode = document.createElement('span');
+    modelMode.style.cssText = 'color:var(--text-muted);margin-left:2px;';
+    modelMode.textContent = 'Extended';
+    modelSelector.appendChild(modelMode);
+    modelSelector.appendChild(createIcon('chevronDown', 14));
+    rightBtns.appendChild(modelSelector);
+
+    // Voice bars icon (decorative)
+    const voiceIcon = document.createElement('div');
+    voiceIcon.style.cssText = 'display:flex;align-items:center;justify-content:center;width:32px;height:32px;color:var(--text-muted);gap:1.5px;';
+    for (let i = 0; i < 5; i++) {
+      const bar = document.createElement('div');
+      const heights = [6, 10, 16, 10, 6];
+      bar.style.cssText = `width:2px;height:${heights[i]}px;background:currentColor;border-radius:1px;`;
+      voiceIcon.appendChild(bar);
+    }
+    rightBtns.appendChild(voiceIcon);
+
+    toolbarRow.appendChild(rightBtns);
+    zone.appendChild(toolbarRow);
+
+    // Hidden file input
     const fileInput = document.createElement('input');
     fileInput.type = 'file';
     fileInput.accept = '.json';
@@ -82,11 +114,13 @@ export class FileUpload {
     zone.appendChild(fileInput);
 
     zone.addEventListener('click', () => fileInput.click());
-    zone.addEventListener('dragover', (e) => { e.preventDefault(); zone.classList.add('dragover'); });
-    zone.addEventListener('dragleave', () => zone.classList.remove('dragover'));
+    zone.addEventListener('mouseenter', () => { zone.style.boxShadow = '0 4px 20px rgba(0,0,0,0.07), 0 0 0 0.5px rgba(31,30,29,0.25)'; });
+    zone.addEventListener('mouseleave', () => { zone.style.boxShadow = '0 4px 20px rgba(0,0,0,0.035), 0 0 0 0.5px rgba(31,30,29,0.12)'; });
+    zone.addEventListener('dragover', (e) => { e.preventDefault(); zone.style.boxShadow = '0 4px 20px rgba(0,0,0,0.07), 0 0 0 0.5px rgba(31,30,29,0.25)'; });
+    zone.addEventListener('dragleave', () => { zone.style.boxShadow = '0 4px 20px rgba(0,0,0,0.035), 0 0 0 0.5px rgba(31,30,29,0.12)'; });
     zone.addEventListener('drop', (e) => {
       e.preventDefault();
-      zone.classList.remove('dragover');
+      zone.style.boxShadow = '0 4px 20px rgba(0,0,0,0.035), 0 0 0 0.5px rgba(31,30,29,0.12)';
       const file = e.dataTransfer.files[0];
       if (file) this.handleFile(file);
     });
@@ -402,10 +436,10 @@ export class FileUpload {
 
     banner.appendChild(btnGroup);
 
-    // Insert before upload zone
+    // Insert after upload zone
     const uploadZone = screen.querySelector('.upload-zone');
-    if (uploadZone) {
-      screen.insertBefore(banner, uploadZone);
+    if (uploadZone && uploadZone.nextSibling) {
+      screen.insertBefore(banner, uploadZone.nextSibling);
     } else {
       screen.appendChild(banner);
     }
