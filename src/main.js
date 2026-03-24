@@ -72,7 +72,7 @@ function renderMainView() {
   // Sidebar function buttons — pill-shaped neumorphic (matching Figma)
   const sidebarActions = document.createElement('div');
   sidebarActions.className = 'sidebar-actions';
-  sidebarActions.style.cssText = 'padding:4px 16px 16px;display:flex;flex-direction:column;gap:10px;';
+  sidebarActions.style.cssText = 'padding:4px 16px 20px;display:flex;flex-direction:column;gap:14px;';
 
   // Search button — opens search panel in content area
   const searchBtn = createSidebarPillBtn('search', '搜索', () => {

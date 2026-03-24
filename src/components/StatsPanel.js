@@ -57,7 +57,7 @@ export class StatsPanel {
     titleRow.style.cssText = 'display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;';
 
     const title = document.createElement('h2');
-    title.style.cssText = 'font-size:1.4rem;background:var(--gradient-header);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;';
+    title.style.cssText = 'font-size:1.5rem;font-weight:700;color:var(--text-primary);';
     title.textContent = '对话统计';
     titleRow.appendChild(title);
 
@@ -93,7 +93,7 @@ export class StatsPanel {
 
     // ---- Basic Stats Cards (floating directly on background, no outer wrapper) ----
     const cardsGrid = document.createElement('div');
-    cardsGrid.style.cssText = 'display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px;';
+    cardsGrid.style.cssText = 'display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;';
 
     // Row 1: 4 basic counts (matching Figma layout)
     const row1Stats = [
@@ -110,7 +110,7 @@ export class StatsPanel {
       label.textContent = s.label;
       card.appendChild(label);
       const val = document.createElement('div');
-      val.style.cssText = 'font-size:1.5rem;font-weight:700;color:var(--text-primary);';
+      val.style.cssText = 'font-size:1.8rem;font-weight:800;color:var(--text-primary);letter-spacing:-0.5px;';
       val.textContent = String(s.value);
       card.appendChild(val);
       cardsGrid.appendChild(card);
@@ -139,7 +139,7 @@ export class StatsPanel {
       label.textContent = s.label;
       textDiv.appendChild(label);
       const val = document.createElement('div');
-      val.style.cssText = 'font-size:1.5rem;font-weight:700;color:var(--text-primary);';
+      val.style.cssText = 'font-size:1.8rem;font-weight:800;color:var(--text-primary);letter-spacing:-0.5px;';
       val.textContent = s.value;
       textDiv.appendChild(val);
       card.appendChild(textDiv);
@@ -330,7 +330,7 @@ export class StatsPanel {
       label.textContent = s.label;
       card.appendChild(label);
       const val = document.createElement('div');
-      val.style.cssText = 'font-size:1.5rem;font-weight:700;color:var(--text-primary);';
+      val.style.cssText = 'font-size:1.8rem;font-weight:800;color:var(--text-primary);letter-spacing:-0.5px;';
       val.textContent = String(s.value);
       card.appendChild(val);
       cardsGrid.appendChild(card);
@@ -341,7 +341,7 @@ export class StatsPanel {
     // ---- First & Last Conversation (cards float directly) ----
     if (stats.firstConv && stats.lastConv) {
       const milestoneRow = document.createElement('div');
-      milestoneRow.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px;';
+      milestoneRow.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;';
 
       milestoneRow.appendChild(this._milestoneCard('第一段对话', stats.firstConv.name || '未命名', formatTimestamp(stats.firstConv.createdAt)));
       milestoneRow.appendChild(this._milestoneCard('最近一段对话', stats.lastConv.name || '未命名', formatTimestamp(stats.lastConv.createdAt)));
@@ -353,7 +353,7 @@ export class StatsPanel {
     if (stats.yearlyData && stats.yearlyData.length > 0) {
       parent.appendChild(this._sectionTitle('年度总览'));
       const yearGrid = document.createElement('div');
-      yearGrid.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:20px;';
+      yearGrid.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:24px;';
       for (const yr of stats.yearlyData) {
         const card = this._neuCard();
         const yearLabel = document.createElement('div');
@@ -517,7 +517,7 @@ export class StatsPanel {
     // ---- Monthly Charts (side by side, each in a raised card) ----
     if (stats.monthlyData.labels.length > 1) {
       const chartsRow = document.createElement('div');
-      chartsRow.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px;';
+      chartsRow.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;';
 
       const chartCard1 = this._neuCard();
       const chartTitle1 = document.createElement('div');
@@ -631,7 +631,7 @@ export class StatsPanel {
     if (stats.totalThinkingCount > 0) {
       parent.appendChild(this._sectionTitle('思考统计'));
       const thinkGrid = document.createElement('div');
-      thinkGrid.style.cssText = 'display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px;';
+      thinkGrid.style.cssText = 'display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;';
       const thinkStats = [
         { label: '总思考次数', value: stats.totalThinkingCount.toLocaleString() + ' 次' },
         { label: '累计思考时间', value: this.formatMs(stats.totalThinkingMs) },
@@ -918,16 +918,16 @@ export class StatsPanel {
     return el;
   }
 
-  /** Neumorphic inner card — convex / raised (matching Figma design) */
+  /** Neumorphic card — convex / raised (matching Figma design) */
   _neuCard() {
     const el = document.createElement('div');
-    el.style.cssText = 'background:var(--bg-card);border-radius:var(--radius);padding:20px;text-align:left;box-shadow:var(--shadow-xs);';
+    el.style.cssText = 'background:var(--bg-card);border-radius:var(--radius-lg);padding:20px 22px;text-align:left;box-shadow:var(--shadow);';
     return el;
   }
 
   _sectionTitle(text) {
     const el = document.createElement('h3');
-    el.style.cssText = 'font-size:1rem;margin-bottom:12px;color:var(--text-primary);';
+    el.style.cssText = 'font-size:1.1rem;font-weight:700;margin-bottom:14px;margin-top:8px;color:var(--text-primary);';
     el.textContent = text;
     return el;
   }
