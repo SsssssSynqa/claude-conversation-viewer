@@ -183,7 +183,7 @@ body {
   justify-content: flex-start;
   min-height: 100vh;
   padding: 24px 24px 24px;
-  padding-top: 12vh;
+  padding-top: 15vh;
   gap: 16px;
   overflow-y: auto;
 }

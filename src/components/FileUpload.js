@@ -35,7 +35,11 @@ export class FileUpload {
 
     const h1 = document.createElement('h1');
     h1.style.cssText = 'font-family:var(--font-display);font-size:28px;font-weight:330;color:var(--text-secondary);line-height:1.3;';
-    h1.textContent = 'Claude 对话记忆查看器';
+    const claudeSpan = document.createElement('span');
+    claudeSpan.style.cssText = 'font-size:26px;vertical-align:1px;';
+    claudeSpan.textContent = 'Claude ';
+    h1.appendChild(claudeSpan);
+    h1.appendChild(document.createTextNode('对话记忆查看器'));
     greetingRow.appendChild(h1);
     greetingRow.style.cssText += 'margin-bottom:20px;';
     screen.appendChild(greetingRow);
@@ -245,12 +249,12 @@ export class FileUpload {
 
     // Spacer to push credit to bottom
     const spacer = document.createElement('div');
-    spacer.style.cssText = 'flex:1;min-height:40px;';
+    spacer.style.cssText = 'flex:1;min-height:60px;';
     screen.appendChild(spacer);
 
     // Credit at very bottom
     const credit = document.createElement('p');
-    credit.style.cssText = 'color:var(--text-muted);font-size:11px;opacity:0.5;text-align:center;padding-bottom:24px;';
+    credit.style.cssText = 'color:var(--text-muted);font-size:11px;opacity:0.5;text-align:center;padding-bottom:32px;';
     credit.textContent = 'Claude对话记忆查看器 · Made with love by Sylux & Synqa';
     screen.appendChild(credit);
 
