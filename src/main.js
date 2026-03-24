@@ -69,20 +69,20 @@ function renderMainView() {
   sidebarTitle.appendChild(titleText);
   sidebar.appendChild(sidebarTitle);
 
-  // Sidebar function buttons
+  // Sidebar function buttons — pill-shaped neumorphic (matching Figma)
   const sidebarActions = document.createElement('div');
   sidebarActions.className = 'sidebar-actions';
-  sidebarActions.style.cssText = 'padding:4px 8px 8px;display:flex;flex-direction:column;gap:2px;';
+  sidebarActions.style.cssText = 'padding:8px 12px 12px;display:flex;flex-direction:column;gap:10px;';
 
   // Search button — opens search panel in content area
-  const searchBtn = createSidebarBtn('search', '搜索', () => {
+  const searchBtn = createSidebarPillBtn('search', '搜索', () => {
     state.set('viewMode', 'search');
   });
   searchBtn.id = 'sidebar-search-btn';
   sidebarActions.appendChild(searchBtn);
 
   // Stats button — go back to homepage stats
-  const statsBtn = createSidebarBtn('stats', '统计总览', () => {
+  const statsBtn = createSidebarPillBtn('stats', '统计总览', () => {
     state.set('viewMode', 'conversation');
     state.set('currentConversationIndex', -1);
   });
@@ -90,14 +90,14 @@ function renderMainView() {
   sidebarActions.appendChild(statsBtn);
 
   // Export button — opens export panel
-  const exportBtn = createSidebarBtn('export', '导出中心', () => {
+  const exportBtn = createSidebarPillBtn('export', '导出中心', () => {
     state.set('viewMode', 'export');
   });
   exportBtn.id = 'sidebar-export-btn';
   sidebarActions.appendChild(exportBtn);
 
   // Theme switcher
-  const themeBtn = createSidebarBtn(
+  const themeBtn = createSidebarPillBtn(
     THEME_ICON_NAMES[state.get('theme')] || 'moon',
     THEME_LABELS[state.get('theme')] || '主题',
     cycleTheme
@@ -109,20 +109,20 @@ function renderMainView() {
     const btn = document.getElementById('sidebar-theme-btn');
     if (btn) {
       const oldIcon = btn.querySelector('.sidebar-btn-icon');
-      const newIcon = createIcon(THEME_ICON_NAMES[t] || 'moon', 18);
+      const newIcon = createIcon(THEME_ICON_NAMES[t] || 'moon', 16);
       newIcon.className = 'sidebar-btn-icon';
-      newIcon.style.cssText += 'color:var(--text-muted);';
+      newIcon.style.cssText += 'color:var(--text-muted);flex-shrink:0;';
       if (oldIcon) oldIcon.replaceWith(newIcon);
       btn.querySelector('.sidebar-btn-label').textContent = THEME_LABELS[t] || '主题';
     }
   });
 
-  // Settings section (display toggles + name config)
+  // Settings section (display toggles + name config) — Figma-style toggles
   const settingsSection = document.createElement('div');
-  settingsSection.style.cssText = 'padding:8px 14px 12px;border-top:1px solid var(--border);margin-top:4px;';
+  settingsSection.style.cssText = 'padding:12px 12px 12px;border-top:1px solid var(--border);margin-top:8px;';
 
   const settingsTitle = document.createElement('div');
-  settingsTitle.style.cssText = 'font-size:0.7rem;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:8px;font-weight:600;';
+  settingsTitle.style.cssText = 'font-size:0.7rem;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:10px;font-weight:600;padding:0 6px;';
   settingsTitle.textContent = '显示设置';
   settingsSection.appendChild(settingsTitle);
 
@@ -135,15 +135,41 @@ function renderMainView() {
 
   for (const t of toggles) {
     const labelEl = document.createElement('label');
-    labelEl.style.cssText = 'display:flex;align-items:center;gap:8px;cursor:pointer;color:var(--sidebar-text);font-size:0.82rem;padding:3px 0;';
+    labelEl.style.cssText = 'display:flex;align-items:center;justify-content:space-between;cursor:pointer;color:var(--sidebar-text);font-size:0.82rem;padding:6px 6px;';
+    const labelText = document.createElement('span');
+    labelText.textContent = t.label;
+    labelEl.appendChild(labelText);
+
+    // Toggle switch (Figma style)
+    const toggle = document.createElement('div');
+    toggle.style.cssText = 'width:36px;height:20px;border-radius:10px;position:relative;transition:background 0.2s;cursor:pointer;flex-shrink:0;';
+    const checked = state.get(t.key);
+    toggle.style.background = checked ? 'var(--accent)' : 'var(--border-strong)';
+    toggle.style.boxShadow = 'var(--shadow-inset)';
+
+    const knob = document.createElement('div');
+    knob.style.cssText = 'width:16px;height:16px;border-radius:50%;background:#fff;position:absolute;top:2px;transition:left 0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.2);';
+    knob.style.left = checked ? '18px' : '2px';
+    toggle.appendChild(knob);
+
+    // Hidden actual input for state
     const input = document.createElement('input');
     input.type = 'checkbox';
     input.id = t.id;
-    input.checked = state.get(t.key);
-    input.style.accentColor = 'var(--accent)';
+    input.checked = checked;
+    input.style.display = 'none';
     input.addEventListener('change', (e) => state.set(t.key, e.target.checked));
+
+    toggle.addEventListener('click', (e) => {
+      e.preventDefault();
+      input.checked = !input.checked;
+      input.dispatchEvent(new Event('change'));
+      toggle.style.background = input.checked ? 'var(--accent)' : 'var(--border-strong)';
+      knob.style.left = input.checked ? '18px' : '2px';
+    });
+
+    labelEl.appendChild(toggle);
     labelEl.appendChild(input);
-    labelEl.appendChild(document.createTextNode(t.label));
     settingsSection.appendChild(labelEl);
   }
 
@@ -244,7 +270,7 @@ function renderMainView() {
     const area = document.getElementById('content-area');
     if (!area) return;
 
-    // Update sidebar button active states
+    // Update sidebar pill button active states
     const allBtns = ['sidebar-search-btn', 'sidebar-export-btn', 'sidebar-stats-btn'];
     const activeMap = { search: 'sidebar-search-btn', export: 'sidebar-export-btn', conversation: null };
     for (const id of allBtns) {
@@ -252,9 +278,16 @@ function renderMainView() {
       if (!el) continue;
       const isActive = activeMap[mode] === id;
       el.dataset.active = isActive ? 'true' : '';
-      el.style.background = isActive ? 'var(--sidebar-active)' : 'transparent';
+      // Active pill: inset shadow (pressed), accent color
+      el.style.boxShadow = isActive ? 'var(--shadow-inset)' : 'var(--shadow-xs)';
       el.style.color = isActive ? 'var(--accent)' : 'var(--sidebar-text)';
       el.style.fontWeight = isActive ? '600' : '';
+      // Update radio circle
+      const radio = el.querySelector('.sidebar-btn-radio');
+      if (radio) {
+        radio.style.background = isActive ? 'var(--accent)' : 'transparent';
+        radio.style.borderColor = isActive ? 'var(--accent)' : 'var(--text-muted)';
+      }
     }
 
     if (mode === 'search') {
@@ -268,31 +301,48 @@ function renderMainView() {
   });
 }
 
-function createSidebarBtn(iconName, label, onClick) {
+/** Pill-shaped neumorphic sidebar button (matching Figma design) */
+function createSidebarPillBtn(iconName, label, onClick) {
   const btn = document.createElement('button');
-  btn.style.cssText = 'display:flex;align-items:center;gap:10px;width:100%;padding:8px 10px;border:none;border-radius:var(--radius-sm);background:transparent;color:var(--sidebar-text);cursor:pointer;font-size:0.85rem;text-align:left;transition:background var(--transition-fast),color var(--transition-fast);';
+  btn.style.cssText = 'display:flex;align-items:center;gap:10px;width:100%;padding:12px 18px;border:none;border-radius:var(--radius-lg);background:var(--bg-card);color:var(--sidebar-text);cursor:pointer;font-size:0.88rem;text-align:left;box-shadow:var(--shadow-xs);transition:all var(--transition-fast);';
   btn.addEventListener('mouseenter', () => {
-    if (btn.dataset.active !== 'true') btn.style.background = 'var(--sidebar-hover)';
+    if (btn.dataset.active !== 'true') {
+      btn.style.boxShadow = 'var(--shadow-sm)';
+      btn.style.transform = 'translateY(-1px)';
+    }
   });
   btn.addEventListener('mouseleave', () => {
     if (btn.dataset.active !== 'true') {
-      btn.style.background = 'transparent';
+      btn.style.boxShadow = 'var(--shadow-xs)';
+      btn.style.transform = '';
       btn.style.color = 'var(--sidebar-text)';
     }
   });
 
-  const iconEl = createIcon(iconName, 18);
-  iconEl.className = 'sidebar-btn-icon';
-  iconEl.style.cssText += 'color:var(--text-muted);';
-  btn.appendChild(iconEl);
+  // Radio circle icon
+  const radioCircle = document.createElement('span');
+  radioCircle.className = 'sidebar-btn-radio';
+  radioCircle.style.cssText = 'width:8px;height:8px;border-radius:50%;border:1.5px solid var(--text-muted);flex-shrink:0;transition:all var(--transition-fast);';
+  btn.appendChild(radioCircle);
 
   const labelSpan = document.createElement('span');
   labelSpan.className = 'sidebar-btn-label';
   labelSpan.textContent = label;
   btn.appendChild(labelSpan);
 
+  // Keep icon reference for theme switcher compatibility
+  const iconEl = createIcon(iconName, 16);
+  iconEl.className = 'sidebar-btn-icon';
+  iconEl.style.cssText += 'display:none;';
+  btn.appendChild(iconEl);
+
   btn.addEventListener('click', onClick);
   return btn;
+}
+
+/** Legacy flat sidebar button (kept for potential reuse) */
+function createSidebarBtn(iconName, label, onClick) {
+  return createSidebarPillBtn(iconName, label, onClick);
 }
 
 function createSidebarNameInput(label, defaultValue, id) {

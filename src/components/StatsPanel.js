@@ -26,7 +26,7 @@ export class StatsPanel {
     container.textContent = '';
     container.style.cssText = 'flex:1;overflow-y:auto;padding:32px 24px;';
     const inner = document.createElement('div');
-    inner.style.cssText = 'max-width:860px;margin:0 auto;';
+    inner.style.cssText = 'max-width:920px;margin:0 auto;';
     this.buildStatsContent(inner, stats, conversations);
     container.appendChild(inner);
   }
@@ -94,33 +94,108 @@ export class StatsPanel {
     // ---- Basic Stats Cards (Neumorphic) ----
     const statsSection = this._neuSection();
     const cardsGrid = document.createElement('div');
-    cardsGrid.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;';
+    cardsGrid.style.cssText = 'display:grid;grid-template-columns:repeat(4,1fr);gap:14px;';
 
-    const basicStats = [
-      { label: '总对话数', value: stats.totalConversations },
+    // Row 1: 4 basic counts (matching Figma layout)
+    const row1Stats = [
+      { label: '总窗口数', value: stats.totalConversations },
       { label: '总消息数', value: stats.totalMessages.toLocaleString() },
-      { label: (names.human || 'Human') + ' 字数', value: stats.totalHumanChars.toLocaleString() },
-      { label: (names.assistant || 'Assistant') + ' 字数', value: stats.totalAssistantChars.toLocaleString() },
       { label: '思考次数', value: stats.totalThinkingCount.toLocaleString() },
-      { label: '累计思考时间', value: this.formatMs(stats.totalThinkingMs) },
-      { label: '时间跨度', value: stats.daySpan + ' 天' },
-      { label: '最长连续天数', value: stats.longestStreak + ' 天' },
-      { label: '深夜对话', value: stats.lateNightConvs + ' 段' },
-      { label: '系统标记', value: stats.totalFlags + ' 条' },
+      { label: '思考总时间', value: this.formatMs(stats.totalThinkingMs) },
     ];
 
-    for (const s of basicStats) {
+    for (const s of row1Stats) {
       const card = this._neuCard();
-      const val = document.createElement('div');
-      val.style.cssText = 'font-size:1.3rem;font-weight:700;color:var(--accent);';
-      val.textContent = String(s.value);
-      card.appendChild(val);
       const label = document.createElement('div');
-      label.style.cssText = 'font-size:0.7rem;color:var(--text-muted);margin-top:4px;';
+      label.style.cssText = 'font-size:0.75rem;color:var(--text-muted);margin-bottom:8px;';
       label.textContent = s.label;
       card.appendChild(label);
+      const val = document.createElement('div');
+      val.style.cssText = 'font-size:1.5rem;font-weight:700;color:var(--text-primary);';
+      val.textContent = String(s.value);
+      card.appendChild(val);
       cardsGrid.appendChild(card);
     }
+
+    // Row 2: 2 wider word count cards with percentage rings (span 2 cols each)
+    const totalChars = stats.totalAssistantChars + stats.totalHumanChars;
+    const assistantPct = totalChars > 0 ? Math.round((stats.totalAssistantChars / totalChars) * 100) : 0;
+    const humanPct = totalChars > 0 ? Math.round((stats.totalHumanChars / totalChars) * 100) : 0;
+
+    const wordCountCards = [
+      { label: (names.assistant || 'Assistant') + '的总字数', value: stats.totalAssistantChars.toLocaleString(), pct: assistantPct, color: '#4A7AE8' },
+      { label: (names.human || 'Human') + '的总字数', value: stats.totalHumanChars.toLocaleString(), pct: humanPct, color: '#45C4B0' },
+    ];
+
+    for (const s of wordCountCards) {
+      const card = this._neuCard();
+      card.style.gridColumn = 'span 2';
+      card.style.display = 'flex';
+      card.style.alignItems = 'center';
+      card.style.justifyContent = 'space-between';
+
+      const textDiv = document.createElement('div');
+      const label = document.createElement('div');
+      label.style.cssText = 'font-size:0.75rem;color:var(--text-muted);margin-bottom:8px;';
+      label.textContent = s.label;
+      textDiv.appendChild(label);
+      const val = document.createElement('div');
+      val.style.cssText = 'font-size:1.5rem;font-weight:700;color:var(--text-primary);';
+      val.textContent = s.value;
+      textDiv.appendChild(val);
+      card.appendChild(textDiv);
+
+      // Ring chart
+      const ringSize = 56;
+      const ringSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      ringSvg.setAttribute('width', ringSize);
+      ringSvg.setAttribute('height', ringSize);
+      ringSvg.setAttribute('viewBox', '0 0 56 56');
+      const r = 22, cx = 28, cy = 28, circumference = 2 * Math.PI * r;
+      const bgCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      bgCircle.setAttribute('cx', cx); bgCircle.setAttribute('cy', cy); bgCircle.setAttribute('r', r);
+      bgCircle.setAttribute('fill', 'none'); bgCircle.setAttribute('stroke', 'var(--border-strong)'); bgCircle.setAttribute('stroke-width', '5');
+      ringSvg.appendChild(bgCircle);
+      const fgCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      fgCircle.setAttribute('cx', cx); fgCircle.setAttribute('cy', cy); fgCircle.setAttribute('r', r);
+      fgCircle.setAttribute('fill', 'none'); fgCircle.setAttribute('stroke', s.color); fgCircle.setAttribute('stroke-width', '5');
+      fgCircle.setAttribute('stroke-linecap', 'round');
+      fgCircle.setAttribute('stroke-dasharray', `${(s.pct / 100) * circumference} ${circumference}`);
+      fgCircle.setAttribute('transform', `rotate(-90 ${cx} ${cy})`);
+      ringSvg.appendChild(fgCircle);
+      const pctText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      pctText.setAttribute('x', cx); pctText.setAttribute('y', cy + 1);
+      pctText.setAttribute('text-anchor', 'middle'); pctText.setAttribute('dominant-baseline', 'central');
+      pctText.setAttribute('font-size', '11'); pctText.setAttribute('font-weight', '600');
+      pctText.setAttribute('fill', 'var(--text-primary)');
+      pctText.textContent = s.pct + '%';
+      ringSvg.appendChild(pctText);
+      card.appendChild(ringSvg);
+
+      cardsGrid.appendChild(card);
+    }
+
+    // Row 3: 4 more stats
+    const row3Stats = [
+      { label: '时间跨度', value: stats.daySpan },
+      { label: '最长连续天数', value: stats.longestStreak },
+      { label: '系统标记', value: stats.totalFlags },
+      { label: '深夜对话', value: stats.lateNightConvs },
+    ];
+
+    for (const s of row3Stats) {
+      const card = this._neuCard();
+      const label = document.createElement('div');
+      label.style.cssText = 'font-size:0.75rem;color:var(--text-muted);margin-bottom:8px;';
+      label.textContent = s.label;
+      card.appendChild(label);
+      const val = document.createElement('div');
+      val.style.cssText = 'font-size:1.5rem;font-weight:700;color:var(--text-primary);';
+      val.textContent = String(s.value);
+      card.appendChild(val);
+      cardsGrid.appendChild(card);
+    }
+
     statsSection.appendChild(cardsGrid);
     parent.appendChild(statsSection);
 
@@ -287,29 +362,38 @@ export class StatsPanel {
       parent.appendChild(hourSection);
     }
 
-    // ---- Monthly Charts ----
+    // ---- Monthly Charts (side by side per Figma) ----
     if (stats.monthlyData.labels.length > 1) {
+      const chartsRow = document.createElement('div');
+      chartsRow.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px;';
+
       const chartSection1 = this._neuSection();
+      chartSection1.style.marginBottom = '0';
       chartSection1.insertBefore(this._sectionTitle('每月对话频率'), chartSection1.firstChild);
       const canvas1 = document.createElement('canvas');
       canvas1.style.cssText = 'width:100%;height:200px;';
       chartSection1.appendChild(canvas1);
-      parent.appendChild(chartSection1);
-      requestAnimationFrame(() => drawLineChart(canvas1, { labels: stats.monthlyData.labels, values: stats.monthlyData.convCounts }, {}));
+      chartsRow.appendChild(chartSection1);
 
       const chartSection2 = this._neuSection();
+      chartSection2.style.marginBottom = '0';
       chartSection2.insertBefore(this._sectionTitle('每月字数'), chartSection2.firstChild);
       const canvas2 = document.createElement('canvas');
       canvas2.style.cssText = 'width:100%;height:200px;';
       chartSection2.appendChild(canvas2);
-      parent.appendChild(chartSection2);
-      requestAnimationFrame(() => drawBarChart(canvas2, {
-        labels: stats.monthlyData.labels,
-        series: [
-          { name: names.human || 'Human', values: stats.monthlyData.humanChars, color: '#7c6eea' },
-          { name: names.assistant || 'Assistant', values: stats.monthlyData.assistantChars, color: '#da7756' },
-        ],
-      }, {}));
+      chartsRow.appendChild(chartSection2);
+
+      parent.appendChild(chartsRow);
+      requestAnimationFrame(() => {
+        drawLineChart(canvas1, { labels: stats.monthlyData.labels, values: stats.monthlyData.convCounts }, {});
+        drawBarChart(canvas2, {
+          labels: stats.monthlyData.labels,
+          series: [
+            { name: names.human || 'Human', values: stats.monthlyData.humanChars, color: '#7c6eea' },
+            { name: names.assistant || 'Assistant', values: stats.monthlyData.assistantChars, color: '#da7756' },
+          ],
+        }, {});
+      });
     }
 
     // ---- Word Cloud (Top Words) ----
@@ -680,10 +764,10 @@ export class StatsPanel {
     return el;
   }
 
-  /** Neumorphic inner card — inset / concave */
+  /** Neumorphic inner card — convex / raised (matching Figma design) */
   _neuCard() {
     const el = document.createElement('div');
-    el.style.cssText = 'background:var(--bg-card);border-radius:var(--radius-sm);padding:14px;text-align:center;box-shadow:var(--shadow-inset);';
+    el.style.cssText = 'background:var(--bg-card);border-radius:var(--radius);padding:20px;text-align:left;box-shadow:var(--shadow-xs);';
     return el;
   }
 
