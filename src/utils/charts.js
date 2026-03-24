@@ -1,22 +1,10 @@
 /**
- * Lightweight canvas chart drawing.
- * Simple line and bar charts without external dependencies.
+ * Lightweight canvas chart drawing — neumorphic style.
+ * Clean line and bar charts matching the Figma design aesthetic.
  */
 
-const CHART_COLORS = {
-  line: '#7c6eea',
-  barHuman: '#7c6eea',
-  barAssistant: '#da7756',
-  grid: 'rgba(128,128,128,0.15)',
-  text: 'rgba(128,128,128,0.8)',
-  bg: 'transparent',
-};
-
 /**
- * Draw a line chart on a canvas element.
- * @param {HTMLCanvasElement} canvas
- * @param {{ labels: string[], values: number[] }} data
- * @param {{ title?: string, color?: string }} opts
+ * Draw a clean line chart with gradient fill, smooth curve, and dots.
  */
 export function drawLineChart(canvas, data, opts = {}) {
   const ctx = canvas.getContext('2d');
@@ -27,91 +15,100 @@ export function drawLineChart(canvas, data, opts = {}) {
   canvas.height = h * dpr;
   ctx.scale(dpr, dpr);
 
-  const padding = { top: 30, right: 20, bottom: 40, left: 50 };
+  const padding = { top: 20, right: 20, bottom: 36, left: 44 };
   const chartW = w - padding.left - padding.right;
   const chartH = h - padding.top - padding.bottom;
-
   const maxVal = Math.max(...data.values, 1);
-  const color = opts.color || CHART_COLORS.line;
+  const color = opts.color || '#7c6eea';
+  const textColor = getComputedStyle(document.documentElement).getPropertyValue('--text-muted').trim() || 'rgba(128,128,128,0.8)';
+  const gridColor = getComputedStyle(document.documentElement).getPropertyValue('--border').trim() || 'rgba(128,128,128,0.12)';
 
-  // Title
-  if (opts.title) {
-    ctx.fillStyle = CHART_COLORS.text;
-    ctx.font = '12px -apple-system, sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText(opts.title, w / 2, 16);
-  }
-
-  // Grid lines
+  // Grid lines (subtle)
   const gridLines = 4;
-  ctx.strokeStyle = CHART_COLORS.grid;
-  ctx.lineWidth = 1;
-  ctx.setLineDash([4, 4]);
+  ctx.strokeStyle = gridColor;
+  ctx.lineWidth = 0.5;
+  ctx.setLineDash([3, 3]);
+  ctx.font = '10px -apple-system, sans-serif';
+  ctx.fillStyle = textColor;
+  ctx.textAlign = 'right';
   for (let i = 0; i <= gridLines; i++) {
     const y = padding.top + (chartH / gridLines) * i;
     ctx.beginPath();
     ctx.moveTo(padding.left, y);
     ctx.lineTo(w - padding.right, y);
     ctx.stroke();
-
     const val = Math.round(maxVal - (maxVal / gridLines) * i);
-    ctx.fillStyle = CHART_COLORS.text;
-    ctx.font = '10px -apple-system, sans-serif';
-    ctx.textAlign = 'right';
-    ctx.fillText(String(val), padding.left - 8, y + 4);
+    ctx.fillText(String(val), padding.left - 8, y + 3);
   }
   ctx.setLineDash([]);
 
   if (data.values.length < 2) return;
 
-  // Line
   const stepX = chartW / (data.values.length - 1);
-  ctx.beginPath();
-  ctx.strokeStyle = color;
-  ctx.lineWidth = 2;
-  ctx.lineJoin = 'round';
 
-  for (let i = 0; i < data.values.length; i++) {
-    const x = padding.left + stepX * i;
-    const y = padding.top + chartH - (data.values[i] / maxVal) * chartH;
-    if (i === 0) ctx.moveTo(x, y);
-    else ctx.lineTo(x, y);
+  // Build points array
+  const points = data.values.map((v, i) => ({
+    x: padding.left + stepX * i,
+    y: padding.top + chartH - (v / maxVal) * chartH,
+  }));
+
+  // Smooth curve (cardinal spline)
+  ctx.beginPath();
+  ctx.moveTo(points[0].x, points[0].y);
+  for (let i = 0; i < points.length - 1; i++) {
+    const p0 = points[Math.max(i - 1, 0)];
+    const p1 = points[i];
+    const p2 = points[i + 1];
+    const p3 = points[Math.min(i + 2, points.length - 1)];
+    const tension = 0.3;
+    const cp1x = p1.x + (p2.x - p0.x) * tension;
+    const cp1y = p1.y + (p2.y - p0.y) * tension;
+    const cp2x = p2.x - (p3.x - p1.x) * tension;
+    const cp2y = p2.y - (p3.y - p1.y) * tension;
+    ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, p2.x, p2.y);
   }
+
+  // Stroke the line
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 2.5;
+  ctx.lineJoin = 'round';
+  ctx.lineCap = 'round';
   ctx.stroke();
 
-  // Fill area under line
-  ctx.lineTo(padding.left + stepX * (data.values.length - 1), padding.top + chartH);
-  ctx.lineTo(padding.left, padding.top + chartH);
+  // Gradient fill under curve
+  const gradient = ctx.createLinearGradient(0, padding.top, 0, padding.top + chartH);
+  gradient.addColorStop(0, color + '20');
+  gradient.addColorStop(1, color + '02');
+  ctx.lineTo(points[points.length - 1].x, padding.top + chartH);
+  ctx.lineTo(points[0].x, padding.top + chartH);
   ctx.closePath();
-  ctx.fillStyle = color.replace(')', ', 0.1)').replace('rgb', 'rgba');
+  ctx.fillStyle = gradient;
   ctx.fill();
 
-  // Dots
-  for (let i = 0; i < data.values.length; i++) {
-    const x = padding.left + stepX * i;
-    const y = padding.top + chartH - (data.values[i] / maxVal) * chartH;
+  // Dots with white center
+  for (const p of points) {
     ctx.beginPath();
-    ctx.arc(x, y, 3, 0, Math.PI * 2);
+    ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
     ctx.fillStyle = color;
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, 2, 0, Math.PI * 2);
+    ctx.fillStyle = '#fff';
     ctx.fill();
   }
 
   // X labels
-  ctx.fillStyle = CHART_COLORS.text;
-  ctx.font = '10px -apple-system, sans-serif';
+  ctx.fillStyle = textColor;
+  ctx.font = '9px -apple-system, sans-serif';
   ctx.textAlign = 'center';
   const labelSkip = Math.max(1, Math.floor(data.labels.length / 8));
   for (let i = 0; i < data.labels.length; i += labelSkip) {
-    const x = padding.left + stepX * i;
-    ctx.fillText(data.labels[i], x, h - padding.bottom + 16);
+    ctx.fillText(data.labels[i], points[i].x, h - padding.bottom + 14);
   }
 }
 
 /**
- * Draw a stacked bar chart.
- * @param {HTMLCanvasElement} canvas
- * @param {{ labels: string[], series: { name: string, values: number[], color: string }[] }} data
- * @param {{ title?: string }} opts
+ * Draw a grouped bar chart with rounded bars.
  */
 export function drawBarChart(canvas, data, opts = {}) {
   const ctx = canvas.getContext('2d');
@@ -122,11 +119,13 @@ export function drawBarChart(canvas, data, opts = {}) {
   canvas.height = h * dpr;
   ctx.scale(dpr, dpr);
 
-  const padding = { top: 30, right: 20, bottom: 40, left: 60 };
+  const padding = { top: 20, right: 20, bottom: 50, left: 52 };
   const chartW = w - padding.left - padding.right;
   const chartH = h - padding.top - padding.bottom;
+  const textColor = getComputedStyle(document.documentElement).getPropertyValue('--text-muted').trim() || 'rgba(128,128,128,0.8)';
+  const gridColor = getComputedStyle(document.documentElement).getPropertyValue('--border').trim() || 'rgba(128,128,128,0.12)';
 
-  // Find max stacked value
+  // Max stacked value
   let maxVal = 0;
   for (let i = 0; i < data.labels.length; i++) {
     let sum = 0;
@@ -135,75 +134,74 @@ export function drawBarChart(canvas, data, opts = {}) {
   }
   maxVal = maxVal || 1;
 
-  // Title
-  if (opts.title) {
-    ctx.fillStyle = CHART_COLORS.text;
-    ctx.font = '12px -apple-system, sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText(opts.title, w / 2, 16);
-  }
-
   // Grid
   const gridLines = 4;
-  ctx.strokeStyle = CHART_COLORS.grid;
-  ctx.lineWidth = 1;
-  ctx.setLineDash([4, 4]);
+  ctx.strokeStyle = gridColor;
+  ctx.lineWidth = 0.5;
+  ctx.setLineDash([3, 3]);
+  ctx.font = '10px -apple-system, sans-serif';
+  ctx.fillStyle = textColor;
+  ctx.textAlign = 'right';
   for (let i = 0; i <= gridLines; i++) {
     const y = padding.top + (chartH / gridLines) * i;
     ctx.beginPath();
     ctx.moveTo(padding.left, y);
     ctx.lineTo(w - padding.right, y);
     ctx.stroke();
-
     const val = maxVal - (maxVal / gridLines) * i;
-    ctx.fillStyle = CHART_COLORS.text;
-    ctx.font = '10px -apple-system, sans-serif';
-    ctx.textAlign = 'right';
-    ctx.fillText(formatNumber(val), padding.left - 8, y + 4);
+    ctx.fillText(formatNumber(val), padding.left - 8, y + 3);
   }
   ctx.setLineDash([]);
 
-  // Bars
-  const barGap = 4;
-  const barWidth = Math.max(4, (chartW / data.labels.length) - barGap);
+  // Bars — grouped side by side with rounded tops
+  const groupGap = 6;
+  const groupWidth = (chartW / data.labels.length) - groupGap;
+  const barWidth = Math.max(4, groupWidth / data.series.length - 2);
+  const barRadius = Math.min(3, barWidth / 2);
 
   for (let i = 0; i < data.labels.length; i++) {
-    let stackY = padding.top + chartH;
-    for (const s of data.series) {
+    const groupX = padding.left + i * (groupWidth + groupGap) + groupGap / 2;
+    for (let si = 0; si < data.series.length; si++) {
+      const s = data.series[si];
       const val = s.values[i] || 0;
       const barH = (val / maxVal) * chartH;
-      ctx.fillStyle = s.color;
-      ctx.fillRect(
-        padding.left + i * (barWidth + barGap),
-        stackY - barH,
-        barWidth,
-        barH
-      );
-      stackY -= barH;
+      const x = groupX + si * (barWidth + 2);
+      const y = padding.top + chartH - barH;
+
+      if (barH > 0) {
+        ctx.beginPath();
+        ctx.roundRect(x, y, barWidth, barH, [barRadius, barRadius, 0, 0]);
+        ctx.fillStyle = s.color;
+        ctx.fill();
+      }
     }
   }
 
   // X labels
-  ctx.fillStyle = CHART_COLORS.text;
-  ctx.font = '10px -apple-system, sans-serif';
+  ctx.fillStyle = textColor;
+  ctx.font = '9px -apple-system, sans-serif';
   ctx.textAlign = 'center';
   const labelSkip = Math.max(1, Math.floor(data.labels.length / 8));
   for (let i = 0; i < data.labels.length; i += labelSkip) {
-    const x = padding.left + i * (barWidth + barGap) + barWidth / 2;
-    ctx.fillText(data.labels[i], x, h - padding.bottom + 16);
+    const x = padding.left + i * (groupWidth + groupGap) + groupGap / 2 + groupWidth / 2;
+    ctx.fillText(data.labels[i], x, h - padding.bottom + 14);
   }
 
-  // Legend
-  let legendX = padding.left;
-  const legendY = h - 8;
+  // Legend (centered at bottom)
   ctx.font = '10px -apple-system, sans-serif';
+  let totalLegendW = 0;
+  for (const s of data.series) totalLegendW += ctx.measureText(s.name).width + 28;
+  let legendX = (w - totalLegendW) / 2;
+  const legendY = h - 10;
   for (const s of data.series) {
+    ctx.beginPath();
+    ctx.roundRect(legendX, legendY - 8, 8, 8, 2);
     ctx.fillStyle = s.color;
-    ctx.fillRect(legendX, legendY - 8, 10, 10);
-    ctx.fillStyle = CHART_COLORS.text;
+    ctx.fill();
+    ctx.fillStyle = textColor;
     ctx.textAlign = 'left';
-    ctx.fillText(s.name, legendX + 14, legendY);
-    legendX += ctx.measureText(s.name).width + 30;
+    ctx.fillText(s.name, legendX + 12, legendY);
+    legendX += ctx.measureText(s.name).width + 28;
   }
 }
 
