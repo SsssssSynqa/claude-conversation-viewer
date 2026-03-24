@@ -59,9 +59,9 @@ function renderMainView() {
   sidebar.className = 'sidebar';
   sidebar.id = 'sidebar';
 
-  // Sidebar title with spark logo
+  // Sidebar title with spark logo — generous top padding
   const sidebarTitle = document.createElement('div');
-  sidebarTitle.style.cssText = 'padding:14px 14px 10px;display:flex;align-items:center;gap:6px;';
+  sidebarTitle.style.cssText = 'padding:24px 20px 16px;display:flex;align-items:center;gap:6px;';
   sidebarTitle.appendChild(createSparkIcon(14));
   const titleText = document.createElement('span');
   titleText.style.cssText = 'font-family:var(--font-display);font-size:14px;font-weight:400;color:var(--text-primary);';
@@ -72,7 +72,7 @@ function renderMainView() {
   // Sidebar function buttons — pill-shaped neumorphic (matching Figma)
   const sidebarActions = document.createElement('div');
   sidebarActions.className = 'sidebar-actions';
-  sidebarActions.style.cssText = 'padding:8px 12px 12px;display:flex;flex-direction:column;gap:10px;';
+  sidebarActions.style.cssText = 'padding:4px 16px 16px;display:flex;flex-direction:column;gap:10px;';
 
   // Search button — opens search panel in content area
   const searchBtn = createSidebarPillBtn('search', '搜索', () => {
@@ -119,10 +119,10 @@ function renderMainView() {
 
   // Settings section (display toggles + name config) — Figma-style toggles
   const settingsSection = document.createElement('div');
-  settingsSection.style.cssText = 'padding:12px 12px 12px;border-top:1px solid var(--border);margin-top:8px;';
+  settingsSection.style.cssText = 'padding:16px 16px 16px;border-top:1px solid var(--border);margin-top:12px;';
 
   const settingsTitle = document.createElement('div');
-  settingsTitle.style.cssText = 'font-size:0.7rem;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:10px;font-weight:600;padding:0 6px;';
+  settingsTitle.style.cssText = 'font-size:0.7rem;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:12px;font-weight:600;padding:0 2px;';
   settingsTitle.textContent = '显示设置';
   settingsSection.appendChild(settingsTitle);
 
@@ -204,7 +204,7 @@ function renderMainView() {
 
   // Name config in sidebar
   const nameSection = document.createElement('div');
-  nameSection.style.cssText = 'margin-top:10px;';
+  nameSection.style.cssText = 'margin-top:16px;padding-top:12px;border-top:1px solid var(--border);';
 
   const nameTitle = document.createElement('div');
   nameTitle.style.cssText = 'font-size:0.7rem;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:6px;font-weight:600;';
