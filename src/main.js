@@ -59,12 +59,13 @@ function renderMainView() {
   sidebar.className = 'sidebar';
   sidebar.id = 'sidebar';
 
-  // Sidebar title — like Claude official sidebar
+  // Sidebar title with spark logo
   const sidebarTitle = document.createElement('div');
-  sidebarTitle.style.cssText = 'padding:14px 14px 10px;';
+  sidebarTitle.style.cssText = 'padding:14px 14px 10px;display:flex;align-items:center;gap:6px;';
+  sidebarTitle.appendChild(createSparkIcon(14));
   const titleText = document.createElement('span');
-  titleText.style.cssText = 'font-family:var(--font-display);font-size:20px;font-weight:400;color:var(--text-primary);';
-  titleText.textContent = 'Claude';
+  titleText.style.cssText = 'font-family:var(--font-display);font-size:14px;font-weight:400;color:var(--text-primary);';
+  titleText.textContent = 'Claude 对话记忆查看器';
   sidebarTitle.appendChild(titleText);
   sidebar.appendChild(sidebarTitle);
 
@@ -250,8 +251,8 @@ function renderMainView() {
       const el = document.getElementById(id);
       if (!el) continue;
       const isActive = activeMap[mode] === id;
-      el.style.background = isActive ? 'var(--sidebar-active)' : '';
-      el.style.color = isActive ? 'var(--accent)' : '';
+      el.style.background = isActive ? 'var(--sidebar-active)' : 'transparent';
+      el.style.color = isActive ? 'var(--accent)' : 'var(--sidebar-text)';
       el.style.fontWeight = isActive ? '600' : '';
     }
 

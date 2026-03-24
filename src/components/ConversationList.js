@@ -85,7 +85,7 @@ export class ConversationList {
     for (const [monthKey, items] of groups) {
       // Month header
       const header = document.createElement('div');
-      header.style.cssText = 'padding:12px 16px 4px;font-size:0.75rem;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);font-weight:600;';
+      header.style.cssText = 'padding:12px 14px 4px;font-size:11px;color:var(--text-muted);font-weight:600;';
       header.textContent = formatMonthLabel(monthKey);
       this.listEl.appendChild(header);
 
@@ -94,10 +94,12 @@ export class ConversationList {
         item.className = 'conv-item';
         if (index === currentIndex) item.classList.add('active');
         item.style.cssText = `
-          padding: 10px 16px;
+          padding: 8px 10px;
+          margin: 0 4px;
           cursor: pointer;
-          border-bottom: 1px solid var(--separator-color);
+          border-radius: 8px;
           transition: background var(--transition);
+          font-size: 13px;
         `;
 
         if (index === currentIndex) {

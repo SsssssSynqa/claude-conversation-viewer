@@ -62,8 +62,8 @@ export class StatsPanel {
     titleRow.appendChild(title);
 
     const screenshotBtn = document.createElement('button');
-    screenshotBtn.style.cssText = 'padding:6px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);background:transparent;color:var(--text-secondary);cursor:pointer;font-size:0.8rem;transition:all 0.15s;white-space:nowrap;';
-    screenshotBtn.appendChild(createIcon('camera', 14));
+    screenshotBtn.style.cssText = 'padding:6px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);background:transparent;color:var(--text-secondary);cursor:pointer;font-size:12px;transition:all 0.15s;white-space:nowrap;display:flex;align-items:center;gap:4px;';
+    screenshotBtn.appendChild(createIcon('save', 14));
     screenshotBtn.appendChild(document.createTextNode(' 保存为图片'));
     screenshotBtn.addEventListener('mouseenter', () => { screenshotBtn.style.borderColor = 'var(--accent)'; screenshotBtn.style.color = 'var(--accent)'; });
     screenshotBtn.addEventListener('mouseleave', () => { screenshotBtn.style.borderColor = 'var(--border)'; screenshotBtn.style.color = 'var(--text-secondary)'; });
@@ -81,10 +81,10 @@ export class StatsPanel {
         link.href = canvas.toDataURL('image/png');
         link.click();
         screenshotBtn.textContent = '\u2713 已保存';
-        setTimeout(() => { screenshotBtn.textContent = ''; screenshotBtn.appendChild(createIcon('camera', 14)); screenshotBtn.appendChild(document.createTextNode(' 保存为图片')); screenshotBtn.disabled = false; }, 1500);
+        setTimeout(() => { screenshotBtn.textContent = ''; screenshotBtn.appendChild(createIcon('save', 14)); screenshotBtn.appendChild(document.createTextNode(' 保存为图片')); screenshotBtn.disabled = false; }, 1500);
       } catch (e) {
         screenshotBtn.textContent = '截图失败';
-        setTimeout(() => { screenshotBtn.textContent = ''; screenshotBtn.appendChild(createIcon('camera', 14)); screenshotBtn.appendChild(document.createTextNode(' 保存为图片')); screenshotBtn.disabled = false; }, 1500);
+        setTimeout(() => { screenshotBtn.textContent = ''; screenshotBtn.appendChild(createIcon('save', 14)); screenshotBtn.appendChild(document.createTextNode(' 保存为图片')); screenshotBtn.disabled = false; }, 1500);
       }
     });
     titleRow.appendChild(screenshotBtn);
