@@ -249,7 +249,7 @@ export class FileUpload {
 
     // Spacer to push credit to bottom
     const spacer = document.createElement('div');
-    spacer.style.cssText = 'flex:1;min-height:60px;';
+    spacer.style.cssText = 'flex:1;min-height:80px;';
     screen.appendChild(spacer);
 
     // Credit at very bottom
