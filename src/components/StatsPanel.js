@@ -460,25 +460,25 @@ export class StatsPanel {
     weekdayTitle.textContent = '星期几最爱聊天';
     weekdayCard.appendChild(weekdayTitle);
     const weekdayBar = document.createElement('div');
-    weekdayBar.style.cssText = 'display:flex;gap:8px;align-items:flex-end;height:140px;';
+    weekdayBar.style.cssText = 'display:flex;gap:6px;justify-content:center;height:160px;';
     const weekdays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
     const maxWeekday = Math.max(...stats.weekdayActivity, 1);
-    const trackH = 120;
+    const trackH = 130;
     for (let d = 0; d < 7; d++) {
       const col = document.createElement('div');
-      col.style.cssText = 'flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;';
+      col.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:6px;';
       // Groove track (inset shadow slot)
       const track = document.createElement('div');
-      track.style.cssText = `width:18px;height:${trackH}px;border-radius:9px;background:var(--bg-tertiary);box-shadow:var(--shadow-inset);position:relative;overflow:hidden;`;
-      // Data pill inside groove
-      const fillH = Math.max(8, (stats.weekdayActivity[d] / maxWeekday) * (trackH - 4));
+      track.style.cssText = `width:22px;height:${trackH}px;border-radius:11px;background:var(--bg-tertiary);box-shadow:var(--shadow-inset);position:relative;`;
+      // Data pill inside groove — convex 3D effect (gradient + inner highlights)
+      const fillH = Math.max(12, (stats.weekdayActivity[d] / maxWeekday) * (trackH - 16));
       const fill = document.createElement('div');
-      fill.style.cssText = `width:14px;height:${fillH}px;border-radius:7px;background:linear-gradient(to top, var(--accent), var(--accent-light));position:absolute;bottom:2px;left:2px;transition:height 0.3s ease;`;
+      fill.style.cssText = `width:16px;height:${fillH}px;border-radius:8px;position:absolute;bottom:3px;left:3px;transition:height 0.3s ease;background:linear-gradient(135deg, var(--accent-light) 0%, var(--accent) 50%, color-mix(in srgb, var(--accent) 80%, #000) 100%);box-shadow:inset 0 1px 2px rgba(255,255,255,0.4), inset 0 -1px 2px rgba(0,0,0,0.15), 0 1px 3px rgba(0,0,0,0.1);`;
       fill.title = stats.weekdayActivity[d] + ' 条消息';
       track.appendChild(fill);
       col.appendChild(track);
       const label = document.createElement('div');
-      label.style.cssText = 'font-size:0.65rem;color:var(--text-muted);margin-top:2px;';
+      label.style.cssText = 'font-size:0.65rem;color:var(--text-muted);';
       label.textContent = weekdays[d];
       col.appendChild(label);
       weekdayBar.appendChild(col);
