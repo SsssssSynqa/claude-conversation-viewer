@@ -251,6 +251,7 @@ function renderMainView() {
       const el = document.getElementById(id);
       if (!el) continue;
       const isActive = activeMap[mode] === id;
+      el.dataset.active = isActive ? 'true' : '';
       el.style.background = isActive ? 'var(--sidebar-active)' : 'transparent';
       el.style.color = isActive ? 'var(--accent)' : 'var(--sidebar-text)';
       el.style.fontWeight = isActive ? '600' : '';
@@ -274,7 +275,10 @@ function createSidebarBtn(iconName, label, onClick) {
     if (btn.dataset.active !== 'true') btn.style.background = 'var(--sidebar-hover)';
   });
   btn.addEventListener('mouseleave', () => {
-    if (btn.dataset.active !== 'true') btn.style.background = '';
+    if (btn.dataset.active !== 'true') {
+      btn.style.background = 'transparent';
+      btn.style.color = 'var(--sidebar-text)';
+    }
   });
 
   const iconEl = createIcon(iconName, 18);
