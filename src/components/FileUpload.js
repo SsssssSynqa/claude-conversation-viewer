@@ -52,13 +52,13 @@ export class FileUpload {
 
     // Text area (fake placeholder)
     const fakeInput = document.createElement('div');
-    fakeInput.style.cssText = 'padding:18px 20px 10px;font-size:12px;color:var(--text-muted);line-height:1.4;';
+    fakeInput.style.cssText = 'padding:14px 18px 6px;font-size:12px;color:var(--text-muted);line-height:1.4;';
     fakeInput.textContent = '点击选择 或拖拽 conversations.json 到这里';
     zone.appendChild(fakeInput);
 
     // Toolbar row (mimics Claude's input toolbar)
     const toolbarRow = document.createElement('div');
-    toolbarRow.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:10px 14px 14px;';
+    toolbarRow.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:8px 12px 12px;';
 
     // Left: + button
     const leftBtns = document.createElement('div');
