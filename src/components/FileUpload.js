@@ -37,6 +37,7 @@ export class FileUpload {
     h1.style.cssText = 'font-family:var(--font-display);font-size:28px;font-weight:330;color:var(--text-secondary);line-height:1.3;';
     h1.textContent = 'Claude 对话记忆查看器';
     greetingRow.appendChild(h1);
+    greetingRow.style.cssText += 'margin-bottom:24px;';
     screen.appendChild(greetingRow);
 
     // Upload zone — styled as Claude's input box (right after title, no subtitle between)
@@ -404,7 +405,7 @@ export class FileUpload {
 
     const info_div = document.createElement('div');
     const title = document.createElement('div');
-    title.style.cssText = 'font-size:13px;font-weight:600;color:var(--section-title-color, var(--text-muted));margin-bottom:3px;';
+    title.style.cssText = 'font-size:12px;font-weight:600;color:var(--section-title-color, var(--text-muted));margin-bottom:3px;';
     title.textContent = '发现上次的数据缓存';
     info_div.appendChild(title);
 
