@@ -460,20 +460,32 @@ export class StatsPanel {
     weekdayTitle.textContent = '星期几最爱聊天';
     weekdayCard.appendChild(weekdayTitle);
     const weekdayBar = document.createElement('div');
-    weekdayBar.style.cssText = 'display:flex;gap:6px;justify-content:center;height:160px;';
+    weekdayBar.style.cssText = 'display:flex;gap:22px;justify-content:center;height:170px;';
     const weekdays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
     const maxWeekday = Math.max(...stats.weekdayActivity, 1);
-    const trackH = 130;
+    const trackH = 140;
     for (let d = 0; d < 7; d++) {
       const col = document.createElement('div');
       col.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:6px;';
       // Groove track (inset shadow slot)
       const track = document.createElement('div');
-      track.style.cssText = `width:22px;height:${trackH}px;border-radius:11px;background:var(--bg-tertiary);box-shadow:var(--shadow-inset);position:relative;`;
-      // Data pill inside groove — convex 3D effect (gradient + inner highlights)
-      const fillH = Math.max(12, (stats.weekdayActivity[d] / maxWeekday) * (trackH - 16));
+      track.style.cssText = `width:24px;height:${trackH}px;border-radius:12px;background:var(--bg-tertiary);box-shadow:var(--shadow-inset);position:relative;`;
+      // Data pill — 3D cylinder effect (left highlight → base → right dark)
+      const fillH = Math.max(14, (stats.weekdayActivity[d] / maxWeekday) * (trackH - 20));
       const fill = document.createElement('div');
-      fill.style.cssText = `width:16px;height:${fillH}px;border-radius:8px;position:absolute;bottom:3px;left:3px;transition:height 0.3s ease;background:linear-gradient(135deg, var(--accent-light) 0%, var(--accent) 50%, color-mix(in srgb, var(--accent) 80%, #000) 100%);box-shadow:inset 0 1px 2px rgba(255,255,255,0.4), inset 0 -1px 2px rgba(0,0,0,0.15), 0 1px 3px rgba(0,0,0,0.1);`;
+      fill.style.cssText = `width:18px;height:${fillH}px;border-radius:9px;position:absolute;bottom:3px;left:3px;transition:height 0.3s ease;`
+        + 'background:linear-gradient(90deg, '
+        + 'color-mix(in srgb, var(--accent-light) 70%, #fff) 0%, '
+        + 'var(--accent-light) 15%, '
+        + 'var(--accent) 45%, '
+        + 'color-mix(in srgb, var(--accent) 70%, #000) 85%, '
+        + 'color-mix(in srgb, var(--accent) 50%, #000) 100%);'
+        + 'box-shadow:'
+        + 'inset 2px 0 3px rgba(255,255,255,0.35),'
+        + 'inset -2px 0 3px rgba(0,0,0,0.2),'
+        + 'inset 0 2px 4px rgba(255,255,255,0.25),'
+        + 'inset 0 -2px 3px rgba(0,0,0,0.15),'
+        + '0 2px 4px rgba(0,0,0,0.1);';
       fill.title = stats.weekdayActivity[d] + ' 条消息';
       track.appendChild(fill);
       col.appendChild(track);
