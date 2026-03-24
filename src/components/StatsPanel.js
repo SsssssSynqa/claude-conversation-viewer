@@ -470,18 +470,16 @@ export class StatsPanel {
       // Groove track (inset shadow slot)
       const track = document.createElement('div');
       track.style.cssText = `width:24px;height:${trackH}px;border-radius:12px;background:var(--bg-tertiary);box-shadow:var(--shadow-inset);position:relative;`;
-      // Data pill — same width as groove, soft 3D with center-left highlight
+      // Data pill — glossy cylinder with radial specular highlight
       const fillH = Math.max(14, (stats.weekdayActivity[d] / maxWeekday) * (trackH - 20));
       const fill = document.createElement('div');
       fill.style.cssText = `width:22px;height:${fillH}px;border-radius:11px;position:absolute;bottom:1px;left:1px;transition:height 0.3s ease;`
-        + 'background:linear-gradient(90deg, '
-        + 'var(--accent-light) 0%, '
-        + 'color-mix(in srgb, var(--accent-light) 85%, #fff) 30%, '
-        + 'var(--accent) 60%, '
-        + 'color-mix(in srgb, var(--accent) 88%, #333) 100%);'
+        + 'background:'
+        + 'radial-gradient(ellipse 70% 50% at 38% 30%, rgba(255,255,255,0.45) 0%, transparent 60%),'
+        + 'linear-gradient(180deg, var(--accent-light), var(--accent));'
         + 'box-shadow:'
-        + 'inset 3px 2px 6px rgba(255,255,255,0.3),'
-        + 'inset -1px -1px 4px rgba(0,0,0,0.1);';
+        + 'inset 0 2px 4px rgba(255,255,255,0.2),'
+        + 'inset 0 -2px 6px rgba(0,0,0,0.12);';
       fill.title = stats.weekdayActivity[d] + ' 条消息';
       track.appendChild(fill);
       col.appendChild(track);
