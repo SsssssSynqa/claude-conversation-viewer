@@ -4,6 +4,7 @@
 
 import { state } from '../store/state.js';
 import { formatDate, formatMonthKey, formatMonthLabel } from '../utils/time.js';
+import { createIcon } from '../utils/icons.js';
 
 export class ConversationList {
   constructor(container) {
@@ -16,17 +17,25 @@ export class ConversationList {
   }
 
   render() {
-    // Search box
+    // Search box — Claude style
     const searchBox = document.createElement('div');
-    searchBox.style.padding = '12px';
-    searchBox.style.borderBottom = '1px solid var(--border)';
+    searchBox.style.cssText = 'padding:8px 10px;border-bottom:1px solid var(--border);';
+
+    const searchWrapper = document.createElement('div');
+    searchWrapper.style.cssText = 'display:flex;align-items:center;gap:8px;padding:6px 10px;background:var(--bg-card);border-radius:12px;box-shadow:0 0 0 0.5px rgba(31,30,29,0.1);';
+
+    const searchIconEl = createIcon('search', 16);
+    searchIconEl.style.cssText += 'color:var(--text-muted);flex-shrink:0;';
 
     this.searchInput = document.createElement('input');
     this.searchInput.type = 'text';
     this.searchInput.placeholder = '搜索对话标题...';
-    this.searchInput.style.cssText = 'width:100%;padding:8px 12px;background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text-primary);font-size:0.9rem;font-family:var(--font-family);';
+    this.searchInput.style.cssText = 'width:100%;border:none;outline:none;background:transparent;color:var(--text-primary);font-size:13px;font-family:var(--font-family);';
     this.searchInput.addEventListener('input', () => this.onSearch());
-    searchBox.appendChild(this.searchInput);
+
+    searchWrapper.appendChild(searchIconEl);
+    searchWrapper.appendChild(this.searchInput);
+    searchBox.appendChild(searchWrapper);
     this.container.appendChild(searchBox);
 
     // List container

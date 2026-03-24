@@ -59,12 +59,11 @@ function renderMainView() {
   sidebar.className = 'sidebar';
   sidebar.id = 'sidebar';
 
-  // Sidebar title (replaces toolbar)
+  // Sidebar title — like Claude official sidebar
   const sidebarTitle = document.createElement('div');
-  sidebarTitle.style.cssText = 'padding:16px 14px 12px;display:flex;align-items:center;gap:6px;border-bottom:1px solid var(--border);';
-  sidebarTitle.appendChild(createSparkIcon(18));
+  sidebarTitle.style.cssText = 'padding:14px 14px 10px;';
   const titleText = document.createElement('span');
-  titleText.style.cssText = 'font-family:var(--font-display);font-size:15px;font-weight:400;color:var(--text-primary);';
+  titleText.style.cssText = 'font-family:var(--font-display);font-size:20px;font-weight:400;color:var(--text-primary);';
   titleText.textContent = 'Claude';
   sidebarTitle.appendChild(titleText);
   sidebar.appendChild(sidebarTitle);
@@ -72,7 +71,7 @@ function renderMainView() {
   // Sidebar function buttons
   const sidebarActions = document.createElement('div');
   sidebarActions.className = 'sidebar-actions';
-  sidebarActions.style.cssText = 'padding:12px;border-bottom:1px solid var(--border);display:flex;flex-direction:column;gap:4px;';
+  sidebarActions.style.cssText = 'padding:4px 8px 8px;display:flex;flex-direction:column;gap:2px;';
 
   // Search button — opens search panel in content area
   const searchBtn = createSidebarBtn('search', '搜索', () => {
@@ -119,7 +118,7 @@ function renderMainView() {
 
   // Settings section (display toggles + name config)
   const settingsSection = document.createElement('div');
-  settingsSection.style.cssText = 'padding:12px;border-bottom:1px solid var(--border);';
+  settingsSection.style.cssText = 'padding:8px 14px 12px;border-top:1px solid var(--border);margin-top:4px;';
 
   const settingsTitle = document.createElement('div');
   settingsTitle.style.cssText = 'font-size:0.7rem;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:8px;font-weight:600;';
