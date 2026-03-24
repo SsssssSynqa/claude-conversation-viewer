@@ -197,7 +197,9 @@ export class FileUpload {
 
     // Theme switcher (at bottom)
     const themeSwitcher = document.createElement('div');
-    themeSwitcher.style.cssText = 'display:flex;gap:6px;padding:6px;border-radius:18px;border:none;background:var(--bg-primary);box-shadow:var(--shadow-xs);';
+    themeSwitcher.style.cssText = 'display:flex;gap:6px;padding:6px;border-radius:18px;border:none;background:var(--bg-card);box-shadow:var(--shadow);transition:box-shadow 0.2s,transform 0.2s;';
+    themeSwitcher.addEventListener('mouseenter', () => { themeSwitcher.style.boxShadow = 'var(--shadow-sm)'; themeSwitcher.style.transform = 'translateY(-1px)'; });
+    themeSwitcher.addEventListener('mouseleave', () => { themeSwitcher.style.boxShadow = 'var(--shadow)'; themeSwitcher.style.transform = ''; });
 
     const themes = [
       { id: 'light', iconName: 'sun' },
