@@ -50,27 +50,7 @@ function renderMainView() {
   searchPanel = new SearchPanel();
   exportPanel = new ExportPanel();
 
-  // Toolbar — title only (search moved to sidebar button + full panel)
-  const toolbar = document.createElement('div');
-  toolbar.className = 'toolbar';
-
-  const titleWrapper = document.createElement('div');
-  titleWrapper.style.cssText = 'display:flex;align-items:center;gap:8px;';
-  titleWrapper.appendChild(createSparkIcon(20));
-  const title = document.createElement('span');
-  title.className = 'toolbar-title';
-  title.textContent = 'Claude 对话记忆查看器';
-  titleWrapper.appendChild(title);
-  toolbar.appendChild(titleWrapper);
-
-  // Spacer
-  const spacer = document.createElement('div');
-  spacer.style.flex = '1';
-  toolbar.appendChild(spacer);
-
-  app.appendChild(toolbar);
-
-  // Main layout
+  // Main layout — no top toolbar, title in sidebar
   const layout = document.createElement('div');
   layout.className = 'main-layout';
 
@@ -79,7 +59,17 @@ function renderMainView() {
   sidebar.className = 'sidebar';
   sidebar.id = 'sidebar';
 
-  // Sidebar top: function buttons
+  // Sidebar title (replaces toolbar)
+  const sidebarTitle = document.createElement('div');
+  sidebarTitle.style.cssText = 'padding:16px 14px 12px;display:flex;align-items:center;gap:6px;border-bottom:1px solid var(--border);';
+  sidebarTitle.appendChild(createSparkIcon(18));
+  const titleText = document.createElement('span');
+  titleText.style.cssText = 'font-family:var(--font-display);font-size:15px;font-weight:400;color:var(--text-primary);';
+  titleText.textContent = 'Claude';
+  sidebarTitle.appendChild(titleText);
+  sidebar.appendChild(sidebarTitle);
+
+  // Sidebar function buttons
   const sidebarActions = document.createElement('div');
   sidebarActions.className = 'sidebar-actions';
   sidebarActions.style.cssText = 'padding:12px;border-bottom:1px solid var(--border);display:flex;flex-direction:column;gap:4px;';

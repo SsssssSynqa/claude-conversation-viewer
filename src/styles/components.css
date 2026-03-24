@@ -97,10 +97,7 @@
   --section-title-color: #6E6E6E;
 }
 
-[data-theme="claude"] .toolbar {
-  background: var(--bg-primary);
-  border-bottom-color: rgba(0, 0, 0, 0.06);
-}
+/* Claude theme toolbar removed — title now in sidebar */
 
 /* Claude theme scrollbar in messages */
 [data-theme="claude"] .messages-scroll {
