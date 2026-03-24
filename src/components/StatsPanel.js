@@ -470,22 +470,18 @@ export class StatsPanel {
       // Groove track (inset shadow slot)
       const track = document.createElement('div');
       track.style.cssText = `width:24px;height:${trackH}px;border-radius:12px;background:var(--bg-tertiary);box-shadow:var(--shadow-inset);position:relative;`;
-      // Data pill — 3D cylinder effect (left highlight → base → right dark)
+      // Data pill — same width as groove, soft 3D with center-left highlight
       const fillH = Math.max(14, (stats.weekdayActivity[d] / maxWeekday) * (trackH - 20));
       const fill = document.createElement('div');
-      fill.style.cssText = `width:18px;height:${fillH}px;border-radius:9px;position:absolute;bottom:3px;left:3px;transition:height 0.3s ease;`
+      fill.style.cssText = `width:22px;height:${fillH}px;border-radius:11px;position:absolute;bottom:1px;left:1px;transition:height 0.3s ease;`
         + 'background:linear-gradient(90deg, '
-        + 'color-mix(in srgb, var(--accent-light) 70%, #fff) 0%, '
-        + 'var(--accent-light) 15%, '
-        + 'var(--accent) 45%, '
-        + 'color-mix(in srgb, var(--accent) 70%, #000) 85%, '
-        + 'color-mix(in srgb, var(--accent) 50%, #000) 100%);'
+        + 'var(--accent-light) 0%, '
+        + 'color-mix(in srgb, var(--accent-light) 85%, #fff) 30%, '
+        + 'var(--accent) 60%, '
+        + 'color-mix(in srgb, var(--accent) 88%, #333) 100%);'
         + 'box-shadow:'
-        + 'inset 2px 0 3px rgba(255,255,255,0.35),'
-        + 'inset -2px 0 3px rgba(0,0,0,0.2),'
-        + 'inset 0 2px 4px rgba(255,255,255,0.25),'
-        + 'inset 0 -2px 3px rgba(0,0,0,0.15),'
-        + '0 2px 4px rgba(0,0,0,0.1);';
+        + 'inset 3px 2px 6px rgba(255,255,255,0.3),'
+        + 'inset -1px -1px 4px rgba(0,0,0,0.1);';
       fill.title = stats.weekdayActivity[d] + ' 条消息';
       track.appendChild(fill);
       col.appendChild(track);
