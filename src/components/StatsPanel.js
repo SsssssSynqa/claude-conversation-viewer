@@ -449,53 +449,57 @@ export class StatsPanel {
     }
 
     // ---- Weekday Distribution ----
-    // ---- Weekday Distribution (in a raised card, slim bars) ----
-    parent.appendChild(this._sectionTitle('星期几最爱聊天'));
+    // ---- Weekday + Hourly side by side ----
+    const activityRow = document.createElement('div');
+    activityRow.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;';
+
+    // Weekday: neumorphic groove bars (slot track + pill inside)
     const weekdayCard = this._neuCard();
-    weekdayCard.style.marginBottom = '20px';
+    const weekdayTitle = document.createElement('div');
+    weekdayTitle.style.cssText = 'font-size:0.85rem;font-weight:600;color:var(--text-primary);margin-bottom:16px;';
+    weekdayTitle.textContent = '星期几最爱聊天';
+    weekdayCard.appendChild(weekdayTitle);
     const weekdayBar = document.createElement('div');
-    weekdayBar.style.cssText = 'display:flex;gap:12px;align-items:flex-end;height:120px;padding:0 20px;';
+    weekdayBar.style.cssText = 'display:flex;gap:8px;align-items:flex-end;height:140px;';
     const weekdays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
     const maxWeekday = Math.max(...stats.weekdayActivity, 1);
+    const trackH = 120;
     for (let d = 0; d < 7; d++) {
       const col = document.createElement('div');
-      col.style.cssText = 'flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;';
-      const barWrapper = document.createElement('div');
-      barWrapper.style.cssText = 'width:100%;display:flex;justify-content:center;';
-      const bar = document.createElement('div');
-      const h = Math.max(6, (stats.weekdayActivity[d] / maxWeekday) * 90);
-      const intensity = 0.4 + (stats.weekdayActivity[d] / maxWeekday) * 0.6;
-      bar.style.cssText = `width:24px;height:${h}px;background:var(--accent);border-radius:6px;opacity:${intensity};transition:all 0.2s;`;
-      bar.title = stats.weekdayActivity[d] + ' 条消息';
-      bar.addEventListener('mouseenter', () => { bar.style.opacity = '1'; bar.style.transform = 'scaleY(1.05)'; });
-      bar.addEventListener('mouseleave', () => { bar.style.opacity = String(intensity); bar.style.transform = ''; });
-      barWrapper.appendChild(bar);
-      col.appendChild(barWrapper);
-      const countLabel = document.createElement('div');
-      countLabel.style.cssText = 'font-size:0.65rem;color:var(--text-muted);';
-      countLabel.textContent = stats.weekdayActivity[d];
-      col.appendChild(countLabel);
+      col.style.cssText = 'flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;';
+      // Groove track (inset shadow slot)
+      const track = document.createElement('div');
+      track.style.cssText = `width:18px;height:${trackH}px;border-radius:9px;background:var(--bg-tertiary);box-shadow:var(--shadow-inset);position:relative;overflow:hidden;`;
+      // Data pill inside groove
+      const fillH = Math.max(8, (stats.weekdayActivity[d] / maxWeekday) * (trackH - 4));
+      const fill = document.createElement('div');
+      fill.style.cssText = `width:14px;height:${fillH}px;border-radius:7px;background:linear-gradient(to top, var(--accent), var(--accent-light));position:absolute;bottom:2px;left:2px;transition:height 0.3s ease;`;
+      fill.title = stats.weekdayActivity[d] + ' 条消息';
+      track.appendChild(fill);
+      col.appendChild(track);
       const label = document.createElement('div');
-      label.style.cssText = 'font-size:0.72rem;color:var(--text-secondary);font-weight:500;';
+      label.style.cssText = 'font-size:0.65rem;color:var(--text-muted);margin-top:2px;';
       label.textContent = weekdays[d];
       col.appendChild(label);
       weekdayBar.appendChild(col);
     }
     weekdayCard.appendChild(weekdayBar);
-    parent.appendChild(weekdayCard);
+    activityRow.appendChild(weekdayCard);
 
-    // ---- Hourly Activity (in a raised card) ----
+    // Hourly Activity
     if (stats.hourlyActivity.some(v => v > 0)) {
-      parent.appendChild(this._sectionTitle('每日活跃时段'));
       const hourCard = this._neuCard();
-      hourCard.style.marginBottom = '20px';
+      const hourTitle = document.createElement('div');
+      hourTitle.style.cssText = 'font-size:0.85rem;font-weight:600;color:var(--text-primary);margin-bottom:16px;';
+      hourTitle.textContent = '每日活跃时段';
+      hourCard.appendChild(hourTitle);
       const heatmap = document.createElement('div');
-      heatmap.style.cssText = 'display:grid;grid-template-columns:repeat(24,1fr);gap:4px;margin-bottom:8px;';
+      heatmap.style.cssText = 'display:grid;grid-template-columns:repeat(12,1fr);grid-template-rows:repeat(2,1fr);gap:4px;margin-bottom:8px;';
       const maxHour = Math.max(...stats.hourlyActivity);
       for (let h = 0; h < 24; h++) {
         const cell = document.createElement('div');
         const intensity = maxHour > 0 ? stats.hourlyActivity[h] / maxHour : 0;
-        cell.style.cssText = `aspect-ratio:1;border-radius:6px;background:var(--accent);opacity:${Math.max(0.06, intensity * 0.85)};transition:opacity 0.15s;`;
+        cell.style.cssText = `aspect-ratio:1;border-radius:8px;background:var(--accent);opacity:${Math.max(0.06, intensity * 0.85)};transition:opacity 0.15s;`;
         cell.title = `${h}:00 — ${stats.hourlyActivity[h]} 条消息`;
         cell.addEventListener('mouseenter', () => cell.style.opacity = '1');
         cell.addEventListener('mouseleave', () => cell.style.opacity = String(Math.max(0.06, intensity * 0.85)));
@@ -503,16 +507,17 @@ export class StatsPanel {
       }
       hourCard.appendChild(heatmap);
       const hourLabels = document.createElement('div');
-      hourLabels.style.cssText = 'display:grid;grid-template-columns:repeat(24,1fr);gap:4px;';
-      for (let h = 0; h < 24; h++) {
+      hourLabels.style.cssText = 'display:grid;grid-template-columns:repeat(12,1fr);gap:4px;';
+      for (let h = 0; h < 24; h += 2) {
         const label = document.createElement('div');
         label.style.cssText = 'text-align:center;font-size:0.6rem;color:var(--text-muted);';
-        label.textContent = h % 3 === 0 ? h + '' : '';
+        label.textContent = h % 6 === 0 ? h + ':00' : '';
         hourLabels.appendChild(label);
       }
       hourCard.appendChild(hourLabels);
-      parent.appendChild(hourCard);
+      activityRow.appendChild(hourCard);
     }
+    parent.appendChild(activityRow);
 
     // ---- Monthly Charts (side by side, each in a raised card) ----
     if (stats.monthlyData.labels.length > 1) {
