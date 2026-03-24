@@ -144,29 +144,88 @@ export class StatsPanel {
       textDiv.appendChild(val);
       card.appendChild(textDiv);
 
-      // Ring chart
-      const ringSize = 56;
+      // Neumorphic ring chart (inset track + thick gradient arc)
+      const ringSize = 88;
       const ringSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
       ringSvg.setAttribute('width', ringSize);
       ringSvg.setAttribute('height', ringSize);
-      ringSvg.setAttribute('viewBox', '0 0 56 56');
-      const r = 22, cx = 28, cy = 28, circumference = 2 * Math.PI * r;
+      ringSvg.setAttribute('viewBox', '0 0 88 88');
+      ringSvg.style.flexShrink = '0';
+
+      // Defs: inner shadow filter + gradient
+      const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+      const filterId = 'neuRingShadow-' + s.pct;
+      const filter = document.createElementNS('http://www.w3.org/2000/svg', 'filter');
+      filter.setAttribute('id', filterId);
+      filter.setAttribute('x', '-20%'); filter.setAttribute('y', '-20%');
+      filter.setAttribute('width', '140%'); filter.setAttribute('height', '140%');
+      // Inner shadow effect
+      const feFlood = document.createElementNS('http://www.w3.org/2000/svg', 'feFlood');
+      feFlood.setAttribute('flood-color', 'rgba(0,0,0,0.15)');
+      filter.appendChild(feFlood);
+      const feComp = document.createElementNS('http://www.w3.org/2000/svg', 'feComposite');
+      feComp.setAttribute('in2', 'SourceGraphic'); feComp.setAttribute('operator', 'in');
+      filter.appendChild(feComp);
+      const feBlur = document.createElementNS('http://www.w3.org/2000/svg', 'feGaussianBlur');
+      feBlur.setAttribute('stdDeviation', '2');
+      filter.appendChild(feBlur);
+      const feOffset = document.createElementNS('http://www.w3.org/2000/svg', 'feOffset');
+      feOffset.setAttribute('dx', '1'); feOffset.setAttribute('dy', '1');
+      filter.appendChild(feOffset);
+      const feMerge = document.createElementNS('http://www.w3.org/2000/svg', 'feMerge');
+      const mergeNode1 = document.createElementNS('http://www.w3.org/2000/svg', 'feMergeNode');
+      feMerge.appendChild(mergeNode1);
+      const mergeNode2 = document.createElementNS('http://www.w3.org/2000/svg', 'feMergeNode');
+      mergeNode2.setAttribute('in', 'SourceGraphic');
+      feMerge.appendChild(mergeNode2);
+      filter.appendChild(feMerge);
+      defs.appendChild(filter);
+
+      // Gradient for the arc
+      const gradId = 'ringGrad-' + s.pct;
+      const grad = document.createElementNS('http://www.w3.org/2000/svg', 'linearGradient');
+      grad.setAttribute('id', gradId);
+      grad.setAttribute('x1', '0%'); grad.setAttribute('y1', '0%');
+      grad.setAttribute('x2', '100%'); grad.setAttribute('y2', '100%');
+      const stop1 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
+      stop1.setAttribute('offset', '0%'); stop1.setAttribute('stop-color', s.color);
+      grad.appendChild(stop1);
+      const stop2 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
+      stop2.setAttribute('offset', '100%'); stop2.setAttribute('stop-color', s.color + 'cc');
+      grad.appendChild(stop2);
+      defs.appendChild(grad);
+      ringSvg.appendChild(defs);
+
+      const r = 33, cx = 44, cy = 44, strokeW = 10, circumference = 2 * Math.PI * r;
+
+      // Background track (neumorphic inset)
       const bgCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
       bgCircle.setAttribute('cx', cx); bgCircle.setAttribute('cy', cy); bgCircle.setAttribute('r', r);
-      bgCircle.setAttribute('fill', 'none'); bgCircle.setAttribute('stroke', 'var(--border-strong)'); bgCircle.setAttribute('stroke-width', '5');
+      bgCircle.setAttribute('fill', 'none');
+      bgCircle.setAttribute('stroke', 'var(--bg-secondary)');
+      bgCircle.setAttribute('stroke-width', String(strokeW + 2));
+      bgCircle.setAttribute('filter', `url(#${filterId})`);
       ringSvg.appendChild(bgCircle);
+
+      // Progress arc
       const fgCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
       fgCircle.setAttribute('cx', cx); fgCircle.setAttribute('cy', cy); fgCircle.setAttribute('r', r);
-      fgCircle.setAttribute('fill', 'none'); fgCircle.setAttribute('stroke', s.color); fgCircle.setAttribute('stroke-width', '5');
+      fgCircle.setAttribute('fill', 'none');
+      fgCircle.setAttribute('stroke', `url(#${gradId})`);
+      fgCircle.setAttribute('stroke-width', String(strokeW));
       fgCircle.setAttribute('stroke-linecap', 'round');
       fgCircle.setAttribute('stroke-dasharray', `${(s.pct / 100) * circumference} ${circumference}`);
       fgCircle.setAttribute('transform', `rotate(-90 ${cx} ${cy})`);
+      fgCircle.style.transition = 'stroke-dasharray 0.8s ease';
       ringSvg.appendChild(fgCircle);
+
+      // Percentage text
       const pctText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
       pctText.setAttribute('x', cx); pctText.setAttribute('y', cy + 1);
       pctText.setAttribute('text-anchor', 'middle'); pctText.setAttribute('dominant-baseline', 'central');
-      pctText.setAttribute('font-size', '11'); pctText.setAttribute('font-weight', '600');
+      pctText.setAttribute('font-size', '14'); pctText.setAttribute('font-weight', '700');
       pctText.setAttribute('fill', 'var(--text-primary)');
+      pctText.setAttribute('font-family', 'var(--font-family)');
       pctText.textContent = s.pct + '%';
       ringSvg.appendChild(pctText);
       card.appendChild(ringSvg);
