@@ -36,7 +36,7 @@ export class FileUpload {
     const h1 = document.createElement('h1');
     h1.style.cssText = 'font-family:var(--font-display);font-size:28px;font-weight:330;color:var(--text-secondary);line-height:1.3;';
     const claudeSpan = document.createElement('span');
-    claudeSpan.style.cssText = 'font-size:30px;vertical-align:-2px;';
+    claudeSpan.style.cssText = 'font-size:30px;vertical-align:-4px;';
     claudeSpan.textContent = 'Claude ';
     h1.appendChild(claudeSpan);
     h1.appendChild(document.createTextNode('对话记忆查看器'));
