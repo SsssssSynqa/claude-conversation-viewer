@@ -180,9 +180,10 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   min-height: 100vh;
-  padding: 48px 24px;
+  padding: 24px 24px 24px;
+  padding-top: 12vh;
   gap: 16px;
   overflow-y: auto;
 }
