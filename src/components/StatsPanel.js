@@ -158,7 +158,7 @@ export class StatsPanel {
       // r=48 strokeW=18: outer edge=48+9=57, groove radius=60, outer gap=3
       // inner edge=48-9=39, hole radius=37.5(75/2), inner gap≈1.5 -> hole smaller
       // Make gaps equal: outer gap = inner gap ≈ 3px each
-      const r = 48, strokeW = 16, circ = 2 * Math.PI * r;
+      const r = 48, strokeW = 19, circ = 2 * Math.PI * r;
       const dashLen = (s.pct / 100) * circ;
       // Syner's exact colors per side
       const isOrange = s.color === 'orange';
