@@ -8,9 +8,9 @@ export const SPARK_SVG = '<svg overflow="visible" width="100%" height="100%" vie
  * @param {number} size - Size in pixels
  * @returns {HTMLElement}
  */
-export function createSparkIcon(size = 20) {
+export function createSparkIcon(size = 20, inherit = false) {
   const span = document.createElement('span');
-  span.style.cssText = `width:${size}px;height:${size}px;display:inline-flex;color:var(--accent);flex-shrink:0;`;
+  span.style.cssText = `width:${size}px;height:${size}px;display:inline-flex;color:${inherit ? 'inherit' : 'var(--accent)'};flex-shrink:0;`;
   // Safe: SPARK_SVG is a hardcoded constant, not user-supplied data
   const t = document.createElement('template');
   t.innerHTML = SPARK_SVG;

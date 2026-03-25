@@ -128,7 +128,7 @@ function renderMainView() {
     const optDiv = document.createElement('div');
     optDiv.className = 'toggle-option' + (opt.theme === currentTheme ? ' active' : '');
     optDiv.dataset.theme = opt.theme;
-    const optIcon = opt.icon === 'spark' ? createSparkIcon(14) : createIcon(opt.icon, 16);
+    const optIcon = opt.icon === 'spark' ? createSparkIcon(14, true) : createIcon(opt.icon, 16);
     optDiv.appendChild(optIcon);
     optDiv.addEventListener('click', () => {
       state.set('theme', opt.theme);
@@ -411,7 +411,7 @@ function renderMainView() {
 
     // Update sidebar pill button active states
     const allBtns = ['sidebar-search-btn', 'sidebar-export-btn', 'sidebar-stats-btn'];
-    const activeMap = { search: 'sidebar-search-btn', export: 'sidebar-export-btn', conversation: null };
+    const activeMap = { search: 'sidebar-search-btn', export: 'sidebar-export-btn', conversation: 'sidebar-stats-btn' };
     for (const id of allBtns) {
       const el = document.getElementById(id);
       if (!el) continue;
