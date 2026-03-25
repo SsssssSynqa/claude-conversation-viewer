@@ -163,27 +163,33 @@ export class StatsPanel {
       const cEnd = isOrange ? '#D97657' : '#7a899c';
       const hlColor = isOrange ? 'rgba(255,180,140,0.55)' : 'rgba(190,210,230,0.7)';
 
+      const cx = ringSize / 2;
       ringSvg.innerHTML = `<svg viewBox="0 0 ${ringSize} ${ringSize}" style="position:absolute;width:${ringSize}px;height:${ringSize}px;transform:rotate(-90deg);">
         <defs>
           <filter id="glow-${uid}" x="-20%" y="-20%" width="140%" height="140%">
             <feGaussianBlur in="SourceGraphic" stdDeviation="2.5"/>
+          </filter>
+          <filter id="shadow-${uid}" x="-30%" y="-30%" width="160%" height="160%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="3.5"/>
           </filter>
           <linearGradient id="g-${uid}" x1="0%" y1="0%" x2="100%" y2="100%">
             <stop offset="0%" stop-color="${cStart}"/>
             <stop offset="100%" stop-color="${cEnd}"/>
           </linearGradient>
         </defs>
-        <circle cx="60" cy="60" r="${r}" fill="none"
-          stroke="rgba(0,0,0,0.12)" stroke-width="${strokeW}" stroke-linecap="round"
-          stroke-dasharray="${dashLen} ${circ}" style="transform:translate(1px,2px);"/>
-        <circle cx="60" cy="60" r="${r}" fill="none"
+        <circle cx="${cx}" cy="${cx}" r="${r}" fill="none"
+          stroke="rgba(0,0,0,0.18)" stroke-width="${strokeW}" stroke-linecap="round"
+          stroke-dasharray="${dashLen} ${circ}"
+          filter="url(#shadow-${uid})"
+          style="transform:translate(1.5px,2.5px);"/>
+        <circle cx="${cx}" cy="${cx}" r="${r}" fill="none"
           stroke="url(#g-${uid})" stroke-width="${strokeW}" stroke-linecap="round"
           stroke-dasharray="${dashLen} ${circ}"/>
-        <circle cx="60" cy="60" r="${r - 0.5}" fill="none"
+        <circle cx="${cx}" cy="${cx}" r="${r - 0.5}" fill="none"
           stroke="${hlColor}" stroke-width="7" stroke-linecap="round"
           stroke-dasharray="${dashLen} ${circ}"
           filter="url(#glow-${uid})"
-          style="transform:translate(-1.2px,-1.2px);opacity:0.6;"/>
+          style="transform:translate(-1.2px,-1.2px);opacity:0.65;"/>
       </svg>`;
       ringWrap.appendChild(ringSvg.firstElementChild);
 
