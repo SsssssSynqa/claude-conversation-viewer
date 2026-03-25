@@ -96,7 +96,7 @@ export class StatsPanel {
 
     // ---- Basic Stats Cards (floating directly on background, no outer wrapper) ----
     const cardsGrid = document.createElement('div');
-    cardsGrid.style.cssText = 'display:grid;grid-template-columns:repeat(4,1fr);gap:14px;';
+    cardsGrid.style.cssText = 'display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:14px;';
 
     // Row 1: 4 basic counts (matching Figma layout)
     const row1Stats = [
@@ -249,7 +249,7 @@ export class StatsPanel {
     // ---- First & Last Conversation (cards float directly) ----
     if (stats.firstConv && stats.lastConv) {
       const milestoneRow = document.createElement('div');
-      milestoneRow.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:14px;';
+      milestoneRow.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;';
 
       milestoneRow.appendChild(this._milestoneCard('第一段对话', stats.firstConv.name || '未命名', formatTimestamp(stats.firstConv.createdAt)));
       milestoneRow.appendChild(this._milestoneCard('最近一段对话', stats.lastConv.name || '未命名', formatTimestamp(stats.lastConv.createdAt)));
@@ -261,7 +261,7 @@ export class StatsPanel {
     if (stats.yearlyData && stats.yearlyData.length > 0) {
       parent.appendChild(this._sectionTitle('年度总览'));
       const yearGrid = document.createElement('div');
-      yearGrid.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;';
+      yearGrid.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:14px;';
       for (const yr of stats.yearlyData) {
         const card = this._neuCard();
         const yearLabel = document.createElement('div');
@@ -299,14 +299,14 @@ export class StatsPanel {
       const heatCard = this._neuCard();
       heatCard.style.padding = '16px 22px';
       heatCard.appendChild(this._buildHeatmapCalendar(stats.dateHeatmap));
-      heatCard.style.marginBottom = '0';
+      heatCard.style.marginBottom = '14px';
       parent.appendChild(heatCard);
     }
 
     // ---- TOP 5 Longest Conversations (in a single raised card) ----
     parent.appendChild(this._sectionTitle('TOP 5 最长对话'));
     const topCard = this._neuCard();
-    topCard.style.marginBottom = '0';
+    topCard.style.marginBottom = '14px';
     topCard.style.padding = '8px 0';
     for (let i = 0; i < Math.min(5, stats.topConversations.length); i++) {
       const conv = stats.topConversations[i];
@@ -337,7 +337,7 @@ export class StatsPanel {
     if (stats.deepNightConvs.length > 0) {
       parent.appendChild(this._sectionTitle('深夜对话榜（凌晨2-5点）'));
       const nightCard = this._neuCard();
-      nightCard.style.marginBottom = '0';
+      nightCard.style.marginBottom = '14px';
       nightCard.style.padding = '8px 0';
       for (let i = 0; i < Math.min(5, stats.deepNightConvs.length); i++) {
         const item = stats.deepNightConvs[i];
@@ -359,7 +359,7 @@ export class StatsPanel {
 
     // ---- Weekday + Monthly Line Chart side by side ----
     const activityRow = document.createElement('div');
-    activityRow.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:14px;';
+    activityRow.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;';
 
     // Weekday: neumorphic groove bars (slot track + pill inside)
     const weekdayCard = this._neuCard();
@@ -521,7 +521,7 @@ export class StatsPanel {
       const wordTitleRow = document.createElement('div');
       wordTitleRow.style.cssText = 'display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;';
       const wordTitle = this._sectionTitle('高频词');
-      wordTitle.style.marginBottom = '0';
+      wordTitle.style.marginBottom = '14px';
       wordTitleRow.appendChild(wordTitle);
 
       const resetBtn = document.createElement('button');
@@ -537,7 +537,7 @@ export class StatsPanel {
       parent.appendChild(wordTitleRow);
 
       const wordCard = this._neuCard();
-      wordCard.style.marginBottom = '0';
+      wordCard.style.marginBottom = '14px';
 
       // Two columns
       const columns = document.createElement('div');
@@ -571,7 +571,7 @@ export class StatsPanel {
     if (stats.topEmojis.length > 0) {
       parent.appendChild(this._sectionTitle('常用 Emoji'));
       const emojiCard = this._neuCard();
-      emojiCard.style.marginBottom = '0';
+      emojiCard.style.marginBottom = '14px';
       const emojiRow = document.createElement('div');
       emojiRow.style.cssText = 'display:flex;flex-wrap:wrap;gap:12px;';
       for (const e of stats.topEmojis.slice(0, 15)) {
@@ -595,7 +595,7 @@ export class StatsPanel {
     if (stats.totalThinkingCount > 0) {
       parent.appendChild(this._sectionTitle('思考统计'));
       const thinkGrid = document.createElement('div');
-      thinkGrid.style.cssText = 'display:grid;grid-template-columns:repeat(4,1fr);gap:14px;';
+      thinkGrid.style.cssText = 'display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:14px;';
       const thinkStats = [
         { label: '总思考次数', value: stats.totalThinkingCount.toLocaleString() + ' 次' },
         { label: '累计思考时间', value: this.formatMs(stats.totalThinkingMs) },
@@ -621,7 +621,7 @@ export class StatsPanel {
     if (stats.topTitleWords.length > 0) {
       parent.appendChild(this._sectionTitle('对话标题高频词'));
       const titleCard = this._neuCard();
-      titleCard.style.marginBottom = '0';
+      titleCard.style.marginBottom = '14px';
       const titleCloudContainer = document.createElement('div');
       this._renderWordCloud(titleCloudContainer, stats.topTitleWords, stats.allTitleWords, 'title');
       titleCard.appendChild(titleCloudContainer);
