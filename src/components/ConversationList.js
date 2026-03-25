@@ -41,7 +41,7 @@ export class ConversationList {
 
     // List container
     this.listEl = document.createElement('div');
-    this.listEl.style.cssText = 'flex:1;overflow-y:auto;padding:0 12px;';
+    this.listEl.style.cssText = 'flex:1;overflow-y:auto;padding:0 10px 16px 16px;';
     this.container.appendChild(this.listEl);
 
     this.renderList();

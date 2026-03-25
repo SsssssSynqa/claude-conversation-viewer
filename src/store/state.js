@@ -52,7 +52,7 @@ export const state = new Store({
   currentConversationIndex: -1,
   searchQuery: '',
   filters: { dateFrom: null, dateTo: null, role: 'all', contentType: 'all' },
-  theme: localStorage.getItem('cv-theme') || 'auto',
+  theme: localStorage.getItem('cv-theme') || 'light',
   displayNames: loadDisplayNames(),
   showThinking: true,
   showToolUse: true,
