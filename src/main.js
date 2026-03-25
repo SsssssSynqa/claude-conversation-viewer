@@ -441,6 +441,9 @@ function renderMainView() {
   state.on('currentConversationIndex', () => {
     updateNavActive(state.get('viewMode'));
   });
+
+  // Initial active state on load
+  requestAnimationFrame(() => updateNavActive(state.get('viewMode')));
 }
 
 

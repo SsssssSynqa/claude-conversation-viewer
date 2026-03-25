@@ -41,7 +41,7 @@ export class ConversationList {
 
     // List container
     this.listEl = document.createElement('div');
-    this.listEl.style.cssText = 'flex:1;overflow-y:auto;';
+    this.listEl.style.cssText = 'flex:1;overflow-y:auto;padding:0 12px;';
     this.container.appendChild(this.listEl);
 
     this.renderList();
@@ -95,8 +95,8 @@ export class ConversationList {
         const isActive = index === currentIndex;
         item.className = 'sidebar-pill ' + (isActive ? 'pill-active' : 'pill-flat');
         item.style.cssText = `
-          padding: 10px 14px;
-          margin: 2px 4px;
+          padding: 10px 16px;
+          margin: 3px 0;
           cursor: pointer;
           font-size: 13px;
           height: auto;
