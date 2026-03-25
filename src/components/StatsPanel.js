@@ -155,7 +155,10 @@ export class StatsPanel {
       const uid = 'ring-' + s.pct + '-' + Math.random().toString(36).slice(2, 6);
       const ringSvg = document.createElement('div');
       // Syner's exact values: r=64 in 160 viewport, stroke-width=24, linecap=round
-      const r = 50, strokeW = 20, circ = 2 * Math.PI * r;
+      // r=48 strokeW=18: outer edge=48+9=57, groove radius=60, outer gap=3
+      // inner edge=48-9=39, hole radius=37.5(75/2), inner gap≈1.5 -> hole smaller
+      // Make gaps equal: outer gap = inner gap ≈ 3px each
+      const r = 48, strokeW = 16, circ = 2 * Math.PI * r;
       const dashLen = (s.pct / 100) * circ;
       // Syner's exact colors per side
       const isOrange = s.color === 'orange';
@@ -194,7 +197,11 @@ export class StatsPanel {
       ringWrap.appendChild(ringSvg.firstElementChild);
 
       // Center hole: Syner's exact convex disc
-      const holeSize = Math.round(ringSize * 0.625);
+      // Inner edge of arc = cx - r + strokeW/2 = 60-48+8 = 20 from center edge
+      // So hole should leave same gap as outer: hole radius = inner_edge - gap
+      // Outer gap = 60 - (48+8) = 4px, so inner gap should also be 4px
+      // hole radius = (48-8) - 4 = 36, hole diameter = 72
+      const holeSize = 72;
       const hole = document.createElement('div');
       hole.style.cssText = `width:${holeSize}px;height:${holeSize}px;border-radius:50%;background:var(--bg-primary);`
         + 'box-shadow:9px 9px 16px rgba(163,177,198,0.5),-9px -9px 16px rgba(255,255,255,0.7);'
