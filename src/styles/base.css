@@ -124,8 +124,8 @@ body {
 .main-layout {
   display: flex;
   flex: 1;
-  overflow: hidden;
   height: 100vh;
+  overflow: hidden;
 }
 
 .sidebar {
@@ -140,11 +140,12 @@ body {
   overflow: hidden;
   flex-shrink: 0;
   transition: width var(--transition);
-  margin: 12px 0 12px 12px;
+  margin: 12px;
 }
-.sidebar ::-webkit-scrollbar { width: 6px; }
-.sidebar ::-webkit-scrollbar-track { background: transparent; }
-.sidebar ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 3px; }
+.sidebar ::-webkit-scrollbar { width: 4px; }
+.sidebar ::-webkit-scrollbar-track { background: transparent; margin: 8px 0; }
+.sidebar ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.08); border-radius: 2px; }
+.sidebar * { scrollbar-width: thin; scrollbar-color: rgba(0,0,0,0.08) transparent; }
 
 .sidebar.collapsed {
   width: 0;
