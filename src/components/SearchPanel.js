@@ -44,7 +44,7 @@ export class SearchPanel {
 
     // Keyword input row
     const searchRow = document.createElement('div');
-    searchRow.style.cssText = 'display:flex;gap:8px;margin-bottom:12px;';
+    searchRow.style.cssText = 'display:flex;gap:8px;margin-bottom:12px;width:100%;';
 
     const searchInput = document.createElement('input');
     searchInput.type = 'text';

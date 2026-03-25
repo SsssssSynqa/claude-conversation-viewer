@@ -921,7 +921,7 @@ export class StatsPanel {
 
   _buildHeatmapCalendar(dateHeatmap) {
     const container = document.createElement('div');
-    container.style.cssText = 'margin-bottom:28px;overflow-x:auto;';
+    container.style.cssText = 'margin-bottom:28px;overflow-x:auto;padding-bottom:8px;';
 
     const dates = Object.keys(dateHeatmap).sort();
     if (dates.length === 0) return container;

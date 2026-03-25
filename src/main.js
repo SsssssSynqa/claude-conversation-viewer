@@ -151,7 +151,8 @@ function renderMainView() {
       });
     }
     // Re-render stats panel so ring charts pick up new theme shadows
-    if (messageView && state.get('viewMode') === 'conversation' && !state.get('selectedConversation')) {
+    const convIdx = state.get('currentConversationIndex');
+    if (messageView && state.get('viewMode') === 'conversation' && (convIdx === -1 || convIdx === undefined || convIdx === null)) {
       const c = messageView.container;
       const overlay = showLoading(c);
       Array.from(c.children).forEach(ch => { if (ch !== overlay) ch.remove(); });
