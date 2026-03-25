@@ -544,21 +544,56 @@ export class StatsPanel {
       chartTitle2.style.cssText = 'font-size:0.85rem;font-weight:600;color:var(--text-primary);margin-bottom:12px;';
       chartTitle2.textContent = '每月字数';
       chartCard2.appendChild(chartTitle2);
-      const canvas2 = document.createElement('canvas');
-      canvas2.style.cssText = 'width:100%;height:180px;';
-      chartCard2.appendChild(canvas2);
+
+      // DOM neumorphic grouped bar chart — Syner's physics
+      const hVals = stats.monthlyData.humanChars;
+      const aVals = stats.monthlyData.assistantChars;
+      const maxWordVal = Math.max(...hVals, ...aVals, 1);
+      const barRow = document.createElement('div');
+      barRow.style.cssText = 'display:flex;justify-content:space-around;align-items:flex-end;height:160px;padding:0 4px;';
+      const trackH = 140;
+      stats.monthlyData.labels.forEach((lbl, i) => {
+        const grp = document.createElement('div');
+        grp.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:4px;';
+        const pair = document.createElement('div');
+        pair.style.cssText = 'display:flex;gap:2px;align-items:flex-end;';
+        // Human (purple) track + pill
+        const t1 = document.createElement('div');
+        t1.style.cssText = `width:10px;height:${trackH}px;border-radius:10px;background:var(--bg-card);box-shadow:var(--shadow-inset);display:flex;align-items:flex-end;padding:2px;box-sizing:border-box;`;
+        const pct1 = Math.max(5, (hVals[i] / maxWordVal) * 100);
+        const f1 = document.createElement('div');
+        f1.style.cssText = `width:100%;height:${pct1}%;border-radius:8px;background:linear-gradient(145deg,#9b8ff0,#7c6eea);box-shadow:1px 1px 3px rgba(163,177,198,0.4),inset 1px 1px 3px rgba(255,255,255,0.5);`;
+        f1.title = `${names.human || 'Human'}: ${hVals[i].toLocaleString()} 字`;
+        t1.appendChild(f1);
+        // Assistant (orange) track + pill
+        const t2 = document.createElement('div');
+        t2.style.cssText = `width:10px;height:${trackH}px;border-radius:10px;background:var(--bg-card);box-shadow:var(--shadow-inset);display:flex;align-items:flex-end;padding:2px;box-sizing:border-box;`;
+        const pct2 = Math.max(5, (aVals[i] / maxWordVal) * 100);
+        const f2 = document.createElement('div');
+        f2.style.cssText = `width:100%;height:${pct2}%;border-radius:8px;background:linear-gradient(145deg,#ea9d85,#D97657);box-shadow:1px 1px 3px rgba(163,177,198,0.4),inset 1px 1px 3px rgba(255,255,255,0.5);`;
+        f2.title = `${names.assistant || 'Assistant'}: ${aVals[i].toLocaleString()} 字`;
+        t2.appendChild(f2);
+        pair.appendChild(t1);
+        pair.appendChild(t2);
+        grp.appendChild(pair);
+        const lab = document.createElement('div');
+        lab.style.cssText = 'font-size:0.55rem;color:var(--text-muted);white-space:nowrap;';
+        lab.textContent = lbl;
+        grp.appendChild(lab);
+        barRow.appendChild(grp);
+      });
+      chartCard2.appendChild(barRow);
+      // Legend
+      const legend = document.createElement('div');
+      legend.style.cssText = 'display:flex;justify-content:center;gap:16px;margin-top:8px;font-size:0.65rem;color:var(--text-muted);';
+      legend.innerHTML = `<span style="display:flex;align-items:center;gap:4px;"><span style="width:8px;height:8px;border-radius:50%;background:#7c6eea;display:inline-block;"></span>${names.human || 'Human'}</span>`
+        + `<span style="display:flex;align-items:center;gap:4px;"><span style="width:8px;height:8px;border-radius:50%;background:#D97657;display:inline-block;"></span>${names.assistant || 'Assistant'}</span>`;
+      chartCard2.appendChild(legend);
       chartsRow.appendChild(chartCard2);
 
       parent.appendChild(chartsRow);
       requestAnimationFrame(() => {
         drawLineChart(canvas1, { labels: stats.monthlyData.labels, values: stats.monthlyData.convCounts }, {});
-        drawBarChart(canvas2, {
-          labels: stats.monthlyData.labels,
-          series: [
-            { name: names.human || 'Human', values: stats.monthlyData.humanChars, color: '#7c6eea' },
-            { name: names.assistant || 'Assistant', values: stats.monthlyData.assistantChars, color: '#da7756' },
-          ],
-        }, {});
       });
     }
 
