@@ -150,12 +150,12 @@ export class StatsPanel {
       ringWrap.style.cssText = `position:relative;width:${ringSize}px;height:${ringSize}px;border-radius:50%;flex-shrink:0;`
         + 'background:var(--bg-primary);'
         + 'box-shadow:inset 5px 5px 10px rgba(163,177,198,0.6),inset -5px -5px 10px rgba(255,255,255,0.8);'
-        + 'display:flex;justify-content:center;align-items:center;';
+        + 'display:flex;justify-content:center;align-items:center;overflow:visible;';
 
       const uid = 'ring-' + s.pct + '-' + Math.random().toString(36).slice(2, 6);
       const ringSvg = document.createElement('div');
       // Syner's exact values: r=64 in 160 viewport, stroke-width=24, linecap=round
-      const r = 48, strokeW = 18, circ = 2 * Math.PI * r;
+      const r = 50, strokeW = 20, circ = 2 * Math.PI * r;
       const dashLen = (s.pct / 100) * circ;
       // Syner's exact colors per side
       const isOrange = s.color === 'orange';
@@ -164,7 +164,7 @@ export class StatsPanel {
       const hlColor = isOrange ? 'rgba(255,180,140,0.55)' : 'rgba(190,210,230,0.7)';
 
       const cx = ringSize / 2;
-      ringSvg.innerHTML = `<svg viewBox="0 0 ${ringSize} ${ringSize}" style="position:absolute;width:${ringSize}px;height:${ringSize}px;transform:rotate(-90deg);">
+      ringSvg.innerHTML = `<svg viewBox="0 0 ${ringSize} ${ringSize}" style="position:absolute;width:${ringSize}px;height:${ringSize}px;transform:rotate(-90deg);overflow:visible;">
         <defs>
           <filter id="glow-${uid}" x="-20%" y="-20%" width="140%" height="140%">
             <feGaussianBlur in="SourceGraphic" stdDeviation="2.5"/>
