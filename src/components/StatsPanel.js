@@ -297,6 +297,7 @@ export class StatsPanel {
     if (stats.dateHeatmap && Object.keys(stats.dateHeatmap).length > 0) {
       parent.appendChild(this._sectionTitle('时光矩阵'));
       const heatCard = this._neuCard();
+      heatCard.style.padding = '16px 22px';
       heatCard.appendChild(this._buildHeatmapCalendar(stats.dateHeatmap));
       heatCard.style.marginBottom = '20px';
       parent.appendChild(heatCard);
@@ -921,7 +922,7 @@ export class StatsPanel {
 
   _buildHeatmapCalendar(dateHeatmap) {
     const container = document.createElement('div');
-    container.style.cssText = 'margin-bottom:28px;overflow-x:auto;padding-bottom:8px;';
+    container.style.cssText = 'overflow-x:auto;padding-bottom:4px;';
 
     const dates = Object.keys(dateHeatmap).sort();
     if (dates.length === 0) return container;
