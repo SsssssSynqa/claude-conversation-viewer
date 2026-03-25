@@ -57,7 +57,7 @@ export class StatsPanel {
     titleRow.style.cssText = 'display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;';
 
     const title = document.createElement('h2');
-    title.style.cssText = 'font-size:1.25rem;font-weight:800;color:var(--text-primary);display:flex;align-items:center;gap:12px;letter-spacing:1px;';
+    title.style.cssText = 'font-size:1rem;font-weight:800;color:var(--text-primary);display:flex;align-items:center;gap:10px;letter-spacing:0.5px;';
     const mainDot = document.createElement('span');
     mainDot.style.cssText = 'width:10px;height:10px;border-radius:50%;background:var(--accent);box-shadow:inset 1px 1px 2px rgba(255,255,255,0.4),0 0 8px rgba(217,118,87,0.4);flex-shrink:0;';
     title.appendChild(mainDot);
@@ -933,7 +933,7 @@ export class StatsPanel {
 
     const maxCount = Math.max(...Object.values(dateHeatmap), 1);
     const CELL = 14, GAP = 4;
-    const weekdays = ['', '周一', '', '周三', '', '周五', ''];
+    const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
     // Outer wrapper with weekday labels on the left
     const wrapper = document.createElement('div');
@@ -941,10 +941,10 @@ export class StatsPanel {
 
     // Weekday labels column
     const weekdayLabels = document.createElement('div');
-    weekdayLabels.style.cssText = `display:flex;flex-direction:column;gap:${GAP}px;justify-content:flex-start;padding-top:${CELL + GAP + 4}px;`;
+    weekdayLabels.style.cssText = `display:flex;flex-direction:column;gap:${GAP}px;justify-content:flex-start;padding-top:${CELL + GAP + 2}px;flex-shrink:0;`;
     for (let d = 0; d < 7; d++) {
       const label = document.createElement('div');
-      label.style.cssText = `height:${CELL}px;font-size:0.6rem;color:var(--text-muted);display:flex;align-items:center;line-height:1;`;
+      label.style.cssText = `height:${CELL}px;font-size:0.5rem;color:var(--text-muted);display:flex;align-items:center;line-height:1;width:22px;`;
       label.textContent = weekdays[d];
       weekdayLabels.appendChild(label);
     }
@@ -1019,7 +1019,7 @@ export class StatsPanel {
 
     // Legend
     const legend = document.createElement('div');
-    legend.style.cssText = 'display:flex;align-items:center;gap:4px;margin-top:8px;justify-content:flex-end;font-size:0.6rem;color:var(--text-muted);';
+    legend.style.cssText = 'display:flex;align-items:center;gap:4px;margin-top:12px;justify-content:flex-start;font-size:0.55rem;color:var(--text-muted);font-weight:600;padding-left:26px;';
     legend.appendChild(document.createTextNode('Less'));
     const legendColors = ['var(--bg-card)', '#f1cfc2', '#e6aa95', '#df8a6f', 'var(--accent)'];
     const legendShadows = ['var(--shadow-inset)', 'none', 'none', '1px 1px 3px rgba(165,178,196,0.3)', '2px 2px 4px rgba(165,178,196,0.3)'];
