@@ -122,8 +122,8 @@ export class StatsPanel {
     const humanPct = totalChars > 0 ? Math.round((stats.totalHumanChars / totalChars) * 100) : 0;
 
     const wordCountCards = [
-      { label: (names.assistant || 'Assistant') + '的总字数', value: stats.totalAssistantChars.toLocaleString(), pct: assistantPct, color: '#4A7AE8' },
-      { label: (names.human || 'Human') + '的总字数', value: stats.totalHumanChars.toLocaleString(), pct: humanPct, color: '#45C4B0' },
+      { label: (names.human || 'Human') + '的总字数', value: stats.totalHumanChars.toLocaleString(), pct: humanPct, color: 'orange' },
+      { label: (names.assistant || 'Assistant') + '的总字数', value: stats.totalAssistantChars.toLocaleString(), pct: assistantPct, color: 'gray' },
     ];
 
     for (const s of wordCountCards) {
@@ -158,10 +158,10 @@ export class StatsPanel {
       const r = 48, strokeW = 18, circ = 2 * Math.PI * r;
       const dashLen = (s.pct / 100) * circ;
       // Syner's exact colors per side
-      const isHuman = s.color === '#7c6eea';
-      const cStart = isHuman ? '#ea9d85' : '#b8c6d4';
-      const cEnd = isHuman ? '#D97657' : '#7a899c';
-      const hlColor = isHuman ? 'rgba(255,180,140,0.55)' : 'rgba(190,210,230,0.7)';
+      const isOrange = s.color === 'orange';
+      const cStart = isOrange ? '#ea9d85' : '#b8c6d4';
+      const cEnd = isOrange ? '#D97657' : '#7a899c';
+      const hlColor = isOrange ? 'rgba(255,180,140,0.55)' : 'rgba(190,210,230,0.7)';
 
       ringSvg.innerHTML = `<svg viewBox="0 0 ${ringSize} ${ringSize}" style="position:absolute;width:${ringSize}px;height:${ringSize}px;transform:rotate(-90deg);">
         <defs>
