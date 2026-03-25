@@ -448,8 +448,7 @@ export class StatsPanel {
       parent.appendChild(nightCard);
     }
 
-    // ---- Weekday Distribution ----
-    // ---- Weekday + Hourly side by side ----
+    // ---- Weekday + Monthly Line Chart side by side ----
     const activityRow = document.createElement('div');
     activityRow.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;';
 
@@ -491,9 +490,29 @@ export class StatsPanel {
     weekdayCard.appendChild(weekdayBar);
     activityRow.appendChild(weekdayCard);
 
-    // Hourly Activity
+    // Monthly line chart goes next to weekday
+    if (stats.monthlyData.labels.length > 1) {
+      const chartCard1 = this._neuCard();
+      const chartTitle1 = document.createElement('div');
+      chartTitle1.style.cssText = 'font-size:0.85rem;font-weight:600;color:var(--text-primary);margin-bottom:12px;';
+      chartTitle1.textContent = '每月对话频率';
+      chartCard1.appendChild(chartTitle1);
+      const canvas1 = document.createElement('canvas');
+      canvas1.style.cssText = 'width:100%;height:180px;';
+      chartCard1.appendChild(canvas1);
+      activityRow.appendChild(chartCard1);
+      parent.appendChild(activityRow);
+      requestAnimationFrame(() => {
+        drawLineChart(canvas1, { labels: stats.monthlyData.labels, values: stats.monthlyData.convCounts }, {});
+      });
+    } else {
+      parent.appendChild(activityRow);
+    }
+
+    // ---- Hourly Activity (own row) ----
     if (stats.hourlyActivity.some(v => v > 0)) {
       const hourCard = this._neuCard();
+      hourCard.style.marginBottom = '24px';
       const hourTitle = document.createElement('div');
       hourTitle.style.cssText = 'font-size:0.85rem;font-weight:600;color:var(--text-primary);margin-bottom:16px;';
       hourTitle.textContent = '每日活跃时段';
@@ -520,24 +539,11 @@ export class StatsPanel {
         hourLabels.appendChild(label);
       }
       hourCard.appendChild(hourLabels);
-      activityRow.appendChild(hourCard);
+      parent.appendChild(hourCard);
     }
-    parent.appendChild(activityRow);
 
-    // ---- Monthly Charts (side by side, each in a raised card) ----
+    // ---- Monthly Word Count (own row) ----
     if (stats.monthlyData.labels.length > 1) {
-      const chartsRow = document.createElement('div');
-      chartsRow.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;';
-
-      const chartCard1 = this._neuCard();
-      const chartTitle1 = document.createElement('div');
-      chartTitle1.style.cssText = 'font-size:0.85rem;font-weight:600;color:var(--text-primary);margin-bottom:12px;';
-      chartTitle1.textContent = '每月对话频率';
-      chartCard1.appendChild(chartTitle1);
-      const canvas1 = document.createElement('canvas');
-      canvas1.style.cssText = 'width:100%;height:180px;';
-      chartCard1.appendChild(canvas1);
-      chartsRow.appendChild(chartCard1);
 
       const chartCard2 = this._neuCard();
       const chartTitle2 = document.createElement('div');
@@ -589,12 +595,8 @@ export class StatsPanel {
       legend.innerHTML = `<span style="display:flex;align-items:center;gap:4px;"><span style="width:8px;height:8px;border-radius:50%;background:#7c6eea;display:inline-block;"></span>${names.human || 'Human'}</span>`
         + `<span style="display:flex;align-items:center;gap:4px;"><span style="width:8px;height:8px;border-radius:50%;background:#D97657;display:inline-block;"></span>${names.assistant || 'Assistant'}</span>`;
       chartCard2.appendChild(legend);
-      chartsRow.appendChild(chartCard2);
-
-      parent.appendChild(chartsRow);
-      requestAnimationFrame(() => {
-        drawLineChart(canvas1, { labels: stats.monthlyData.labels, values: stats.monthlyData.convCounts }, {});
-      });
+      chartCard2.style.marginBottom = '24px';
+      parent.appendChild(chartCard2);
     }
 
     // ---- Word Cloud (Top Words) — in a raised card ----
