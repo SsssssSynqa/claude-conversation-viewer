@@ -444,34 +444,42 @@ export class StatsPanel {
       const aVals = stats.monthlyData.assistantChars;
       const maxWordVal = Math.max(...hVals, ...aVals, 1);
       const barRow = document.createElement('div');
-      barRow.style.cssText = 'display:flex;justify-content:space-around;align-items:flex-end;height:160px;padding:0 4px;';
-      const trackH = 140;
+      barRow.style.cssText = 'display:flex;justify-content:space-between;align-items:flex-end;height:200px;padding:0 10px;';
+      const trackH = 170;
       stats.monthlyData.labels.forEach((lbl, i) => {
         const grp = document.createElement('div');
-        grp.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:4px;';
+        grp.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:6px;flex:1;';
         const pair = document.createElement('div');
-        pair.style.cssText = 'display:flex;gap:2px;align-items:flex-end;';
+        pair.style.cssText = 'display:flex;gap:4px;align-items:flex-end;justify-content:center;';
         // Human (purple) track + pill
         const t1 = document.createElement('div');
-        t1.style.cssText = `width:10px;height:${trackH}px;border-radius:10px;background:var(--bg-card);box-shadow:var(--shadow-inset);display:flex;align-items:flex-end;padding:2px;box-sizing:border-box;`;
-        const pct1 = Math.max(5, (hVals[i] / maxWordVal) * 100);
+        t1.style.cssText = `width:18px;height:${trackH}px;border-radius:9px;background:var(--bg-primary);`
+          + 'box-shadow:inset 3px 3px 6px rgba(163,177,198,0.5),inset -3px -3px 6px rgba(255,255,255,0.7);'
+          + 'display:flex;align-items:flex-end;padding:2px;box-sizing:border-box;';
+        const pct1 = Math.max(4, (hVals[i] / maxWordVal) * 100);
         const f1 = document.createElement('div');
-        f1.style.cssText = `width:100%;height:${pct1}%;border-radius:8px;background:linear-gradient(145deg,#9b8ff0,#7c6eea);box-shadow:1px 1px 3px rgba(163,177,198,0.4),inset 1px 1px 3px rgba(255,255,255,0.5);`;
+        f1.style.cssText = `width:100%;height:${pct1}%;border-radius:7px;`
+          + 'background:linear-gradient(145deg,#9b8ff0,#7c6eea);'
+          + 'box-shadow:1px 1px 4px rgba(163,177,198,0.4),inset 1px 1px 2px rgba(255,255,255,0.5);';
         f1.title = `${names.human || 'Human'}: ${hVals[i].toLocaleString()} 字`;
         t1.appendChild(f1);
         // Assistant (orange) track + pill
         const t2 = document.createElement('div');
-        t2.style.cssText = `width:10px;height:${trackH}px;border-radius:10px;background:var(--bg-card);box-shadow:var(--shadow-inset);display:flex;align-items:flex-end;padding:2px;box-sizing:border-box;`;
-        const pct2 = Math.max(5, (aVals[i] / maxWordVal) * 100);
+        t2.style.cssText = `width:18px;height:${trackH}px;border-radius:9px;background:var(--bg-primary);`
+          + 'box-shadow:inset 3px 3px 6px rgba(163,177,198,0.5),inset -3px -3px 6px rgba(255,255,255,0.7);'
+          + 'display:flex;align-items:flex-end;padding:2px;box-sizing:border-box;';
+        const pct2 = Math.max(4, (aVals[i] / maxWordVal) * 100);
         const f2 = document.createElement('div');
-        f2.style.cssText = `width:100%;height:${pct2}%;border-radius:8px;background:linear-gradient(145deg,#ea9d85,#D97657);box-shadow:1px 1px 3px rgba(163,177,198,0.4),inset 1px 1px 3px rgba(255,255,255,0.5);`;
+        f2.style.cssText = `width:100%;height:${pct2}%;border-radius:7px;`
+          + 'background:linear-gradient(145deg,#ea9d85,#D97657);'
+          + 'box-shadow:1px 1px 4px rgba(163,177,198,0.4),inset 1px 1px 2px rgba(255,255,255,0.5);';
         f2.title = `${names.assistant || 'Assistant'}: ${aVals[i].toLocaleString()} 字`;
         t2.appendChild(f2);
         pair.appendChild(t1);
         pair.appendChild(t2);
         grp.appendChild(pair);
         const lab = document.createElement('div');
-        lab.style.cssText = 'font-size:0.55rem;color:var(--text-muted);white-space:nowrap;';
+        lab.style.cssText = 'font-size:0.65rem;color:var(--text-muted);white-space:nowrap;';
         lab.textContent = lbl;
         grp.appendChild(lab);
         barRow.appendChild(grp);
