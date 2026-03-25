@@ -18,6 +18,7 @@ logs/
 xiaohongshu-skills/
 wechat-mcp-macos/
 Clawd拼团/
+claude-conversation-viewer/
 
 # 指向 xiaohongshu-skills 的符号链接
 .claude/skills/xhs-*
