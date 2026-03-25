@@ -15,6 +15,7 @@ import { ExportPanel } from './components/ExportPanel.js';
 import { SearchPanel } from './components/SearchPanel.js';
 import { createIcon } from './utils/icons.js';
 import { createSparkIcon } from './utils/spark.js';
+import { showLoading, hideLoading } from './components/Loading.js';
 
 // ---- Theme ----
 function applyTheme(theme) {
@@ -117,7 +118,11 @@ function renderMainView() {
     }
     // Re-render stats panel so ring charts pick up new theme shadows
     if (messageView && state.get('viewMode') === 'conversation' && !state.get('selectedConversation')) {
-      messageView.renderEmpty();
+      const overlay = showLoading(messageView.container);
+      setTimeout(() => {
+        messageView.renderEmpty();
+        hideLoading(overlay);
+      }, 400);
     }
   });
 

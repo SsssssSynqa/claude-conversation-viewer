@@ -9,6 +9,7 @@ import { formatTimestamp, formatShortTime, formatDate, getTimeDiffMinutes } from
 import { desensitize } from '../utils/desensitize.js';
 import { createIcon } from '../utils/icons.js';
 import { StatsPanel } from './StatsPanel.js';
+import { showLoading, hideLoading } from './Loading.js';
 
 export class MessageView {
   constructor(container) {
@@ -37,7 +38,11 @@ export class MessageView {
     this._removeSelectionToolbar();
     const conversations = state.get('conversations') || [];
     if (conversations.length > 0) {
-      this.statsPanel.renderInline(this.container);
+      const overlay = showLoading(this.container);
+      setTimeout(() => {
+        this.statsPanel.renderInline(this.container);
+        hideLoading(overlay);
+      }, 300);
     } else {
       const empty = document.createElement('div');
       empty.style.cssText = 'display:flex;align-items:center;justify-content:center;height:100%;color:var(--text-muted);font-size:1.1rem;';
