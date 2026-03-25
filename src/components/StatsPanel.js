@@ -144,58 +144,55 @@ export class StatsPanel {
       textDiv.appendChild(val);
       card.appendChild(textDiv);
 
-      // Neumorphic ring chart — Syner's 3-layer SVG approach
-      // CSS groove (inset shadow) + SVG arcs (shadow + main + highlight) + CSS center hole
+      // Neumorphic ring chart — 1:1 copy of Syner's code
+      const ringSize = 120;
       const ringWrap = document.createElement('div');
-      ringWrap.style.cssText = 'position:relative;width:96px;height:96px;border-radius:50%;flex-shrink:0;'
-        + 'background:var(--bg-primary);box-shadow:var(--shadow-inset);'
+      ringWrap.style.cssText = `position:relative;width:${ringSize}px;height:${ringSize}px;border-radius:50%;flex-shrink:0;`
+        + 'background:var(--bg-primary);'
+        + 'box-shadow:inset 5px 5px 10px rgba(163,177,198,0.6),inset -5px -5px 10px rgba(255,255,255,0.8);'
         + 'display:flex;justify-content:center;align-items:center;';
 
       const uid = 'ring-' + s.pct + '-' + Math.random().toString(36).slice(2, 6);
-      const svgNS = 'http://www.w3.org/2000/svg';
-      const ringSvg = document.createElementNS(svgNS, 'svg');
-      ringSvg.setAttribute('viewBox', '0 0 96 96');
-      ringSvg.style.cssText = 'position:absolute;width:96px;height:96px;transform:rotate(-90deg);';
-
-      const r = 35, strokeW = 14, circ = 2 * Math.PI * r;
+      const ringSvg = document.createElement('div');
+      // Syner's exact values: r=64 in 160 viewport, stroke-width=24, linecap=round
+      const r = 48, strokeW = 18, circ = 2 * Math.PI * r;
       const dashLen = (s.pct / 100) * circ;
-      const dashOff = circ - dashLen;
-      const cStart = s.color === '#7c6eea' ? '#9b8ff0' : '#ea9d85';
-      const cEnd = s.color;
-      const hlColor = s.color === '#7c6eea' ? 'rgba(190,170,255,0.6)' : 'rgba(255,180,140,0.55)';
+      // Syner's exact colors per side
+      const isHuman = s.color === '#7c6eea';
+      const cStart = isHuman ? '#ea9d85' : '#b8c6d4';
+      const cEnd = isHuman ? '#D97657' : '#7a899c';
+      const hlColor = isHuman ? 'rgba(255,180,140,0.55)' : 'rgba(190,210,230,0.7)';
 
-      // Defs: gradient + glow filter
-      ringSvg.innerHTML = `
+      ringSvg.innerHTML = `<svg viewBox="0 0 ${ringSize} ${ringSize}" style="position:absolute;width:${ringSize}px;height:${ringSize}px;transform:rotate(-90deg);">
         <defs>
+          <filter id="glow-${uid}" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="2.5"/>
+          </filter>
           <linearGradient id="g-${uid}" x1="0%" y1="0%" x2="100%" y2="100%">
             <stop offset="0%" stop-color="${cStart}"/>
             <stop offset="100%" stop-color="${cEnd}"/>
           </linearGradient>
-          <filter id="glow-${uid}" x="-20%" y="-20%" width="140%" height="140%">
-            <feGaussianBlur in="SourceGraphic" stdDeviation="2.5"/>
-          </filter>
         </defs>
-        <!-- 1: Shadow layer -->
-        <circle cx="48" cy="48" r="${r}" fill="none"
+        <circle cx="60" cy="60" r="${r}" fill="none"
           stroke="rgba(0,0,0,0.12)" stroke-width="${strokeW}" stroke-linecap="round"
           stroke-dasharray="${dashLen} ${circ}" style="transform:translate(1px,2px);"/>
-        <!-- 2: Main gradient arc -->
-        <circle cx="48" cy="48" r="${r}" fill="none"
+        <circle cx="60" cy="60" r="${r}" fill="none"
           stroke="url(#g-${uid})" stroke-width="${strokeW}" stroke-linecap="round"
           stroke-dasharray="${dashLen} ${circ}"/>
-        <!-- 3: Highlight glow -->
-        <circle cx="48" cy="48" r="${r - 0.5}" fill="none"
-          stroke="${hlColor}" stroke-width="${Math.floor(strokeW * 0.4)}" stroke-linecap="round"
+        <circle cx="60" cy="60" r="${r - 0.5}" fill="none"
+          stroke="${hlColor}" stroke-width="7" stroke-linecap="round"
           stroke-dasharray="${dashLen} ${circ}"
           filter="url(#glow-${uid})"
           style="transform:translate(-1.2px,-1.2px);opacity:0.6;"/>
-      `;
-      ringWrap.appendChild(ringSvg);
+      </svg>`;
+      ringWrap.appendChild(ringSvg.firstElementChild);
 
-      // Center hole: convex disc with percentage
+      // Center hole: Syner's exact convex disc
+      const holeSize = Math.round(ringSize * 0.625);
       const hole = document.createElement('div');
-      hole.style.cssText = 'width:56px;height:56px;border-radius:50%;background:var(--bg-primary);'
-        + 'box-shadow:var(--shadow);display:flex;justify-content:center;align-items:center;z-index:10;';
+      hole.style.cssText = `width:${holeSize}px;height:${holeSize}px;border-radius:50%;background:var(--bg-primary);`
+        + 'box-shadow:9px 9px 16px rgba(163,177,198,0.5),-9px -9px 16px rgba(255,255,255,0.7);'
+        + 'display:flex;justify-content:center;align-items:center;z-index:10;';
       hole.innerHTML = `<span style="font-size:14px;font-weight:700;color:${cEnd};text-shadow:1px 1px 1px rgba(255,255,255,0.8);">${s.pct}%</span>`;
       ringWrap.appendChild(hole);
       card.appendChild(ringWrap);
