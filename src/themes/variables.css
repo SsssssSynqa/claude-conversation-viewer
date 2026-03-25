@@ -36,9 +36,9 @@
   --text-primary: #f0f0f0;
   --text-secondary: #ccccd4;
   --text-muted: #a8a8b0;
-  --accent: #e07848;
-  --accent-light: #f09060;
-  --accent-bg: rgba(224, 120, 72, 0.12);
+  --accent: #D97657;
+  --accent-light: #E89272;
+  --accent-bg: rgba(217, 118, 87, 0.12);
   --border: rgba(255, 255, 255, 0.04);
   --border-strong: rgba(255, 255, 255, 0.08);
   /* Neumorphic shadows — soft */
@@ -49,8 +49,8 @@
   --sidebar-bg: #242428;
   --sidebar-text: #c8c8d0;
   --sidebar-hover: #303034;
-  --sidebar-active: rgba(224, 120, 72, 0.16);
-  --message-human-bg: rgba(224, 120, 72, 0.06);
+  --sidebar-active: rgba(217, 118, 87, 0.16);
+  --message-human-bg: rgba(217, 118, 87, 0.06);
   --message-assistant-bg: transparent;
   --thinking-bg: rgba(255, 193, 7, 0.06);
   --thinking-border: rgba(255, 255, 255, 0.04);
@@ -65,7 +65,7 @@
   --scrollbar-track: transparent;
   --code-bg: #242428;
   --backdrop-blur: none;
-  --gradient-header: linear-gradient(135deg, #e07848 0%, #f09060 100%);
+  --gradient-header: linear-gradient(135deg, #D97657 0%, #E89272 100%);
   --btn-primary-bg: var(--accent-bg);
   --btn-primary-text: var(--accent);
 }
@@ -81,9 +81,9 @@
   --text-primary: #1a1a1a;
   --text-secondary: #3a3a40;
   --text-muted: #6a6a70;
-  --accent: #d4714a;
-  --accent-light: #e08a60;
-  --accent-bg: rgba(212, 113, 74, 0.1);
+  --accent: #D97657;
+  --accent-light: #E89272;
+  --accent-bg: rgba(217, 118, 87, 0.1);
   --border: rgba(0, 0, 0, 0.04);
   --border-strong: rgba(0, 0, 0, 0.08);
   /* Neumorphic shadows — soft */
@@ -94,8 +94,8 @@
   --sidebar-bg: #dddde1;
   --sidebar-text: #3a3a3c;
   --sidebar-hover: #e8e8ec;
-  --sidebar-active: rgba(212, 113, 74, 0.12);
-  --message-human-bg: rgba(212, 113, 74, 0.06);
+  --sidebar-active: rgba(217, 118, 87, 0.12);
+  --message-human-bg: rgba(217, 118, 87, 0.06);
   --message-assistant-bg: transparent;
   --thinking-bg: rgba(255, 152, 0, 0.05);
   --thinking-border: rgba(0, 0, 0, 0.04);
@@ -110,7 +110,7 @@
   --scrollbar-track: transparent;
   --code-bg: #dcdce0;
   --backdrop-blur: none;
-  --gradient-header: linear-gradient(135deg, #d4714a 0%, #e08a60 100%);
+  --gradient-header: linear-gradient(135deg, #D97657 0%, #E89272 100%);
   --btn-primary-bg: var(--accent-bg);
   --btn-primary-text: var(--accent);
 }
@@ -126,9 +126,9 @@
   --text-primary: #141413;
   --text-secondary: #3d3d3a;
   --text-muted: #9b9b97;
-  --accent: #D97757;
-  --accent-light: #e08a68;
-  --accent-bg: rgba(217, 119, 87, 0.08);
+  --accent: #D97657;
+  --accent-light: #E89272;
+  --accent-bg: rgba(217, 118, 87, 0.08);
   --border: rgba(31, 30, 29, 0.08);
   --border-strong: rgba(31, 30, 29, 0.12);
   /* Claude official shadow: exact values from claude.ai, border thinned */
@@ -156,7 +156,7 @@
   --scrollbar-track: transparent;
   --code-bg: #f1f0ea;
   --backdrop-blur: none;
-  --gradient-header: linear-gradient(135deg, #D97757 0%, #e08a68 100%);
+  --gradient-header: linear-gradient(135deg, #D97657 0%, #E89272 100%);
   --btn-primary-bg: #3B3B3B;
   --btn-primary-text: #fff;
 }
@@ -202,7 +202,7 @@
     --scrollbar-track: transparent;
     --code-bg: #dcdce0;
     --backdrop-blur: none;
-    --gradient-header: linear-gradient(135deg, #d4714a 0%, #e08a60 100%);
+    --gradient-header: linear-gradient(135deg, #D97657 0%, #E89272 100%);
     --btn-primary-bg: var(--accent-bg);
     --btn-primary-text: var(--accent);
   }
@@ -219,9 +219,9 @@
     --text-primary: #f0f0f0;
     --text-secondary: #ccccd4;
     --text-muted: #a8a8b0;
-    --accent: #e07848;
-    --accent-light: #f09060;
-    --accent-bg: rgba(224, 120, 72, 0.12);
+    --accent: #D97657;
+    --accent-light: #E89272;
+    --accent-bg: rgba(217, 118, 87, 0.12);
     --border: rgba(255, 255, 255, 0.04);
     --border-strong: rgba(255, 255, 255, 0.08);
     --shadow: 4px 4px 10px #1e1e21, -4px -4px 10px #36363b;
@@ -231,8 +231,8 @@
     --sidebar-bg: #242428;
     --sidebar-text: #c8c8d0;
     --sidebar-hover: #303034;
-    --sidebar-active: rgba(224, 120, 72, 0.16);
-    --message-human-bg: rgba(224, 120, 72, 0.06);
+    --sidebar-active: rgba(217, 118, 87, 0.16);
+    --message-human-bg: rgba(217, 118, 87, 0.06);
     --message-assistant-bg: transparent;
     --thinking-bg: rgba(255, 193, 7, 0.06);
     --thinking-border: rgba(255, 255, 255, 0.04);
@@ -247,7 +247,7 @@
     --scrollbar-track: transparent;
     --code-bg: #242428;
     --backdrop-blur: none;
-    --gradient-header: linear-gradient(135deg, #e07848 0%, #f09060 100%);
+    --gradient-header: linear-gradient(135deg, #D97657 0%, #E89272 100%);
     --btn-primary-bg: var(--accent-bg);
     --btn-primary-text: var(--accent);
   }
