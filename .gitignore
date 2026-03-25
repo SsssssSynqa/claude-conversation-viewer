@@ -2,3 +2,26 @@ node_modules/
 dist/
 .DS_Store
 .superpowers/
+*.dmg
+*.pdf
+
+# 个人数据（不入库）
+数据导出/
+猫猫照片/
+微信项目/
+微信图片_*
+
+# 运行日志
+logs/
+
+# 有独立 GitHub 仓库的子项目
+xiaohongshu-skills/
+wechat-mcp-macos/
+Clawd拼团/
+
+# 指向 xiaohongshu-skills 的符号链接
+.claude/skills/xhs-*
+
+# 猫猫笔记中的大文件和聊天导出（.md日记正常追踪）
+猫猫笔记/*.txt
+猫猫笔记/*.docx
