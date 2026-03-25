@@ -54,7 +54,7 @@ export class StatsPanel {
 
     // Title row with screenshot button
     const titleRow = document.createElement('div');
-    titleRow.style.cssText = 'display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;';
+    titleRow.style.cssText = 'display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;';
 
     const title = document.createElement('h2');
     title.style.cssText = 'font-size:1rem;font-weight:800;color:var(--text-primary);display:flex;align-items:center;gap:10px;letter-spacing:0.5px;';
@@ -96,7 +96,7 @@ export class StatsPanel {
 
     // ---- Basic Stats Cards (floating directly on background, no outer wrapper) ----
     const cardsGrid = document.createElement('div');
-    cardsGrid.style.cssText = 'display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;';
+    cardsGrid.style.cssText = 'display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:14px;';
 
     // Row 1: 4 basic counts (matching Figma layout)
     const row1Stats = [
@@ -249,7 +249,7 @@ export class StatsPanel {
     // ---- First & Last Conversation (cards float directly) ----
     if (stats.firstConv && stats.lastConv) {
       const milestoneRow = document.createElement('div');
-      milestoneRow.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;';
+      milestoneRow.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;';
 
       milestoneRow.appendChild(this._milestoneCard('第一段对话', stats.firstConv.name || '未命名', formatTimestamp(stats.firstConv.createdAt)));
       milestoneRow.appendChild(this._milestoneCard('最近一段对话', stats.lastConv.name || '未命名', formatTimestamp(stats.lastConv.createdAt)));
@@ -261,7 +261,7 @@ export class StatsPanel {
     if (stats.yearlyData && stats.yearlyData.length > 0) {
       parent.appendChild(this._sectionTitle('年度总览'));
       const yearGrid = document.createElement('div');
-      yearGrid.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:24px;';
+      yearGrid.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:14px;';
       for (const yr of stats.yearlyData) {
         const card = this._neuCard();
         const yearLabel = document.createElement('div');
@@ -359,7 +359,7 @@ export class StatsPanel {
 
     // ---- Weekday + Monthly Line Chart side by side ----
     const activityRow = document.createElement('div');
-    activityRow.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;';
+    activityRow.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;';
 
     // Weekday: neumorphic groove bars (slot track + pill inside)
     const weekdayCard = this._neuCard();
@@ -595,7 +595,7 @@ export class StatsPanel {
     if (stats.totalThinkingCount > 0) {
       parent.appendChild(this._sectionTitle('思考统计'));
       const thinkGrid = document.createElement('div');
-      thinkGrid.style.cssText = 'display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;';
+      thinkGrid.style.cssText = 'display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:14px;';
       const thinkStats = [
         { label: '总思考次数', value: stats.totalThinkingCount.toLocaleString() + ' 次' },
         { label: '累计思考时间', value: this.formatMs(stats.totalThinkingMs) },
@@ -878,7 +878,7 @@ export class StatsPanel {
   /** Neumorphic outer section — convex container */
   _neuSection() {
     const el = document.createElement('div');
-    el.style.cssText = 'background:var(--bg-card);border-radius:var(--radius-lg);padding:20px;margin-bottom:20px;box-shadow:var(--shadow);';
+    el.style.cssText = 'background:var(--bg-card);border-radius:var(--radius-lg);padding:20px;margin-bottom:14px;box-shadow:var(--shadow);';
     return el;
   }
 
@@ -891,7 +891,7 @@ export class StatsPanel {
 
   _sectionTitle(text) {
     const el = document.createElement('h3');
-    el.style.cssText = 'font-size:1rem;font-weight:800;margin-bottom:14px;margin-top:8px;color:var(--text-primary);display:flex;align-items:center;gap:10px;letter-spacing:0.5px;';
+    el.style.cssText = 'font-size:1rem;font-weight:800;margin-bottom:12px;margin-top:20px;color:var(--text-primary);display:flex;align-items:center;gap:10px;letter-spacing:0.5px;';
     const dot = document.createElement('span');
     dot.style.cssText = 'width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 6px rgba(217,118,87,0.4);flex-shrink:0;';
     el.appendChild(dot);
