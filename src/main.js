@@ -115,6 +115,10 @@ function renderMainView() {
       if (oldIcon) oldIcon.replaceWith(newIcon);
       btn.querySelector('.sidebar-btn-label').textContent = THEME_LABELS[t] || '主题';
     }
+    // Re-render stats panel so ring charts pick up new theme shadows
+    if (messageView && state.get('viewMode') === 'conversation' && !state.get('selectedConversation')) {
+      messageView.renderEmpty();
+    }
   });
 
   // Settings section (display toggles + name config) — Figma-style toggles
