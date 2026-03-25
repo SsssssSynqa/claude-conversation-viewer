@@ -467,19 +467,18 @@ export class StatsPanel {
     for (let d = 0; d < 7; d++) {
       const col = document.createElement('div');
       col.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:6px;';
-      // Groove track (inset shadow slot)
+      // Groove track — Syner's neumorphic physics
       const track = document.createElement('div');
-      track.style.cssText = `width:24px;height:${trackH}px;border-radius:12px;background:var(--bg-tertiary);box-shadow:var(--shadow-inset);position:relative;`;
-      // Data pill — glossy cylinder with radial specular highlight
-      const fillH = Math.max(14, (stats.weekdayActivity[d] / maxWeekday) * (trackH - 20));
+      track.style.cssText = `width:24px;height:${trackH}px;border-radius:20px;`
+        + 'background:var(--bg-card);box-shadow:var(--shadow-inset);'
+        + 'display:flex;align-items:flex-end;padding:4px;box-sizing:border-box;';
+      // Data pill — Syner's glossy capsule: diagonal gradient + outer shadow + inner highlight
+      const pct = Math.max(8, (stats.weekdayActivity[d] / maxWeekday) * 100);
       const fill = document.createElement('div');
-      fill.style.cssText = `width:22px;height:${fillH}px;border-radius:11px;position:absolute;bottom:1px;left:1px;transition:height 0.3s ease;`
-        + 'background:'
-        + 'radial-gradient(ellipse 70% 50% at 38% 30%, rgba(255,255,255,0.45) 0%, transparent 60%),'
-        + 'linear-gradient(180deg, var(--accent-light), var(--accent));'
-        + 'box-shadow:'
-        + 'inset 0 2px 4px rgba(255,255,255,0.2),'
-        + 'inset 0 -2px 6px rgba(0,0,0,0.12);';
+      fill.style.cssText = `width:100%;height:${pct}%;border-radius:16px;transition:height 0.3s ease;`
+        + 'background:linear-gradient(145deg, #ea9d85, #D97657);'
+        + 'box-shadow:2px 2px 5px rgba(163,177,198,0.4),'
+        + 'inset 2px 2px 4px rgba(255,255,255,0.5);';
       fill.title = stats.weekdayActivity[d] + ' 条消息';
       track.appendChild(fill);
       col.appendChild(track);
