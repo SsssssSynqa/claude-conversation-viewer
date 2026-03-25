@@ -77,7 +77,7 @@ function renderMainView() {
 
   // Nav pills: Search, Stats, Export
   const navItems = [
-    { id: 'sidebar-search-btn', icon: 'search', label: '搜索', action: () => state.set('viewMode', 'search') },
+    { id: 'sidebar-search-btn', icon: 'search', label: '搜索中心', action: () => state.set('viewMode', 'search') },
     { id: 'sidebar-stats-btn', icon: 'stats', label: '统计总览', action: () => { state.set('viewMode', 'conversation'); state.set('currentConversationIndex', -1); } },
     { id: 'sidebar-export-btn', icon: 'export', label: '导出中心', action: () => state.set('viewMode', 'export') },
   ];
@@ -137,7 +137,7 @@ function renderMainView() {
   }
 
   themeTrackRow.appendChild(themeTrack);
-  sidebarActions.appendChild(themeTrackRow);
+  // themeTrackRow will be appended later, after foldables
 
   // Theme state listener — update track thumb + active option + re-render stats
   state.on('theme', (t) => {
@@ -179,7 +179,6 @@ function renderMainView() {
   const settingsChevron = document.createElement('span');
   settingsChevron.className = 'chevron-icon nav-icon';
   settingsChevron.appendChild(createIcon('chevronDown', 14));
-  settingsChevron.style.transform = 'rotate(-90deg)';
   settingsPill.appendChild(settingsChevron);
   settingsSummary.appendChild(settingsPill);
   settingsFoldable.appendChild(settingsSummary);
@@ -277,7 +276,6 @@ function renderMainView() {
   const nameChevron = document.createElement('span');
   nameChevron.className = 'chevron-icon nav-icon';
   nameChevron.appendChild(createIcon('chevronDown', 14));
-  nameChevron.style.transform = 'rotate(-90deg)';
   namePill.appendChild(nameChevron);
   nameSummary.appendChild(namePill);
   nameFoldable.appendChild(nameSummary);
@@ -350,6 +348,46 @@ function renderMainView() {
 
   nameFoldable.appendChild(nameContent);
   sidebarActions.appendChild(nameFoldable);
+
+  // Language toggle (中文 / EN)
+  const langTrack = document.createElement('div');
+  langTrack.className = 'sidebar-pill toggle-track track-2';
+  langTrack.id = 'sidebar-lang-track';
+  const langThumb = document.createElement('div');
+  langThumb.className = 'toggle-thumb';
+  langTrack.appendChild(langThumb);
+  const langOptions = [
+    { lang: 'zh', label: '中文' },
+    { lang: 'en', label: 'EN' },
+  ];
+  const currentLang = state.get('lang') || 'zh';
+  const langIdx = langOptions.findIndex(o => o.lang === currentLang);
+  if (langIdx > 0) langThumb.style.transform = `translateX(${langIdx * 100}%)`;
+  for (let i = 0; i < langOptions.length; i++) {
+    const lo = langOptions[i];
+    const loDiv = document.createElement('div');
+    loDiv.className = 'toggle-option' + (lo.lang === currentLang ? ' active' : '');
+    loDiv.dataset.lang = lo.lang;
+    loDiv.style.cssText = 'font-weight:700;letter-spacing:0.5px;font-size:13px;';
+    loDiv.textContent = lo.label;
+    loDiv.addEventListener('click', () => {
+      state.set('lang', lo.lang);
+      const lt = document.getElementById('sidebar-lang-track');
+      if (lt) {
+        const li = langOptions.findIndex(o => o.lang === lo.lang);
+        const lth = lt.querySelector('.toggle-thumb');
+        if (lth && li >= 0) lth.style.transform = `translateX(${li * 100}%)`;
+        lt.querySelectorAll('.toggle-option').forEach(el => {
+          el.classList.toggle('active', el.dataset.lang === lo.lang);
+        });
+      }
+    });
+    langTrack.appendChild(loDiv);
+  }
+  themeTrackRow.appendChild(langTrack);
+
+  // Append toggle row (theme + lang) after foldables, before search
+  sidebarActions.appendChild(themeTrackRow);
 
   sidebar.appendChild(sidebarActions);
 
