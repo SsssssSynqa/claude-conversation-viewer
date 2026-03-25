@@ -70,58 +70,90 @@ function renderMainView() {
   sidebarTitle.appendChild(titleText);
   sidebar.appendChild(sidebarTitle);
 
-  // Sidebar function buttons — pill-shaped neumorphic (matching Figma)
+  // Sidebar function buttons — neumorphic pills
   const sidebarActions = document.createElement('div');
   sidebarActions.className = 'sidebar-actions';
-  sidebarActions.style.cssText = 'padding:4px 16px 20px;display:flex;flex-direction:column;gap:14px;';
+  sidebarActions.style.cssText = 'padding:4px 16px 12px;display:flex;flex-direction:column;gap:6px;';
 
-  // Search button — opens search panel in content area
-  const searchBtn = createSidebarPillBtn('search', '搜索', () => {
-    state.set('viewMode', 'search');
-  });
-  searchBtn.id = 'sidebar-search-btn';
-  sidebarActions.appendChild(searchBtn);
+  // Nav pills: Search, Stats, Export
+  const navItems = [
+    { id: 'sidebar-search-btn', icon: 'search', label: '搜索', action: () => state.set('viewMode', 'search') },
+    { id: 'sidebar-stats-btn', icon: 'stats', label: '统计总览', action: () => { state.set('viewMode', 'conversation'); state.set('currentConversationIndex', -1); } },
+    { id: 'sidebar-export-btn', icon: 'export', label: '导出中心', action: () => state.set('viewMode', 'export') },
+  ];
 
-  // Stats button — go back to homepage stats
-  const statsBtn = createSidebarPillBtn('stats', '统计总览', () => {
-    state.set('viewMode', 'conversation');
-    state.set('currentConversationIndex', -1);
-  });
-  statsBtn.id = 'sidebar-stats-btn';
-  sidebarActions.appendChild(statsBtn);
+  for (const nav of navItems) {
+    const pill = document.createElement('div');
+    pill.className = 'sidebar-pill pill-flat';
+    pill.id = nav.id;
+    const iconWrap = document.createElement('span');
+    iconWrap.className = 'nav-icon';
+    iconWrap.appendChild(createIcon(nav.icon, 16));
+    pill.appendChild(iconWrap);
+    const labelSpan = document.createElement('span');
+    labelSpan.textContent = nav.label;
+    pill.appendChild(labelSpan);
+    pill.addEventListener('click', nav.action);
+    sidebarActions.appendChild(pill);
+  }
 
-  // Export button — opens export panel
-  const exportBtn = createSidebarPillBtn('export', '导出中心', () => {
-    state.set('viewMode', 'export');
-  });
-  exportBtn.id = 'sidebar-export-btn';
-  sidebarActions.appendChild(exportBtn);
+  // Theme toggle track (3-way: sun / moon / flower)
+  const themeTrackRow = document.createElement('div');
+  themeTrackRow.className = 'pill-row';
+  themeTrackRow.style.cssText += 'padding:4px 0;';
 
-  // Theme switcher
-  const themeBtn = createSidebarPillBtn(
-    THEME_ICON_NAMES[state.get('theme')] || 'moon',
-    THEME_LABELS[state.get('theme')] || '主题',
-    cycleTheme
-  );
-  themeBtn.id = 'sidebar-theme-btn';
-  sidebarActions.appendChild(themeBtn);
+  const themeTrack = document.createElement('div');
+  themeTrack.className = 'sidebar-pill toggle-track track-3';
+  themeTrack.id = 'sidebar-theme-track';
 
+  const themeThumb = document.createElement('div');
+  themeThumb.className = 'toggle-thumb';
+  themeTrack.appendChild(themeThumb);
+
+  const themeOptions = [
+    { theme: 'light', icon: 'sun' },
+    { theme: 'dark', icon: 'moon' },
+    { theme: 'claude', icon: 'flower' },
+  ];
+
+  const currentTheme = state.get('theme');
+  const currentIdx = themeOptions.findIndex(o => o.theme === currentTheme);
+  // Set initial thumb position
+  if (currentIdx >= 0) {
+    themeThumb.style.transform = `translateX(${currentIdx * 100}%)`;
+  }
+
+  for (let i = 0; i < themeOptions.length; i++) {
+    const opt = themeOptions[i];
+    const optDiv = document.createElement('div');
+    optDiv.className = 'toggle-option' + (opt.theme === currentTheme ? ' active' : '');
+    optDiv.dataset.theme = opt.theme;
+    const optIcon = createIcon(opt.icon, 16);
+    optDiv.appendChild(optIcon);
+    optDiv.addEventListener('click', () => {
+      state.set('theme', opt.theme);
+    });
+    themeTrack.appendChild(optDiv);
+  }
+
+  themeTrackRow.appendChild(themeTrack);
+  sidebarActions.appendChild(themeTrackRow);
+
+  // Theme state listener — update track thumb + active option + re-render stats
   state.on('theme', (t) => {
-    const btn = document.getElementById('sidebar-theme-btn');
-    if (btn) {
-      const oldIcon = btn.querySelector('.sidebar-btn-icon');
-      const newIcon = createIcon(THEME_ICON_NAMES[t] || 'moon', 16);
-      newIcon.className = 'sidebar-btn-icon';
-      newIcon.style.cssText += 'color:var(--text-muted);flex-shrink:0;';
-      if (oldIcon) oldIcon.replaceWith(newIcon);
-      btn.querySelector('.sidebar-btn-label').textContent = THEME_LABELS[t] || '主题';
+    const track = document.getElementById('sidebar-theme-track');
+    if (track) {
+      const idx = themeOptions.findIndex(o => o.theme === t);
+      const thumb = track.querySelector('.toggle-thumb');
+      if (thumb && idx >= 0) thumb.style.transform = `translateX(${idx * 100}%)`;
+      track.querySelectorAll('.toggle-option').forEach(el => {
+        el.classList.toggle('active', el.dataset.theme === t);
+      });
     }
     // Re-render stats panel so ring charts pick up new theme shadows
     if (messageView && state.get('viewMode') === 'conversation' && !state.get('selectedConversation')) {
       const c = messageView.container;
-      // Remove all children except overlay, then show loading
       const overlay = showLoading(c);
-      // Remove old stats content (everything except the overlay)
       Array.from(c.children).forEach(ch => { if (ch !== overlay) ch.remove(); });
       setTimeout(() => {
         messageView.statsPanel.renderInline(c);
@@ -130,14 +162,30 @@ function renderMainView() {
     }
   });
 
-  // Settings section (display toggles + name config) — Figma-style toggles
-  const settingsSection = document.createElement('div');
-  settingsSection.style.cssText = 'padding:16px 16px 16px;border-top:1px solid var(--border);margin-top:12px;';
+  // ---- Foldable: Display Settings ----
+  const settingsFoldable = document.createElement('details');
+  settingsFoldable.className = 'sidebar-foldable';
 
-  const settingsTitle = document.createElement('div');
-  settingsTitle.style.cssText = 'font-size:0.7rem;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:12px;font-weight:600;padding:0 2px;';
-  settingsTitle.textContent = '显示设置';
-  settingsSection.appendChild(settingsTitle);
+  const settingsSummary = document.createElement('summary');
+  const settingsPill = document.createElement('div');
+  settingsPill.className = 'sidebar-pill pill-flat';
+  const settingsIcon = document.createElement('span');
+  settingsIcon.className = 'nav-icon';
+  settingsIcon.appendChild(createIcon('shield', 16));
+  settingsPill.appendChild(settingsIcon);
+  const settingsLabel = document.createElement('span');
+  settingsLabel.textContent = '显示设置';
+  settingsPill.appendChild(settingsLabel);
+  const settingsChevron = document.createElement('span');
+  settingsChevron.className = 'chevron-icon nav-icon';
+  settingsChevron.appendChild(createIcon('chevronDown', 14));
+  settingsChevron.style.transform = 'rotate(-90deg)';
+  settingsPill.appendChild(settingsChevron);
+  settingsSummary.appendChild(settingsPill);
+  settingsFoldable.appendChild(settingsSummary);
+
+  const settingsContent = document.createElement('div');
+  settingsContent.className = 'fold-content';
 
   const toggles = [
     { id: 'toggle-thinking', label: '思考过程', key: 'showThinking' },
@@ -147,55 +195,49 @@ function renderMainView() {
   ];
 
   for (const t of toggles) {
-    const labelEl = document.createElement('label');
-    labelEl.style.cssText = 'display:flex;align-items:center;justify-content:space-between;cursor:pointer;color:var(--sidebar-text);font-size:0.82rem;padding:6px 6px;';
+    const row = document.createElement('div');
+    row.className = 'sidebar-toggle-row';
+
     const labelText = document.createElement('span');
+    labelText.className = 'sidebar-toggle-label';
     labelText.textContent = t.label;
-    labelEl.appendChild(labelText);
+    row.appendChild(labelText);
 
-    // Toggle switch (Figma style)
-    const toggle = document.createElement('div');
-    toggle.style.cssText = 'width:36px;height:20px;border-radius:10px;position:relative;transition:background 0.2s;cursor:pointer;flex-shrink:0;';
-    const checked = state.get(t.key);
-    toggle.style.background = checked ? 'var(--accent)' : 'var(--border-strong)';
-    toggle.style.boxShadow = 'var(--shadow-inset)';
+    // Neumorphic switch
+    const neuSwitch = document.createElement('div');
+    neuSwitch.className = 'neu-switch' + (state.get(t.key) ? ' active' : '');
+    const handle = document.createElement('div');
+    handle.className = 'switch-handle';
+    neuSwitch.appendChild(handle);
 
-    const knob = document.createElement('div');
-    knob.style.cssText = 'width:16px;height:16px;border-radius:50%;background:#fff;position:absolute;top:2px;transition:left 0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.2);';
-    knob.style.left = checked ? '18px' : '2px';
-    toggle.appendChild(knob);
-
-    // Hidden actual input for state
     const input = document.createElement('input');
     input.type = 'checkbox';
     input.id = t.id;
-    input.checked = checked;
+    input.checked = state.get(t.key);
     input.style.display = 'none';
     input.addEventListener('change', (e) => state.set(t.key, e.target.checked));
 
-    toggle.addEventListener('click', (e) => {
-      e.preventDefault();
+    neuSwitch.addEventListener('click', () => {
       input.checked = !input.checked;
       input.dispatchEvent(new Event('change'));
-      toggle.style.background = input.checked ? 'var(--accent)' : 'var(--border-strong)';
-      knob.style.left = input.checked ? '18px' : '2px';
+      neuSwitch.classList.toggle('active', input.checked);
     });
 
-    labelEl.appendChild(toggle);
-    labelEl.appendChild(input);
-    settingsSection.appendChild(labelEl);
+    row.appendChild(neuSwitch);
+    row.appendChild(input);
+    settingsContent.appendChild(row);
   }
 
   // Desensitize word input (shown when desensitize is on)
   const desensitizeSection = document.createElement('div');
   desensitizeSection.id = 'desensitize-section';
-  desensitizeSection.style.cssText = 'margin-top:6px;display:' + (state.get('desensitize') ? 'block' : 'none') + ';';
+  desensitizeSection.style.cssText = 'display:' + (state.get('desensitize') ? 'flex' : 'none') + ';flex-direction:column;gap:4px;';
 
   const dsInput = document.createElement('input');
   dsInput.type = 'text';
-  dsInput.placeholder = '输入敏感词，逗号分隔';
+  dsInput.className = 'neu-input';
+  dsInput.placeholder = '敏感词，逗号分隔';
   dsInput.value = (state.get('desensitizeWords') || []).join(', ');
-  dsInput.style.cssText = 'width:100%;padding:4px 8px;background:var(--bg-input);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);font-size:0.75rem;font-family:var(--font-family);';
   dsInput.addEventListener('input', () => {
     const words = dsInput.value.split(/[,，]/).map(w => w.trim()).filter(Boolean);
     state.set('desensitizeWords', words);
@@ -204,38 +246,83 @@ function renderMainView() {
   desensitizeSection.appendChild(dsInput);
 
   const dsHint = document.createElement('div');
-  dsHint.style.cssText = 'font-size:0.65rem;color:var(--text-muted);margin-top:2px;';
-  dsHint.textContent = '开启后，这些词会在界面和导出中被替换为 ***';
+  dsHint.style.cssText = 'font-size:11px;color:var(--text-muted);padding:0 2px;';
+  dsHint.textContent = '这些词会被替换为 ***';
   desensitizeSection.appendChild(dsHint);
 
-  settingsSection.appendChild(desensitizeSection);
+  settingsContent.appendChild(desensitizeSection);
 
   state.on('desensitize', (val) => {
     const sec = document.getElementById('desensitize-section');
-    if (sec) sec.style.display = val ? 'block' : 'none';
+    if (sec) sec.style.display = val ? 'flex' : 'none';
   });
 
-  // Name config in sidebar
-  const nameSection = document.createElement('div');
-  nameSection.style.cssText = 'margin-top:16px;padding-top:12px;border-top:1px solid var(--border);';
+  settingsFoldable.appendChild(settingsContent);
+  sidebarActions.appendChild(settingsFoldable);
 
-  const nameTitle = document.createElement('div');
-  nameTitle.style.cssText = 'font-size:0.7rem;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:6px;font-weight:600;';
-  nameTitle.textContent = '显示名称';
-  nameSection.appendChild(nameTitle);
+  // ---- Foldable: Display Name ----
+  const nameFoldable = document.createElement('details');
+  nameFoldable.className = 'sidebar-foldable';
+
+  const nameSummary = document.createElement('summary');
+  const namePill = document.createElement('div');
+  namePill.className = 'sidebar-pill pill-flat';
+  const nameIcon = document.createElement('span');
+  nameIcon.className = 'nav-icon';
+  nameIcon.appendChild(createIcon('user', 16));
+  namePill.appendChild(nameIcon);
+  const nameLabel = document.createElement('span');
+  nameLabel.textContent = '显示名称';
+  namePill.appendChild(nameLabel);
+  const nameChevron = document.createElement('span');
+  nameChevron.className = 'chevron-icon nav-icon';
+  nameChevron.appendChild(createIcon('chevronDown', 14));
+  nameChevron.style.transform = 'rotate(-90deg)';
+  namePill.appendChild(nameChevron);
+  nameSummary.appendChild(namePill);
+  nameFoldable.appendChild(nameSummary);
+
+  const nameContent = document.createElement('div');
+  nameContent.className = 'fold-content';
 
   const names = state.get('displayNames');
 
-  const humanInput = createSidebarNameInput('用户', names.human, 'sidebar-name-human');
-  const assistantInput = createSidebarNameInput('AI', names.assistant, 'sidebar-name-assistant');
-  nameSection.appendChild(humanInput);
-  nameSection.appendChild(assistantInput);
+  // Human name row
+  const humanRow = document.createElement('div');
+  humanRow.className = 'sidebar-name-row';
+  const humanLabel = document.createElement('span');
+  humanLabel.className = 'sidebar-name-label';
+  humanLabel.textContent = '用户';
+  humanRow.appendChild(humanLabel);
+  const humanInput = document.createElement('input');
+  humanInput.type = 'text';
+  humanInput.id = 'sidebar-name-human';
+  humanInput.className = 'neu-input';
+  humanInput.value = names.human;
+  humanRow.appendChild(humanInput);
+  nameContent.appendChild(humanRow);
 
+  // Assistant name row
+  const assistantRow = document.createElement('div');
+  assistantRow.className = 'sidebar-name-row';
+  const assistantLabel = document.createElement('span');
+  assistantLabel.className = 'sidebar-name-label';
+  assistantLabel.textContent = 'AI';
+  assistantRow.appendChild(assistantLabel);
+  const assistantInput = document.createElement('input');
+  assistantInput.type = 'text';
+  assistantInput.id = 'sidebar-name-assistant';
+  assistantInput.className = 'neu-input';
+  assistantInput.value = names.assistant;
+  assistantRow.appendChild(assistantInput);
+  nameContent.appendChild(assistantRow);
+
+  // Save / Reset buttons
   const nameBtnRow = document.createElement('div');
-  nameBtnRow.style.cssText = 'display:flex;gap:6px;margin-top:6px;';
+  nameBtnRow.style.cssText = 'display:flex;gap:8px;';
 
   const saveNameBtn = document.createElement('button');
-  saveNameBtn.style.cssText = 'flex:1;padding:5px 8px;border:none;border-radius:4px;background:var(--accent);color:#fff;cursor:pointer;font-size:0.75rem;font-weight:600;';
+  saveNameBtn.className = 'sidebar-name-btn primary';
   saveNameBtn.textContent = '保存';
   saveNameBtn.addEventListener('click', () => {
     const humanVal = document.getElementById('sidebar-name-human')?.value || 'Synqa';
@@ -249,7 +336,7 @@ function renderMainView() {
   nameBtnRow.appendChild(saveNameBtn);
 
   const resetNameBtn = document.createElement('button');
-  resetNameBtn.style.cssText = 'padding:5px 8px;border:1px solid var(--border);border-radius:4px;background:transparent;color:var(--sidebar-text);cursor:pointer;font-size:0.75rem;';
+  resetNameBtn.className = 'sidebar-name-btn secondary';
   resetNameBtn.textContent = '重置';
   resetNameBtn.addEventListener('click', () => {
     const defaults = { human: 'Synqa', assistant: 'Sylux' };
@@ -259,10 +346,11 @@ function renderMainView() {
     localStorage.setItem('cv-names', JSON.stringify(defaults));
   });
   nameBtnRow.appendChild(resetNameBtn);
-  nameSection.appendChild(nameBtnRow);
+  nameContent.appendChild(nameBtnRow);
 
-  settingsSection.appendChild(nameSection);
-  sidebarActions.appendChild(settingsSection);
+  nameFoldable.appendChild(nameContent);
+  sidebarActions.appendChild(nameFoldable);
+
   sidebar.appendChild(sidebarActions);
 
   // Content area
@@ -290,17 +378,8 @@ function renderMainView() {
       const el = document.getElementById(id);
       if (!el) continue;
       const isActive = activeMap[mode] === id;
-      el.dataset.active = isActive ? 'true' : '';
-      // Active pill: inset shadow (pressed), accent color
-      el.style.boxShadow = isActive ? 'var(--shadow-inset)' : 'var(--shadow-xs)';
-      el.style.color = isActive ? 'var(--accent)' : 'var(--sidebar-text)';
-      el.style.fontWeight = isActive ? '600' : '';
-      // Update radio circle
-      const radio = el.querySelector('.sidebar-btn-radio');
-      if (radio) {
-        radio.style.background = isActive ? 'var(--accent)' : 'transparent';
-        radio.style.borderColor = isActive ? 'var(--accent)' : 'var(--text-muted)';
-      }
+      el.classList.remove('pill-flat', 'pill-active');
+      el.classList.add(isActive ? 'pill-active' : 'pill-flat');
     }
 
     if (mode === 'search') {
@@ -314,68 +393,6 @@ function renderMainView() {
   });
 }
 
-/** Pill-shaped neumorphic sidebar button (matching Figma design) */
-function createSidebarPillBtn(iconName, label, onClick) {
-  const btn = document.createElement('button');
-  btn.style.cssText = 'display:flex;align-items:center;gap:10px;width:100%;padding:12px 18px;border:none;border-radius:var(--radius-lg);background:var(--bg-card);color:var(--sidebar-text);cursor:pointer;font-size:0.88rem;text-align:left;box-shadow:var(--shadow-xs);transition:all var(--transition-fast);';
-  btn.addEventListener('mouseenter', () => {
-    if (btn.dataset.active !== 'true') {
-      btn.style.boxShadow = 'var(--shadow-sm)';
-      btn.style.transform = 'translateY(-1px)';
-    }
-  });
-  btn.addEventListener('mouseleave', () => {
-    if (btn.dataset.active !== 'true') {
-      btn.style.boxShadow = 'var(--shadow-xs)';
-      btn.style.transform = '';
-      btn.style.color = 'var(--sidebar-text)';
-    }
-  });
-
-  // Radio circle icon
-  const radioCircle = document.createElement('span');
-  radioCircle.className = 'sidebar-btn-radio';
-  radioCircle.style.cssText = 'width:8px;height:8px;border-radius:50%;border:1.5px solid var(--text-muted);flex-shrink:0;transition:all var(--transition-fast);';
-  btn.appendChild(radioCircle);
-
-  const labelSpan = document.createElement('span');
-  labelSpan.className = 'sidebar-btn-label';
-  labelSpan.textContent = label;
-  btn.appendChild(labelSpan);
-
-  // Keep icon reference for theme switcher compatibility
-  const iconEl = createIcon(iconName, 16);
-  iconEl.className = 'sidebar-btn-icon';
-  iconEl.style.cssText += 'display:none;';
-  btn.appendChild(iconEl);
-
-  btn.addEventListener('click', onClick);
-  return btn;
-}
-
-/** Legacy flat sidebar button (kept for potential reuse) */
-function createSidebarBtn(iconName, label, onClick) {
-  return createSidebarPillBtn(iconName, label, onClick);
-}
-
-function createSidebarNameInput(label, defaultValue, id) {
-  const row = document.createElement('div');
-  row.style.cssText = 'display:flex;align-items:center;gap:6px;margin-bottom:4px;';
-
-  const labelEl = document.createElement('span');
-  labelEl.style.cssText = 'font-size:0.75rem;color:var(--text-muted);width:28px;flex-shrink:0;';
-  labelEl.textContent = label;
-  row.appendChild(labelEl);
-
-  const input = document.createElement('input');
-  input.type = 'text';
-  input.id = id;
-  input.value = defaultValue;
-  input.style.cssText = 'flex:1;padding:4px 8px;background:var(--bg-input);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);font-size:0.8rem;font-family:var(--font-family);';
-  row.appendChild(input);
-
-  return row;
-}
 
 // ---- Init ----
 state.on('conversations', (conversations) => {

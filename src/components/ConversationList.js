@@ -17,20 +17,21 @@ export class ConversationList {
   }
 
   render() {
-    // Search box — Claude style
+    // Search box — neumorphic pill input
     const searchBox = document.createElement('div');
-    searchBox.style.cssText = 'padding:8px 10px;border-bottom:1px solid var(--border);';
+    searchBox.style.cssText = 'padding:8px 16px 8px;';
 
     const searchWrapper = document.createElement('div');
-    searchWrapper.style.cssText = 'display:flex;align-items:center;gap:8px;padding:6px 10px;background:var(--bg-card);border-radius:12px;box-shadow:0 0 0 0.5px rgba(31,30,29,0.1);';
+    searchWrapper.className = 'sidebar-pill pill-input';
 
-    const searchIconEl = createIcon('search', 16);
-    searchIconEl.style.cssText += 'color:var(--text-muted);flex-shrink:0;';
+    const searchIconEl = document.createElement('span');
+    searchIconEl.className = 'nav-icon';
+    searchIconEl.appendChild(createIcon('search', 16));
 
     this.searchInput = document.createElement('input');
     this.searchInput.type = 'text';
+    this.searchInput.className = 'history-search-input';
     this.searchInput.placeholder = '搜索对话标题...';
-    this.searchInput.style.cssText = 'width:100%;border:none;outline:none;background:transparent;color:var(--text-primary);font-size:13px;font-family:var(--font-family);';
     this.searchInput.addEventListener('input', () => this.onSearch());
 
     searchWrapper.appendChild(searchIconEl);
