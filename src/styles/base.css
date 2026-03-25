@@ -454,13 +454,14 @@ button {
   top: 4px;
   bottom: 4px;
   left: 4px;
-  width: 40px;
   border-radius: 12px;
   background: var(--bg-primary);
   box-shadow: var(--shadow);
   transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
   z-index: 1;
 }
+.track-3 > .toggle-thumb { width: calc(33.333% - 5.33px); }
+.track-2 > .toggle-thumb { width: calc(50% - 6px); }
 .toggle-option {
   flex: 1;
   display: flex;
@@ -481,8 +482,8 @@ button {
   gap: 12px;
   width: 100%;
 }
-.track-3 { width: 128px; flex: none; }
-.track-2 { width: 88px; flex: none; }
+.track-3 { flex: 3; min-width: 0; }
+.track-2 { flex: 2; min-width: 0; }
 
 /* Neumorphic switch */
 .neu-switch {

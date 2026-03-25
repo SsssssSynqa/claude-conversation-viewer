@@ -65,7 +65,7 @@ function renderMainView() {
   sidebarTitle.style.cssText = 'padding:24px 20px 16px;display:flex;align-items:center;gap:6px;';
   sidebarTitle.appendChild(createSparkIcon(14));
   const titleText = document.createElement('span');
-  titleText.style.cssText = 'font-family:var(--font-display);font-size:14px;font-weight:400;color:var(--text-primary);';
+  titleText.style.cssText = 'font-family:var(--font-display);font-size:16px;font-weight:700;color:var(--text-primary);';
   titleText.textContent = 'Claude 对话记忆查看器';
   sidebarTitle.appendChild(titleText);
   sidebar.appendChild(sidebarTitle);
@@ -100,7 +100,7 @@ function renderMainView() {
   // Theme toggle track (3-way: sun / moon / flower)
   const themeTrackRow = document.createElement('div');
   themeTrackRow.className = 'pill-row';
-  themeTrackRow.style.cssText += 'padding:4px 0;';
+  themeTrackRow.style.cssText += 'padding:4px 0;justify-content:stretch;';
 
   const themeTrack = document.createElement('div');
   themeTrack.className = 'sidebar-pill toggle-track track-3';
@@ -113,7 +113,7 @@ function renderMainView() {
   const themeOptions = [
     { theme: 'light', icon: 'sun' },
     { theme: 'dark', icon: 'moon' },
-    { theme: 'claude', icon: 'flower' },
+    { theme: 'claude', icon: 'spark' },
   ];
 
   const currentTheme = state.get('theme');
@@ -128,7 +128,7 @@ function renderMainView() {
     const optDiv = document.createElement('div');
     optDiv.className = 'toggle-option' + (opt.theme === currentTheme ? ' active' : '');
     optDiv.dataset.theme = opt.theme;
-    const optIcon = createIcon(opt.icon, 16);
+    const optIcon = opt.icon === 'spark' ? createSparkIcon(14) : createIcon(opt.icon, 16);
     optDiv.appendChild(optIcon);
     optDiv.addEventListener('click', () => {
       state.set('theme', opt.theme);
