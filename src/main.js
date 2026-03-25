@@ -118,11 +118,15 @@ function renderMainView() {
     }
     // Re-render stats panel so ring charts pick up new theme shadows
     if (messageView && state.get('viewMode') === 'conversation' && !state.get('selectedConversation')) {
-      const overlay = showLoading(messageView.container);
+      const c = messageView.container;
+      // Remove all children except overlay, then show loading
+      const overlay = showLoading(c);
+      // Remove old stats content (everything except the overlay)
+      Array.from(c.children).forEach(ch => { if (ch !== overlay) ch.remove(); });
       setTimeout(() => {
-        messageView.renderEmpty();
+        messageView.statsPanel.renderInline(c);
         hideLoading(overlay);
-      }, 400);
+      }, 500);
     }
   });
 

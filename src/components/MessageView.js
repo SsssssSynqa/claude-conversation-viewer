@@ -38,11 +38,7 @@ export class MessageView {
     this._removeSelectionToolbar();
     const conversations = state.get('conversations') || [];
     if (conversations.length > 0) {
-      const overlay = showLoading(this.container);
-      setTimeout(() => {
-        this.statsPanel.renderInline(this.container);
-        hideLoading(overlay);
-      }, 300);
+      this.statsPanel.renderInline(this.container);
     } else {
       const empty = document.createElement('div');
       empty.style.cssText = 'display:flex;align-items:center;justify-content:center;height:100%;color:var(--text-muted);font-size:1.1rem;';
