@@ -78,7 +78,7 @@ function renderMainView() {
   // Nav pills: Search, Stats, Export
   const navItems = [
     { id: 'sidebar-search-btn', icon: 'search', label: '搜索中心', action: () => state.set('viewMode', 'search') },
-    { id: 'sidebar-stats-btn', icon: 'stats', label: '统计总览', action: () => { state.set('viewMode', 'conversation'); state.set('currentConversationIndex', -1); } },
+    { id: 'sidebar-stats-btn', icon: 'stats', label: '统计总览', action: () => { state.set('currentConversationIndex', -1); if (state.get('viewMode') !== 'conversation') { state.set('viewMode', 'conversation'); } else { window._updateNavActive && window._updateNavActive('conversation'); const a = document.getElementById('content-area'); if (a) { messageView = new MessageView(a); } } } },
     { id: 'sidebar-export-btn', icon: 'export', label: '导出中心', action: () => state.set('viewMode', 'export') },
   ];
 
@@ -404,30 +404,42 @@ function renderMainView() {
   conversationList = new ConversationList(sidebar);
   messageView = new MessageView(contentArea);
 
+  // ---- Nav active state helper ----
+  function updateNavActive(mode) {
+    const allBtns = ['sidebar-search-btn', 'sidebar-export-btn', 'sidebar-stats-btn'];
+    // Stats only active when conversation mode AND no conversation selected
+    const convIdx = state.get('currentConversationIndex');
+    const activeId = mode === 'search' ? 'sidebar-search-btn'
+      : mode === 'export' ? 'sidebar-export-btn'
+      : (mode === 'conversation' && (convIdx === -1 || convIdx === undefined || convIdx === null)) ? 'sidebar-stats-btn'
+      : null;
+    for (const id of allBtns) {
+      const el = document.getElementById(id);
+      if (!el) continue;
+      el.classList.remove('pill-flat', 'pill-active');
+      el.classList.add(id === activeId ? 'pill-active' : 'pill-flat');
+    }
+  }
+  // Make it accessible for stats button action
+  window._updateNavActive = updateNavActive;
+
   // ---- View Mode switching ----
   state.on('viewMode', (mode) => {
     const area = document.getElementById('content-area');
     if (!area) return;
-
-    // Update sidebar pill button active states
-    const allBtns = ['sidebar-search-btn', 'sidebar-export-btn', 'sidebar-stats-btn'];
-    const activeMap = { search: 'sidebar-search-btn', export: 'sidebar-export-btn', conversation: 'sidebar-stats-btn' };
-    for (const id of allBtns) {
-      const el = document.getElementById(id);
-      if (!el) continue;
-      const isActive = activeMap[mode] === id;
-      el.classList.remove('pill-flat', 'pill-active');
-      el.classList.add(isActive ? 'pill-active' : 'pill-flat');
-    }
-
+    updateNavActive(mode);
     if (mode === 'search') {
       searchPanel.render(area);
     } else if (mode === 'export') {
       exportPanel.render(area);
     } else {
-      // Re-render current conversation or stats
       messageView = new MessageView(area);
     }
+  });
+
+  // When a conversation is selected, deactivate stats pill
+  state.on('currentConversationIndex', () => {
+    updateNavActive(state.get('viewMode'));
   });
 }
 

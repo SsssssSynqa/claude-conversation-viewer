@@ -92,29 +92,18 @@ export class ConversationList {
 
       for (const { conv, index } of items) {
         const item = document.createElement('div');
-        item.className = 'conv-item';
-        if (index === currentIndex) item.classList.add('active');
+        const isActive = index === currentIndex;
+        item.className = 'sidebar-pill ' + (isActive ? 'pill-active' : 'pill-flat');
         item.style.cssText = `
-          padding: 8px 10px;
-          margin: 0 4px;
+          padding: 10px 14px;
+          margin: 2px 4px;
           cursor: pointer;
-          border-radius: 8px;
-          transition: background var(--transition);
           font-size: 13px;
+          height: auto;
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 2px;
         `;
-
-        if (index === currentIndex) {
-          item.style.background = 'var(--sidebar-active)';
-        }
-
-        item.addEventListener('mouseenter', () => {
-          if (index !== state.get('currentConversationIndex'))
-            item.style.background = 'var(--sidebar-hover)';
-        });
-        item.addEventListener('mouseleave', () => {
-          if (index !== state.get('currentConversationIndex'))
-            item.style.background = '';
-        });
 
         // Title
         const titleEl = document.createElement('div');
