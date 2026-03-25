@@ -57,8 +57,11 @@ export class StatsPanel {
     titleRow.style.cssText = 'display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;';
 
     const title = document.createElement('h2');
-    title.style.cssText = 'font-size:1.5rem;font-weight:700;color:var(--text-primary);';
-    title.textContent = '对话统计';
+    title.style.cssText = 'font-size:1.25rem;font-weight:800;color:var(--text-primary);display:flex;align-items:center;gap:12px;letter-spacing:1px;';
+    const mainDot = document.createElement('span');
+    mainDot.style.cssText = 'width:10px;height:10px;border-radius:50%;background:var(--accent);box-shadow:inset 1px 1px 2px rgba(255,255,255,0.4),0 0 8px rgba(217,118,87,0.4);flex-shrink:0;';
+    title.appendChild(mainDot);
+    title.appendChild(document.createTextNode('数据雕塑'));
     titleRow.appendChild(title);
 
     const screenshotBtn = document.createElement('button');
@@ -77,7 +80,7 @@ export class StatsPanel {
           useCORS: true,
         });
         const link = document.createElement('a');
-        link.download = '对话统计_' + new Date().toISOString().slice(0, 10) + '.png';
+        link.download = '数据雕塑_' + new Date().toISOString().slice(0, 10) + '.png';
         link.href = canvas.toDataURL('image/png');
         link.click();
         screenshotBtn.textContent = '\u2713 已保存';
@@ -292,7 +295,7 @@ export class StatsPanel {
 
     // ---- GitHub-style Heatmap (in a single raised card) ----
     if (stats.dateHeatmap && Object.keys(stats.dateHeatmap).length > 0) {
-      parent.appendChild(this._sectionTitle('对话热力图'));
+      parent.appendChild(this._sectionTitle('时光矩阵'));
       const heatCard = this._neuCard();
       heatCard.appendChild(this._buildHeatmapCalendar(stats.dateHeatmap));
       heatCard.style.marginBottom = '20px';
@@ -887,8 +890,13 @@ export class StatsPanel {
 
   _sectionTitle(text) {
     const el = document.createElement('h3');
-    el.style.cssText = 'font-size:1.1rem;font-weight:700;margin-bottom:14px;margin-top:8px;color:var(--text-primary);';
-    el.textContent = text;
+    el.style.cssText = 'font-size:1rem;font-weight:800;margin-bottom:14px;margin-top:8px;color:var(--text-primary);display:flex;align-items:center;gap:10px;letter-spacing:0.5px;';
+    const dot = document.createElement('span');
+    dot.style.cssText = 'width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 6px rgba(217,118,87,0.4);flex-shrink:0;';
+    el.appendChild(dot);
+    const span = document.createElement('span');
+    span.textContent = text;
+    el.appendChild(span);
     return el;
   }
 
@@ -924,7 +932,7 @@ export class StatsPanel {
     start.setDate(start.getDate() - start.getDay()); // Align to Sunday
 
     const maxCount = Math.max(...Object.values(dateHeatmap), 1);
-    const CELL = 11, GAP = 2;
+    const CELL = 14, GAP = 4;
     const weekdays = ['', '周一', '', '周三', '', '周五', ''];
 
     // Outer wrapper with weekday labels on the left
@@ -990,8 +998,17 @@ export class StatsPanel {
       for (const cell of week.cells) {
         const el = document.createElement('div');
         const intensity = cell.count / maxCount;
-        const opacity = cell.count === 0 ? '0.15' : (0.25 + intensity * 0.75).toFixed(2);
-        el.style.cssText = `width:${CELL}px;height:${CELL}px;border-radius:2px;background:${cell.count === 0 ? 'var(--bg-secondary)' : 'var(--accent)'};opacity:${opacity};`;
+        // Neumorphic physics levels: 0=deep inset, 1-4=increasing raised
+        const level = cell.count === 0 ? 0 : intensity < 0.25 ? 1 : intensity < 0.5 ? 2 : intensity < 0.75 ? 3 : 4;
+        const isDark = document.documentElement.dataset.theme === 'dark';
+        const cellStyles = {
+          0: `background:var(--bg-card);box-shadow:var(--shadow-inset);`,
+          1: `background:#f1cfc2;box-shadow:${isDark ? 'none' : 'inset 2px 2px 4px rgba(165,178,196,0.3),inset -2px -2px 4px rgba(255,255,255,0.6)'};${isDark ? 'background:#4a3530;' : ''}`,
+          2: `background:#e6aa95;box-shadow:none;${isDark ? 'background:#6b4a3e;' : ''}`,
+          3: `background:#df8a6f;box-shadow:2px 2px 4px rgba(165,178,196,0.3),-2px -2px 4px rgba(255,255,255,0.5);${isDark ? 'background:#8a5a45;box-shadow:2px 2px 4px rgba(0,0,0,0.3),-2px -2px 4px rgba(255,255,255,0.03);' : ''}`,
+          4: `background:var(--accent);box-shadow:3px 3px 5px rgba(165,178,196,0.4),-2px -2px 5px rgba(255,255,255,0.6);transform:scale(1.05);z-index:2;${isDark ? 'box-shadow:3px 3px 5px rgba(0,0,0,0.4),-2px -2px 5px rgba(255,255,255,0.03);' : ''}`,
+        };
+        el.style.cssText = `width:${CELL}px;height:${CELL}px;border-radius:4px;transition:transform 0.2s;position:relative;${cellStyles[level]}`;
         el.title = cell.dayKey + ': ' + cell.count + ' 条消息';
         weekCol.appendChild(el);
       }
@@ -1004,10 +1021,11 @@ export class StatsPanel {
     const legend = document.createElement('div');
     legend.style.cssText = 'display:flex;align-items:center;gap:4px;margin-top:8px;justify-content:flex-end;font-size:0.6rem;color:var(--text-muted);';
     legend.appendChild(document.createTextNode('Less'));
-    const levels = [0.15, 0.35, 0.55, 0.75, 1.0];
-    for (const lv of levels) {
+    const legendColors = ['var(--bg-card)', '#f1cfc2', '#e6aa95', '#df8a6f', 'var(--accent)'];
+    const legendShadows = ['var(--shadow-inset)', 'none', 'none', '1px 1px 3px rgba(165,178,196,0.3)', '2px 2px 4px rgba(165,178,196,0.3)'];
+    for (let i = 0; i < 5; i++) {
       const box = document.createElement('div');
-      box.style.cssText = `width:${CELL}px;height:${CELL}px;border-radius:2px;background:${lv === 0.15 ? 'var(--bg-secondary)' : 'var(--accent)'};opacity:${lv};`;
+      box.style.cssText = `width:12px;height:12px;border-radius:3px;background:${legendColors[i]};box-shadow:${legendShadows[i]};`;
       legend.appendChild(box);
     }
     legend.appendChild(document.createTextNode('More'));
