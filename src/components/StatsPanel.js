@@ -144,173 +144,61 @@ export class StatsPanel {
       textDiv.appendChild(val);
       card.appendChild(textDiv);
 
-      // Neumorphic ring chart — deep groove track + 3D tube arc + convex center
-      const ringSize = 96;
-      const ringSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-      ringSvg.setAttribute('width', ringSize);
-      ringSvg.setAttribute('height', ringSize);
-      ringSvg.setAttribute('viewBox', '0 0 96 96');
-      ringSvg.style.flexShrink = '0';
+      // Neumorphic ring chart — Syner's 3-layer SVG approach
+      // CSS groove (inset shadow) + SVG arcs (shadow + main + highlight) + CSS center hole
+      const ringWrap = document.createElement('div');
+      ringWrap.style.cssText = 'position:relative;width:96px;height:96px;border-radius:50%;flex-shrink:0;'
+        + 'background:var(--bg-primary);box-shadow:var(--shadow-inset);'
+        + 'display:flex;justify-content:center;align-items:center;';
 
-      const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
       const uid = 'ring-' + s.pct + '-' + Math.random().toString(36).slice(2, 6);
-
-      // Filter: deep inset shadow for groove
       const svgNS = 'http://www.w3.org/2000/svg';
-      const grooveFilter = document.createElementNS(svgNS, 'filter');
-      grooveFilter.setAttribute('id', uid + '-groove');
-      grooveFilter.setAttribute('x', '-30%'); grooveFilter.setAttribute('y', '-30%');
-      grooveFilter.setAttribute('width', '160%'); grooveFilter.setAttribute('height', '160%');
-      // Dark inner shadow (top-left light source → shadow on bottom-right inside)
-      const gBlur = document.createElementNS(svgNS, 'feGaussianBlur');
-      gBlur.setAttribute('in', 'SourceAlpha'); gBlur.setAttribute('stdDeviation', '3'); gBlur.setAttribute('result', 'blur');
-      grooveFilter.appendChild(gBlur);
-      const gOff1 = document.createElementNS(svgNS, 'feOffset');
-      gOff1.setAttribute('in', 'blur'); gOff1.setAttribute('dx', '2'); gOff1.setAttribute('dy', '2'); gOff1.setAttribute('result', 'dOff');
-      grooveFilter.appendChild(gOff1);
-      const gFlood1 = document.createElementNS(svgNS, 'feFlood');
-      gFlood1.setAttribute('flood-color', 'rgba(0,0,0,0.3)'); gFlood1.setAttribute('result', 'dColor');
-      grooveFilter.appendChild(gFlood1);
-      const gComp1 = document.createElementNS(svgNS, 'feComposite');
-      gComp1.setAttribute('in', 'dColor'); gComp1.setAttribute('in2', 'dOff'); gComp1.setAttribute('operator', 'in'); gComp1.setAttribute('result', 'dShadow');
-      grooveFilter.appendChild(gComp1);
-      // Light highlight (opposite corner)
-      const gOff2 = document.createElementNS(svgNS, 'feOffset');
-      gOff2.setAttribute('in', 'blur'); gOff2.setAttribute('dx', '-2'); gOff2.setAttribute('dy', '-2'); gOff2.setAttribute('result', 'lOff');
-      grooveFilter.appendChild(gOff2);
-      const gFlood2 = document.createElementNS(svgNS, 'feFlood');
-      gFlood2.setAttribute('flood-color', 'rgba(255,255,255,0.5)'); gFlood2.setAttribute('result', 'lColor');
-      grooveFilter.appendChild(gFlood2);
-      const gComp2 = document.createElementNS(svgNS, 'feComposite');
-      gComp2.setAttribute('in', 'lColor'); gComp2.setAttribute('in2', 'lOff'); gComp2.setAttribute('operator', 'in'); gComp2.setAttribute('result', 'lShadow');
-      grooveFilter.appendChild(gComp2);
-      const gMerge = document.createElementNS(svgNS, 'feMerge');
-      const gM1 = document.createElementNS(svgNS, 'feMergeNode'); gM1.setAttribute('in', 'dShadow'); gMerge.appendChild(gM1);
-      const gM2 = document.createElementNS(svgNS, 'feMergeNode'); gM2.setAttribute('in', 'lShadow'); gMerge.appendChild(gM2);
-      const gM3 = document.createElementNS(svgNS, 'feMergeNode'); gM3.setAttribute('in', 'SourceGraphic'); gMerge.appendChild(gM3);
-      grooveFilter.appendChild(gMerge);
-      defs.appendChild(grooveFilter);
+      const ringSvg = document.createElementNS(svgNS, 'svg');
+      ringSvg.setAttribute('viewBox', '0 0 96 96');
+      ringSvg.style.cssText = 'position:absolute;width:96px;height:96px;transform:rotate(-90deg);';
 
-      // Filter: convex center disc
-      const centerFilter = document.createElementNS(svgNS, 'filter');
-      centerFilter.setAttribute('id', uid + '-center');
-      centerFilter.setAttribute('x', '-20%'); centerFilter.setAttribute('y', '-20%');
-      centerFilter.setAttribute('width', '140%'); centerFilter.setAttribute('height', '140%');
-      const cBlur = document.createElementNS(svgNS, 'feGaussianBlur');
-      cBlur.setAttribute('in', 'SourceAlpha'); cBlur.setAttribute('stdDeviation', '2'); cBlur.setAttribute('result', 'cb');
-      centerFilter.appendChild(cBlur);
-      const cOff1 = document.createElementNS(svgNS, 'feOffset');
-      cOff1.setAttribute('in', 'cb'); cOff1.setAttribute('dx', '-1.5'); cOff1.setAttribute('dy', '-1.5'); cOff1.setAttribute('result', 'cLO');
-      centerFilter.appendChild(cOff1);
-      const cF1 = document.createElementNS(svgNS, 'feFlood');
-      cF1.setAttribute('flood-color', 'rgba(255,255,255,0.7)'); cF1.setAttribute('result', 'cLC');
-      centerFilter.appendChild(cF1);
-      const cC1 = document.createElementNS(svgNS, 'feComposite');
-      cC1.setAttribute('in', 'cLC'); cC1.setAttribute('in2', 'cLO'); cC1.setAttribute('operator', 'in'); cC1.setAttribute('result', 'cLS');
-      centerFilter.appendChild(cC1);
-      const cOff2 = document.createElementNS(svgNS, 'feOffset');
-      cOff2.setAttribute('in', 'cb'); cOff2.setAttribute('dx', '2'); cOff2.setAttribute('dy', '2'); cOff2.setAttribute('result', 'cDO');
-      centerFilter.appendChild(cOff2);
-      const cF2 = document.createElementNS(svgNS, 'feFlood');
-      cF2.setAttribute('flood-color', 'rgba(0,0,0,0.12)'); cF2.setAttribute('result', 'cDC');
-      centerFilter.appendChild(cF2);
-      const cC2 = document.createElementNS(svgNS, 'feComposite');
-      cC2.setAttribute('in', 'cDC'); cC2.setAttribute('in2', 'cDO'); cC2.setAttribute('operator', 'in'); cC2.setAttribute('result', 'cDS');
-      centerFilter.appendChild(cC2);
-      const cMerge = document.createElementNS(svgNS, 'feMerge');
-      const cM1 = document.createElementNS(svgNS, 'feMergeNode'); cM1.setAttribute('in', 'cDS'); cMerge.appendChild(cM1);
-      const cM2 = document.createElementNS(svgNS, 'feMergeNode'); cM2.setAttribute('in', 'cLS'); cMerge.appendChild(cM2);
-      const cM3 = document.createElementNS(svgNS, 'feMergeNode'); cM3.setAttribute('in', 'SourceGraphic'); cMerge.appendChild(cM3);
-      centerFilter.appendChild(cMerge);
-      defs.appendChild(centerFilter);
+      const r = 35, strokeW = 14, circ = 2 * Math.PI * r;
+      const dashLen = (s.pct / 100) * circ;
+      const dashOff = circ - dashLen;
+      const cStart = s.color === '#7c6eea' ? '#9b8ff0' : '#ea9d85';
+      const cEnd = s.color;
+      const hlColor = s.color === '#7c6eea' ? 'rgba(190,170,255,0.6)' : 'rgba(255,180,140,0.55)';
 
-      // Gradient: arc base color
-      const arcGrad = document.createElementNS(svgNS, 'linearGradient');
-      arcGrad.setAttribute('id', uid + '-ag');
-      arcGrad.setAttribute('x1', '0'); arcGrad.setAttribute('y1', '0');
-      arcGrad.setAttribute('x2', '1'); arcGrad.setAttribute('y2', '1');
-      const agS1 = document.createElementNS(svgNS, 'stop');
-      agS1.setAttribute('offset', '0%'); agS1.setAttribute('stop-color', s.color); agS1.setAttribute('stop-opacity', '0.85');
-      arcGrad.appendChild(agS1);
-      const agS2 = document.createElementNS(svgNS, 'stop');
-      agS2.setAttribute('offset', '50%'); agS2.setAttribute('stop-color', s.color);
-      arcGrad.appendChild(agS2);
-      const agS3 = document.createElementNS(svgNS, 'stop');
-      agS3.setAttribute('offset', '100%'); agS3.setAttribute('stop-color', s.color); agS3.setAttribute('stop-opacity', '0.7');
-      arcGrad.appendChild(agS3);
-      defs.appendChild(arcGrad);
+      // Defs: gradient + glow filter
+      ringSvg.innerHTML = `
+        <defs>
+          <linearGradient id="g-${uid}" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="${cStart}"/>
+            <stop offset="100%" stop-color="${cEnd}"/>
+          </linearGradient>
+          <filter id="glow-${uid}" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="2.5"/>
+          </filter>
+        </defs>
+        <!-- 1: Shadow layer -->
+        <circle cx="48" cy="48" r="${r}" fill="none"
+          stroke="rgba(0,0,0,0.12)" stroke-width="${strokeW}" stroke-linecap="round"
+          stroke-dasharray="${dashLen} ${circ}" style="transform:translate(1px,2px);"/>
+        <!-- 2: Main gradient arc -->
+        <circle cx="48" cy="48" r="${r}" fill="none"
+          stroke="url(#g-${uid})" stroke-width="${strokeW}" stroke-linecap="round"
+          stroke-dasharray="${dashLen} ${circ}"/>
+        <!-- 3: Highlight glow -->
+        <circle cx="48" cy="48" r="${r - 0.5}" fill="none"
+          stroke="${hlColor}" stroke-width="${Math.floor(strokeW * 0.4)}" stroke-linecap="round"
+          stroke-dasharray="${dashLen} ${circ}"
+          filter="url(#glow-${uid})"
+          style="transform:translate(-1.2px,-1.2px);opacity:0.6;"/>
+      `;
+      ringWrap.appendChild(ringSvg);
 
-      // Gradient: tube shine highlight
-      const shineGrad = document.createElementNS(svgNS, 'linearGradient');
-      shineGrad.setAttribute('id', uid + '-sh');
-      shineGrad.setAttribute('x1', '0'); shineGrad.setAttribute('y1', '0');
-      shineGrad.setAttribute('x2', '0'); shineGrad.setAttribute('y2', '1');
-      const shS1 = document.createElementNS(svgNS, 'stop');
-      shS1.setAttribute('offset', '0%'); shS1.setAttribute('stop-color', 'rgba(255,255,255,0.45)');
-      shineGrad.appendChild(shS1);
-      const shS2 = document.createElementNS(svgNS, 'stop');
-      shS2.setAttribute('offset', '50%'); shS2.setAttribute('stop-color', 'rgba(255,255,255,0.05)');
-      shineGrad.appendChild(shS2);
-      const shS3 = document.createElementNS(svgNS, 'stop');
-      shS3.setAttribute('offset', '100%'); shS3.setAttribute('stop-color', 'rgba(0,0,0,0.1)');
-      shineGrad.appendChild(shS3);
-      defs.appendChild(shineGrad);
-
-      ringSvg.appendChild(defs);
-
-      const cx = 48, cy = 48, r = 35, strokeW = 14, circumference = 2 * Math.PI * r;
-
-      // Layer 1: Groove track
-      const groove = document.createElementNS(svgNS, 'circle');
-      groove.setAttribute('cx', cx); groove.setAttribute('cy', cy); groove.setAttribute('r', r);
-      groove.setAttribute('fill', 'none');
-      groove.setAttribute('stroke', 'var(--bg-tertiary)');
-      groove.setAttribute('stroke-width', String(strokeW));
-      groove.setAttribute('filter', `url(#${uid}-groove)`);
-      ringSvg.appendChild(groove);
-
-      // Layer 2: Convex center disc
-      const centerDisc = document.createElementNS(svgNS, 'circle');
-      centerDisc.setAttribute('cx', cx); centerDisc.setAttribute('cy', cy);
-      centerDisc.setAttribute('r', String(r - strokeW / 2 - 2));
-      centerDisc.setAttribute('fill', 'var(--bg-card)');
-      centerDisc.setAttribute('filter', `url(#${uid}-center)`);
-      ringSvg.appendChild(centerDisc);
-
-      // Layer 3: Progress arc (base)
-      const arcBase = document.createElementNS(svgNS, 'circle');
-      arcBase.setAttribute('cx', cx); arcBase.setAttribute('cy', cy); arcBase.setAttribute('r', r);
-      arcBase.setAttribute('fill', 'none');
-      arcBase.setAttribute('stroke', `url(#${uid}-ag)`);
-      arcBase.setAttribute('stroke-width', String(strokeW - 2));
-      arcBase.setAttribute('stroke-linecap', 'round');
-      arcBase.setAttribute('stroke-dasharray', `${(s.pct / 100) * circumference} ${circumference}`);
-      arcBase.setAttribute('transform', `rotate(-90 ${cx} ${cy})`);
-      arcBase.style.transition = 'stroke-dasharray 0.8s ease';
-      ringSvg.appendChild(arcBase);
-
-      // Layer 4: Shine highlight on arc (3D tube effect)
-      const arcShine = document.createElementNS(svgNS, 'circle');
-      arcShine.setAttribute('cx', cx); arcShine.setAttribute('cy', cy); arcShine.setAttribute('r', r);
-      arcShine.setAttribute('fill', 'none');
-      arcShine.setAttribute('stroke', `url(#${uid}-sh)`);
-      arcShine.setAttribute('stroke-width', String(strokeW - 4));
-      arcShine.setAttribute('stroke-linecap', 'round');
-      arcShine.setAttribute('stroke-dasharray', `${(s.pct / 100) * circumference} ${circumference}`);
-      arcShine.setAttribute('transform', `rotate(-90 ${cx} ${cy})`);
-      arcShine.style.transition = 'stroke-dasharray 0.8s ease';
-      ringSvg.appendChild(arcShine);
-
-      // Percentage text
-      const pctText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-      pctText.setAttribute('x', cx); pctText.setAttribute('y', cy + 1);
-      pctText.setAttribute('text-anchor', 'middle'); pctText.setAttribute('dominant-baseline', 'central');
-      pctText.setAttribute('font-size', '14'); pctText.setAttribute('font-weight', '700');
-      pctText.setAttribute('fill', 'var(--text-primary)');
-      pctText.setAttribute('font-family', 'var(--font-family)');
-      pctText.textContent = s.pct + '%';
-      ringSvg.appendChild(pctText);
-      card.appendChild(ringSvg);
+      // Center hole: convex disc with percentage
+      const hole = document.createElement('div');
+      hole.style.cssText = 'width:56px;height:56px;border-radius:50%;background:var(--bg-primary);'
+        + 'box-shadow:var(--shadow);display:flex;justify-content:center;align-items:center;z-index:10;';
+      hole.innerHTML = `<span style="font-size:14px;font-weight:700;color:${cEnd};text-shadow:1px 1px 1px rgba(255,255,255,0.8);">${s.pct}%</span>`;
+      ringWrap.appendChild(hole);
+      card.appendChild(ringWrap);
 
       cardsGrid.appendChild(card);
     }
