@@ -5,11 +5,12 @@
 
 import { state, saveExportCollection } from '../store/state.js';
 import { exportAsText, exportAsMarkdown, exportAsHTML, downloadFile, encodeUTF8 } from '../utils/export.js';
-import { formatTimestamp, formatDate } from '../utils/time.js';
+import { formatTimestamp, formatDate, formatLocalDateStamp } from '../utils/time.js';
 import JSZip from 'jszip';
 
 export class ExportPanel {
   constructor() {
+    this._unsubCollection = null;
     this.format = 'md';
     this.options = {
       includeThinking: true,
@@ -21,7 +22,14 @@ export class ExportPanel {
     };
   }
 
+  destroy() {
+    this._unsubCollection?.();
+    this._unsubCollection = null;
+  }
+
   render(container) {
+    // Clean up previous subscription
+    this._unsubCollection?.();
     container.textContent = '';
     container.style.cssText = 'flex:1;overflow:hidden;display:flex;flex-direction:column;';
 
@@ -179,6 +187,10 @@ export class ExportPanel {
     collectionSection.id = 'export-collection-section';
 
     this._renderCollectionSection(collectionSection);
+    // Subscribe to exportCollection changes so the section auto-refreshes
+    this._unsubCollection = state.on('exportCollection', () => {
+      this._renderCollectionSection(collectionSection);
+    });
     content.appendChild(collectionSection);
 
     // ---- Section 3: Per-conversation Export ----
@@ -345,7 +357,7 @@ export class ExportPanel {
 
     const conversations = state.get('conversations') || [];
     const names = state.get('displayNames');
-    const dateSuffix = new Date().toISOString().slice(0, 10);
+    const dateSuffix = formatLocalDateStamp();
 
     // JSON format — export raw message data
     if (this.format === 'json') {
@@ -409,7 +421,7 @@ export class ExportPanel {
   }
 
   _buildFilename(nameBase) {
-    const dateSuffix = new Date().toISOString().slice(0, 10);
+    const dateSuffix = formatLocalDateStamp();
     const prefix = this.options.filePrefix ? this.options.filePrefix + '_' : '';
     const suffix = this.options.fileSuffix ? '_' + this.options.fileSuffix : '';
     const extMap = { md: '.md', txt: '.txt', html: '.html', json: '.json' };
@@ -459,7 +471,7 @@ export class ExportPanel {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = '对话导出_' + new Date().toISOString().slice(0, 10) + '.zip';
+    a.download = '对话导出_' + formatLocalDateStamp() + '.zip';
     a.click();
     URL.revokeObjectURL(url);
   }

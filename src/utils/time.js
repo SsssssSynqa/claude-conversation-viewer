@@ -45,6 +45,16 @@ export function formatDate(iso) {
   }
 }
 
+export function formatLocalDateStamp(dateInput = new Date()) {
+  try {
+    const date = dateInput instanceof Date ? dateInput : new Date(dateInput);
+    if (isNaN(date.getTime())) return '';
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+  } catch (e) {
+    return '';
+  }
+}
+
 export function formatMonthKey(iso) {
   if (!iso) return 'unknown';
   try {

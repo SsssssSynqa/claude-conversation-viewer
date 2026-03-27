@@ -51,7 +51,6 @@ export const state = new Store({
   filteredConversations: [],
   currentConversationIndex: -1,
   searchQuery: '',
-  filters: { dateFrom: null, dateTo: null, role: 'all', contentType: 'all' },
   theme: localStorage.getItem('cv-theme') || 'light',
   displayNames: loadDisplayNames(),
   showThinking: true,
@@ -59,13 +58,9 @@ export const state = new Store({
   showFlags: false,
   desensitize: false, // Data masking mode
   desensitizeWords: loadDesensitizeWords(),
-  viewMode: 'conversation', // 'conversation' | 'search' | 'export'
+  viewMode: 'stats', // 'conversation' | 'search' | 'export' | 'stats'
   loading: false,
   loadingProgress: { current: 0, total: 0 },
-  selectedConversations: new Set(),
-  // Message selection within a conversation
-  selectedMessages: new Set(), // Set of "convUuid:msgIndex" strings
-  selectionMode: false,
   // Export collection ("精选集")
   exportCollection: loadExportCollection(),
 });
@@ -93,4 +88,14 @@ function loadExportCollection() {
 export function saveExportCollection() {
   const collection = state.get('exportCollection');
   localStorage.setItem('cv-export-collection', JSON.stringify(collection));
+}
+
+/**
+ * Reset sidebar search filter to show all conversations.
+ * Use this instead of manually setting searchQuery + filteredConversations
+ * in multiple components — keeps the "reset sidebar" logic in one place.
+ */
+export function resetSidebarFilter() {
+  state.set('filteredConversations', state.get('conversations') || []);
+  state.set('searchQuery', '');
 }

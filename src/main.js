@@ -6,7 +6,7 @@ import './themes/variables.css';
 import './styles/base.css';
 import './styles/components.css';
 import './styles/clawd.css';
-import { state, saveDesensitizeWords, saveExportCollection } from './store/state.js';
+import { state, saveDesensitizeWords, saveExportCollection, resetSidebarFilter } from './store/state.js';
 import { FileUpload } from './components/FileUpload.js';
 import { ConversationList } from './components/ConversationList.js';
 import { MessageView } from './components/MessageView.js';
@@ -41,6 +41,7 @@ applyTheme(state.get('theme'));
 const app = document.getElementById('app');
 let fileUpload, conversationList, messageView, searchPanel, exportPanel;
 let _mainViewCleanups = [];
+let _statsThemeRerenderTimer = null;
 
 function renderUploadScreen() {
   app.textContent = '';
@@ -51,6 +52,8 @@ function renderMainView() {
   // Clean up listeners from previous renderMainView call
   _mainViewCleanups.forEach(fn => fn());
   _mainViewCleanups = [];
+  clearTimeout(_statsThemeRerenderTimer);
+  _statsThemeRerenderTimer = null;
   conversationList?.destroy?.();
   messageView?.destroy?.();
 
@@ -85,19 +88,7 @@ function renderMainView() {
   // Nav pills: Search, Stats, Export
   const navItems = [
     { id: 'sidebar-search-btn', icon: 'search', label: '搜索中心', action: () => state.set('viewMode', 'search') },
-    { id: 'sidebar-stats-btn', icon: 'stats', label: '统计总览', action: () => {
-      state.set('currentConversationIndex', -1);
-      if (state.get('viewMode') !== 'conversation') {
-        state.set('viewMode', 'conversation');
-      } else {
-        messageView?.destroy?.();
-        const a = document.getElementById('content-area');
-        if (a) {
-          messageView = new MessageView(a);
-        }
-        window._updateNavActive && window._updateNavActive('conversation');
-      }
-    } },
+    { id: 'sidebar-stats-btn', icon: 'stats', label: '统计总览', action: () => state.set('viewMode', 'stats') },
     { id: 'sidebar-export-btn', icon: 'export', label: '导出中心', action: () => state.set('viewMode', 'export') },
   ];
 
@@ -170,14 +161,19 @@ function renderMainView() {
       });
     }
     // Re-render stats panel so ring charts pick up new theme shadows
-    const convIdx = state.get('currentConversationIndex');
-    if (messageView && state.get('viewMode') === 'conversation' && (convIdx === -1 || convIdx === undefined || convIdx === null)) {
+    if (messageView && state.get('viewMode') === 'stats') {
       const c = messageView.container;
+      const currentMessageView = messageView;
       const overlay = showLoading(c);
       Array.from(c.children).forEach(ch => { if (ch !== overlay) ch.remove(); });
-      setTimeout(() => {
-        messageView.statsPanel.renderInline(c);
+      clearTimeout(_statsThemeRerenderTimer);
+      _statsThemeRerenderTimer = setTimeout(() => {
+        if (messageView !== currentMessageView) return;
+        if (state.get('viewMode') !== 'stats') return;
+        if (!c.isConnected) return;
+        currentMessageView.statsPanel.renderInline(c);
         hideLoading(overlay);
+        _statsThemeRerenderTimer = null;
       }, 500);
     }
   }));
@@ -427,11 +423,9 @@ function renderMainView() {
   // ---- Nav active state helper ----
   function updateNavActive(mode) {
     const allBtns = ['sidebar-search-btn', 'sidebar-export-btn', 'sidebar-stats-btn'];
-    // Stats only active when conversation mode AND no conversation selected
-    const convIdx = state.get('currentConversationIndex');
     const activeId = mode === 'search' ? 'sidebar-search-btn'
       : mode === 'export' ? 'sidebar-export-btn'
-      : (mode === 'conversation' && (convIdx === -1 || convIdx === undefined || convIdx === null)) ? 'sidebar-stats-btn'
+      : mode === 'stats' ? 'sidebar-stats-btn'
       : null;
     for (const id of allBtns) {
       const el = document.getElementById(id);
@@ -449,17 +443,30 @@ function renderMainView() {
     if (!area) return;
     updateNavActive(mode);
     if (mode === 'search') {
+      messageView?.destroy?.(); messageView = null;
+      exportPanel?.destroy?.();
       searchPanel.render(area);
     } else if (mode === 'export') {
+      messageView?.destroy?.(); messageView = null;
       exportPanel.render(area);
+    } else if (mode === 'stats') {
+      exportPanel?.destroy?.();
+      state.set('currentConversationIndex', -1);
+      messageView?.destroy?.();
+      messageView = new MessageView(area);
     } else {
+      // conversation mode — MessageView will render the selected conversation
+      exportPanel?.destroy?.();
       messageView?.destroy?.();
       messageView = new MessageView(area);
     }
   }));
 
-  // When a conversation is selected, deactivate stats pill
-  _mainViewCleanups.push(state.on('currentConversationIndex', () => {
+  _mainViewCleanups.push(state.on('currentConversationIndex', (idx) => {
+    // When a conversation is selected from stats/list, switch to conversation mode
+    if (idx >= 0 && state.get('viewMode') === 'stats') {
+      state.set('viewMode', 'conversation');
+    }
     updateNavActive(state.get('viewMode'));
   }));
 
@@ -471,13 +478,12 @@ function renderMainView() {
 // ---- Init ----
 state.on('conversations', (conversations) => {
   if (conversations.length > 0 && state.get('loading') === false) {
-    state.set('searchQuery', '');
     state.set('highlightMessageIndex', null);
     state.set('currentConversationIndex', -1);
-    state.set('viewMode', 'conversation');
+    state.set('viewMode', 'stats');
     state.set('exportCollection', []);
     saveExportCollection();
-    state.set('filteredConversations', conversations);
+    resetSidebarFilter();
     renderMainView();
   }
 });

@@ -32,7 +32,7 @@ export function parseConversation(raw) {
         if (block.durationMs > 0) totalThinkingMs += block.durationMs;
       } else if (block.type === 'flag') {
         hasFlags = true;
-      } else if (block.type === 'tool_use') {
+      } else if (block.type === 'tool_use' || block.type === 'tool_result') {
         hasTools = true;
       }
     }
@@ -125,21 +125,26 @@ function parseMessages(chatMessages) {
           pendingToolUses.push(toolBlock);
           searchTextParts.push(item.name || '');
           searchTextParts.push(item.message || '');
+          if (item.input && typeof item.input === 'object') {
+            searchTextParts.push(JSON.stringify(item.input));
+          }
           break;
         }
 
         case 'tool_result': {
+          const resultText = extractToolResult(item);
           // Pair with pending tool_use
           const paired = pendingToolUses.shift();
           if (paired) {
-            paired.result = extractToolResult(item);
+            paired.result = resultText;
           } else {
             // Unpaired tool_result — show standalone
             contentBlocks.push({
               type: 'tool_result',
-              result: extractToolResult(item),
+              result: resultText,
             });
           }
+          if (resultText) searchTextParts.push(resultText);
           break;
         }
 
@@ -154,6 +159,8 @@ function parseMessages(chatMessages) {
             flagType: item.flag || 'unknown',
             helpline: item.helpline || null,
           });
+          searchTextParts.push(item.flag || '');
+          searchTextParts.push(item.helpline || '');
           break;
         }
 

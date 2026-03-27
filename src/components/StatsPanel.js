@@ -2,9 +2,9 @@
  * StatsPanel — Rich statistics dashboard with charts, rankings, and fun data.
  */
 
-import { state } from '../store/state.js';
+import { state, resetSidebarFilter } from '../store/state.js';
 import { drawLineChart, drawBarChart } from '../utils/charts.js';
-import { formatMonthKey, formatMonthLabel, formatTimestamp, getHourOfDay } from '../utils/time.js';
+import { formatMonthKey, formatMonthLabel, formatTimestamp, formatLocalDateStamp, getHourOfDay } from '../utils/time.js';
 import html2canvas from 'html2canvas';
 import { desensitize } from '../utils/desensitize.js';
 import { createIcon } from '../utils/icons.js';
@@ -80,7 +80,7 @@ export class StatsPanel {
           useCORS: true,
         });
         const link = document.createElement('a');
-        link.download = '数据雕塑_' + new Date().toISOString().slice(0, 10) + '.png';
+        link.download = '数据雕塑_' + formatLocalDateStamp() + '.png';
         link.href = canvas.toDataURL('image/png');
         link.click();
         screenshotBtn.textContent = '\u2713 已保存';
@@ -327,9 +327,8 @@ export class StatsPanel {
         let visibleConvs = state.get('filteredConversations') || [];
         let idx = visibleConvs.findIndex(c => c.uuid === conv.uuid);
         if (idx < 0) {
-          visibleConvs = state.get('conversations') || [];
-          state.set('filteredConversations', visibleConvs);
-          state.set('searchQuery', '');
+          resetSidebarFilter();
+          visibleConvs = state.get('filteredConversations') || [];
           idx = visibleConvs.findIndex(c => c.uuid === conv.uuid);
         }
         if (idx >= 0) {
@@ -684,7 +683,7 @@ export class StatsPanel {
         if (msg.createdAt) {
           const date = new Date(msg.createdAt);
           const hour = date.getHours();
-          const dayKey = date.toISOString().slice(0, 10);
+          const dayKey = this._getLocalDayKey(date);
           const weekday = date.getDay();
 
           hourlyActivity[hour]++;
@@ -796,7 +795,7 @@ export class StatsPanel {
       yr.assistantChars += conv.stats.assistantChars;
       yr.thinkingCount += conv.stats.thinkingCount || 0;
       for (const msg of conv.messages) {
-        if (msg.createdAt) yr.activeDaysSet.add(new Date(msg.createdAt).toISOString().slice(0, 10));
+        if (msg.createdAt) yr.activeDaysSet.add(this._getLocalDayKey(new Date(msg.createdAt)));
       }
     }
     const yearlyData = [...yearMap.values()]
@@ -974,7 +973,7 @@ export class StatsPanel {
       const weekStart = new Date(current);
       const cells = [];
       for (let d = 0; d < 7; d++) {
-        const dayKey = current.toISOString().slice(0, 10);
+        const dayKey = this._getLocalDayKey(current);
         cells.push({ dayKey, count: dateHeatmap[dayKey] || 0, date: new Date(current) });
         current.setDate(current.getDate() + 1);
       }
@@ -1080,5 +1079,12 @@ export class StatsPanel {
     if (minutes < 60) return minutes + '分' + Math.floor(seconds % 60) + '秒';
     const hours = Math.floor(minutes / 60);
     return hours + '小时' + (minutes % 60) + '分';
+  }
+
+  _getLocalDayKey(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   }
 }

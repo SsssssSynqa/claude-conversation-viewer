@@ -5,7 +5,7 @@
 
 import { state, saveExportCollection } from '../store/state.js';
 import { renderMarkdown, escapeHtml } from '../utils/markdown.js';
-import { formatTimestamp, formatShortTime, formatDate, getTimeDiffMinutes } from '../utils/time.js';
+import { formatTimestamp, formatShortTime, formatDate, formatLocalDateStamp, getTimeDiffMinutes } from '../utils/time.js';
 import { desensitize } from '../utils/desensitize.js';
 import { createIcon } from '../utils/icons.js';
 import { StatsPanel } from './StatsPanel.js';
@@ -431,7 +431,7 @@ export class MessageView {
   _quickExportConversation(conv, format = 'md') {
     import('../utils/export.js').then(({ exportAsText, exportAsMarkdown, exportAsHTML, downloadFile }) => {
       const options = { includeThinking: state.get('showThinking'), includeToolUse: state.get('showToolUse'), includeFlags: state.get('showFlags'), displayNames: state.get('displayNames') };
-      const dateSuffix = new Date().toISOString().slice(0, 10);
+      const dateSuffix = formatLocalDateStamp();
       const nameBase = this._sanitizeFilename(conv.name || '对话');
       let content, filename, mimeType;
       switch (format) {
@@ -457,7 +457,7 @@ export class MessageView {
         }
         output += '---\n\n';
       }
-      const dateSuffix = new Date().toISOString().slice(0, 10);
+      const dateSuffix = formatLocalDateStamp();
       const safeName = this._sanitizeFilename(conv.name || '对话');
       downloadFile(output, `${safeName}_节选_${dateSuffix}.md`, 'text/markdown;charset=utf-8');
     });

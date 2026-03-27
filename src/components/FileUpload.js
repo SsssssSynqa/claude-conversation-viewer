@@ -121,6 +121,7 @@ export class FileUpload {
     });
     fileInput.addEventListener('change', (e) => {
       const file = e.target.files[0];
+      e.target.value = '';
       if (file) this.handleFile(file);
     });
 
@@ -348,6 +349,7 @@ export class FileUpload {
     };
     reader.onerror = () => {
       state.set('loading', false);
+      this.showUploadScreen();
       this.showError('文件读取失败');
     };
     reader.readAsText(file);

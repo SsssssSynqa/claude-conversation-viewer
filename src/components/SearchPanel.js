@@ -3,7 +3,7 @@
  * Features: keyword search, date range filter, role/type filter, result list with jump-to-message.
  */
 
-import { state } from '../store/state.js';
+import { state, resetSidebarFilter } from '../store/state.js';
 import { formatTimestamp } from '../utils/time.js';
 import { escapeHtml } from '../utils/markdown.js';
 
@@ -238,7 +238,7 @@ export class SearchPanel {
 
         // Content type filter on message level
         if (contentType === 'thinking' && !msg.contentBlocks.some(b => b.type === 'thinking')) continue;
-        if (contentType === 'tool' && !msg.contentBlocks.some(b => b.type === 'tool_use')) continue;
+        if (contentType === 'tool' && !this._messageHasToolContent(msg)) continue;
         if (contentType === 'flag' && !msg.contentBlocks.some(b => b.type === 'flag')) continue;
 
         // Keyword search (if query is empty and we have filters, show all matching messages)
@@ -264,7 +264,7 @@ export class SearchPanel {
             snippet,
             query,
             hasThinking: msg.contentBlocks.some(b => b.type === 'thinking'),
-            hasTools: msg.contentBlocks.some(b => b.type === 'tool_use'),
+            hasTools: this._messageHasToolContent(msg),
             hasFlags: msg.contentBlocks.some(b => b.type === 'flag'),
           });
         } else if (!query && (role !== 'all' || contentType !== 'all' || dateFrom || dateTo)) {
@@ -280,7 +280,7 @@ export class SearchPanel {
             snippet,
             query: '',
             hasThinking: msg.contentBlocks.some(b => b.type === 'thinking'),
-            hasTools: msg.contentBlocks.some(b => b.type === 'tool_use'),
+            hasTools: this._messageHasToolContent(msg),
             hasFlags: msg.contentBlocks.some(b => b.type === 'flag'),
           });
         }
@@ -293,6 +293,10 @@ export class SearchPanel {
     if (resultsContainer && statsBar) {
       this._renderResults(resultsContainer, statsBar);
     }
+  }
+
+  _messageHasToolContent(msg) {
+    return msg.contentBlocks.some(b => b.type === 'tool_use' || b.type === 'tool_result');
   }
 
   _renderResults(container, statsBar) {
@@ -451,9 +455,8 @@ export class SearchPanel {
     // Find conversation in filtered list
     let targetIdx = filteredConvs.findIndex(c => c.uuid === convUuid);
     if (targetIdx < 0) {
-      // Not in filtered list, reset filters
-      state.set('filteredConversations', allConvs);
-      state.set('searchQuery', '');
+      // Not in filtered list, reset sidebar filter
+      resetSidebarFilter();
       targetIdx = allConvs.findIndex(c => c.uuid === convUuid);
       if (targetIdx < 0) targetIdx = convIndex; // ultimate fallback
     }

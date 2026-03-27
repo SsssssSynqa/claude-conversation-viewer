@@ -44,7 +44,7 @@ export async function saveToCache(conversations, metadata = {}) {
       convCount: conversations.length,
       fileName: metadata.fileName || '',
       fileSize: metadata.fileSize || 0,
-      parseDate: new Date().toISOString(),
+      parseDate: metadata.parseDate || new Date().toISOString(),
       version: 2, // Cache version for invalidation
     });
 
@@ -112,6 +112,12 @@ export async function loadFromCache() {
       .sort((a, b) => a.index - b.index);
 
     if (chunks.length === 0) return null;
+    const expectedChunks = chunks[0].total || 0;
+    if (expectedChunks <= 0 || chunks.length !== expectedChunks) return null;
+    for (let i = 0; i < chunks.length; i++) {
+      if (chunks[i].index !== i) return null;
+      if (chunks[i].total !== expectedChunks) return null;
+    }
 
     const jsonStr = chunks.map(c => c.data).join('');
     const conversations = JSON.parse(jsonStr);
