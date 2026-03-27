@@ -24,6 +24,7 @@ export class SearchPanel {
    * Render the search panel into the given container (replaces content area).
    */
   render(container) {
+    clearTimeout(this.searchTimer);
     container.textContent = '';
     container.style.cssText = 'flex:1;overflow:hidden;display:flex;flex-direction:column;';
 
@@ -452,7 +453,9 @@ export class SearchPanel {
     if (targetIdx < 0) {
       // Not in filtered list, reset filters
       state.set('filteredConversations', allConvs);
-      targetIdx = convIndex;
+      state.set('searchQuery', '');
+      targetIdx = allConvs.findIndex(c => c.uuid === convUuid);
+      if (targetIdx < 0) targetIdx = convIndex; // ultimate fallback
     }
 
     // Store the target message index for highlighting

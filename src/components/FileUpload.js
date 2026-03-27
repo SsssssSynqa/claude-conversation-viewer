@@ -310,6 +310,12 @@ export class FileUpload {
               break;
             case 'done':
               state.set('loading', false);
+              if (!data.conversations || data.conversations.length === 0) {
+                this.showUploadScreen();
+                this.showError('没有解析出可显示的对话，请检查导出的 JSON 内容');
+                worker.terminate();
+                break;
+              }
               state.set('conversations', data.conversations);
               // Cache parsed data for next visit
               saveToCache(data.conversations, {
@@ -331,6 +337,7 @@ export class FileUpload {
           state.set('loading', false);
           this.showUploadScreen();
           this.showError('解析失败，请刷新页面重试');
+          worker.terminate();
         };
         worker.postMessage({ jsonString: e.target.result });
       } catch (err) {

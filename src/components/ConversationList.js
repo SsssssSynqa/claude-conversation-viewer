@@ -11,9 +11,20 @@ export class ConversationList {
     this.container = container;
     this.searchInput = null;
     this.listEl = null;
+    this._unsubs = [];
     this.render();
-    state.on('filteredConversations', () => this.renderList());
-    state.on('currentConversationIndex', () => this.renderList());
+    this._unsubs.push(state.on('filteredConversations', () => this.renderList()));
+    this._unsubs.push(state.on('currentConversationIndex', () => this.renderList()));
+    this._unsubs.push(state.on('searchQuery', (query) => {
+      if (this.searchInput && this.searchInput.value !== query) {
+        this.searchInput.value = query;
+      }
+    }));
+  }
+
+  destroy() {
+    this._unsubs.forEach(fn => fn());
+    this._unsubs = [];
   }
 
   render() {
@@ -32,6 +43,7 @@ export class ConversationList {
     this.searchInput.type = 'text';
     this.searchInput.className = 'history-search-input';
     this.searchInput.placeholder = '搜索对话标题...';
+    this.searchInput.value = state.get('searchQuery') || '';
     this.searchInput.addEventListener('input', () => this.onSearch());
 
     searchWrapper.appendChild(searchIconEl);
@@ -49,6 +61,7 @@ export class ConversationList {
 
   onSearch() {
     const query = this.searchInput.value.toLowerCase().trim();
+    state.set('searchQuery', query);
     const all = state.get('conversations');
     if (!query) {
       state.set('filteredConversations', all);

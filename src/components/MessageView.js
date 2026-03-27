@@ -349,9 +349,11 @@ export class MessageView {
   }
 
   _selectToHere(mi, conv) {
-    let startIdx = 0;
-    for (const idx of this.selectedIndices) { if (idx < mi && idx >= startIdx) startIdx = idx; }
-    if (this.selectedIndices.size === 0) startIdx = 0;
+    // Find the closest selected index before mi as the range start
+    let startIdx = -1;
+    for (const idx of this.selectedIndices) { if (idx < mi && idx > startIdx) startIdx = idx; }
+    // If no selected index before mi, start from mi itself
+    if (startIdx < 0) startIdx = mi;
     for (let i = startIdx; i <= mi; i++) this.selectedIndices.add(i);
   }
 

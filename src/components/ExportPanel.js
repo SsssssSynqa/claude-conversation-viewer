@@ -281,11 +281,17 @@ export class ExportPanel {
     // Group by conversation
     const grouped = new Map();
     for (const item of collection) {
-      if (!grouped.has(item.convName)) grouped.set(item.convName, []);
-      grouped.get(item.convName).push(item);
+      if (!grouped.has(item.convUuid)) {
+        grouped.set(item.convUuid, {
+          convName: item.convName,
+          items: [],
+        });
+      }
+      grouped.get(item.convUuid).items.push(item);
     }
 
-    for (const [convName, items] of grouped) {
+    for (const [, group] of grouped) {
+      const { convName, items } = group;
       const groupEl = document.createElement('div');
       groupEl.style.cssText = 'border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:8px;overflow:hidden;';
 
@@ -358,49 +364,12 @@ export class ExportPanel {
 
     // Text and Markdown formats
     const isTxt = this.format === 'txt';
+    const collectionConvs = this._buildCollectionAsConversations(collection, conversations);
     let output = isTxt ? '精选集导出\n' + '='.repeat(40) + '\n\n' : '# 精选集导出\n\n';
 
-    const grouped = new Map();
-    for (const item of collection) {
-      if (!grouped.has(item.convUuid)) grouped.set(item.convUuid, []);
-      grouped.get(item.convUuid).push(item);
-    }
-
-    for (const [convUuid, items] of grouped) {
-      const conv = conversations.find(c => c.uuid === convUuid);
-      if (!conv) continue;
-      output += isTxt
-        ? (conv.name || '未命名对话') + '\n' + '-'.repeat(30) + '\n\n'
-        : `## ${conv.name || '未命名对话'}\n\n`;
-
-      const sortedItems = items.sort((a, b) => a.msgIndex - b.msgIndex);
-      for (const item of sortedItems) {
-        const msg = conv.messages[item.msgIndex];
-        if (!msg) continue;
-        const sender = msg.sender === 'human' ? (names.human || 'Human') : (names.assistant || 'Assistant');
-
-        if (isTxt) {
-          output += `[${sender}] ${formatTimestamp(msg.createdAt)}\n`;
-        } else {
-          output += `### ${sender} (${formatTimestamp(msg.createdAt)})\n\n`;
-        }
-
-        for (const block of msg.contentBlocks) {
-          if (block.type === 'text') {
-            output += block.text + '\n' + (isTxt ? '' : '\n');
-          } else if (block.type === 'thinking' && this.options.includeThinking && block.thinking) {
-            if (isTxt) {
-              output += '\n--- 思考过程 ---\n' + block.thinking + '\n--- 思考结束 ---\n';
-            } else {
-              output += `> \uD83D\uDCAD **思考过程**\n>\n`;
-              for (const line of block.thinking.split('\n')) output += `> ${line}\n`;
-              output += '\n';
-            }
-          }
-        }
-        output += isTxt ? '\n---\n\n' : '---\n\n';
-      }
-    }
+    output += isTxt
+      ? exportAsText(collectionConvs, { ...this.options, displayNames: names })
+      : exportAsMarkdown(collectionConvs, { ...this.options, displayNames: names });
 
     const ext = isTxt ? 'txt' : 'md';
     const mime = isTxt ? 'text/plain;charset=utf-8' : 'text/markdown;charset=utf-8';

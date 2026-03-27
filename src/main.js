@@ -6,7 +6,7 @@ import './themes/variables.css';
 import './styles/base.css';
 import './styles/components.css';
 import './styles/clawd.css';
-import { state, saveDesensitizeWords } from './store/state.js';
+import { state, saveDesensitizeWords, saveExportCollection } from './store/state.js';
 import { FileUpload } from './components/FileUpload.js';
 import { ConversationList } from './components/ConversationList.js';
 import { MessageView } from './components/MessageView.js';
@@ -40,6 +40,7 @@ applyTheme(state.get('theme'));
 // ---- App ----
 const app = document.getElementById('app');
 let fileUpload, conversationList, messageView, searchPanel, exportPanel;
+let _mainViewCleanups = [];
 
 function renderUploadScreen() {
   app.textContent = '';
@@ -47,6 +48,12 @@ function renderUploadScreen() {
 }
 
 function renderMainView() {
+  // Clean up listeners from previous renderMainView call
+  _mainViewCleanups.forEach(fn => fn());
+  _mainViewCleanups = [];
+  conversationList?.destroy?.();
+  messageView?.destroy?.();
+
   app.textContent = '';
   searchPanel = new SearchPanel();
   exportPanel = new ExportPanel();
@@ -78,7 +85,19 @@ function renderMainView() {
   // Nav pills: Search, Stats, Export
   const navItems = [
     { id: 'sidebar-search-btn', icon: 'search', label: '搜索中心', action: () => state.set('viewMode', 'search') },
-    { id: 'sidebar-stats-btn', icon: 'stats', label: '统计总览', action: () => { state.set('currentConversationIndex', -1); if (state.get('viewMode') !== 'conversation') { state.set('viewMode', 'conversation'); } else { window._updateNavActive && window._updateNavActive('conversation'); const a = document.getElementById('content-area'); if (a) { messageView = new MessageView(a); } } } },
+    { id: 'sidebar-stats-btn', icon: 'stats', label: '统计总览', action: () => {
+      state.set('currentConversationIndex', -1);
+      if (state.get('viewMode') !== 'conversation') {
+        state.set('viewMode', 'conversation');
+      } else {
+        messageView?.destroy?.();
+        const a = document.getElementById('content-area');
+        if (a) {
+          messageView = new MessageView(a);
+        }
+        window._updateNavActive && window._updateNavActive('conversation');
+      }
+    } },
     { id: 'sidebar-export-btn', icon: 'export', label: '导出中心', action: () => state.set('viewMode', 'export') },
   ];
 
@@ -140,7 +159,7 @@ function renderMainView() {
   // themeTrackRow will be appended later, after foldables
 
   // Theme state listener — update track thumb + active option + re-render stats
-  state.on('theme', (t) => {
+  _mainViewCleanups.push(state.on('theme', (t) => {
     const track = document.getElementById('sidebar-theme-track');
     if (track) {
       const idx = themeOptions.findIndex(o => o.theme === t);
@@ -161,7 +180,7 @@ function renderMainView() {
         hideLoading(overlay);
       }, 500);
     }
-  });
+  }));
 
   // ---- Foldable: Display Settings ----
   const settingsFoldable = document.createElement('details');
@@ -252,10 +271,10 @@ function renderMainView() {
 
   settingsContent.appendChild(desensitizeSection);
 
-  state.on('desensitize', (val) => {
+  _mainViewCleanups.push(state.on('desensitize', (val) => {
     const sec = document.getElementById('desensitize-section');
     if (sec) sec.style.display = val ? 'flex' : 'none';
-  });
+  }));
 
   settingsFoldable.appendChild(settingsContent);
   sidebarActions.appendChild(settingsFoldable);
@@ -425,7 +444,7 @@ function renderMainView() {
   window._updateNavActive = updateNavActive;
 
   // ---- View Mode switching ----
-  state.on('viewMode', (mode) => {
+  _mainViewCleanups.push(state.on('viewMode', (mode) => {
     const area = document.getElementById('content-area');
     if (!area) return;
     updateNavActive(mode);
@@ -437,12 +456,12 @@ function renderMainView() {
       messageView?.destroy?.();
       messageView = new MessageView(area);
     }
-  });
+  }));
 
   // When a conversation is selected, deactivate stats pill
-  state.on('currentConversationIndex', () => {
+  _mainViewCleanups.push(state.on('currentConversationIndex', () => {
     updateNavActive(state.get('viewMode'));
-  });
+  }));
 
   // Initial active state on load
   requestAnimationFrame(() => updateNavActive(state.get('viewMode')));
@@ -452,6 +471,12 @@ function renderMainView() {
 // ---- Init ----
 state.on('conversations', (conversations) => {
   if (conversations.length > 0 && state.get('loading') === false) {
+    state.set('searchQuery', '');
+    state.set('highlightMessageIndex', null);
+    state.set('currentConversationIndex', -1);
+    state.set('viewMode', 'conversation');
+    state.set('exportCollection', []);
+    saveExportCollection();
     state.set('filteredConversations', conversations);
     renderMainView();
   }

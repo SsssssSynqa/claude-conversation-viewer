@@ -324,9 +324,18 @@ export class StatsPanel {
       count.textContent = conv.stats.messageCount + ' 条 / ' + (conv.stats.humanChars + conv.stats.assistantChars).toLocaleString() + ' 字';
       item.appendChild(count);
       item.addEventListener('click', () => {
-        const allConvs = state.get('filteredConversations') || [];
-        const idx = allConvs.findIndex(c => c.uuid === conv.uuid);
-        if (idx >= 0) { state.set('viewMode', 'conversation'); state.set('currentConversationIndex', idx); }
+        let visibleConvs = state.get('filteredConversations') || [];
+        let idx = visibleConvs.findIndex(c => c.uuid === conv.uuid);
+        if (idx < 0) {
+          visibleConvs = state.get('conversations') || [];
+          state.set('filteredConversations', visibleConvs);
+          state.set('searchQuery', '');
+          idx = visibleConvs.findIndex(c => c.uuid === conv.uuid);
+        }
+        if (idx >= 0) {
+          state.set('viewMode', 'conversation');
+          state.set('currentConversationIndex', idx);
+        }
         this.hide();
       });
       topCard.appendChild(item);
