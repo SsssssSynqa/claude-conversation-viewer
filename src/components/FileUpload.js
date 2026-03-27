@@ -443,6 +443,8 @@ export class FileUpload {
           state.set('conversations', cached.conversations);
         } else {
           this.showError('缓存数据损坏，请重新上传');
+          loadBtn.textContent = '加载缓存';
+          loadBtn.disabled = false;
         }
       } catch (e) {
         this.showError('加载缓存失败: ' + e.message);

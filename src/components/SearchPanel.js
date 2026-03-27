@@ -162,6 +162,7 @@ export class SearchPanel {
     });
     clearBtn.addEventListener('click', () => {
       this.filters = { role: 'all', contentType: 'all', dateFrom: '', dateTo: '' };
+      this.currentQuery = '';
       dateFromInput.value = '';
       dateToInput.value = '';
       roleSelect.value = 'all';
@@ -460,29 +461,6 @@ export class SearchPanel {
     // Switch view mode back to conversation
     state.set('viewMode', 'conversation');
     state.set('currentConversationIndex', targetIdx);
-
-    // After render, scroll to the target message
-    requestAnimationFrame(() => {
-      setTimeout(() => {
-        const messagesScroll = document.querySelector('.messages-scroll');
-        if (!messagesScroll) return;
-
-        const messageBlocks = messagesScroll.querySelectorAll('.message-block');
-        const targetBlock = messageBlocks[msgIndex];
-        if (targetBlock) {
-          targetBlock.scrollIntoView({ behavior: 'smooth', block: 'center' });
-
-          // Highlight animation
-          targetBlock.style.transition = 'box-shadow 0.3s, outline 0.3s';
-          targetBlock.style.outline = '2px solid var(--accent)';
-          targetBlock.style.boxShadow = '0 0 12px var(--accent-bg)';
-          setTimeout(() => {
-            targetBlock.style.outline = 'none';
-            targetBlock.style.boxShadow = 'none';
-          }, 2500);
-        }
-      }, 100);
-    });
   }
 
   _renderEmptyState(container) {

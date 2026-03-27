@@ -4,7 +4,7 @@
  */
 
 import { state, saveExportCollection } from '../store/state.js';
-import { exportAsText, exportAsMarkdown, exportAsHTML, downloadFile } from '../utils/export.js';
+import { exportAsText, exportAsMarkdown, exportAsHTML, downloadFile, encodeUTF8 } from '../utils/export.js';
 import { formatTimestamp, formatDate } from '../utils/time.js';
 import JSZip from 'jszip';
 
@@ -15,7 +15,7 @@ export class ExportPanel {
       includeThinking: true,
       includeToolUse: false,
       includeFlags: false,
-      addBOM: false,
+      addBOM: true,
       filePrefix: '',
       fileSuffix: '',
     };
@@ -444,7 +444,8 @@ export class ExportPanel {
     const prefix = this.options.filePrefix ? this.options.filePrefix + '_' : '';
     const suffix = this.options.fileSuffix ? '_' + this.options.fileSuffix : '';
     const extMap = { md: '.md', txt: '.txt', html: '.html', json: '.json' };
-    return `${prefix}${nameBase}_${dateSuffix}${suffix}${extMap[this.format] || '.md'}`;
+    const safeBase = this._sanitizeFilename(nameBase);
+    return `${prefix}${safeBase}_${dateSuffix}${suffix}${extMap[this.format] || '.md'}`;
   }
 
   _exportContent(conversations) {
@@ -457,16 +458,12 @@ export class ExportPanel {
     }
   }
 
-  _addBOM(content) {
-    return this.options.addBOM ? '\uFEFF' + content : content;
-  }
-
   _doExport(conversations) {
     const nameBase = conversations.length === 1 ? (conversations[0].name || '对话') : '对话导出';
-    const content = this._addBOM(this._exportContent(conversations));
+    const content = this._exportContent(conversations);
     const filename = this._buildFilename(nameBase);
     const mimeMap = { md: 'text/markdown', txt: 'text/plain', html: 'text/html', json: 'application/json' };
-    downloadFile(content, filename, (mimeMap[this.format] || 'text/plain') + ';charset=utf-8');
+    downloadFile(content, filename, (mimeMap[this.format] || 'text/plain') + ';charset=utf-8', this.options.addBOM);
   }
 
   async _doZipExport(conversations) {
@@ -477,7 +474,7 @@ export class ExportPanel {
 
     for (let i = 0; i < conversations.length; i++) {
       const conv = conversations[i];
-      const name = (conv.name || '未命名_' + i).replace(/[/\\?%*:|"<>]/g, '_');
+      const name = this._sanitizeFilename(conv.name || '未命名_' + i);
       let content;
       switch (this.format) {
         case 'txt': content = exportAsText([conv], options); break;
@@ -485,8 +482,8 @@ export class ExportPanel {
         case 'json': content = JSON.stringify([conv], null, 2); break;
         default: content = exportAsMarkdown([conv], options); break;
       }
-      if (this.options.addBOM) content = '\uFEFF' + content;
-      zip.file(name + ext, content);
+      const isText = ['txt', 'md', 'json'].includes(this.format);
+      zip.file(name + ext, isText ? encodeUTF8(content, this.options.addBOM) : content);
     }
 
     const blob = await zip.generateAsync({ type: 'blob' });
@@ -523,5 +520,9 @@ export class ExportPanel {
 
     btn.addEventListener('click', onClick);
     return btn;
+  }
+
+  _sanitizeFilename(name) {
+    return (name || '对话').replace(/[/\\?%*:|"<>]/g, '_').trim().slice(0, 120) || '对话';
   }
 }

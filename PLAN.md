@@ -131,3 +131,10 @@ git add src/ && git add -f dist/index.html
 git commit -m "描述"
 git push origin main   # GitHub Actions自动部署到Pages
 ```
+
+## 构建链备注
+- 当前依赖组合是 `vite@8.0.1` + `rollup@4.60.0` + `vite-plugin-singlefile@2.3.2`
+- 构建时出现的 `inlineDynamicImports` 废弃警告来自 `vite-plugin-singlefile` 内部实现，不是本项目业务代码显式写错
+- 目前该 warning 不影响构建成功，也不影响单文件 `dist/index.html` 产物可用
+- 短期建议：保留现状，先接受 warning
+- 中期建议：后续统一升级构建链时，再评估升级插件或将单文件打包逻辑本地化维护

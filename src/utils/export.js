@@ -87,30 +87,25 @@ export function exportAsMarkdown(conversations, options = {}) {
       for (const block of msg.contentBlocks) {
         switch (block.type) {
           case 'text':
-            output += block.text + '\n\n';
+            output += toMarkdownCodeBlock(block.text) + '\n\n';
             break;
           case 'thinking':
             if (includeThinking && block.thinking) {
               const dur = block.durationText ? ` (${block.durationText})` : '';
-              output += `> \uD83D\uDCAD **思考过程**${dur}\n>\n`;
-              const lines = block.thinking.split('\n');
-              for (const line of lines) {
-                output += `> ${line}\n`;
-              }
-              output += '\n';
+              output += `> \uD83D\uDCAD **思考过程**${dur}\n\n`;
+              output += toMarkdownCodeBlock(block.thinking) + '\n\n';
             }
             break;
           case 'tool_use':
             if (includeToolUse) {
-              output += `> \uD83D\uDD27 **工具: ${block.toolName}**\n>\n`;
+              output += `> \uD83D\uDD27 **工具: ${block.toolName}**\n\n`;
               if (block.toolInput && Object.keys(block.toolInput).length > 0) {
-                output += `> Input: \`${JSON.stringify(block.toolInput)}\`\n`;
+                output += toMarkdownCodeBlock(JSON.stringify(block.toolInput, null, 2)) + '\n\n';
               }
               if (block.result) {
                 const resultStr = typeof block.result === 'string' ? block.result : JSON.stringify(block.result);
-                output += `>\n> Result: ${resultStr.substring(0, 500)}${resultStr.length > 500 ? '...' : ''}\n`;
+                output += toMarkdownCodeBlock(resultStr.substring(0, 500) + (resultStr.length > 500 ? '...' : '')) + '\n\n';
               }
-              output += '\n';
             }
             break;
           case 'flag':
@@ -130,6 +125,14 @@ export function exportAsMarkdown(conversations, options = {}) {
   }
 
   return output;
+}
+
+function toMarkdownCodeBlock(text) {
+  const content = text || '';
+  const matches = Array.from(content.matchAll(/`{3,}/g));
+  const fenceLength = matches.length > 0 ? Math.max(...matches.map(m => m[0].length)) + 1 : 3;
+  const fence = '`'.repeat(fenceLength);
+  return `${fence}text\n${content}\n${fence}`;
 }
 
 /**
@@ -222,10 +225,26 @@ function escapeForAttr(str) {
 }
 
 /**
+ * Encode string as UTF-8 byte array, optionally with BOM.
+ */
+export function encodeUTF8(content, addBOM = true) {
+  const encoder = new TextEncoder();
+  const contentBytes = encoder.encode(content);
+  if (!addBOM) return contentBytes;
+  const bom = new Uint8Array([0xEF, 0xBB, 0xBF]);
+  const result = new Uint8Array(bom.length + contentBytes.length);
+  result.set(bom, 0);
+  result.set(contentBytes, bom.length);
+  return result;
+}
+
+/**
  * Download content as a file.
  */
-export function downloadFile(content, filename, mimeType = 'text/plain;charset=utf-8') {
-  const blob = new Blob([content], { type: mimeType });
+export function downloadFile(content, filename, mimeType = 'text/plain;charset=utf-8', addBOM = true) {
+  const isText = /text|json|markdown/.test(mimeType);
+  const data = isText ? encodeUTF8(content, addBOM) : content;
+  const blob = new Blob([data], { type: mimeType });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;

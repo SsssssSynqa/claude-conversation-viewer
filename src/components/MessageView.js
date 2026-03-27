@@ -17,14 +17,26 @@ export class MessageView {
     this.statsPanel = new StatsPanel();
     this.selectedIndices = new Set();
     this.selectMode = false;
+    this.unsubscribers = [];
+    this.activeExportDropdown = null;
+    this.handleDocumentClick = (e) => {
+      if (!this.activeExportDropdown) return;
+      if (this.activeExportDropdown.wrapper.contains(e.target)) return;
+      this.activeExportDropdown.dropdown.classList.add('hidden');
+      this.activeExportDropdown = null;
+    };
+    document.addEventListener('click', this.handleDocumentClick);
     this.render();
-    state.on('currentConversationIndex', () => { this.selectedIndices.clear(); this.selectMode = false; this.renderConversation(); });
-    state.on('showThinking', () => this.renderConversation());
-    state.on('showToolUse', () => this.renderConversation());
-    state.on('showFlags', () => this.renderConversation());
-    state.on('displayNames', () => this.renderConversation());
-    state.on('desensitize', () => this.renderConversation());
-    state.on('desensitizeWords', () => { if (state.get('desensitize')) this.renderConversation(); });
+    this.unsubscribers.push(
+      state.on('currentConversationIndex', () => { this.selectedIndices.clear(); this.selectMode = false; this.renderConversation(); }),
+      state.on('showThinking', () => this.renderConversation()),
+      state.on('showToolUse', () => this.renderConversation()),
+      state.on('showFlags', () => this.renderConversation()),
+      state.on('displayNames', () => this.renderConversation()),
+      state.on('desensitize', () => this.renderConversation()),
+      state.on('desensitizeWords', () => { if (state.get('desensitize')) this.renderConversation(); }),
+      state.on('highlightMessageIndex', () => this._applyHighlightFromState()),
+    );
   }
 
   render() {
@@ -140,7 +152,15 @@ export class MessageView {
     exportWrapper.style.cssText = 'position:relative;';
     const exportBtn = this._headerBtn('导出此对话', 'export');
     exportBtn.appendChild(document.createTextNode(' \u25BE'));
-    exportBtn.addEventListener('click', (e) => { e.stopPropagation(); exportWrapper.querySelector('.export-dropdown').classList.toggle('hidden'); });
+    exportBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const willOpen = dropdown.classList.contains('hidden');
+      if (this.activeExportDropdown && this.activeExportDropdown.dropdown !== dropdown) {
+        this.activeExportDropdown.dropdown.classList.add('hidden');
+      }
+      dropdown.classList.toggle('hidden');
+      this.activeExportDropdown = willOpen ? { wrapper: exportWrapper, dropdown } : null;
+    });
     exportWrapper.appendChild(exportBtn);
 
     const dropdown = document.createElement('div');
@@ -152,11 +172,15 @@ export class MessageView {
       item.textContent = fmt.label;
       item.addEventListener('mouseenter', () => item.style.background = 'var(--bg-card-hover)');
       item.addEventListener('mouseleave', () => item.style.background = '');
-      item.addEventListener('click', (e) => { e.stopPropagation(); dropdown.classList.add('hidden'); this._quickExportConversation(conv, fmt.key); });
+      item.addEventListener('click', (e) => {
+        e.stopPropagation();
+        dropdown.classList.add('hidden');
+        this.activeExportDropdown = null;
+        this._quickExportConversation(conv, fmt.key);
+      });
       dropdown.appendChild(item);
     }
     exportWrapper.appendChild(dropdown);
-    document.addEventListener('click', () => dropdown.classList.add('hidden'));
     headerBtns.appendChild(exportWrapper);
 
     headerTop.appendChild(headerBtns);
@@ -289,6 +313,7 @@ export class MessageView {
 
     this.container.appendChild(scrollContainer);
     if (this.selectMode) this._updateSelectionToolbar(conv);
+    this._applyHighlightFromState();
   }
 
   // ---- Header Button Helper ----
@@ -405,7 +430,7 @@ export class MessageView {
     import('../utils/export.js').then(({ exportAsText, exportAsMarkdown, exportAsHTML, downloadFile }) => {
       const options = { includeThinking: state.get('showThinking'), includeToolUse: state.get('showToolUse'), includeFlags: state.get('showFlags'), displayNames: state.get('displayNames') };
       const dateSuffix = new Date().toISOString().slice(0, 10);
-      const nameBase = conv.name || '对话';
+      const nameBase = this._sanitizeFilename(conv.name || '对话');
       let content, filename, mimeType;
       switch (format) {
         case 'txt': content = exportAsText([conv], options); filename = `${nameBase}_${dateSuffix}.txt`; mimeType = 'text/plain;charset=utf-8'; break;
@@ -425,14 +450,60 @@ export class MessageView {
         const sender = msg.sender === 'human' ? (names.human || 'Human') : (names.assistant || 'Assistant');
         output += `## ${sender} (${formatTimestamp(msg.createdAt)})\n\n`;
         for (const block of msg.contentBlocks) {
-          if (block.type === 'text') output += block.text + '\n\n';
-          else if (block.type === 'thinking' && block.thinking) { output += `> 思考过程\n>\n`; for (const line of block.thinking.split('\n')) output += `> ${line}\n`; output += '\n'; }
+          if (block.type === 'text') output += this._toMarkdownCodeBlock(block.text) + '\n\n';
+          else if (block.type === 'thinking' && block.thinking) output += `> 思考过程\n\n${this._toMarkdownCodeBlock(block.thinking)}\n\n`;
         }
         output += '---\n\n';
       }
       const dateSuffix = new Date().toISOString().slice(0, 10);
-      downloadFile(output, `${conv.name || '对话'}_节选_${dateSuffix}.md`, 'text/markdown;charset=utf-8');
+      const safeName = this._sanitizeFilename(conv.name || '对话');
+      downloadFile(output, `${safeName}_节选_${dateSuffix}.md`, 'text/markdown;charset=utf-8');
     });
+  }
+
+  _sanitizeFilename(name) {
+    return (name || '对话').replace(/[/\\?%*:|"<>]/g, '_').trim().slice(0, 120) || '对话';
+  }
+
+  _toMarkdownCodeBlock(text) {
+    const content = text || '';
+    const matches = Array.from(content.matchAll(/`{3,}/g));
+    const fenceLength = matches.length > 0 ? Math.max(...matches.map(m => m[0].length)) + 1 : 3;
+    const fence = '`'.repeat(fenceLength);
+    return `${fence}text\n${content}\n${fence}`;
+  }
+
+  _applyHighlightFromState() {
+    const msgIndex = state.get('highlightMessageIndex');
+    if (msgIndex === undefined || msgIndex === null || msgIndex < 0) return;
+
+    requestAnimationFrame(() => {
+      const messagesScroll = this.container.querySelector('.messages-scroll');
+      if (!messagesScroll) return;
+
+      const messageBlocks = messagesScroll.querySelectorAll('.message-block');
+      const targetBlock = messageBlocks[msgIndex];
+      if (!targetBlock) return;
+
+      targetBlock.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      targetBlock.style.transition = 'box-shadow 0.3s, outline 0.3s';
+      targetBlock.style.outline = '2px solid var(--accent)';
+      targetBlock.style.boxShadow = '0 0 12px var(--accent-bg)';
+
+      setTimeout(() => {
+        targetBlock.style.outline = 'none';
+        targetBlock.style.boxShadow = 'none';
+      }, 2500);
+
+      state.set('highlightMessageIndex', null);
+    });
+  }
+
+  destroy() {
+    for (const unsubscribe of this.unsubscribers) unsubscribe();
+    this.unsubscribers = [];
+    document.removeEventListener('click', this.handleDocumentClick);
+    this.activeExportDropdown = null;
   }
 
   // ---- Content Renderers ----

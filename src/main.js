@@ -434,6 +434,7 @@ function renderMainView() {
     } else if (mode === 'export') {
       exportPanel.render(area);
     } else {
+      messageView?.destroy?.();
       messageView = new MessageView(area);
     }
   });
