@@ -18,7 +18,10 @@ html {
 
 body {
   font-family: var(--font-family);
-  background: var(--bg-primary);
+  background:
+    radial-gradient(circle at top left, rgba(255, 255, 255, 0.06), transparent 18%),
+    radial-gradient(circle at bottom right, rgba(217, 118, 87, 0.03), transparent 14%),
+    var(--bg-primary);
   color: var(--text-primary);
   min-height: 100vh;
   transition: background-color var(--transition), color var(--transition);
@@ -30,7 +33,10 @@ body {
 /* Theme backgrounds */
 [data-theme="dark"] body,
 [data-theme="auto"] body {
-  background: #2a2a2e;
+  background:
+    radial-gradient(circle at top left, rgba(255, 255, 255, 0.004), transparent 12%),
+    radial-gradient(circle at bottom right, rgba(227, 139, 104, 0.018), transparent 14%),
+    #1f2126;
 }
 
 /* Neumorphic styles for light/dark */
@@ -38,7 +44,7 @@ body {
 [data-theme="light"] .name-config,
 [data-theme="dark"] .upload-zone,
 [data-theme="dark"] .name-config {
-  background: var(--bg-primary);
+  background: var(--surface-raised);
 }
 
 [data-theme="light"] .upload-zone:hover,
@@ -126,11 +132,12 @@ body {
   flex: 1;
   height: 100vh;
   overflow: hidden;
+  gap: 10px;
 }
 
 .sidebar {
   width: var(--sidebar-width);
-  background: var(--bg-primary);
+  background: var(--surface-raised);
   border: none;
   border-radius: 24px;
   box-shadow: var(--shadow);
@@ -139,7 +146,8 @@ body {
   overflow: hidden;
   flex-shrink: 0;
   transition: width var(--transition);
-  margin: 12px;
+  margin: 12px 0 12px 12px;
+  position: relative;
 }
 .sidebar ::-webkit-scrollbar { width: 4px; }
 .sidebar ::-webkit-scrollbar-track { background: transparent; margin: 8px 0; }
@@ -156,16 +164,17 @@ body {
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  background: var(--bg-primary);
+  background: transparent;
+  padding: 0 14px 0 4px;
 }
 
 .content-area > * {
-  max-width: 640px;
+  max-width: 720px;
   margin-left: auto;
   margin-right: auto;
   width: 100%;
-  padding-left: 32px;
-  padding-right: 32px;
+  padding-left: 20px;
+  padding-right: 20px;
 }
 
 /* ---- Upload Screen ---- */
@@ -175,7 +184,7 @@ body {
   align-items: center;
   justify-content: flex-start;
   min-height: 100vh;
-  padding: 24px 24px 24px;
+  padding: 18px 18px 20px;
   padding-top: 15vh;
   gap: 16px;
   overflow-y: auto;
@@ -185,7 +194,7 @@ body {
   width: 100%;
   max-width: 504px;
   border: none;
-  border-radius: 20px;
+  border-radius: 16px;
   text-align: center;
   cursor: pointer;
   transition: box-shadow 0.2s, transform 0.2s;
@@ -214,8 +223,8 @@ body {
   width: 100%;
   max-width: 504px;
   background: var(--bg-card);
-  padding: 16px 20px;
-  border-radius: 20px;
+  padding: 14px 16px;
+  border-radius: 16px;
   border: none;
   box-shadow: var(--shadow);
   transition: box-shadow 0.2s, transform 0.2s;
@@ -359,9 +368,9 @@ button {
 
 /* ---- Sidebar Pills (Neumorphic) ---- */
 .sidebar-pill {
-  height: 48px;
-  border-radius: 16px;
-  padding: 0 16px;
+  min-height: 46px;
+  border-radius: 15px;
+  padding: 0 15px;
   box-sizing: border-box;
   display: flex;
   align-items: center;
@@ -374,23 +383,25 @@ button {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   border: none;
   font-family: var(--font-family);
-  background: none;
+  background: var(--surface-soft);
   text-align: left;
 }
 
 .sidebar-pill.pill-flat {
   box-shadow: none;
-  background-color: transparent;
-  border: 1px solid transparent;
+  border: none;
+  background: transparent;
 }
 
 .sidebar-pill.pill-flat:hover {
-  background-color: rgba(255, 255, 255, 0.4);
+  transform: none;
+  box-shadow: none;
+  background: color-mix(in srgb, var(--surface-soft) 70%, transparent);
   color: var(--accent);
 }
 
 [data-theme="dark"] .sidebar-pill.pill-flat:hover {
-  background-color: rgba(255, 255, 255, 0.04);
+  background-color: rgba(255, 255, 255, 0.02);
 }
 
 .sidebar-pill.pill-flat:hover .nav-icon {
@@ -400,8 +411,8 @@ button {
 .sidebar-pill.pill-active {
   box-shadow: var(--shadow-inset);
   color: var(--accent);
-  border: 1px solid transparent;
-  background: var(--bg-card);
+  background: var(--surface-inset);
+  transform: none;
 }
 
 .sidebar-pill.pill-active .nav-icon {
@@ -437,10 +448,16 @@ button {
   color: var(--accent);
 }
 .fold-content {
-  padding: 12px 16px 4px 16px;
+  padding: 12px 14px 6px 14px;
   display: flex;
   flex-direction: column;
   gap: 14px;
+  margin-top: 8px;
+  margin-bottom: 4px;
+  border-radius: 16px;
+  background: var(--surface-inset);
+  box-shadow: var(--shadow-inset);
+  border: none;
 }
 
 /* Toggle track */
@@ -450,25 +467,26 @@ button {
   padding: 4px !important;
   gap: 0 !important;
   cursor: default;
-  background: var(--bg-card);
-  height: 48px;
-  border-radius: 16px;
+  background: var(--surface-inset);
+  height: 46px;
+  border-radius: 15px;
   display: flex;
   align-items: center;
+  border: none;
 }
 .toggle-thumb {
   position: absolute;
   top: 4px;
   bottom: 4px;
   left: 4px;
-  border-radius: 12px;
-  background: var(--bg-primary);
-  box-shadow: var(--shadow);
+  border-radius: 11px;
+  background: var(--surface-raised);
+  box-shadow: 4px 4px 8px rgba(0,0,0,0.06), -2px -2px 4px rgba(255,255,255,0.08);
   transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
   z-index: 1;
 }
-.track-3 > .toggle-thumb { width: calc(33.333% - 5.33px); }
-.track-2 > .toggle-thumb { width: calc(50% - 6px); }
+.track-3 > .toggle-thumb { width: calc((100% - 8px) / 3); }
+.track-2 > .toggle-thumb { width: calc((100% - 8px) / 2); }
 .toggle-option {
   flex: 1;
   display: flex;
@@ -496,7 +514,7 @@ button {
 .neu-switch {
   width: 38px;
   height: 20px;
-  background-color: var(--bg-primary);
+  background-color: var(--bg-input);
   border-radius: 10px;
   box-shadow: var(--shadow-inset);
   position: relative;
@@ -512,7 +530,7 @@ button {
   background-color: var(--bg-card);
   border-radius: 50%;
   transition: all 0.3s cubic-bezier(0.1, 0.9, 0.2, 1);
-  box-shadow: 1px 1px 3px rgba(165,178,196,0.5), -1px -1px 2px rgba(255,255,255,0.8);
+  box-shadow: var(--shadow-xs);
 }
 .neu-switch.active .switch-handle {
   background-color: var(--accent);
@@ -522,9 +540,9 @@ button {
 /* Search input pill */
 .sidebar-pill.pill-input {
   box-shadow: var(--shadow-inset);
-  border: 1px solid transparent;
+  border: none;
   cursor: text;
-  background: var(--bg-card);
+  background: var(--surface-inset);
 }
 .history-search-input {
   flex: 1;
@@ -544,11 +562,11 @@ button {
 /* Neumorphic input */
 .neu-input {
   flex: 1;
-  background-color: var(--bg-primary);
+  background: var(--surface-inset);
   border: none;
-  border-radius: 12px;
+  border-radius: 14px;
   box-shadow: var(--shadow-inset);
-  padding: 8px 12px;
+  padding: 10px 14px;
   color: var(--text-primary);
   font-size: 13px;
   outline: none;
@@ -585,7 +603,7 @@ button {
 /* Sidebar name buttons */
 .sidebar-name-btn {
   flex: 1;
-  padding: 6px 0;
+  padding: 8px 0;
   border: none;
   border-radius: 12px;
   cursor: pointer;
@@ -595,14 +613,171 @@ button {
   transition: all 0.2s ease;
 }
 .sidebar-name-btn.primary {
-  background: var(--accent);
+  background: var(--gradient-header);
   color: #fff;
   box-shadow: var(--shadow-xs);
 }
 .sidebar-name-btn.secondary {
-  background: transparent;
+  background: var(--surface-soft);
   color: var(--text-muted);
-  border: 1px solid var(--border-strong);
+  box-shadow: var(--shadow-xs);
+}
+
+.neu-panel {
+  background: var(--surface-raised);
+  border-radius: 22px;
+  box-shadow: var(--shadow);
+  border: none;
+}
+
+.neu-panel-inset {
+  background: var(--surface-inset);
+  border-radius: 16px;
+  box-shadow: var(--shadow-inset);
+  border: none;
+}
+
+.neu-soft-card {
+  background: var(--surface-raised);
+  border-radius: 18px;
+  box-shadow: var(--shadow-sm);
+  border: none;
+}
+
+.neu-toolbar {
+  background: var(--surface-raised);
+  border-radius: 22px;
+  box-shadow: var(--shadow);
+  border: none;
+}
+
+.neu-action-tile {
+  background: var(--surface-raised);
+  border-radius: 14px;
+  border: none;
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), border-color var(--transition-fast);
+}
+
+.neu-action-tile:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow);
+}
+
+.neu-ghost-btn {
+  padding: 6px 10px;
+  border-radius: 10px;
+  border: none;
+  background: var(--surface-raised);
+  color: var(--text-secondary);
+  box-shadow: var(--shadow-xs);
+}
+
+.neu-primary-btn {
+  padding: 6px 10px;
+  border-radius: 10px;
+  border: none;
+  background: var(--gradient-header);
+  color: #fff;
+  box-shadow: var(--shadow-xs);
+}
+
+[data-theme="dark"] .toggle-thumb,
+[data-theme="auto"] .toggle-thumb {
+  background: var(--surface-raised);
+  box-shadow: 4px 4px 8px rgba(0,0,0,0.22), -2px -2px 4px rgba(255,255,255,0.018);
+}
+
+[data-theme="dark"] .sidebar,
+[data-theme="dark"] .upload-zone,
+[data-theme="dark"] .name-config,
+[data-theme="dark"] .neu-panel,
+[data-theme="dark"] .neu-toolbar,
+[data-theme="dark"] .neu-soft-card,
+[data-theme="dark"] .neu-action-tile,
+[data-theme="dark"] .neu-ghost-btn,
+[data-theme="auto"] .sidebar,
+[data-theme="auto"] .upload-zone,
+[data-theme="auto"] .name-config,
+[data-theme="auto"] .neu-panel,
+[data-theme="auto"] .neu-toolbar,
+[data-theme="auto"] .neu-soft-card,
+[data-theme="auto"] .neu-action-tile,
+[data-theme="auto"] .neu-ghost-btn {
+  border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+[data-theme="dark"] .toggle-track,
+[data-theme="dark"] .fold-content,
+[data-theme="dark"] .sidebar-pill.pill-input,
+[data-theme="dark"] .neu-panel-inset,
+[data-theme="auto"] .toggle-track,
+[data-theme="auto"] .fold-content,
+[data-theme="auto"] .sidebar-pill.pill-input,
+[data-theme="auto"] .neu-panel-inset {
+  border: 1px solid rgba(255, 255, 255, 0.02);
+}
+
+[data-theme="dark"] .neu-action-tile,
+[data-theme="dark"] .neu-ghost-btn,
+[data-theme="dark"] .neu-primary-btn,
+[data-theme="auto"] .neu-action-tile,
+[data-theme="auto"] .neu-ghost-btn,
+[data-theme="auto"] .neu-primary-btn {
+  background-image: none;
+}
+
+[data-theme="dark"] .neu-action-tile,
+[data-theme="auto"] .neu-action-tile {
+  box-shadow: var(--shadow-sm);
+}
+
+[data-theme="dark"] .neu-action-tile:hover,
+[data-theme="auto"] .neu-action-tile:hover {
+  box-shadow: var(--shadow);
+}
+
+[data-theme="dark"] .neu-ghost-btn,
+[data-theme="auto"] .neu-ghost-btn {
+  box-shadow: var(--shadow-xs);
+}
+
+[data-theme="dark"] .neu-primary-btn,
+[data-theme="auto"] .neu-primary-btn {
+  box-shadow: var(--shadow-xs);
+}
+
+.panel-section-title {
+  font-size: 0.76rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--text-muted);
+  font-weight: 700;
+  margin-bottom: 14px;
+}
+
+.search-stats-strip {
+  background: var(--surface-soft);
+  border-radius: 18px;
+  box-shadow: var(--shadow-xs);
+}
+
+.content-shell {
+  padding-top: 14px;
+  padding-bottom: 20px;
+}
+
+.conversation-list-scroll {
+  mask-image: linear-gradient(to bottom, transparent 0, black 12px, black calc(100% - 12px), transparent 100%);
+}
+
+.conversation-list-item .nav-icon {
+  display: none;
+}
+
+.conversation-list-item {
+  align-items: stretch;
+  gap: 6px;
 }
 
 /* ---- Responsive ---- */
@@ -627,5 +802,26 @@ button {
   }
   .name-inputs {
     flex-direction: column;
+  }
+
+  .content-area > * {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  .sidebar-actions {
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+
+  .sidebar-pill {
+    min-height: 46px;
+    border-radius: 16px;
+    padding: 0 15px;
+  }
+
+  .fold-content {
+    padding: 12px 14px 6px;
+    gap: 12px;
   }
 }

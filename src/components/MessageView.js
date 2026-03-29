@@ -37,6 +37,7 @@ export class MessageView {
       state.on('desensitize', () => this.renderConversation()),
       state.on('desensitizeWords', () => { if (state.get('desensitize')) this.renderConversation(); }),
       state.on('highlightMessageIndex', () => this._applyHighlightFromState()),
+      state.on('exportCollection', () => this.renderConversation()),
     );
   }
 
@@ -70,13 +71,17 @@ export class MessageView {
     const showThinking = state.get('showThinking');
     const showToolUse = state.get('showToolUse');
     const showFlags = state.get('showFlags');
+    const collection = state.get('exportCollection') || [];
+    const allMessageKeys = conv.messages.map((_, i) => conv.uuid + ':' + i);
+    const allInCollection = allMessageKeys.length > 0 && allMessageKeys.every(key => collection.some(item => item.key === key));
 
     this.container.textContent = '';
     this._removeSelectionToolbar();
 
     // ---- Header ----
     const header = document.createElement('div');
-    header.style.cssText = 'padding:16px 24px;border-bottom:1px solid var(--border);flex-shrink:0;';
+    header.className = 'message-header-card';
+    header.style.cssText = 'flex-shrink:0;';
 
     const headerTop = document.createElement('div');
     headerTop.style.cssText = 'display:flex;justify-content:space-between;align-items:flex-start;gap:12px;';
@@ -108,7 +113,7 @@ export class MessageView {
 
     // Header buttons
     const headerBtns = document.createElement('div');
-    headerBtns.style.cssText = 'display:flex;gap:6px;flex-shrink:0;align-items:center;';
+    headerBtns.style.cssText = 'display:flex;gap:8px;flex-shrink:0;align-items:center;flex-wrap:wrap;justify-content:flex-end;';
 
     // Toggle switch — pill shape with sliding circle
     const toggleOuter = document.createElement('div');
@@ -135,7 +140,7 @@ export class MessageView {
     headerBtns.appendChild(toggleOuter);
 
     // Add all to collection
-    const addAllBtn = this._headerBtn(t('msgView.addToCollection'), 'star', () => {
+    const addAllBtn = this._headerBtn(allInCollection ? t('msgView.addedToCollection') : t('msgView.addToCollection'), allInCollection ? 'check' : 'star', () => {
       const collection = state.get('exportCollection') || [];
       for (let i = 0; i < conv.messages.length; i++) {
         const msg = conv.messages[i];
@@ -197,6 +202,8 @@ export class MessageView {
 
     for (let mi = 0; mi < conv.messages.length; mi++) {
       const msg = conv.messages[mi];
+      const msgKey = conv.uuid + ':' + mi;
+      const isCollected = collection.some(item => item.key === msgKey);
 
       // Time separator
       if (prevTimestamp && msg.createdAt) {
@@ -216,7 +223,7 @@ export class MessageView {
       const msgEl = document.createElement('div');
       msgEl.className = 'message-block ' + (isHuman ? 'message-human' : 'message-assistant');
       msgEl.dataset.msgIndex = mi;
-      msgEl.style.cssText = 'padding:12px 24px;background:' + (isHuman ? 'var(--message-human-bg)' : 'var(--message-assistant-bg)') + ';border-bottom:1px solid var(--separator-color);position:relative;';
+      msgEl.style.cssText = 'position:relative;background:' + (isHuman ? 'var(--message-human-bg)' : 'var(--message-assistant-bg)') + ';';
 
       // Selection checkbox (only in select mode)
       if (this.selectMode) {
@@ -276,7 +283,7 @@ export class MessageView {
 
       // ---- Message Footer: timestamp + action buttons ----
       const footer = document.createElement('div');
-      footer.style.cssText = 'display:flex;justify-content:space-between;align-items:center;margin-top:8px;opacity:0;transition:opacity 0.15s;';
+      footer.style.cssText = 'display:flex;justify-content:space-between;align-items:center;margin-top:12px;opacity:0.55;transition:opacity 0.15s;';
 
       const timeEl = document.createElement('span');
       timeEl.style.cssText = 'font-size:0.72rem;color:var(--text-muted);';
@@ -287,7 +294,8 @@ export class MessageView {
       actionBtns.style.cssText = 'display:flex;gap:4px;';
 
       actionBtns.appendChild(this._createActionBtn('复制', () => this._copyMessage(msg)));
-      actionBtns.appendChild(this._createActionBtn('+精选', () => {
+      actionBtns.appendChild(this._createActionBtn(isCollected ? '已精选' : '+精选', () => {
+        if (isCollected) return;
         this._addToCollection(conv, mi, msg);
         // Auto enter select mode and select this message
         if (!this.selectMode) {
@@ -295,7 +303,7 @@ export class MessageView {
           this.selectedIndices.add(mi);
           this.renderConversation();
         }
-      }));
+      }, isCollected));
       actionBtns.appendChild(this._createActionBtn('选择到这里', () => {
         if (!this.selectMode) { this.selectMode = true; }
         this._selectToHere(mi, conv);
@@ -320,7 +328,8 @@ export class MessageView {
   // ---- Header Button Helper ----
   _headerBtn(text, iconName, onClick) {
     const btn = document.createElement('button');
-    btn.style.cssText = 'padding:5px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);background:transparent;color:var(--text-secondary);cursor:pointer;font-size:0.78rem;white-space:nowrap;transition:all 0.15s;display:flex;align-items:center;gap:4px;';
+    btn.className = 'neu-ghost-btn';
+    btn.style.cssText = 'font-size:0.78rem;white-space:nowrap;transition:all 0.15s;display:flex;align-items:center;gap:4px;';
     if (iconName) btn.appendChild(createIcon(iconName, 13));
     btn.appendChild(document.createTextNode(' ' + text));
     btn.addEventListener('mouseenter', () => { btn.style.borderColor = 'var(--accent)'; btn.style.color = 'var(--accent)'; });
@@ -330,12 +339,23 @@ export class MessageView {
   }
 
   // ---- Action Buttons ----
-  _createActionBtn(text, onClick) {
+  _createActionBtn(text, onClick, active = false) {
     const btn = document.createElement('button');
-    btn.style.cssText = 'padding:2px 8px;border:1px solid var(--border);border-radius:4px;background:var(--bg-card);color:var(--text-muted);cursor:pointer;font-size:0.7rem;transition:all 0.15s;white-space:nowrap;';
+    btn.className = 'neu-ghost-btn';
+    btn.style.cssText = 'padding:4px 10px;font-size:0.7rem;transition:all 0.15s;white-space:nowrap;';
     btn.textContent = text;
+    if (active) {
+      btn.dataset.active = 'true';
+      btn.style.color = 'var(--accent)';
+      btn.style.borderColor = 'var(--accent)';
+    }
     btn.addEventListener('mouseenter', () => { btn.style.borderColor = 'var(--accent)'; btn.style.color = 'var(--accent)'; });
-    btn.addEventListener('mouseleave', () => { btn.style.borderColor = 'var(--border)'; btn.style.color = 'var(--text-muted)'; });
+    btn.addEventListener('mouseleave', () => {
+      if (!btn.dataset.active) {
+        btn.style.borderColor = 'var(--border)';
+        btn.style.color = 'var(--text-muted)';
+      }
+    });
     btn.addEventListener('click', (e) => { e.stopPropagation(); onClick(); });
     return btn;
   }
@@ -374,7 +394,8 @@ export class MessageView {
 
     const toolbar = document.createElement('div');
     toolbar.id = 'selection-toolbar';
-    toolbar.style.cssText = 'position:absolute;bottom:0;left:0;right:0;padding:12px 24px;background:var(--bg-secondary);border-top:2px solid var(--accent);display:flex;align-items:center;gap:12px;z-index:50;box-shadow:0 -4px 12px rgba(0,0,0,0.1);';
+    toolbar.className = 'selection-toolbar';
+    toolbar.style.cssText = 'display:flex;align-items:center;gap:12px;z-index:50;';
 
     const info = document.createElement('span');
     info.style.cssText = 'font-size:0.85rem;color:var(--text-primary);font-weight:600;';
@@ -422,7 +443,8 @@ export class MessageView {
 
   _toolbarBtn(text, onClick) {
     const btn = document.createElement('button');
-    btn.style.cssText = 'padding:6px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);background:transparent;color:var(--text-secondary);cursor:pointer;font-size:0.82rem;transition:all 0.15s;white-space:nowrap;';
+    btn.className = 'neu-ghost-btn';
+    btn.style.cssText = 'font-size:0.82rem;transition:all 0.15s;white-space:nowrap;';
     btn.textContent = text;
     btn.addEventListener('click', onClick);
     return btn;

@@ -7,6 +7,7 @@ import { state, resetSidebarFilter } from '../store/state.js';
 import { formatTimestamp } from '../utils/time.js';
 import { escapeHtml } from '../utils/markdown.js';
 import { t } from '../i18n.js';
+import { createIcon } from '../utils/icons.js';
 
 export class SearchPanel {
   constructor() {
@@ -27,6 +28,7 @@ export class SearchPanel {
   render(container) {
     clearTimeout(this.searchTimer);
     container.textContent = '';
+    container.className = 'content-shell';
     container.style.cssText = 'flex:1;overflow:hidden;display:flex;flex-direction:column;';
 
     // ---- Search Header ----
@@ -38,6 +40,7 @@ export class SearchPanel {
       flex-shrink: 0;
       background: var(--bg-secondary);
     `;
+    header.classList.add('content-constrained');
 
     const title = document.createElement('h2');
     title.style.cssText = 'font-size:1.15rem;font-weight:600;margin-bottom:16px;color:var(--text-primary);';
@@ -46,28 +49,26 @@ export class SearchPanel {
 
     // Keyword input row
     const searchRow = document.createElement('div');
-    searchRow.style.cssText = 'display:flex;gap:8px;margin-bottom:12px;width:100%;';
+    searchRow.className = 'search-config-row';
+    searchRow.style.cssText = 'margin-bottom:14px;width:100%;';
 
     const searchInput = document.createElement('input');
     searchInput.type = 'text';
     searchInput.placeholder = t('search.placeholder');
     searchInput.id = 'search-panel-input';
+    searchInput.className = 'search-field';
     searchInput.style.cssText = `
       flex: 1;
-      padding: 10px 14px 10px 36px;
-      background: var(--bg-input);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
+      padding: 14px 16px 14px 42px;
       color: var(--text-primary);
-      font-size: 0.9rem;
+      font-size: 0.95rem;
       font-family: var(--font-family);
-      transition: border-color 0.15s;
     `;
     searchInput.addEventListener('focus', () => {
-      searchInput.style.borderColor = 'var(--accent)';
+      inputWrapper.style.boxShadow = 'var(--ring-accent-soft)';
     });
     searchInput.addEventListener('blur', () => {
-      searchInput.style.borderColor = 'var(--border)';
+      inputWrapper.style.boxShadow = 'var(--shadow-inset)';
     });
     searchInput.addEventListener('input', () => {
       clearTimeout(this.searchTimer);
@@ -75,11 +76,13 @@ export class SearchPanel {
     });
 
     const inputWrapper = document.createElement('div');
-    inputWrapper.style.cssText = 'flex:1;position:relative;';
+    inputWrapper.className = 'search-input-shell';
+    inputWrapper.style.cssText = 'flex:1;position:relative;box-shadow:var(--shadow-inset);';
 
     const searchIcon = document.createElement('span');
-    searchIcon.style.cssText = 'position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:0.9rem;pointer-events:none;';
-    searchIcon.textContent = '\uD83D\uDD0D';
+    searchIcon.className = 'search-input-icon';
+    searchIcon.style.cssText = 'position:absolute;left:16px;top:50%;transform:translateY(-50%);color:var(--text-muted);pointer-events:none;display:flex;align-items:center;justify-content:center;';
+    searchIcon.appendChild(createIcon('search', 18));
     inputWrapper.appendChild(searchIcon);
     inputWrapper.appendChild(searchInput);
     searchRow.appendChild(inputWrapper);
@@ -88,7 +91,7 @@ export class SearchPanel {
 
     // ---- Filter Row ----
     const filterRow = document.createElement('div');
-    filterRow.style.cssText = 'display:flex;gap:10px;align-items:center;flex-wrap:wrap;';
+    filterRow.className = 'search-filter-row';
 
     // Date range
     const dateFromInput = this._createDateInput('search-date-from', t('search.startDate'));
@@ -142,15 +145,10 @@ export class SearchPanel {
 
     // Clear filters button
     const clearBtn = document.createElement('button');
+    clearBtn.className = 'neu-ghost-btn';
     clearBtn.style.cssText = `
-      padding: 6px 12px;
-      background: transparent;
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      color: var(--text-muted);
       font-size: 0.8rem;
       cursor: pointer;
-      transition: all 0.15s;
       white-space: nowrap;
     `;
     clearBtn.textContent = t('search.clearFilters');
@@ -171,7 +169,7 @@ export class SearchPanel {
       typeSelect.value = 'all';
       searchInput.value = '';
       this.results = [];
-      this._renderResults(resultsContainer, statsBar);
+      this._renderResults(resultsInner, statsBar);
     });
     filterRow.appendChild(clearBtn);
 
@@ -181,24 +179,29 @@ export class SearchPanel {
     // ---- Stats Bar ----
     const statsBar = document.createElement('div');
     statsBar.id = 'search-stats-bar';
+    statsBar.className = 'search-stats-strip';
     statsBar.style.cssText = `
-      padding: 8px 24px;
+      padding: 12px 18px;
       font-size: 0.8rem;
       color: var(--text-muted);
-      border-bottom: 1px solid var(--border);
       flex-shrink: 0;
       display: none;
+      margin: 12px 0 0;
     `;
+    statsBar.classList.add('content-constrained');
     container.appendChild(statsBar);
 
     // ---- Results Container ----
     const resultsContainer = document.createElement('div');
     resultsContainer.id = 'search-results-container';
-    resultsContainer.style.cssText = 'flex:1;overflow-y:auto;';
+    resultsContainer.style.cssText = 'flex:1;overflow-y:auto;padding:16px 0 8px;';
+    const resultsInner = document.createElement('div');
+    resultsInner.className = 'content-constrained';
+    resultsContainer.appendChild(resultsInner);
     container.appendChild(resultsContainer);
 
     // Show initial empty state
-    this._renderEmptyState(resultsContainer);
+    this._renderEmptyState(resultsInner);
 
     // Focus input
     setTimeout(() => searchInput.focus(), 100);
@@ -292,7 +295,7 @@ export class SearchPanel {
     const resultsContainer = document.getElementById('search-results-container');
     const statsBar = document.getElementById('search-stats-bar');
     if (resultsContainer && statsBar) {
-      this._renderResults(resultsContainer, statsBar);
+      this._renderResults(resultsContainer.firstElementChild || resultsContainer, statsBar);
     }
   }
 
@@ -338,16 +341,7 @@ export class SearchPanel {
       groupEl.style.cssText = 'border-bottom:1px solid var(--border);';
 
       const groupHeader = document.createElement('div');
-      groupHeader.style.cssText = `
-        padding: 10px 24px;
-        font-size: 0.82rem;
-        font-weight: 600;
-        color: var(--accent);
-        background: var(--bg-secondary);
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-      `;
+      groupHeader.className = 'search-result-header';
 
       const groupTitle = document.createElement('span');
       groupTitle.textContent = group.convName;
@@ -365,13 +359,9 @@ export class SearchPanel {
         const item = document.createElement('div');
         item.className = 'search-result-item';
         item.style.cssText = `
-          padding: 12px 24px 12px 36px;
+          padding: 16px 18px;
           cursor: pointer;
-          transition: background 0.15s;
-          border-bottom: 1px solid var(--separator-color);
         `;
-        item.addEventListener('mouseenter', () => item.style.background = 'var(--bg-card-hover)');
-        item.addEventListener('mouseleave', () => item.style.background = '');
 
         // Meta line: sender + time + badges
         const meta = document.createElement('div');
@@ -416,6 +406,7 @@ export class SearchPanel {
 
         // Snippet with highlighted match
         const snippetEl = document.createElement('div');
+        snippetEl.className = 'search-result-snippet';
         snippetEl.style.cssText = 'font-size:0.85rem;color:var(--text-secondary);line-height:1.5;word-break:break-word;';
 
         if (r.query) {
@@ -472,11 +463,12 @@ export class SearchPanel {
 
   _renderEmptyState(container) {
     const empty = document.createElement('div');
-    empty.style.cssText = 'display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--text-muted);gap:12px;padding:40px;';
+    empty.className = 'search-empty-state neu-panel-inset';
+    empty.style.cssText = 'color:var(--text-muted);';
 
     const icon = document.createElement('div');
-    icon.style.cssText = 'font-size:3rem;opacity:0.5;';
-    icon.textContent = '\uD83D\uDD0D';
+    icon.style.cssText = 'width:72px;height:72px;border-radius:22px;display:flex;align-items:center;justify-content:center;color:var(--accent);background:var(--surface-raised);box-shadow:var(--shadow-sm);';
+    icon.appendChild(createIcon('search', 28));
     empty.appendChild(icon);
 
     const text = document.createElement('div');
@@ -494,10 +486,11 @@ export class SearchPanel {
 
   _renderNoResults(container) {
     const empty = document.createElement('div');
-    empty.style.cssText = 'display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--text-muted);gap:12px;padding:40px;';
+    empty.className = 'search-no-results neu-panel-inset';
+    empty.style.cssText = 'color:var(--text-muted);';
 
     const icon = document.createElement('div');
-    icon.style.cssText = 'font-size:2.5rem;opacity:0.5;';
+    icon.style.cssText = 'width:68px;height:68px;border-radius:22px;display:flex;align-items:center;justify-content:center;color:var(--text-muted);background:var(--surface-raised);box-shadow:var(--shadow-sm);';
     icon.textContent = '\uD83D\uDE3F';
     empty.appendChild(icon);
 
@@ -513,11 +506,12 @@ export class SearchPanel {
     const input = document.createElement('input');
     input.type = 'date';
     input.id = id;
+    input.className = 'search-filter-control';
     input.style.cssText = `
-      padding: 6px 10px;
-      background: var(--bg-input);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
+      padding: 10px 12px;
+      background: var(--surface-inset);
+      box-shadow: var(--shadow-inset);
+      border-radius: 14px;
       color: var(--text-secondary);
       font-size: 0.8rem;
       font-family: var(--font-family);
@@ -528,11 +522,12 @@ export class SearchPanel {
   _createSelect(id, options) {
     const select = document.createElement('select');
     select.id = id;
+    select.className = 'search-filter-control';
     select.style.cssText = `
-      padding: 6px 10px;
-      background: var(--bg-input);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
+      padding: 10px 12px;
+      background: var(--surface-inset);
+      box-shadow: var(--shadow-inset);
+      border-radius: 14px;
       color: var(--text-secondary);
       font-size: 0.8rem;
       font-family: var(--font-family);

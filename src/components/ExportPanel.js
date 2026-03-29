@@ -32,26 +32,30 @@ export class ExportPanel {
     // Clean up previous subscription
     this._unsubCollection?.();
     container.textContent = '';
+    container.className = 'content-shell';
     container.style.cssText = 'flex:1;overflow:hidden;display:flex;flex-direction:column;';
 
     // Header
     const header = document.createElement('div');
-    header.style.cssText = 'padding:20px 24px 16px;border-bottom:1px solid var(--border);flex-shrink:0;background:var(--bg-secondary);';
+    header.className = 'export-panel-header';
+    header.style.cssText = 'padding:14px 16px 12px;flex-shrink:0;background:transparent;';
+    header.classList.add('content-constrained');
 
     const title = document.createElement('h2');
-    title.style.cssText = 'font-size:1.15rem;font-weight:600;color:var(--text-primary);margin-bottom:12px;';
+    title.style.cssText = 'font-size:1rem;font-weight:600;color:var(--text-primary);margin-bottom:10px;';
     title.textContent = t('export.title');
     header.appendChild(title);
 
     // Format + Options row
     const configRow = document.createElement('div');
-    configRow.style.cssText = 'display:flex;gap:16px;align-items:center;flex-wrap:wrap;';
+    configRow.style.cssText = 'display:flex;gap:12px;align-items:center;flex-wrap:wrap;';
 
     // Format selector
     const formatGroup = document.createElement('div');
-    formatGroup.style.cssText = 'display:flex;gap:6px;align-items:center;';
+    formatGroup.className = 'export-toolbar-group';
+    formatGroup.style.cssText = 'display:flex;gap:4px;align-items:center;';
     const formatLabel = document.createElement('span');
-    formatLabel.style.cssText = 'font-size:0.8rem;color:var(--text-muted);';
+    formatLabel.style.cssText = 'font-size:0.74rem;color:var(--text-muted);';
     formatLabel.textContent = t('export.format');
     formatGroup.appendChild(formatLabel);
 
@@ -63,29 +67,24 @@ export class ExportPanel {
     ];
     for (const fmt of formats) {
       const btn = document.createElement('button');
+      btn.className = 'export-format-btn' + (fmt.value === this.format ? ' active' : '');
       btn.dataset.format = fmt.value;
-      btn.style.cssText = 'padding:4px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);background:' + (fmt.value === this.format ? 'var(--accent-bg)' : 'transparent') + ';color:' + (fmt.value === this.format ? 'var(--accent)' : 'var(--text-secondary)') + ';cursor:pointer;font-size:0.8rem;transition:all 0.15s;';
-      if (fmt.value === this.format) btn.style.borderColor = 'var(--accent)';
+      btn.style.cssText = 'font-size:0.74rem;';
       btn.textContent = fmt.label;
       btn.addEventListener('click', () => {
         this.format = fmt.value;
         formatGroup.querySelectorAll('button').forEach(b => {
           const active = b.dataset.format === this.format;
-          b.style.background = active ? 'var(--accent-bg)' : 'transparent';
-          b.style.color = active ? 'var(--accent)' : 'var(--text-secondary)';
-          b.style.borderColor = active ? 'var(--accent)' : 'var(--border)';
+          b.classList.toggle('active', active);
         });
       });
       formatGroup.appendChild(btn);
     }
     configRow.appendChild(formatGroup);
 
-    // Separator
-    const sep = document.createElement('span');
-    sep.style.cssText = 'width:1px;height:20px;background:var(--border);';
-    configRow.appendChild(sep);
-
-    // Options toggles (inline)
+    // Options toggles (plain inline)
+    const optionsRow = document.createElement('div');
+    optionsRow.style.cssText = 'display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:0 2px;';
     const optToggles = [
       { key: 'includeThinking', label: t('export.includeThinking') },
       { key: 'includeToolUse', label: t('export.includeTools') },
@@ -94,7 +93,7 @@ export class ExportPanel {
     ];
     for (const opt of optToggles) {
       const label = document.createElement('label');
-      label.style.cssText = 'display:flex;align-items:center;gap:4px;font-size:0.8rem;color:var(--text-secondary);cursor:pointer;';
+      label.style.cssText = 'display:flex;align-items:center;gap:4px;font-size:0.76rem;color:var(--text-secondary);cursor:pointer;';
       const input = document.createElement('input');
       input.type = 'checkbox';
       input.checked = this.options[opt.key];
@@ -102,36 +101,40 @@ export class ExportPanel {
       input.addEventListener('change', () => { this.options[opt.key] = input.checked; });
       label.appendChild(input);
       label.appendChild(document.createTextNode(opt.label));
-      configRow.appendChild(label);
+      optionsRow.appendChild(label);
     }
+    configRow.appendChild(optionsRow);
 
     header.appendChild(configRow);
 
     // File naming row
     const nameRow = document.createElement('div');
-    nameRow.style.cssText = 'display:flex;gap:8px;align-items:center;margin-top:10px;';
+    nameRow.className = 'export-toolbar-group';
+    nameRow.style.cssText = 'display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap;';
 
     const prefixLabel = document.createElement('span');
-    prefixLabel.style.cssText = 'font-size:0.8rem;color:var(--text-muted);';
+    prefixLabel.style.cssText = 'font-size:0.75rem;color:var(--text-muted);';
     prefixLabel.textContent = t('export.filePrefix');
     nameRow.appendChild(prefixLabel);
 
     const prefixInput = document.createElement('input');
     prefixInput.type = 'text';
     prefixInput.placeholder = t('export.optional');
-    prefixInput.style.cssText = 'padding:4px 8px;background:var(--bg-input);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);font-size:0.8rem;width:100px;';
+    prefixInput.className = 'export-mini-input';
+    prefixInput.style.cssText = 'padding:6px 8px;background:var(--surface-inset);box-shadow:var(--shadow-inset);border-radius:10px;color:var(--text-primary);font-size:0.76rem;width:92px;';
     prefixInput.addEventListener('input', () => { this.options.filePrefix = prefixInput.value; });
     nameRow.appendChild(prefixInput);
 
     const suffixLabel = document.createElement('span');
-    suffixLabel.style.cssText = 'font-size:0.8rem;color:var(--text-muted);';
+    suffixLabel.style.cssText = 'font-size:0.75rem;color:var(--text-muted);';
     suffixLabel.textContent = t('export.fileSuffix');
     nameRow.appendChild(suffixLabel);
 
     const suffixInput = document.createElement('input');
     suffixInput.type = 'text';
     suffixInput.placeholder = t('export.optional');
-    suffixInput.style.cssText = 'padding:4px 8px;background:var(--bg-input);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);font-size:0.8rem;width:100px;';
+    suffixInput.className = 'export-mini-input';
+    suffixInput.style.cssText = 'padding:6px 8px;background:var(--surface-inset);box-shadow:var(--shadow-inset);border-radius:10px;color:var(--text-primary);font-size:0.76rem;width:92px;';
     suffixInput.addEventListener('input', () => { this.options.fileSuffix = suffixInput.value; });
     nameRow.appendChild(suffixInput);
 
@@ -140,17 +143,20 @@ export class ExportPanel {
 
     // Scrollable content
     const content = document.createElement('div');
-    content.style.cssText = 'flex:1;overflow-y:auto;padding:16px 24px;';
+    content.className = 'export-page-content';
+    content.style.cssText = 'flex:1;overflow-y:auto;padding:10px 2px;';
+    const contentInner = document.createElement('div');
+    contentInner.className = 'content-constrained';
 
     // ---- Section 1: Quick Actions ----
     const quickSection = document.createElement('div');
-    quickSection.style.cssText = 'margin-bottom:24px;';
+    quickSection.className = 'export-section';
 
     const quickTitle = this._sectionTitle(t('export.quickExport'));
     quickSection.appendChild(quickTitle);
 
     const quickRow = document.createElement('div');
-    quickRow.style.cssText = 'display:flex;gap:12px;flex-wrap:wrap;';
+    quickRow.style.cssText = 'display:flex;gap:8px;flex-wrap:wrap;';
 
     const conversations = state.get('conversations') || [];
 
@@ -180,11 +186,11 @@ export class ExportPanel {
     }
 
     quickSection.appendChild(quickRow);
-    content.appendChild(quickSection);
+    contentInner.appendChild(quickSection);
 
     // ---- Section 2: Export Collection ("精选集") ----
     const collectionSection = document.createElement('div');
-    collectionSection.style.cssText = 'margin-bottom:24px;';
+    collectionSection.className = 'export-section';
     collectionSection.id = 'export-collection-section';
 
     this._renderCollectionSection(collectionSection);
@@ -192,34 +198,33 @@ export class ExportPanel {
     this._unsubCollection = state.on('exportCollection', () => {
       this._renderCollectionSection(collectionSection);
     });
-    content.appendChild(collectionSection);
+    contentInner.appendChild(collectionSection);
 
     // ---- Section 3: Per-conversation Export ----
     const convSection = document.createElement('div');
-    convSection.style.cssText = 'margin-bottom:24px;';
+    convSection.className = 'export-section';
 
     const convTitle = this._sectionTitle(t('export.perConv', { n: conversations.length }));
     convSection.appendChild(convTitle);
 
     const convList = document.createElement('div');
-    convList.style.cssText = 'display:flex;flex-direction:column;gap:4px;';
+    convList.style.cssText = 'display:flex;flex-direction:column;gap:6px;';
 
     for (const conv of conversations) {
       const item = document.createElement('div');
-      item.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);transition:background 0.15s;';
-      item.addEventListener('mouseenter', () => item.style.background = 'var(--bg-card-hover)');
-      item.addEventListener('mouseleave', () => item.style.background = '');
+      item.className = 'export-list-item';
+      item.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:10px 12px;';
 
       const info = document.createElement('div');
       info.style.cssText = 'min-width:0;flex:1;';
 
       const name = document.createElement('div');
-      name.style.cssText = 'font-size:0.9rem;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:500;';
+      name.style.cssText = 'font-size:0.82rem;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:500;';
       name.textContent = conv.name || t('convList.unnamed');
       info.appendChild(name);
 
       const meta = document.createElement('div');
-      meta.style.cssText = 'font-size:0.75rem;color:var(--text-muted);margin-top:2px;';
+      meta.style.cssText = 'font-size:0.7rem;color:var(--text-muted);margin-top:2px;';
       const firstTs = conv.messages[0]?.createdAt;
       const lastTs = conv.messages[conv.messages.length - 1]?.createdAt;
       let metaText = t('export.msgCount', { n: conv.stats.messageCount });
@@ -232,7 +237,8 @@ export class ExportPanel {
       item.appendChild(info);
 
       const btn = document.createElement('button');
-      btn.style.cssText = 'padding:4px 12px;border:1px solid var(--border);border-radius:4px;background:transparent;color:var(--text-muted);cursor:pointer;font-size:0.75rem;transition:all 0.15s;white-space:nowrap;flex-shrink:0;margin-left:12px;';
+      btn.className = 'neu-ghost-btn';
+      btn.style.cssText = 'font-size:0.72rem;white-space:nowrap;flex-shrink:0;margin-left:10px;padding:5px 10px;';
       btn.textContent = t('export.exportBtn');
       btn.addEventListener('mouseenter', () => { btn.style.borderColor = 'var(--accent)'; btn.style.color = 'var(--accent)'; });
       btn.addEventListener('mouseleave', () => { btn.style.borderColor = 'var(--border)'; btn.style.color = 'var(--text-muted)'; });
@@ -243,8 +249,8 @@ export class ExportPanel {
     }
 
     convSection.appendChild(convList);
-    content.appendChild(convSection);
-
+    contentInner.appendChild(convSection);
+    content.appendChild(contentInner);
     container.appendChild(content);
   }
 
@@ -264,13 +270,15 @@ export class ExportPanel {
       btnGroup.style.cssText = 'display:flex;gap:8px;';
 
       const exportBtn = document.createElement('button');
-      exportBtn.style.cssText = 'padding:4px 12px;border:none;border-radius:4px;background:var(--accent);color:#fff;cursor:pointer;font-size:0.8rem;font-weight:600;';
+      exportBtn.className = 'neu-primary-btn';
+      exportBtn.style.cssText = 'font-size:0.74rem;font-weight:600;padding:6px 10px;';
       exportBtn.textContent = t('export.exportCollection');
       exportBtn.addEventListener('click', () => this._exportCollection());
       btnGroup.appendChild(exportBtn);
 
       const clearBtn = document.createElement('button');
-      clearBtn.style.cssText = 'padding:4px 12px;border:1px solid var(--border);border-radius:4px;background:transparent;color:var(--text-muted);cursor:pointer;font-size:0.8rem;';
+      clearBtn.className = 'neu-ghost-btn';
+      clearBtn.style.cssText = 'font-size:0.74rem;padding:6px 10px;';
       clearBtn.textContent = t('export.clearCollection');
       clearBtn.addEventListener('click', () => {
         state.set('exportCollection', []);
@@ -285,7 +293,8 @@ export class ExportPanel {
 
     if (collection.length === 0) {
       const empty = document.createElement('div');
-      empty.style.cssText = 'padding:20px;text-align:center;color:var(--text-muted);font-size:0.85rem;border:1px dashed var(--border);border-radius:var(--radius-sm);';
+      empty.className = 'neu-panel-inset';
+      empty.style.cssText = 'padding:18px;text-align:center;color:var(--text-muted);font-size:0.78rem;';
       empty.textContent = t('export.collectionEmpty');
       section.appendChild(empty);
       return;
@@ -306,16 +315,17 @@ export class ExportPanel {
     for (const [, group] of grouped) {
       const { convName, items } = group;
       const groupEl = document.createElement('div');
-      groupEl.style.cssText = 'border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:8px;overflow:hidden;';
+      groupEl.className = 'collection-group';
+      groupEl.style.cssText = 'margin-bottom:8px;';
 
       const groupHeader = document.createElement('div');
-      groupHeader.style.cssText = 'padding:8px 14px;background:var(--bg-secondary);font-size:0.82rem;font-weight:600;color:var(--accent);';
+      groupHeader.className = 'collection-group-header';
       groupHeader.textContent = convName + ' (' + items.length + ')';
       groupEl.appendChild(groupHeader);
 
       for (const item of items) {
         const row = document.createElement('div');
-        row.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:6px 14px;border-bottom:1px solid var(--separator-color);';
+        row.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:5px 12px;border-bottom:1px solid var(--separator-color);';
 
         const names = state.get('displayNames');
         const senderName = item.sender === 'human' ? (names.human || 'Human') : (names.assistant || 'Assistant');
@@ -324,12 +334,12 @@ export class ExportPanel {
         info.style.cssText = 'min-width:0;flex:1;';
 
         const senderSpan = document.createElement('span');
-        senderSpan.style.cssText = 'font-size:0.78rem;font-weight:600;color:' + (item.sender === 'human' ? 'var(--accent)' : 'var(--text-primary)') + ';margin-right:8px;';
+        senderSpan.style.cssText = 'font-size:0.72rem;font-weight:600;color:' + (item.sender === 'human' ? 'var(--accent)' : 'var(--text-primary)') + ';margin-right:6px;';
         senderSpan.textContent = senderName;
         info.appendChild(senderSpan);
 
         const preview = document.createElement('span');
-        preview.style.cssText = 'font-size:0.78rem;color:var(--text-muted);';
+        preview.style.cssText = 'font-size:0.72rem;color:var(--text-muted);';
         preview.textContent = item.preview;
         info.appendChild(preview);
 
@@ -479,16 +489,15 @@ export class ExportPanel {
 
   _sectionTitle(text) {
     const el = document.createElement('div');
-    el.style.cssText = 'font-size:0.75rem;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);font-weight:600;margin-bottom:12px;';
+    el.className = 'panel-section-title';
     el.textContent = text;
     return el;
   }
 
   _createExportBtn(text, sub, onClick) {
     const btn = document.createElement('button');
-    btn.style.cssText = 'padding:14px 20px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg-card);cursor:pointer;text-align:left;transition:all 0.15s;min-width:180px;';
-    btn.addEventListener('mouseenter', () => { btn.style.borderColor = 'var(--accent)'; btn.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)'; });
-    btn.addEventListener('mouseleave', () => { btn.style.borderColor = 'var(--border)'; btn.style.boxShadow = 'none'; });
+    btn.className = 'neu-action-tile';
+    btn.style.cssText = 'padding:18px 20px;cursor:pointer;text-align:left;min-width:210px;';
 
     const mainText = document.createElement('div');
     mainText.style.cssText = 'font-size:0.9rem;color:var(--text-primary);font-weight:600;margin-bottom:4px;';

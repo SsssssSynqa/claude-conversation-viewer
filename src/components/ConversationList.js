@@ -31,7 +31,7 @@ export class ConversationList {
   render() {
     // Search box — neumorphic pill input
     const searchBox = document.createElement('div');
-    searchBox.style.cssText = 'padding:8px 16px 8px;';
+    searchBox.style.cssText = 'padding:8px 14px 10px;';
 
     const searchWrapper = document.createElement('div');
     searchWrapper.className = 'sidebar-pill pill-input';
@@ -54,7 +54,8 @@ export class ConversationList {
 
     // List container
     this.listEl = document.createElement('div');
-    this.listEl.style.cssText = 'flex:1;overflow-y:auto;padding:0 10px 16px 16px;';
+    this.listEl.className = 'conversation-list-scroll';
+    this.listEl.style.cssText = 'flex:1;overflow-y:auto;padding:0 10px 16px 14px;';
     this.container.appendChild(this.listEl);
 
     this.renderList();
@@ -100,34 +101,34 @@ export class ConversationList {
     for (const [monthKey, items] of groups) {
       // Month header
       const header = document.createElement('div');
-      header.style.cssText = 'padding:12px 14px 4px;font-size:11px;color:var(--text-muted);font-weight:600;';
+      header.style.cssText = 'padding:10px 12px 4px;font-size:10px;color:var(--text-muted);font-weight:600;';
       header.textContent = formatMonthLabel(monthKey);
       this.listEl.appendChild(header);
 
       for (const { conv, index } of items) {
         const item = document.createElement('div');
         const isActive = index === currentIndex;
-        item.className = 'sidebar-pill ' + (isActive ? 'pill-active' : 'pill-flat');
+        item.className = 'sidebar-pill conversation-list-item ' + (isActive ? 'pill-active' : 'pill-flat');
         item.style.cssText = `
-          padding: 10px 16px;
-          margin: 3px 0;
+          padding: 10px 12px;
+          margin: 4px 0;
           cursor: pointer;
-          font-size: 13px;
+          font-size: 12px;
           height: auto;
           flex-direction: column;
           align-items: flex-start;
-          gap: 2px;
+          gap: 3px;
         `;
 
         // Title
         const titleEl = document.createElement('div');
-        titleEl.style.cssText = 'font-size:0.9rem;color:var(--sidebar-text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:500;';
+        titleEl.style.cssText = 'font-size:0.82rem;color:var(--sidebar-text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:500;';
         titleEl.textContent = conv.name || t('convList.unnamed');
         item.appendChild(titleEl);
 
         // Meta line
         const meta = document.createElement('div');
-        meta.style.cssText = 'font-size:0.75rem;color:var(--text-muted);margin-top:3px;display:flex;gap:8px;align-items:center;';
+        meta.style.cssText = 'font-size:0.7rem;color:var(--text-muted);margin-top:1px;display:flex;gap:6px;align-items:center;flex-wrap:wrap;';
 
         const dateSpan = document.createElement('span');
         dateSpan.textContent = formatDate(conv.createdAt);

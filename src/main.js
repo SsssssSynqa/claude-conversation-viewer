@@ -130,12 +130,20 @@ function renderMainView() {
     { theme: 'claude', icon: 'spark' },
   ];
 
+  const syncThemeThumb = (themeValue) => {
+    const track = document.getElementById('sidebar-theme-track');
+    if (!track) return;
+    const idx = themeOptions.findIndex(o => o.theme === themeValue);
+    if (idx < 0) return;
+    const thumb = track.querySelector('.toggle-thumb');
+    if (!thumb) return;
+    const pad = 4;
+    const seg = (track.clientWidth - pad * 2) / themeOptions.length;
+    thumb.style.width = `${seg}px`;
+    thumb.style.transform = `translateX(${idx * seg}px)`;
+  };
+
   const currentTheme = state.get('theme');
-  const currentIdx = themeOptions.findIndex(o => o.theme === currentTheme);
-  // Set initial thumb position
-  if (currentIdx >= 0) {
-    themeThumb.style.transform = `translateX(${currentIdx * 100}%)`;
-  }
 
   for (let i = 0; i < themeOptions.length; i++) {
     const opt = themeOptions[i];
@@ -151,15 +159,14 @@ function renderMainView() {
   }
 
   themeTrackRow.appendChild(themeTrack);
+  requestAnimationFrame(() => syncThemeThumb(currentTheme));
   // themeTrackRow will be appended later, after foldables
 
   // Theme state listener — update track thumb + active option + re-render stats
   _mainViewCleanups.push(state.on('theme', (t) => {
     const track = document.getElementById('sidebar-theme-track');
     if (track) {
-      const idx = themeOptions.findIndex(o => o.theme === t);
-      const thumb = track.querySelector('.toggle-thumb');
-      if (thumb && idx >= 0) thumb.style.transform = `translateX(${idx * 100}%)`;
+      syncThemeThumb(t);
       track.querySelectorAll('.toggle-option').forEach(el => {
         el.classList.toggle('active', el.dataset.theme === t);
       });
@@ -181,6 +188,9 @@ function renderMainView() {
       }, 500);
     }
   }));
+  const handleThemeResize = () => syncThemeThumb(state.get('theme'));
+  window.addEventListener('resize', handleThemeResize);
+  _mainViewCleanups.push(() => window.removeEventListener('resize', handleThemeResize));
 
   // ---- Foldable: Display Settings ----
   const settingsFoldable = document.createElement('details');
