@@ -76,12 +76,31 @@ function renderMainView() {
 
   // Sidebar title with spark logo — generous top padding
   const sidebarTitle = document.createElement('div');
-  sidebarTitle.style.cssText = 'padding:24px 20px 16px;display:flex;align-items:center;gap:6px;';
-  sidebarTitle.appendChild(createSparkIcon(14));
+  sidebarTitle.className = 'sidebar-brand';
+  const brandLogoBtn = document.createElement('button');
+  brandLogoBtn.type = 'button';
+  brandLogoBtn.className = 'sidebar-brand-logo';
+  brandLogoBtn.title = t('sidebar.title');
+  brandLogoBtn.appendChild(createSparkIcon(16));
+  brandLogoBtn.addEventListener('click', () => {
+    if (state.get('sidebarCollapsed')) {
+      state.set('sidebarCollapsed', false);
+    }
+  });
+  sidebarTitle.appendChild(brandLogoBtn);
   const titleText = document.createElement('span');
-  titleText.style.cssText = 'font-family:var(--font-display);font-size:16px;font-weight:700;color:var(--text-primary);';
+  titleText.className = 'sidebar-title-text';
   titleText.textContent = t('sidebar.title');
   sidebarTitle.appendChild(titleText);
+  const collapseBtn = document.createElement('button');
+  collapseBtn.type = 'button';
+  collapseBtn.className = 'sidebar-collapse-btn';
+  collapseBtn.textContent = '‹';
+  collapseBtn.title = 'Collapse sidebar';
+  collapseBtn.addEventListener('click', () => {
+    state.set('sidebarCollapsed', true);
+  });
+  sidebarTitle.appendChild(collapseBtn);
   sidebar.appendChild(sidebarTitle);
 
   // Sidebar function buttons — neumorphic pills
@@ -110,6 +129,16 @@ function renderMainView() {
     pill.addEventListener('click', nav.action);
     sidebarActions.appendChild(pill);
   }
+
+  const railExpandBtn = document.createElement('button');
+  railExpandBtn.type = 'button';
+  railExpandBtn.className = 'sidebar-rail-toggle';
+  railExpandBtn.textContent = '›';
+  railExpandBtn.title = 'Expand sidebar';
+  railExpandBtn.addEventListener('click', () => {
+    state.set('sidebarCollapsed', false);
+  });
+  sidebarActions.appendChild(railExpandBtn);
 
   // Theme toggle track (3-way: sun / moon / flower)
   const themeTrackRow = document.createElement('div');
@@ -477,6 +506,14 @@ function renderMainView() {
     }
     updateNavActive(state.get('viewMode'));
   }));
+
+  const applySidebarCollapsed = (collapsed) => {
+    sidebar.classList.toggle('collapsed', collapsed);
+    contentArea.classList.toggle('sidebar-compact', collapsed);
+    localStorage.setItem('cv-sidebar-collapsed', collapsed ? 'true' : 'false');
+  };
+  _mainViewCleanups.push(state.on('sidebarCollapsed', applySidebarCollapsed));
+  applySidebarCollapsed(state.get('sidebarCollapsed'));
 
   // Initial active state on load
   requestAnimationFrame(() => updateNavActive(state.get('viewMode')));

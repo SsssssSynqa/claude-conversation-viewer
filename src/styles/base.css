@@ -155,8 +155,7 @@ body {
 .sidebar * { scrollbar-width: thin; scrollbar-color: rgba(0,0,0,0.08) transparent; }
 
 .sidebar.collapsed {
-  width: 0;
-  border-right: none;
+  width: 84px;
 }
 
 .content-area {
@@ -169,12 +168,67 @@ body {
 }
 
 .content-area > * {
-  max-width: 720px;
-  margin-left: auto;
-  margin-right: auto;
   width: 100%;
-  padding-left: 20px;
-  padding-right: 20px;
+}
+
+.sidebar-brand {
+  padding: 20px 16px 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sidebar-brand-logo {
+  width: 40px;
+  height: 40px;
+  border: none;
+  background: transparent;
+  color: var(--accent);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.sidebar-title-text {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+.sidebar-collapse-btn,
+.sidebar-rail-toggle {
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 22px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.sidebar-collapse-btn {
+  margin-left: auto;
+  width: 30px;
+  height: 30px;
+}
+
+.sidebar-rail-toggle {
+  display: none;
+  width: 44px;
+  height: 44px;
+  margin: 2px auto 0;
+}
+
+.content-area.sidebar-compact {
+  padding-left: 12px;
 }
 
 /* ---- Upload Screen ---- */
@@ -780,6 +834,61 @@ button {
   gap: 6px;
 }
 
+.sidebar.collapsed .sidebar-brand {
+  padding: 18px 0 10px;
+  justify-content: center;
+}
+
+.sidebar.collapsed .sidebar-title-text,
+.sidebar.collapsed .sidebar-collapse-btn,
+.sidebar.collapsed .sidebar-foldable,
+.sidebar.collapsed .pill-row,
+.sidebar.collapsed .history-search-input,
+.sidebar.collapsed .conversation-list-scroll,
+.sidebar.collapsed .sidebar-pill span:not(.nav-icon),
+.sidebar.collapsed .sidebar-pill .chevron-icon {
+  display: none !important;
+}
+
+.sidebar.collapsed .sidebar-brand-logo {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+}
+
+.sidebar.collapsed .sidebar-actions {
+  padding: 2px 0 12px !important;
+  align-items: center;
+}
+
+.sidebar.collapsed .sidebar-pill {
+  width: 44px;
+  min-width: 44px;
+  min-height: 44px;
+  height: 44px;
+  padding: 0;
+  justify-content: center;
+  margin: 0 auto;
+  border-radius: 14px;
+}
+
+.sidebar.collapsed .sidebar-pill.pill-flat {
+  background: transparent;
+}
+
+.sidebar.collapsed .sidebar-pill.pill-active {
+  box-shadow: var(--shadow-inset);
+}
+
+.sidebar.collapsed .nav-icon {
+  width: 18px;
+  height: 18px;
+}
+
+.sidebar.collapsed .sidebar-rail-toggle {
+  display: inline-flex;
+}
+
 /* ---- Responsive ---- */
 @media (max-width: 768px) {
   .sidebar {
@@ -807,6 +916,10 @@ button {
   .content-area > * {
     padding-left: 14px;
     padding-right: 14px;
+  }
+
+  .content-shell {
+    max-width: none;
   }
 
   .sidebar-actions {

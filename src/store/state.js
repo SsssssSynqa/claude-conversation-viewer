@@ -51,6 +51,7 @@ export const state = new Store({
   filteredConversations: [],
   currentConversationIndex: -1,
   searchQuery: '',
+  sidebarCollapsed: localStorage.getItem('cv-sidebar-collapsed') === 'true',
   lang: localStorage.getItem('cv-lang') || 'zh',
   theme: localStorage.getItem('cv-theme') || 'light',
   displayNames: loadDisplayNames(),
