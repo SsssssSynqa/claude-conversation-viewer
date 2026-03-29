@@ -8,6 +8,7 @@ import { formatMonthKey, formatMonthLabel, formatTimestamp, formatLocalDateStamp
 import html2canvas from 'html2canvas';
 import { desensitize } from '../utils/desensitize.js';
 import { createIcon } from '../utils/icons.js';
+import { t } from '../i18n.js';
 
 export class StatsPanel {
   constructor() {
@@ -61,17 +62,17 @@ export class StatsPanel {
     const mainDot = document.createElement('span');
     mainDot.style.cssText = 'width:10px;height:10px;border-radius:50%;background:var(--accent);box-shadow:inset 1px 1px 2px rgba(255,255,255,0.4),0 0 8px rgba(217,118,87,0.4);flex-shrink:0;';
     title.appendChild(mainDot);
-    title.appendChild(document.createTextNode('数据雕塑'));
+    title.appendChild(document.createTextNode(t('stats.title')));
     titleRow.appendChild(title);
 
     const screenshotBtn = document.createElement('button');
     screenshotBtn.style.cssText = 'padding:6px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);background:transparent;color:var(--text-secondary);cursor:pointer;font-size:12px;transition:all 0.15s;white-space:nowrap;display:flex;align-items:center;gap:4px;';
     screenshotBtn.appendChild(createIcon('save', 14));
-    screenshotBtn.appendChild(document.createTextNode(' 保存为图片'));
+    screenshotBtn.appendChild(document.createTextNode(t('stats.saveImage')));
     screenshotBtn.addEventListener('mouseenter', () => { screenshotBtn.style.borderColor = 'var(--accent)'; screenshotBtn.style.color = 'var(--accent)'; });
     screenshotBtn.addEventListener('mouseleave', () => { screenshotBtn.style.borderColor = 'var(--border)'; screenshotBtn.style.color = 'var(--text-secondary)'; });
     screenshotBtn.addEventListener('click', async () => {
-      screenshotBtn.textContent = '截图中...';
+      screenshotBtn.textContent = t('stats.saving');
       screenshotBtn.disabled = true;
       try {
         const canvas = await html2canvas(parent, {
@@ -80,14 +81,14 @@ export class StatsPanel {
           useCORS: true,
         });
         const link = document.createElement('a');
-        link.download = '数据雕塑_' + formatLocalDateStamp() + '.png';
+        link.download = t('stats.title') + '_' + formatLocalDateStamp() + '.png';
         link.href = canvas.toDataURL('image/png');
         link.click();
-        screenshotBtn.textContent = '\u2713 已保存';
-        setTimeout(() => { screenshotBtn.textContent = ''; screenshotBtn.appendChild(createIcon('save', 14)); screenshotBtn.appendChild(document.createTextNode(' 保存为图片')); screenshotBtn.disabled = false; }, 1500);
+        screenshotBtn.textContent = t('stats.imageSaved');
+        setTimeout(() => { screenshotBtn.textContent = ''; screenshotBtn.appendChild(createIcon('save', 14)); screenshotBtn.appendChild(document.createTextNode(t('stats.saveImage'))); screenshotBtn.disabled = false; }, 1500);
       } catch (e) {
         screenshotBtn.textContent = '截图失败';
-        setTimeout(() => { screenshotBtn.textContent = ''; screenshotBtn.appendChild(createIcon('save', 14)); screenshotBtn.appendChild(document.createTextNode(' 保存为图片')); screenshotBtn.disabled = false; }, 1500);
+        setTimeout(() => { screenshotBtn.textContent = ''; screenshotBtn.appendChild(createIcon('save', 14)); screenshotBtn.appendChild(document.createTextNode(t('stats.saveImage'))); screenshotBtn.disabled = false; }, 1500);
       }
     });
     titleRow.appendChild(screenshotBtn);
@@ -100,10 +101,10 @@ export class StatsPanel {
 
     // Row 1: 4 basic counts (matching Figma layout)
     const row1Stats = [
-      { label: '总窗口数', value: stats.totalConversations },
-      { label: '总消息数', value: stats.totalMessages.toLocaleString() },
-      { label: '思考次数', value: stats.totalThinkingCount.toLocaleString() },
-      { label: '思考总时间', value: this.formatMs(stats.totalThinkingMs) },
+      { label: t('stats.totalConvs'), value: stats.totalConversations },
+      { label: t('stats.totalMsgs'), value: stats.totalMessages.toLocaleString() },
+      { label: t('stats.thinkingCount'), value: stats.totalThinkingCount.toLocaleString() },
+      { label: t('stats.thinkingTime'), value: this.formatMs(stats.totalThinkingMs) },
     ];
 
     for (const s of row1Stats) {
@@ -125,8 +126,8 @@ export class StatsPanel {
     const humanPct = totalChars > 0 ? Math.round((stats.totalHumanChars / totalChars) * 100) : 0;
 
     const wordCountCards = [
-      { label: (names.human || 'Human') + '的总字数', value: stats.totalHumanChars.toLocaleString(), pct: humanPct, color: 'orange' },
-      { label: (names.assistant || 'Assistant') + '的总字数', value: stats.totalAssistantChars.toLocaleString(), pct: assistantPct, color: 'gray' },
+      { label: (names.human || 'Human') + t('stats.wordCount'), value: stats.totalHumanChars.toLocaleString(), pct: humanPct, color: 'orange' },
+      { label: (names.assistant || 'Assistant') + t('stats.wordCount'), value: stats.totalAssistantChars.toLocaleString(), pct: assistantPct, color: 'gray' },
     ];
 
     for (const s of wordCountCards) {
@@ -225,10 +226,10 @@ export class StatsPanel {
 
     // Row 3: 4 more stats
     const row3Stats = [
-      { label: '时间跨度', value: stats.daySpan },
-      { label: '最长连续天数', value: stats.longestStreak },
-      { label: '系统标记', value: stats.totalFlags },
-      { label: '深夜对话', value: stats.lateNightConvs },
+      { label: t('stats.timeSpan'), value: stats.daySpan },
+      { label: t('stats.longestStreak'), value: stats.longestStreak },
+      { label: t('stats.flagCount'), value: stats.totalFlags },
+      { label: t('stats.lateNight'), value: stats.lateNightConvs },
     ];
 
     for (const s of row3Stats) {
@@ -251,29 +252,29 @@ export class StatsPanel {
       const milestoneRow = document.createElement('div');
       milestoneRow.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;';
 
-      milestoneRow.appendChild(this._milestoneCard('第一段对话', stats.firstConv.name || '未命名', formatTimestamp(stats.firstConv.createdAt)));
-      milestoneRow.appendChild(this._milestoneCard('最近一段对话', stats.lastConv.name || '未命名', formatTimestamp(stats.lastConv.createdAt)));
+      milestoneRow.appendChild(this._milestoneCard(t('stats.firstConv'), stats.firstConv.name || '未命名', formatTimestamp(stats.firstConv.createdAt)));
+      milestoneRow.appendChild(this._milestoneCard(t('stats.latestConv'), stats.lastConv.name || '未命名', formatTimestamp(stats.lastConv.createdAt)));
 
       parent.appendChild(milestoneRow);
     }
 
     // ---- Year Overview (cards float directly) ----
     if (stats.yearlyData && stats.yearlyData.length > 0) {
-      parent.appendChild(this._sectionTitle('年度总览'));
+      parent.appendChild(this._sectionTitle(t('stats.yearOverview')));
       const yearGrid = document.createElement('div');
       yearGrid.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:14px;';
       for (const yr of stats.yearlyData) {
         const card = this._neuCard();
         const yearLabel = document.createElement('div');
         yearLabel.style.cssText = 'font-size:1.2rem;font-weight:700;color:var(--accent);margin-bottom:10px;';
-        yearLabel.textContent = yr.year + ' 年';
+        yearLabel.textContent = yr.year + t('stats.year');
         card.appendChild(yearLabel);
         const rows = [
-          ['对话数', yr.convCount],
-          ['消息数', yr.msgCount.toLocaleString()],
-          ['总字数', (yr.humanChars + yr.assistantChars).toLocaleString()],
-          ['活跃天数', yr.activeDays + ' 天'],
-          ['思考次数', yr.thinkingCount.toLocaleString()],
+          [t('stats.yearConvs'), yr.convCount],
+          [t('stats.yearMsgs'), yr.msgCount.toLocaleString()],
+          [t('stats.yearWords'), (yr.humanChars + yr.assistantChars).toLocaleString()],
+          [t('stats.yearDays'), yr.activeDays + ' 天'],
+          [t('stats.yearThinking'), yr.thinkingCount.toLocaleString()],
         ];
         for (const [label, value] of rows) {
           const row = document.createElement('div');
@@ -295,7 +296,7 @@ export class StatsPanel {
 
     // ---- GitHub-style Heatmap (in a single raised card) ----
     if (stats.dateHeatmap && Object.keys(stats.dateHeatmap).length > 0) {
-      parent.appendChild(this._sectionTitle('时光矩阵'));
+      parent.appendChild(this._sectionTitle(t('stats.heatmap')));
       const heatCard = this._neuCard();
       heatCard.style.padding = '16px 22px';
       heatCard.appendChild(this._buildHeatmapCalendar(stats.dateHeatmap));
@@ -304,7 +305,7 @@ export class StatsPanel {
     }
 
     // ---- TOP 5 Longest Conversations (in a single raised card) ----
-    parent.appendChild(this._sectionTitle('TOP 5 最长对话'));
+    parent.appendChild(this._sectionTitle(t('stats.top5')));
     const topCard = this._neuCard();
     topCard.style.marginBottom = '14px';
     topCard.style.padding = '8px 0';
@@ -321,7 +322,7 @@ export class StatsPanel {
       item.appendChild(name);
       const count = document.createElement('span');
       count.style.cssText = 'color:var(--text-muted);white-space:nowrap;';
-      count.textContent = conv.stats.messageCount + ' 条 / ' + (conv.stats.humanChars + conv.stats.assistantChars).toLocaleString() + ' 字';
+      count.textContent = conv.stats.messageCount + t('stats.top5msgs') + (conv.stats.humanChars + conv.stats.assistantChars).toLocaleString() + t('stats.top5chars');
       item.appendChild(count);
       item.addEventListener('click', () => {
         let visibleConvs = state.get('filteredConversations') || [];
@@ -343,7 +344,7 @@ export class StatsPanel {
 
     // ---- Deep Night Ranking (in a single raised card) ----
     if (stats.deepNightConvs.length > 0) {
-      parent.appendChild(this._sectionTitle('深夜对话榜（凌晨2-5点）'));
+      parent.appendChild(this._sectionTitle(t('stats.lateNightRank')));
       const nightCard = this._neuCard();
       nightCard.style.marginBottom = '14px';
       nightCard.style.padding = '8px 0';

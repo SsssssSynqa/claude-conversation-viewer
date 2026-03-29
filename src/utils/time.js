@@ -1,12 +1,13 @@
 /**
  * Time formatting utilities.
  */
+import { t } from '../i18n.js';
 
 export function formatTimestamp(iso) {
-  if (!iso) return '未知时间';
+  if (!iso) return t('time.unknown');
   try {
     const date = new Date(iso);
-    if (isNaN(date.getTime())) return '未知时间';
+    if (isNaN(date.getTime())) return t('time.unknown');
     return date.toLocaleString('zh-CN', {
       year: 'numeric',
       month: '2-digit',
@@ -67,9 +68,9 @@ export function formatMonthKey(iso) {
 }
 
 export function formatMonthLabel(monthKey) {
-  if (monthKey === 'unknown') return '未知日期';
+  if (monthKey === 'unknown') return t('time.unknownDate');
   const [year, month] = monthKey.split('-');
-  return `${year}年${parseInt(month)}月`;
+  return t('time.yearMonth', { year, month: parseInt(month) });
 }
 
 export function formatDuration(startIso, stopIso) {

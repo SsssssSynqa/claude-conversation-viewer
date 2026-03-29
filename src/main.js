@@ -16,6 +16,7 @@ import { SearchPanel } from './components/SearchPanel.js';
 import { createIcon } from './utils/icons.js';
 import { createSparkIcon } from './utils/spark.js';
 import { showLoading, hideLoading } from './components/Loading.js';
+import { t } from './i18n.js';
 
 // ---- Theme ----
 function applyTheme(theme) {
@@ -25,7 +26,7 @@ function applyTheme(theme) {
 
 const THEMES = ['dark', 'light', 'claude'];
 const THEME_ICON_NAMES = { dark: 'moon', light: 'sun', claude: 'flower' };
-const THEME_LABELS = { dark: '关灯版', light: '开灯版', claude: '怀旧版' };
+const THEME_LABELS = { dark: t('theme.dark'), light: t('theme.light'), claude: t('theme.claude') };
 
 function cycleTheme() {
   const current = state.get('theme');
@@ -76,7 +77,7 @@ function renderMainView() {
   sidebarTitle.appendChild(createSparkIcon(14));
   const titleText = document.createElement('span');
   titleText.style.cssText = 'font-family:var(--font-display);font-size:16px;font-weight:700;color:var(--text-primary);';
-  titleText.textContent = 'Claude 对话记忆查看器';
+  titleText.textContent = t('sidebar.title');
   sidebarTitle.appendChild(titleText);
   sidebar.appendChild(sidebarTitle);
 
@@ -87,9 +88,9 @@ function renderMainView() {
 
   // Nav pills: Search, Stats, Export
   const navItems = [
-    { id: 'sidebar-search-btn', icon: 'search', label: '搜索中心', action: () => state.set('viewMode', 'search') },
-    { id: 'sidebar-stats-btn', icon: 'stats', label: '统计总览', action: () => state.set('viewMode', 'stats') },
-    { id: 'sidebar-export-btn', icon: 'export', label: '导出中心', action: () => state.set('viewMode', 'export') },
+    { id: 'sidebar-search-btn', icon: 'search', label: t('sidebar.search'), action: () => state.set('viewMode', 'search') },
+    { id: 'sidebar-stats-btn', icon: 'stats', label: t('sidebar.stats'), action: () => state.set('viewMode', 'stats') },
+    { id: 'sidebar-export-btn', icon: 'export', label: t('sidebar.export'), action: () => state.set('viewMode', 'export') },
   ];
 
   for (const nav of navItems) {
@@ -190,7 +191,7 @@ function renderMainView() {
   settingsIcon.appendChild(createIcon('shield', 16));
   settingsPill.appendChild(settingsIcon);
   const settingsLabel = document.createElement('span');
-  settingsLabel.textContent = '显示设置';
+  settingsLabel.textContent = t('sidebar.displaySettings');
   settingsPill.appendChild(settingsLabel);
   const settingsChevron = document.createElement('span');
   settingsChevron.className = 'chevron-icon nav-icon';
@@ -203,10 +204,10 @@ function renderMainView() {
   settingsContent.className = 'fold-content';
 
   const toggles = [
-    { id: 'toggle-thinking', label: '思考过程', key: 'showThinking' },
-    { id: 'toggle-tools', label: '工具调用', key: 'showToolUse' },
-    { id: 'toggle-flags', label: '系统标记', key: 'showFlags' },
-    { id: 'toggle-desensitize', label: '数据脱敏', key: 'desensitize' },
+    { id: 'toggle-thinking', label: t('sidebar.showThinking'), key: 'showThinking' },
+    { id: 'toggle-tools', label: t('sidebar.showToolUse'), key: 'showToolUse' },
+    { id: 'toggle-flags', label: t('sidebar.showFlags'), key: 'showFlags' },
+    { id: 'toggle-desensitize', label: t('sidebar.desensitize'), key: 'desensitize' },
   ];
 
   for (const t of toggles) {
@@ -251,7 +252,7 @@ function renderMainView() {
   const dsInput = document.createElement('input');
   dsInput.type = 'text';
   dsInput.className = 'neu-input';
-  dsInput.placeholder = '敏感词，逗号分隔';
+  dsInput.placeholder = t('sidebar.desensitizePlaceholder');
   dsInput.value = (state.get('desensitizeWords') || []).join(', ');
   dsInput.addEventListener('input', () => {
     const words = dsInput.value.split(/[,，]/).map(w => w.trim()).filter(Boolean);
@@ -262,7 +263,7 @@ function renderMainView() {
 
   const dsHint = document.createElement('div');
   dsHint.style.cssText = 'font-size:11px;color:var(--text-muted);padding:0 2px;';
-  dsHint.textContent = '这些词会被替换为 ***';
+  dsHint.textContent = t('sidebar.desensitizeHint');
   desensitizeSection.appendChild(dsHint);
 
   settingsContent.appendChild(desensitizeSection);
@@ -287,7 +288,7 @@ function renderMainView() {
   nameIcon.appendChild(createIcon('user', 16));
   namePill.appendChild(nameIcon);
   const nameLabel = document.createElement('span');
-  nameLabel.textContent = '显示名称';
+  nameLabel.textContent = t('sidebar.displayNames');
   namePill.appendChild(nameLabel);
   const nameChevron = document.createElement('span');
   nameChevron.className = 'chevron-icon nav-icon';
@@ -306,7 +307,7 @@ function renderMainView() {
   humanRow.className = 'sidebar-name-row';
   const humanLabel = document.createElement('span');
   humanLabel.className = 'sidebar-name-label';
-  humanLabel.textContent = '用户';
+  humanLabel.textContent = t('sidebar.userName');
   humanRow.appendChild(humanLabel);
   const humanInput = document.createElement('input');
   humanInput.type = 'text';
@@ -321,7 +322,7 @@ function renderMainView() {
   assistantRow.className = 'sidebar-name-row';
   const assistantLabel = document.createElement('span');
   assistantLabel.className = 'sidebar-name-label';
-  assistantLabel.textContent = 'AI';
+  assistantLabel.textContent = t('sidebar.aiName');
   assistantRow.appendChild(assistantLabel);
   const assistantInput = document.createElement('input');
   assistantInput.type = 'text';
@@ -337,21 +338,21 @@ function renderMainView() {
 
   const saveNameBtn = document.createElement('button');
   saveNameBtn.className = 'sidebar-name-btn primary';
-  saveNameBtn.textContent = '保存';
+  saveNameBtn.textContent = t('sidebar.save');
   saveNameBtn.addEventListener('click', () => {
     const humanVal = document.getElementById('sidebar-name-human')?.value || 'Synqa';
     const assistantVal = document.getElementById('sidebar-name-assistant')?.value || 'Sylux';
     const newNames = { human: humanVal, assistant: assistantVal };
     state.set('displayNames', newNames);
     localStorage.setItem('cv-names', JSON.stringify(newNames));
-    saveNameBtn.textContent = '\u2713';
-    setTimeout(() => { saveNameBtn.textContent = '保存'; }, 1200);
+    saveNameBtn.textContent = t('sidebar.saved');
+    setTimeout(() => { saveNameBtn.textContent = t('sidebar.save'); }, 1200);
   });
   nameBtnRow.appendChild(saveNameBtn);
 
   const resetNameBtn = document.createElement('button');
   resetNameBtn.className = 'sidebar-name-btn secondary';
-  resetNameBtn.textContent = '重置';
+  resetNameBtn.textContent = t('sidebar.reset');
   resetNameBtn.addEventListener('click', () => {
     const defaults = { human: 'Synqa', assistant: 'Sylux' };
     document.getElementById('sidebar-name-human').value = defaults.human;

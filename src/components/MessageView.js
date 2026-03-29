@@ -10,6 +10,7 @@ import { desensitize } from '../utils/desensitize.js';
 import { createIcon } from '../utils/icons.js';
 import { StatsPanel } from './StatsPanel.js';
 import { showLoading, hideLoading } from './Loading.js';
+import { t } from '../i18n.js';
 
 export class MessageView {
   constructor(container) {
@@ -54,7 +55,7 @@ export class MessageView {
     } else {
       const empty = document.createElement('div');
       empty.style.cssText = 'display:flex;align-items:center;justify-content:center;height:100%;color:var(--text-muted);font-size:1.1rem;';
-      empty.textContent = '\u2190 选择一段对话开始阅读';
+      empty.textContent = t('msgView.empty');
       this.container.appendChild(empty);
     }
   }
@@ -84,7 +85,7 @@ export class MessageView {
     titleSection.style.cssText = 'flex:1;min-width:0;';
     const titleEl = document.createElement('h2');
     titleEl.style.cssText = 'font-family:var(--font-display);font-size:1.2rem;font-weight:400;margin-bottom:4px;';
-    titleEl.textContent = conv.name || '未命名对话';
+    titleEl.textContent = conv.name || t('msgView.unnamed');
     titleSection.appendChild(titleEl);
 
     // Time span
@@ -99,7 +100,7 @@ export class MessageView {
 
     const metaEl = document.createElement('div');
     metaEl.style.cssText = 'font-size:0.78rem;color:var(--text-muted);display:flex;gap:12px;flex-wrap:wrap;';
-    const statItems = [conv.stats.messageCount + ' 条消息', (names.human || 'Human') + ': ' + conv.stats.humanChars.toLocaleString() + ' 字', (names.assistant || 'Assistant') + ': ' + conv.stats.assistantChars.toLocaleString() + ' 字'];
+    const statItems = [conv.stats.messageCount + t('msgView.msgCount'), (names.human || 'Human') + ': ' + conv.stats.humanChars.toLocaleString() + ' 字', (names.assistant || 'Assistant') + ': ' + conv.stats.assistantChars.toLocaleString() + ' 字'];
     if (conv.stats.hasThinking) statItems.push(conv.stats.thinkingCount + ' 次思考');
     for (const s of statItems) { const sp = document.createElement('span'); sp.textContent = s; metaEl.appendChild(sp); }
     titleSection.appendChild(metaEl);
@@ -115,7 +116,7 @@ export class MessageView {
 
     const toggleLabel = document.createElement('span');
     toggleLabel.style.cssText = 'font-size:0.75rem;color:var(--text-muted);user-select:none;';
-    toggleLabel.textContent = this.selectMode ? '选择' : '查看';
+    toggleLabel.textContent = this.selectMode ? t('msgView.selectMode') : t('msgView.viewMode');
 
     const toggleTrack = document.createElement('div');
     toggleTrack.style.cssText = `width:44px;height:24px;border-radius:12px;position:relative;transition:background 0.2s;${this.selectMode ? 'background:var(--accent);' : 'background:var(--border-strong);'}`;
@@ -134,13 +135,13 @@ export class MessageView {
     headerBtns.appendChild(toggleOuter);
 
     // Add all to collection
-    const addAllBtn = this._headerBtn('加入精选集', 'star', () => {
+    const addAllBtn = this._headerBtn(t('msgView.addToCollection'), 'star', () => {
       const collection = state.get('exportCollection') || [];
       for (let i = 0; i < conv.messages.length; i++) {
         const msg = conv.messages[i];
         const key = conv.uuid + ':' + i;
         if (collection.some(item => item.key === key)) continue;
-        collection.push({ key, convUuid: conv.uuid, convName: conv.name || '未命名', msgIndex: i, sender: msg.sender, preview: (msg.searchText || '').substring(0, 80), timestamp: msg.createdAt });
+        collection.push({ key, convUuid: conv.uuid, convName: conv.name || t('msgView.unnamed2'), msgIndex: i, sender: msg.sender, preview: (msg.searchText || '').substring(0, 80), timestamp: msg.createdAt });
       }
       state.set('exportCollection', collection);
       saveExportCollection();
@@ -150,7 +151,7 @@ export class MessageView {
     // Export dropdown
     const exportWrapper = document.createElement('div');
     exportWrapper.style.cssText = 'position:relative;';
-    const exportBtn = this._headerBtn('导出此对话', 'export');
+    const exportBtn = this._headerBtn(t('msgView.exportThis'), 'export');
     exportBtn.appendChild(document.createTextNode(' \u25BE'));
     exportBtn.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -205,7 +206,7 @@ export class MessageView {
           sep.className = 'time-separator';
           sep.style.cssText = 'text-align:center;padding:16px 0;color:var(--text-muted);font-size:0.8rem;';
           const hours = Math.floor(diffMinutes / 60);
-          sep.textContent = '\u2014 ' + (hours > 24 ? Math.floor(hours / 24) + ' 天后' : hours + ' 小时后') + ' \u2014';
+          sep.textContent = '\u2014 ' + (hours > 24 ? Math.floor(hours / 24) + t('msgView.daysLater') : hours + t('msgView.hoursLater')) + ' \u2014';
           scrollContainer.appendChild(sep);
         }
       }
@@ -361,7 +362,7 @@ export class MessageView {
     const collection = state.get('exportCollection') || [];
     const key = conv.uuid + ':' + mi;
     if (collection.some(item => item.key === key)) return;
-    collection.push({ key, convUuid: conv.uuid, convName: conv.name || '未命名', msgIndex: mi, sender: msg.sender, preview: (msg.searchText || '').substring(0, 80), timestamp: msg.createdAt });
+    collection.push({ key, convUuid: conv.uuid, convName: conv.name || t('msgView.unnamed2'), msgIndex: mi, sender: msg.sender, preview: (msg.searchText || '').substring(0, 80), timestamp: msg.createdAt });
     state.set('exportCollection', collection);
     saveExportCollection();
   }
@@ -402,7 +403,7 @@ export class MessageView {
         const msg = conv.messages[idx];
         const key = conv.uuid + ':' + idx;
         if (collection.some(item => item.key === key)) continue;
-        collection.push({ key, convUuid: conv.uuid, convName: conv.name || '未命名', msgIndex: idx, sender: msg.sender, preview: (msg.searchText || '').substring(0, 80), timestamp: msg.createdAt });
+        collection.push({ key, convUuid: conv.uuid, convName: conv.name || t('msgView.unnamed2'), msgIndex: idx, sender: msg.sender, preview: (msg.searchText || '').substring(0, 80), timestamp: msg.createdAt });
       }
       state.set('exportCollection', collection);
       saveExportCollection();

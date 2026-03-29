@@ -6,6 +6,7 @@
 import { state, resetSidebarFilter } from '../store/state.js';
 import { formatTimestamp } from '../utils/time.js';
 import { escapeHtml } from '../utils/markdown.js';
+import { t } from '../i18n.js';
 
 export class SearchPanel {
   constructor() {
@@ -40,7 +41,7 @@ export class SearchPanel {
 
     const title = document.createElement('h2');
     title.style.cssText = 'font-size:1.15rem;font-weight:600;margin-bottom:16px;color:var(--text-primary);';
-    title.textContent = '搜索对话内容';
+    title.textContent = t('search.title');
     header.appendChild(title);
 
     // Keyword input row
@@ -49,7 +50,7 @@ export class SearchPanel {
 
     const searchInput = document.createElement('input');
     searchInput.type = 'text';
-    searchInput.placeholder = '输入关键词搜索所有对话...';
+    searchInput.placeholder = t('search.placeholder');
     searchInput.id = 'search-panel-input';
     searchInput.style.cssText = `
       flex: 1;
@@ -90,11 +91,11 @@ export class SearchPanel {
     filterRow.style.cssText = 'display:flex;gap:10px;align-items:center;flex-wrap:wrap;';
 
     // Date range
-    const dateFromInput = this._createDateInput('search-date-from', '开始日期');
+    const dateFromInput = this._createDateInput('search-date-from', t('search.startDate'));
     const dateSep = document.createElement('span');
     dateSep.style.cssText = 'color:var(--text-muted);font-size:0.85rem;';
-    dateSep.textContent = '至';
-    const dateToInput = this._createDateInput('search-date-to', '结束日期');
+    dateSep.textContent = t('search.dateSep');
+    const dateToInput = this._createDateInput('search-date-to', t('search.endDate'));
 
     dateFromInput.addEventListener('change', () => {
       this.filters.dateFrom = dateFromInput.value;
@@ -116,9 +117,9 @@ export class SearchPanel {
 
     // Role filter
     const roleSelect = this._createSelect('search-role', [
-      { value: 'all', label: '全部角色' },
-      { value: 'human', label: '仅人类' },
-      { value: 'assistant', label: '仅 AI' },
+      { value: 'all', label: t('search.allRoles') },
+      { value: 'human', label: t('search.humanOnly') },
+      { value: 'assistant', label: t('search.aiOnly') },
     ]);
     roleSelect.addEventListener('change', () => {
       this.filters.role = roleSelect.value;
@@ -128,10 +129,10 @@ export class SearchPanel {
 
     // Content type filter
     const typeSelect = this._createSelect('search-type', [
-      { value: 'all', label: '全部类型' },
-      { value: 'thinking', label: '含思考过程' },
-      { value: 'tool', label: '含工具调用' },
-      { value: 'flag', label: '含系统标记' },
+      { value: 'all', label: t('search.allTypes') },
+      { value: 'thinking', label: t('search.withThinking') },
+      { value: 'tool', label: t('search.withToolUse') },
+      { value: 'flag', label: t('search.withFlags') },
     ]);
     typeSelect.addEventListener('change', () => {
       this.filters.contentType = typeSelect.value;
@@ -152,7 +153,7 @@ export class SearchPanel {
       transition: all 0.15s;
       white-space: nowrap;
     `;
-    clearBtn.textContent = '清除筛选';
+    clearBtn.textContent = t('search.clearFilters');
     clearBtn.addEventListener('mouseenter', () => {
       clearBtn.style.borderColor = 'var(--accent)';
       clearBtn.style.color = 'var(--accent)';
@@ -310,7 +311,7 @@ export class SearchPanel {
 
     if (this.results.length === 0) {
       statsBar.style.display = 'block';
-      statsBar.textContent = '没有找到匹配的内容';
+      statsBar.textContent = t('search.noResults');
       this._renderNoResults(container);
       return;
     }
@@ -318,8 +319,8 @@ export class SearchPanel {
     // Stats bar
     statsBar.style.display = 'block';
     const convCount = new Set(this.results.map(r => r.convIndex)).size;
-    statsBar.textContent = `找到 ${this.results.length} 条结果，分布在 ${convCount} 段对话中` +
-      (this.results.length >= 200 ? '（仅显示前200条）' : '');
+    statsBar.textContent = t('search.results', { count: this.results.length, convs: convCount }) +
+      (this.results.length >= 200 ? t('search.resultsLimit') : '');
 
     // Group results by conversation
     const grouped = new Map();
@@ -354,7 +355,7 @@ export class SearchPanel {
 
       const groupCount = document.createElement('span');
       groupCount.style.cssText = 'font-weight:400;color:var(--text-muted);font-size:0.75rem;';
-      groupCount.textContent = group.results.length + ' 条匹配';
+      groupCount.textContent = group.results.length + t('search.matchCount');
       groupHeader.appendChild(groupCount);
 
       groupEl.appendChild(groupHeader);

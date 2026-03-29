@@ -6,6 +6,7 @@ import { state } from '../store/state.js';
 import { saveToCache, getCacheInfo, loadFromCache, clearCache } from '../utils/cache.js';
 import { createIcon } from '../utils/icons.js';
 import { SPARK_SVG } from '../utils/spark.js';
+import { t } from '../i18n.js';
 import ParseWorker from '../parser/worker.js?worker&inline';
 
 // SPARK_SVG imported from shared module '../utils/spark.js'
@@ -39,7 +40,7 @@ export class FileUpload {
     claudeSpan.style.cssText = 'font-size:30px;vertical-align:-4px;';
     claudeSpan.textContent = 'Claude ';
     h1.appendChild(claudeSpan);
-    h1.appendChild(document.createTextNode('对话记忆查看器'));
+    h1.appendChild(document.createTextNode(t('upload.title')));
     greetingRow.appendChild(h1);
     greetingRow.style.cssText += 'margin-bottom:20px;';
     screen.appendChild(greetingRow);
@@ -53,7 +54,7 @@ export class FileUpload {
     // Text area (fake placeholder)
     const fakeInput = document.createElement('div');
     fakeInput.style.cssText = 'padding:16px 18px 8px;font-size:12px;color:var(--text-muted);line-height:1.4;';
-    fakeInput.textContent = '点击选择 或拖拽 conversations.json 到这里';
+    fakeInput.textContent = t('upload.dropzone');
     zone.appendChild(fakeInput);
 
     // Toolbar row (mimics Claude's input toolbar)
@@ -133,7 +134,7 @@ export class FileUpload {
 
     const nameTitle = document.createElement('div');
     nameTitle.className = 'name-config-title';
-    nameTitle.textContent = '显示名称设置';
+    nameTitle.textContent = t('upload.namesTitle');
     nameConfig.appendChild(nameTitle);
 
     const nameInputs = document.createElement('div');
@@ -141,10 +142,10 @@ export class FileUpload {
 
     const names = state.get('displayNames');
 
-    const humanGroup = this.createNameInput('用户显示名', names.human);
+    const humanGroup = this.createNameInput(t('upload.humanName'), names.human);
     humanGroup.querySelector('input').id = 'name-human';
 
-    const assistantGroup = this.createNameInput('助手显示名', names.assistant);
+    const assistantGroup = this.createNameInput(t('upload.assistantName'), names.assistant);
     assistantGroup.querySelector('input').id = 'name-assistant';
 
     nameInputs.appendChild(humanGroup);
@@ -160,7 +161,7 @@ export class FileUpload {
     saveBtn.addEventListener('mouseenter', () => { saveBtn.style.opacity = '0.85'; saveBtn.style.transform = 'translateY(-1px)'; saveBtn.style.boxShadow = 'var(--shadow-sm)'; });
     saveBtn.addEventListener('mouseleave', () => { saveBtn.style.opacity = '1'; saveBtn.style.transform = ''; saveBtn.style.boxShadow = 'var(--shadow-xs)'; });
     saveBtn.appendChild(createIcon('save', 14));
-    saveBtn.appendChild(document.createTextNode(' 保存并应用'));
+    saveBtn.appendChild(document.createTextNode(t('upload.saveApply')));
     saveBtn.addEventListener('click', () => {
       const humanVal = document.getElementById('name-human')?.value || 'Synqa';
       const assistantVal = document.getElementById('name-assistant')?.value || 'Sylux';
@@ -169,11 +170,11 @@ export class FileUpload {
       localStorage.setItem('cv-names', JSON.stringify(newNames));
       saveBtn.textContent = '';
       saveBtn.appendChild(createIcon('check', 14));
-      saveBtn.appendChild(document.createTextNode(' 已保存'));
+      saveBtn.appendChild(document.createTextNode(t('upload.applied')));
       setTimeout(() => {
         saveBtn.textContent = '';
         saveBtn.appendChild(createIcon('save', 14));
-        saveBtn.appendChild(document.createTextNode(' 保存并应用'));
+        saveBtn.appendChild(document.createTextNode(t('upload.saveApply')));
       }, 1500);
     });
     btnRow.appendChild(saveBtn);
@@ -183,7 +184,7 @@ export class FileUpload {
     resetBtn.addEventListener('mouseenter', () => { resetBtn.style.transform = 'translateY(-1px)'; resetBtn.style.boxShadow = 'var(--shadow-sm)'; });
     resetBtn.addEventListener('mouseleave', () => { resetBtn.style.transform = ''; resetBtn.style.boxShadow = 'var(--shadow-xs)'; });
     resetBtn.appendChild(createIcon('reset', 14));
-    resetBtn.appendChild(document.createTextNode(' 重置'));
+    resetBtn.appendChild(document.createTextNode(t('upload.resetNames')));
     resetBtn.addEventListener('click', () => {
       const defaults = { human: 'Synqa', assistant: 'Sylux' };
       document.getElementById('name-human').value = defaults.human;
@@ -208,13 +209,13 @@ export class FileUpload {
       { id: 'claude', iconName: null },
     ];
 
-    for (const t of themes) {
+    for (const th of themes) {
       const btn = document.createElement('button');
-      btn.dataset.theme = t.id;
-      const isActive = state.get('theme') === t.id;
+      btn.dataset.theme = th.id;
+      const isActive = state.get('theme') === th.id;
       btn.style.cssText = `display:flex;align-items:center;justify-content:center;width:36px;height:36px;border:none;border-radius:12px;cursor:pointer;transition:all 0.15s;color:${isActive ? 'var(--accent)' : 'var(--text-muted)'};${isActive ? 'background:var(--accent-bg);box-shadow:var(--shadow-inset);' : 'background:transparent;'}`;
-      if (t.iconName) {
-        btn.appendChild(createIcon(t.iconName, 18));
+      if (th.iconName) {
+        btn.appendChild(createIcon(th.iconName, 18));
       } else {
         const sparkSmall = document.createElement('span');
         sparkSmall.style.cssText = 'width:18px;height:18px;display:inline-flex;';
@@ -224,9 +225,9 @@ export class FileUpload {
         btn.appendChild(sparkSmall);
       }
       btn.addEventListener('click', () => {
-        state.set('theme', t.id);
+        state.set('theme', th.id);
         themeSwitcher.querySelectorAll('button').forEach(b => {
-          const active = b.dataset.theme === t.id;
+          const active = b.dataset.theme === th.id;
           b.style.background = active ? 'var(--accent-bg)' : 'transparent';
           b.style.boxShadow = active ? 'var(--shadow-inset)' : 'none';
           b.style.color = active ? 'var(--accent)' : 'var(--text-muted)';
@@ -241,11 +242,11 @@ export class FileUpload {
     hintsWrapper.style.cssText = 'text-align:center;margin-top:8px;';
     const subtitle = document.createElement('p');
     subtitle.style.cssText = 'color:var(--text-muted);font-size:12px;';
-    subtitle.textContent = '上传 Claude 导出的 JSON 文件，回顾和整理你与Claude的每一段对话';
+    subtitle.textContent = t('upload.subtitle');
     hintsWrapper.appendChild(subtitle);
     const hintPath = document.createElement('p');
     hintPath.style.cssText = 'color:var(--text-muted);font-size:12px;margin-top:4px;';
-    hintPath.textContent = 'Claude Settings → Data Export → 下载的 conversations.json';
+    hintPath.textContent = t('upload.hint');
     hintsWrapper.appendChild(hintPath);
 
     screen.appendChild(hintsWrapper);
@@ -258,7 +259,7 @@ export class FileUpload {
     // Credit at very bottom
     const credit = document.createElement('p');
     credit.style.cssText = 'color:var(--text-muted);font-size:11px;opacity:0.5;text-align:center;padding-bottom:32px;';
-    credit.textContent = 'Claude对话记忆查看器 · Made with love by Sylux & Synqa';
+    credit.textContent = t('upload.footer');
     screen.appendChild(credit);
 
     // Error banner
@@ -291,7 +292,7 @@ export class FileUpload {
 
   handleFile(file) {
     if (!file.name.endsWith('.json')) {
-      this.showError('请上传 JSON 格式的文件');
+      this.showError(t('upload.errorJson'));
       return;
     }
 
@@ -313,7 +314,7 @@ export class FileUpload {
               state.set('loading', false);
               if (!data.conversations || data.conversations.length === 0) {
                 this.showUploadScreen();
-                this.showError('没有解析出可显示的对话，请检查导出的 JSON 内容');
+                this.showError(t('upload.errorEmpty'));
                 worker.terminate();
                 break;
               }
@@ -337,20 +338,20 @@ export class FileUpload {
           // Worker crash — fallback to main thread
           state.set('loading', false);
           this.showUploadScreen();
-          this.showError('解析失败，请刷新页面重试');
+          this.showError(t('upload.errorParse'));
           worker.terminate();
         };
         worker.postMessage({ jsonString: e.target.result });
       } catch (err) {
         state.set('loading', false);
         this.showUploadScreen();
-        this.showError('文件读取失败: ' + err.message);
+        this.showError(t('upload.errorRead') + ': ' + err.message);
       }
     };
     reader.onerror = () => {
       state.set('loading', false);
       this.showUploadScreen();
-      this.showError('文件读取失败');
+      this.showError(t('upload.errorRead'));
     };
     reader.readAsText(file);
   }
@@ -383,7 +384,7 @@ export class FileUpload {
     const loadingText = document.createElement('div');
     loadingText.className = 'loading-text';
     loadingText.id = 'loading-text';
-    loadingText.textContent = '正在搬运你的记忆...';
+    loadingText.textContent = t('upload.loading');
     screen.appendChild(loadingText);
 
     const progressContainer = document.createElement('div');
@@ -399,7 +400,7 @@ export class FileUpload {
   updateProgress(current, total) {
     const text = document.getElementById('loading-text');
     const bar = document.getElementById('loading-progress-bar');
-    if (text) text.textContent = `正在搬运你的记忆... ${current}/${total} 段对话`;
+    if (text) text.textContent = t('upload.loadingProgress', { current, total });
     if (bar) bar.style.width = `${(current / total) * 100}%`;
   }
 
@@ -421,7 +422,7 @@ export class FileUpload {
     const info_div = document.createElement('div');
     const title = document.createElement('div');
     title.style.cssText = 'font-size:13px;font-weight:600;color:var(--section-title-color, var(--text-muted));margin-bottom:3px;';
-    title.textContent = '发现上次的数据缓存';
+    title.textContent = t('upload.cacheFound');
     info_div.appendChild(title);
 
     const detail = document.createElement('div');
@@ -430,7 +431,7 @@ export class FileUpload {
     const sizeStr = info.fileSize > 1024 * 1024
       ? (info.fileSize / (1024 * 1024)).toFixed(1) + ' MB'
       : (info.fileSize / 1024).toFixed(0) + ' KB';
-    detail.textContent = `${info.convCount} 段对话 · ${sizeStr} · ${date.toLocaleString('zh-CN')}`;
+    detail.textContent = `${t('upload.cacheConvs', { n: info.convCount })} · ${sizeStr} · ${date.toLocaleString('zh-CN')}`;
     info_div.appendChild(detail);
     banner.appendChild(info_div);
 
@@ -441,9 +442,9 @@ export class FileUpload {
     loadBtn.style.cssText = 'padding:7px 14px;border:none;border-radius:var(--radius-sm);background:var(--btn-primary-bg, var(--text-secondary));color:var(--btn-primary-text, #fff);cursor:pointer;font-size:12px;font-weight:500;transition:all 0.2s;box-shadow:var(--shadow-xs);';
     loadBtn.addEventListener('mouseenter', () => { loadBtn.style.opacity = '0.85'; loadBtn.style.transform = 'translateY(-1px)'; loadBtn.style.boxShadow = 'var(--shadow-sm)'; });
     loadBtn.addEventListener('mouseleave', () => { loadBtn.style.opacity = '1'; loadBtn.style.transform = ''; loadBtn.style.boxShadow = 'var(--shadow-xs)'; });
-    loadBtn.textContent = '加载缓存';
+    loadBtn.textContent = t('upload.cacheLoad');
     loadBtn.addEventListener('click', async () => {
-      loadBtn.textContent = '加载中...';
+      loadBtn.textContent = t('upload.cacheLoading');
       loadBtn.disabled = true;
       try {
         const cached = await loadFromCache();
@@ -451,13 +452,13 @@ export class FileUpload {
           state.set('loading', false);
           state.set('conversations', cached.conversations);
         } else {
-          this.showError('缓存数据损坏，请重新上传');
-          loadBtn.textContent = '加载缓存';
+          this.showError(t('upload.cacheCorrupt'));
+          loadBtn.textContent = t('upload.cacheLoad');
           loadBtn.disabled = false;
         }
       } catch (e) {
-        this.showError('加载缓存失败: ' + e.message);
-        loadBtn.textContent = '加载缓存';
+        this.showError(t('upload.cacheFail') + e.message);
+        loadBtn.textContent = t('upload.cacheLoad');
         loadBtn.disabled = false;
       }
     });
@@ -467,7 +468,7 @@ export class FileUpload {
     clearBtn.style.cssText = 'padding:7px 14px;border:none;border-radius:var(--radius-sm);background:var(--bg-input);color:var(--text-secondary);cursor:pointer;font-size:12px;transition:all 0.2s;box-shadow:var(--shadow-xs);';
     clearBtn.addEventListener('mouseenter', () => { clearBtn.style.transform = 'translateY(-1px)'; clearBtn.style.boxShadow = 'var(--shadow-sm)'; });
     clearBtn.addEventListener('mouseleave', () => { clearBtn.style.transform = ''; clearBtn.style.boxShadow = 'var(--shadow-xs)'; });
-    clearBtn.textContent = '清除';
+    clearBtn.textContent = t('upload.cacheClear');
     clearBtn.addEventListener('click', async () => {
       await clearCache();
       banner.remove();

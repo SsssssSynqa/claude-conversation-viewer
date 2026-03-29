@@ -2,6 +2,7 @@
  * Export utilities — TXT, Markdown, HTML formats.
  * All formats properly handle thinking blocks via item.thinking field.
  */
+import { t } from '../i18n.js';
 
 /**
  * Export conversations as plain text.
@@ -14,9 +15,9 @@ export function exportAsText(conversations, options = {}) {
 
   for (const conv of conversations) {
     output += '='.repeat(60) + '\n';
-    output += (conv.name || '未命名对话') + '\n';
+    output += (conv.name || t('exportFile.unnamed')) + '\n';
     output += formatDateLine(conv.createdAt) + '\n';
-    output += conv.stats.messageCount + ' 条消息\n';
+    output += conv.stats.messageCount + t('exportFile.msgCount') + '\n';
     output += '='.repeat(60) + '\n\n';
 
     for (const msg of conv.messages) {
@@ -31,14 +32,14 @@ export function exportAsText(conversations, options = {}) {
             break;
           case 'thinking':
             if (includeThinking && block.thinking) {
-              output += '\n--- 思考过程' + (block.durationText ? ` (${block.durationText})` : '') + ' ---\n';
+              output += '\n' + t('exportFile.thinkingStart') + (block.durationText ? ` (${block.durationText})` : '') + ' ---\n';
               output += block.thinking + '\n';
-              output += '--- 思考结束 ---\n';
+              output += t('exportFile.thinkingEnd') + '\n';
             }
             break;
           case 'tool_use':
             if (includeToolUse) {
-              output += `\n[工具调用: ${block.toolName}]\n`;
+              output += `\n[${t('exportFile.toolUse')}${block.toolName}]\n`;
               if (block.toolInput && Object.keys(block.toolInput).length > 0) {
                 output += 'Input: ' + JSON.stringify(block.toolInput) + '\n';
               }
@@ -49,14 +50,14 @@ export function exportAsText(conversations, options = {}) {
             break;
           case 'flag':
             if (includeFlags) {
-              output += `\n[系统标记: ${block.flagType}]\n`;
+              output += `\n[${t('exportFile.flag')}${block.flagType}]\n`;
             }
             break;
         }
       }
 
       if (msg.files.length > 0) {
-        output += '附件: ' + msg.files.join(', ') + '\n';
+        output += t('exportFile.attachment') + msg.files.join(', ') + '\n';
       }
 
       output += '\n---\n\n';
@@ -76,8 +77,8 @@ export function exportAsMarkdown(conversations, options = {}) {
   let output = '';
 
   for (const conv of conversations) {
-    output += `# ${conv.name || '未命名对话'}\n\n`;
-    output += `*${formatDateLine(conv.createdAt)} \u2014 ${conv.stats.messageCount} 条消息*\n\n`;
+    output += `# ${conv.name || t('exportFile.unnamed')}\n\n`;
+    output += `*${formatDateLine(conv.createdAt)} \u2014 ${conv.stats.messageCount}${t('exportFile.msgCount')}*\n\n`;
 
     for (const msg of conv.messages) {
       const sender = msg.sender === 'human' ? humanName : assistantName;
@@ -92,13 +93,13 @@ export function exportAsMarkdown(conversations, options = {}) {
           case 'thinking':
             if (includeThinking && block.thinking) {
               const dur = block.durationText ? ` (${block.durationText})` : '';
-              output += `> \uD83D\uDCAD **思考过程**${dur}\n\n`;
+              output += `${t('exportFile.mdThinking')}${dur}\n\n`;
               output += toMarkdownCodeBlock(block.thinking) + '\n\n';
             }
             break;
           case 'tool_use':
             if (includeToolUse) {
-              output += `> \uD83D\uDD27 **工具: ${block.toolName}**\n\n`;
+              output += `${t('exportFile.mdTool')}${block.toolName}**\n\n`;
               if (block.toolInput && Object.keys(block.toolInput).length > 0) {
                 output += toMarkdownCodeBlock(JSON.stringify(block.toolInput, null, 2)) + '\n\n';
               }
@@ -110,14 +111,14 @@ export function exportAsMarkdown(conversations, options = {}) {
             break;
           case 'flag':
             if (includeFlags) {
-              output += `> \u26A0\uFE0F **系统标记: ${block.flagType}**\n\n`;
+              output += `${t('exportFile.mdFlag')}${block.flagType}**\n\n`;
             }
             break;
         }
       }
 
       if (msg.files.length > 0) {
-        output += '\uD83D\uDCCE 附件: ' + msg.files.join(', ') + '\n\n';
+        output += t('exportFile.mdAttachment') + msg.files.join(', ') + '\n\n';
       }
 
       output += '---\n\n';
@@ -146,8 +147,8 @@ export function exportAsHTML(conversations, options = {}) {
   let body = '';
   for (const conv of conversations) {
     body += '<div class="conv">';
-    body += '<h1>' + escapeForHtml(conv.name || '未命名对话') + '</h1>';
-    body += '<p class="meta">' + escapeForHtml(formatDateLine(conv.createdAt)) + ' \u2014 ' + conv.stats.messageCount + ' 条消息</p>';
+    body += '<h1>' + escapeForHtml(conv.name || t('exportFile.unnamed')) + '</h1>';
+    body += '<p class="meta">' + escapeForHtml(formatDateLine(conv.createdAt)) + ' \u2014 ' + conv.stats.messageCount + t('exportFile.msgCount') + '</p>';
 
     for (const msg of conv.messages) {
       const sender = msg.sender === 'human' ? humanName : assistantName;

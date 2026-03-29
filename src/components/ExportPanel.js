@@ -6,6 +6,7 @@
 import { state, saveExportCollection } from '../store/state.js';
 import { exportAsText, exportAsMarkdown, exportAsHTML, downloadFile, encodeUTF8 } from '../utils/export.js';
 import { formatTimestamp, formatDate, formatLocalDateStamp } from '../utils/time.js';
+import { t } from '../i18n.js';
 import JSZip from 'jszip';
 
 export class ExportPanel {
@@ -39,7 +40,7 @@ export class ExportPanel {
 
     const title = document.createElement('h2');
     title.style.cssText = 'font-size:1.15rem;font-weight:600;color:var(--text-primary);margin-bottom:12px;';
-    title.textContent = '导出中心';
+    title.textContent = t('export.title');
     header.appendChild(title);
 
     // Format + Options row
@@ -51,12 +52,12 @@ export class ExportPanel {
     formatGroup.style.cssText = 'display:flex;gap:6px;align-items:center;';
     const formatLabel = document.createElement('span');
     formatLabel.style.cssText = 'font-size:0.8rem;color:var(--text-muted);';
-    formatLabel.textContent = '格式:';
+    formatLabel.textContent = t('export.format');
     formatGroup.appendChild(formatLabel);
 
     const formats = [
       { value: 'md', label: 'Markdown' },
-      { value: 'txt', label: '纯文本' },
+      { value: 'txt', label: t('export.plainText') },
       { value: 'html', label: 'HTML' },
       { value: 'json', label: 'JSON' },
     ];
@@ -86,10 +87,10 @@ export class ExportPanel {
 
     // Options toggles (inline)
     const optToggles = [
-      { key: 'includeThinking', label: '含思考' },
-      { key: 'includeToolUse', label: '含工具' },
-      { key: 'includeFlags', label: '含标记' },
-      { key: 'addBOM', label: 'BOM (Excel兼容)' },
+      { key: 'includeThinking', label: t('export.includeThinking') },
+      { key: 'includeToolUse', label: t('export.includeTools') },
+      { key: 'includeFlags', label: t('export.includeFlags') },
+      { key: 'addBOM', label: t('export.bom') },
     ];
     for (const opt of optToggles) {
       const label = document.createElement('label');
@@ -112,24 +113,24 @@ export class ExportPanel {
 
     const prefixLabel = document.createElement('span');
     prefixLabel.style.cssText = 'font-size:0.8rem;color:var(--text-muted);';
-    prefixLabel.textContent = '文件名前缀:';
+    prefixLabel.textContent = t('export.filePrefix');
     nameRow.appendChild(prefixLabel);
 
     const prefixInput = document.createElement('input');
     prefixInput.type = 'text';
-    prefixInput.placeholder = '可选';
+    prefixInput.placeholder = t('export.optional');
     prefixInput.style.cssText = 'padding:4px 8px;background:var(--bg-input);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);font-size:0.8rem;width:100px;';
     prefixInput.addEventListener('input', () => { this.options.filePrefix = prefixInput.value; });
     nameRow.appendChild(prefixInput);
 
     const suffixLabel = document.createElement('span');
     suffixLabel.style.cssText = 'font-size:0.8rem;color:var(--text-muted);';
-    suffixLabel.textContent = '后缀:';
+    suffixLabel.textContent = t('export.fileSuffix');
     nameRow.appendChild(suffixLabel);
 
     const suffixInput = document.createElement('input');
     suffixInput.type = 'text';
-    suffixInput.placeholder = '可选';
+    suffixInput.placeholder = t('export.optional');
     suffixInput.style.cssText = 'padding:4px 8px;background:var(--bg-input);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);font-size:0.8rem;width:100px;';
     suffixInput.addEventListener('input', () => { this.options.fileSuffix = suffixInput.value; });
     nameRow.appendChild(suffixInput);
@@ -145,7 +146,7 @@ export class ExportPanel {
     const quickSection = document.createElement('div');
     quickSection.style.cssText = 'margin-bottom:24px;';
 
-    const quickTitle = this._sectionTitle('快捷导出');
+    const quickTitle = this._sectionTitle(t('export.quickExport'));
     quickSection.appendChild(quickTitle);
 
     const quickRow = document.createElement('div');
@@ -154,16 +155,16 @@ export class ExportPanel {
     const conversations = state.get('conversations') || [];
 
     const exportAllBtn = this._createExportBtn(
-      '\uD83D\uDCE6 导出全部对话',
-      conversations.length + ' 段对话',
+      t('export.exportAll'),
+      t('export.exportAllCount', { n: conversations.length }),
       () => this._doExport(conversations)
     );
     quickRow.appendChild(exportAllBtn);
 
     // ZIP export
     const exportZipBtn = this._createExportBtn(
-      '\uD83D\uDCE6 批量导出 ZIP',
-      conversations.length + ' 段对话，每段一个文件',
+      t('export.exportZip'),
+      t('export.exportZipDesc', { n: conversations.length }),
       () => this._doZipExport(conversations)
     );
     quickRow.appendChild(exportZipBtn);
@@ -171,8 +172,8 @@ export class ExportPanel {
     const filtered = state.get('filteredConversations') || [];
     if (filtered.length !== conversations.length) {
       const exportFilteredBtn = this._createExportBtn(
-        '\uD83D\uDD0D 导出筛选结果',
-        filtered.length + ' 段对话',
+        t('export.exportFiltered'),
+        t('export.exportAllCount', { n: filtered.length }),
         () => this._doExport(filtered)
       );
       quickRow.appendChild(exportFilteredBtn);
@@ -197,7 +198,7 @@ export class ExportPanel {
     const convSection = document.createElement('div');
     convSection.style.cssText = 'margin-bottom:24px;';
 
-    const convTitle = this._sectionTitle('按对话导出（' + conversations.length + '）');
+    const convTitle = this._sectionTitle(t('export.perConv', { n: conversations.length }));
     convSection.appendChild(convTitle);
 
     const convList = document.createElement('div');
@@ -214,14 +215,14 @@ export class ExportPanel {
 
       const name = document.createElement('div');
       name.style.cssText = 'font-size:0.9rem;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:500;';
-      name.textContent = conv.name || '未命名对话';
+      name.textContent = conv.name || t('convList.unnamed');
       info.appendChild(name);
 
       const meta = document.createElement('div');
       meta.style.cssText = 'font-size:0.75rem;color:var(--text-muted);margin-top:2px;';
       const firstTs = conv.messages[0]?.createdAt;
       const lastTs = conv.messages[conv.messages.length - 1]?.createdAt;
-      let metaText = conv.stats.messageCount + ' 条消息';
+      let metaText = t('export.msgCount', { n: conv.stats.messageCount });
       if (firstTs && lastTs) {
         metaText += ' \u00B7 ' + formatTimestamp(firstTs) + ' \u2014 ' + formatTimestamp(lastTs);
       }
@@ -232,7 +233,7 @@ export class ExportPanel {
 
       const btn = document.createElement('button');
       btn.style.cssText = 'padding:4px 12px;border:1px solid var(--border);border-radius:4px;background:transparent;color:var(--text-muted);cursor:pointer;font-size:0.75rem;transition:all 0.15s;white-space:nowrap;flex-shrink:0;margin-left:12px;';
-      btn.textContent = '导出';
+      btn.textContent = t('export.exportBtn');
       btn.addEventListener('mouseenter', () => { btn.style.borderColor = 'var(--accent)'; btn.style.color = 'var(--accent)'; });
       btn.addEventListener('mouseleave', () => { btn.style.borderColor = 'var(--border)'; btn.style.color = 'var(--text-muted)'; });
       btn.addEventListener('click', () => this._doExport([conv]));
@@ -254,7 +255,7 @@ export class ExportPanel {
     const titleRow = document.createElement('div');
     titleRow.style.cssText = 'display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;';
 
-    const title = this._sectionTitle('精选集（' + collection.length + ' 条）');
+    const title = this._sectionTitle(t('export.collection', { n: collection.length }));
     title.style.marginBottom = '0';
     titleRow.appendChild(title);
 
@@ -264,13 +265,13 @@ export class ExportPanel {
 
       const exportBtn = document.createElement('button');
       exportBtn.style.cssText = 'padding:4px 12px;border:none;border-radius:4px;background:var(--accent);color:#fff;cursor:pointer;font-size:0.8rem;font-weight:600;';
-      exportBtn.textContent = '导出精选集';
+      exportBtn.textContent = t('export.exportCollection');
       exportBtn.addEventListener('click', () => this._exportCollection());
       btnGroup.appendChild(exportBtn);
 
       const clearBtn = document.createElement('button');
       clearBtn.style.cssText = 'padding:4px 12px;border:1px solid var(--border);border-radius:4px;background:transparent;color:var(--text-muted);cursor:pointer;font-size:0.8rem;';
-      clearBtn.textContent = '清空';
+      clearBtn.textContent = t('export.clearCollection');
       clearBtn.addEventListener('click', () => {
         state.set('exportCollection', []);
         saveExportCollection();
@@ -285,7 +286,7 @@ export class ExportPanel {
     if (collection.length === 0) {
       const empty = document.createElement('div');
       empty.style.cssText = 'padding:20px;text-align:center;color:var(--text-muted);font-size:0.85rem;border:1px dashed var(--border);border-radius:var(--radius-sm);';
-      empty.textContent = '精选集为空。在对话中选择消息并点击"+精选"添加到这里。';
+      empty.textContent = t('export.collectionEmpty');
       section.appendChild(empty);
       return;
     }

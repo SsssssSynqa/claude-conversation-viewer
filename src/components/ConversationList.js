@@ -5,6 +5,7 @@
 import { state } from '../store/state.js';
 import { formatDate, formatMonthKey, formatMonthLabel } from '../utils/time.js';
 import { createIcon } from '../utils/icons.js';
+import { t } from '../i18n.js';
 
 export class ConversationList {
   constructor(container) {
@@ -42,7 +43,7 @@ export class ConversationList {
     this.searchInput = document.createElement('input');
     this.searchInput.type = 'text';
     this.searchInput.className = 'history-search-input';
-    this.searchInput.placeholder = '搜索对话标题...';
+    this.searchInput.placeholder = t('convList.searchPlaceholder');
     this.searchInput.value = state.get('searchQuery') || '';
     this.searchInput.addEventListener('input', () => this.onSearch());
 
@@ -82,7 +83,7 @@ export class ConversationList {
     if (conversations.length === 0) {
       const empty = document.createElement('div');
       empty.style.cssText = 'padding:40px 20px;text-align:center;color:var(--text-muted);';
-      empty.textContent = '没有找到对话';
+      empty.textContent = t('convList.empty');
       this.listEl.appendChild(empty);
       return;
     }
@@ -121,7 +122,7 @@ export class ConversationList {
         // Title
         const titleEl = document.createElement('div');
         titleEl.style.cssText = 'font-size:0.9rem;color:var(--sidebar-text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:500;';
-        titleEl.textContent = conv.name || '未命名对话';
+        titleEl.textContent = conv.name || t('convList.unnamed');
         item.appendChild(titleEl);
 
         // Meta line
@@ -133,13 +134,13 @@ export class ConversationList {
         meta.appendChild(dateSpan);
 
         const countSpan = document.createElement('span');
-        countSpan.textContent = conv.stats.messageCount + ' 条';
+        countSpan.textContent = conv.stats.messageCount + t('convList.msgCount');
         meta.appendChild(countSpan);
 
         if (conv.stats.hasThinking) {
           const thinkBadge = document.createElement('span');
           thinkBadge.textContent = '\uD83D\uDCAD';
-          thinkBadge.title = '包含思考过程';
+          thinkBadge.title = t('convList.hasThinking');
           thinkBadge.style.fontSize = '0.7rem';
           meta.appendChild(thinkBadge);
         }
@@ -147,7 +148,7 @@ export class ConversationList {
         if (conv.stats.hasFlags) {
           const flagBadge = document.createElement('span');
           flagBadge.textContent = '\u26A0\uFE0F';
-          flagBadge.title = '包含系统标记';
+          flagBadge.title = t('convList.hasFlags');
           flagBadge.style.fontSize = '0.7rem';
           meta.appendChild(flagBadge);
         }
