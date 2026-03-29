@@ -18,6 +18,9 @@ import { createSparkIcon } from './utils/spark.js';
 import { showLoading, hideLoading } from './components/Loading.js';
 import { t } from './i18n.js';
 
+// ---- Page title ----
+document.title = t('page.title');
+
 // ---- Theme ----
 function applyTheme(theme) {
   document.documentElement.dataset.theme = theme;
@@ -388,16 +391,10 @@ function renderMainView() {
     loDiv.style.cssText = 'font-weight:700;letter-spacing:0.5px;font-size:13px;';
     loDiv.textContent = lo.label;
     loDiv.addEventListener('click', () => {
+      localStorage.setItem('cv-lang', lo.lang);
       state.set('lang', lo.lang);
-      const lt = document.getElementById('sidebar-lang-track');
-      if (lt) {
-        const li = langOptions.findIndex(o => o.lang === lo.lang);
-        const lth = lt.querySelector('.toggle-thumb');
-        if (lth && li >= 0) lth.style.transform = `translateX(${li * 100}%)`;
-        lt.querySelectorAll('.toggle-option').forEach(el => {
-          el.classList.toggle('active', el.dataset.lang === lo.lang);
-        });
-      }
+      document.title = t('page.title');
+      location.reload();
     });
     langTrack.appendChild(loDiv);
   }
