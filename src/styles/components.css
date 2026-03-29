@@ -222,6 +222,8 @@
 
 .message-block .message-text {
   color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.7;
 }
 
 .message-block .message-sender {
