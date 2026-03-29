@@ -843,9 +843,9 @@ button {
 .sidebar.collapsed .sidebar-collapse-btn,
 .sidebar.collapsed .sidebar-foldable,
 .sidebar.collapsed .pill-row,
-.sidebar.collapsed .history-search-input,
+.sidebar.collapsed .sidebar-pill.pill-input,
 .sidebar.collapsed .conversation-list-scroll,
-.sidebar.collapsed .sidebar-pill span:not(.nav-icon),
+.sidebar.collapsed .sidebar-pill-label,
 .sidebar.collapsed .sidebar-pill .chevron-icon {
   display: none !important;
 }
@@ -859,6 +859,7 @@ button {
 .sidebar.collapsed .sidebar-actions {
   padding: 2px 0 12px !important;
   align-items: center;
+  height: 100%;
 }
 
 .sidebar.collapsed .sidebar-pill {
@@ -887,6 +888,8 @@ button {
 
 .sidebar.collapsed .sidebar-rail-toggle {
   display: inline-flex;
+  margin-top: auto;
+  margin-bottom: 8px;
 }
 
 /* ---- Responsive ---- */

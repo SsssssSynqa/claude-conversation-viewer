@@ -124,6 +124,7 @@ function renderMainView() {
     iconWrap.appendChild(createIcon(nav.icon, 16));
     pill.appendChild(iconWrap);
     const labelSpan = document.createElement('span');
+    labelSpan.className = 'sidebar-pill-label';
     labelSpan.textContent = nav.label;
     pill.appendChild(labelSpan);
     pill.addEventListener('click', nav.action);
