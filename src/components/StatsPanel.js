@@ -357,12 +357,17 @@ export class StatsPanel {
       parent.appendChild(nightCard);
     }
 
+    parent.appendChild(this._sectionTitle(t('stats.rhythm')));
+    const rhythmSection = document.createElement('div');
+    rhythmSection.style.cssText = 'margin-bottom:24px;';
+
     // ---- Weekday + Monthly Line Chart side by side ----
     const activityRow = document.createElement('div');
     activityRow.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;';
 
     // Weekday: neumorphic groove bars (slot track + pill inside)
     const weekdayCard = this._neuCard();
+    weekdayCard.style.cssText += 'background:var(--surface-soft);box-shadow:var(--shadow-xs);';
     const weekdayTitle = document.createElement('div');
     weekdayTitle.style.cssText = 'font-size:0.85rem;font-weight:600;color:var(--text-primary);margin-bottom:16px;';
     weekdayTitle.textContent = '星期几最爱聊天';
@@ -402,6 +407,7 @@ export class StatsPanel {
     // Monthly line chart goes next to weekday
     if (stats.monthlyData.labels.length > 1) {
       const chartCard1 = this._neuCard();
+      chartCard1.style.cssText += 'background:var(--surface-soft);box-shadow:var(--shadow-xs);';
       const chartTitle1 = document.createElement('div');
       chartTitle1.style.cssText = 'font-size:0.85rem;font-weight:600;color:var(--text-primary);margin-bottom:12px;';
       chartTitle1.textContent = '每月对话频率';
@@ -410,18 +416,18 @@ export class StatsPanel {
       canvas1.style.cssText = 'width:100%;height:180px;';
       chartCard1.appendChild(canvas1);
       activityRow.appendChild(chartCard1);
-      parent.appendChild(activityRow);
+      rhythmSection.appendChild(activityRow);
       requestAnimationFrame(() => {
         drawLineChart(canvas1, { labels: stats.monthlyData.labels, values: stats.monthlyData.convCounts }, {});
       });
     } else {
-      parent.appendChild(activityRow);
+      rhythmSection.appendChild(activityRow);
     }
 
     // ---- Hourly Activity (own row) ----
     if (stats.hourlyActivity.some(v => v > 0)) {
       const hourCard = this._neuCard();
-      hourCard.style.marginBottom = '24px';
+      hourCard.style.cssText += 'background:var(--surface-soft);box-shadow:var(--shadow-xs);margin-bottom:14px;';
       const hourTitle = document.createElement('div');
       hourTitle.style.cssText = 'font-size:0.85rem;font-weight:600;color:var(--text-primary);margin-bottom:16px;';
       hourTitle.textContent = '每日活跃时段';
@@ -448,13 +454,14 @@ export class StatsPanel {
         hourLabels.appendChild(label);
       }
       hourCard.appendChild(hourLabels);
-      parent.appendChild(hourCard);
+      rhythmSection.appendChild(hourCard);
     }
 
     // ---- Monthly Word Count (own row) ----
     if (stats.monthlyData.labels.length > 1) {
 
       const chartCard2 = this._neuCard();
+      chartCard2.style.cssText += 'background:var(--surface-soft);box-shadow:var(--shadow-xs);';
       const chartTitle2 = document.createElement('div');
       chartTitle2.style.cssText = 'font-size:0.85rem;font-weight:600;color:var(--text-primary);margin-bottom:12px;';
       chartTitle2.textContent = '每月字数';
@@ -512,9 +519,9 @@ export class StatsPanel {
       legend.innerHTML = `<span style="display:flex;align-items:center;gap:4px;"><span style="width:8px;height:8px;border-radius:50%;background:#7c6eea;display:inline-block;"></span>${names.human || 'Human'}</span>`
         + `<span style="display:flex;align-items:center;gap:4px;"><span style="width:8px;height:8px;border-radius:50%;background:#D97657;display:inline-block;"></span>${names.assistant || 'Assistant'}</span>`;
       chartCard2.appendChild(legend);
-      chartCard2.style.marginBottom = '24px';
-      parent.appendChild(chartCard2);
+      rhythmSection.appendChild(chartCard2);
     }
+    parent.appendChild(rhythmSection);
 
     // ---- Word Cloud (Top Words) — in a raised card ----
     if (stats.topHumanWords.length > 0 || stats.topAssistantWords.length > 0) {

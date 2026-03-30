@@ -149,6 +149,7 @@ const zh = {
   'stats.top5msgs': ' 条 / ',
   'stats.top5chars': ' 字',
   'stats.lateNightRank': '深夜对话榜（凌晨2-5点）',
+  'stats.rhythm': '交互节律',
 
   // Loading captions
   'loading.bubbles': '吹泡泡中...',
@@ -325,6 +326,7 @@ const en = {
   'stats.top5msgs': ' msgs / ',
   'stats.top5chars': ' chars',
   'stats.lateNightRank': 'Late Night Sessions (2-5 AM)',
+  'stats.rhythm': 'Interaction Rhythm',
 
   // Loading captions
   'loading.bubbles': 'Blowing bubbles...',

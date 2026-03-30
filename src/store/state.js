@@ -38,9 +38,18 @@ class Store {
   }
 }
 
+function getStorage() {
+  try {
+    return typeof localStorage !== 'undefined' ? localStorage : null;
+  } catch (e) {
+    return null;
+  }
+}
+
 function loadDisplayNames() {
   try {
-    const saved = localStorage.getItem('cv-names');
+    const storage = getStorage();
+    const saved = storage ? storage.getItem('cv-names') : null;
     if (saved) return JSON.parse(saved);
   } catch (e) { /* ignore */ }
   return { human: 'Synqa', assistant: 'Sylux' };
@@ -51,9 +60,9 @@ export const state = new Store({
   filteredConversations: [],
   currentConversationIndex: -1,
   searchQuery: '',
-  sidebarCollapsed: localStorage.getItem('cv-sidebar-collapsed') === 'true',
-  lang: localStorage.getItem('cv-lang') || 'zh',
-  theme: localStorage.getItem('cv-theme') || 'light',
+  sidebarCollapsed: getStorage()?.getItem('cv-sidebar-collapsed') === 'true',
+  lang: getStorage()?.getItem('cv-lang') || 'zh',
+  theme: getStorage()?.getItem('cv-theme') || 'light',
   displayNames: loadDisplayNames(),
   showThinking: true,
   showToolUse: true,
@@ -69,19 +78,22 @@ export const state = new Store({
 
 function loadDesensitizeWords() {
   try {
-    const saved = localStorage.getItem('cv-desensitize-words');
+    const storage = getStorage();
+    const saved = storage ? storage.getItem('cv-desensitize-words') : null;
     if (saved) return JSON.parse(saved);
   } catch (e) { /* ignore */ }
   return [];
 }
 
 export function saveDesensitizeWords(words) {
-  localStorage.setItem('cv-desensitize-words', JSON.stringify(words));
+  const storage = getStorage();
+  if (storage) storage.setItem('cv-desensitize-words', JSON.stringify(words));
 }
 
 function loadExportCollection() {
   try {
-    const saved = localStorage.getItem('cv-export-collection');
+    const storage = getStorage();
+    const saved = storage ? storage.getItem('cv-export-collection') : null;
     if (saved) return JSON.parse(saved);
   } catch (e) { /* ignore */ }
   return []; // Array of { convUuid, convName, msgIndex, sender, preview, timestamp }
@@ -89,7 +101,8 @@ function loadExportCollection() {
 
 export function saveExportCollection() {
   const collection = state.get('exportCollection');
-  localStorage.setItem('cv-export-collection', JSON.stringify(collection));
+  const storage = getStorage();
+  if (storage) storage.setItem('cv-export-collection', JSON.stringify(collection));
 }
 
 /**
