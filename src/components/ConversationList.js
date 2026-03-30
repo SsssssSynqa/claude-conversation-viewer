@@ -31,6 +31,7 @@ export class ConversationList {
   render() {
     // Search box — neumorphic pill input
     const searchBox = document.createElement('div');
+    searchBox.className = 'sidebar-expand-only';
     searchBox.style.cssText = 'padding:8px 14px 10px;';
 
     const searchWrapper = document.createElement('div');
@@ -54,7 +55,7 @@ export class ConversationList {
 
     // List container
     this.listEl = document.createElement('div');
-    this.listEl.className = 'conversation-list-scroll';
+    this.listEl.className = 'conversation-list-scroll sidebar-expand-only';
     this.listEl.style.cssText = 'flex:1;overflow-y:auto;padding:0 10px 16px 14px;';
     this.container.appendChild(this.listEl);
 
