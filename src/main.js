@@ -46,6 +46,7 @@ const app = document.getElementById('app');
 let fileUpload, conversationList, messageView, searchPanel, exportPanel;
 let _mainViewCleanups = [];
 let _statsThemeRerenderTimer = null;
+let _sidebarTransitionTimer = null;
 
 function renderUploadScreen() {
   app.textContent = '';
@@ -89,12 +90,12 @@ function renderMainView() {
   });
   sidebarTitle.appendChild(brandLogoBtn);
   const titleText = document.createElement('span');
-  titleText.className = 'sidebar-title-text';
+  titleText.className = 'sidebar-title-text sidebar-expand-only';
   titleText.textContent = t('sidebar.title');
   sidebarTitle.appendChild(titleText);
   const collapseBtn = document.createElement('button');
   collapseBtn.type = 'button';
-  collapseBtn.className = 'sidebar-collapse-btn';
+  collapseBtn.className = 'sidebar-collapse-btn sidebar-expand-only';
   collapseBtn.textContent = '‹';
   collapseBtn.title = 'Collapse sidebar';
   collapseBtn.addEventListener('click', () => {
@@ -143,7 +144,7 @@ function renderMainView() {
 
   // Theme toggle track (3-way: sun / moon / flower)
   const themeTrackRow = document.createElement('div');
-  themeTrackRow.className = 'pill-row';
+  themeTrackRow.className = 'pill-row sidebar-expand-only';
   themeTrackRow.style.cssText += 'padding:4px 0;justify-content:stretch;';
 
   const themeTrack = document.createElement('div');
@@ -224,7 +225,7 @@ function renderMainView() {
 
   // ---- Foldable: Display Settings ----
   const settingsFoldable = document.createElement('details');
-  settingsFoldable.className = 'sidebar-foldable';
+  settingsFoldable.className = 'sidebar-foldable sidebar-expand-only';
 
   const settingsSummary = document.createElement('summary');
   const settingsPill = document.createElement('div');
@@ -321,7 +322,7 @@ function renderMainView() {
 
   // ---- Foldable: Display Name ----
   const nameFoldable = document.createElement('details');
-  nameFoldable.className = 'sidebar-foldable';
+  nameFoldable.className = 'sidebar-foldable sidebar-expand-only';
 
   const nameSummary = document.createElement('summary');
   const namePill = document.createElement('div');
@@ -509,8 +510,14 @@ function renderMainView() {
   }));
 
   const applySidebarCollapsed = (collapsed) => {
+    clearTimeout(_sidebarTransitionTimer);
+    sidebar.classList.add('transitioning');
     sidebar.classList.toggle('collapsed', collapsed);
     contentArea.classList.toggle('sidebar-compact', collapsed);
+    _sidebarTransitionTimer = setTimeout(() => {
+      sidebar.classList.remove('transitioning');
+      _sidebarTransitionTimer = null;
+    }, 260);
     localStorage.setItem('cv-sidebar-collapsed', collapsed ? 'true' : 'false');
   };
   _mainViewCleanups.push(state.on('sidebarCollapsed', applySidebarCollapsed));

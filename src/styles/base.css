@@ -850,6 +850,20 @@ button {
   display: none !important;
 }
 
+.sidebar .sidebar-expand-only,
+.sidebar .sidebar-pill-label {
+  opacity: 1;
+  transform: translateX(0);
+  transition: opacity 0.16s ease, transform 0.16s ease;
+}
+
+.sidebar.transitioning .sidebar-expand-only,
+.sidebar.transitioning .sidebar-pill-label {
+  opacity: 0;
+  transform: translateX(-6px);
+  pointer-events: none;
+}
+
 .sidebar.collapsed .sidebar-brand-logo {
   width: 48px;
   height: 48px;
