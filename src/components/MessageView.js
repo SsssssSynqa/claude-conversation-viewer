@@ -312,7 +312,7 @@ export class MessageView {
       // ---- Message Footer: timestamp + action buttons ----
       const footer = document.createElement('div');
       if (isClaude) {
-        footer.style.cssText = 'display:flex;justify-content:space-between;align-items:center;margin-top:4px;opacity:0;height:0;overflow:hidden;transition:all 0.15s;';
+        footer.style.cssText = 'display:flex;justify-content:space-between;align-items:center;margin-top:4px;opacity:0;transition:opacity 0.15s;';
       } else {
         footer.style.cssText = 'display:flex;justify-content:space-between;align-items:center;margin-top:12px;opacity:0.55;transition:opacity 0.15s;';
       }
@@ -347,8 +347,8 @@ export class MessageView {
 
       // Show footer on hover
       if (isClaude) {
-        msgEl.addEventListener('mouseenter', () => { footer.style.opacity = '1'; footer.style.height = 'auto'; footer.style.overflow = 'visible'; });
-        msgEl.addEventListener('mouseleave', () => { footer.style.opacity = '0'; footer.style.height = '0'; footer.style.overflow = 'hidden'; });
+        msgEl.addEventListener('mouseenter', () => footer.style.opacity = '1');
+        msgEl.addEventListener('mouseleave', () => footer.style.opacity = '0');
       } else {
         msgEl.addEventListener('mouseenter', () => footer.style.opacity = '1');
         msgEl.addEventListener('mouseleave', () => { if (!footer.dataset.pinned) footer.style.opacity = '0.55'; });
