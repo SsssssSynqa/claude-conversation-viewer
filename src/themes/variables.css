@@ -3,10 +3,58 @@
    Apple-level aesthetics: minimalism, typography, whitespace
    ============================================ */
 
+/* ---- Anthropic Font Family ---- */
+@font-face {
+  font-family: 'Anthropic Sans';
+  src: url('../fonts/AnthropicSans-Roman.woff2') format('woff2');
+  font-weight: 300 800;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Anthropic Sans';
+  src: url('../fonts/AnthropicSans-Italic.woff2') format('woff2');
+  font-weight: 300 800;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Anthropic Serif';
+  src: url('../fonts/AnthropicSerif-Roman.woff2') format('woff2');
+  font-weight: 300 800;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Anthropic Serif';
+  src: url('../fonts/AnthropicSerif-Italic.woff2') format('woff2');
+  font-weight: 300 800;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Anthropic Mono';
+  src: url('../fonts/AnthropicMono-Roman.woff2') format('woff2');
+  font-weight: 300 800;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Anthropic Mono';
+  src: url('../fonts/AnthropicMono-Italic.woff2') format('woff2');
+  font-weight: 300 800;
+  font-style: italic;
+  font-display: swap;
+}
+
 :root {
   --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   --font-display: 'Anthropic Serif', Georgia, 'Times New Roman', Times, serif;
   --font-mono: 'SF Mono', 'Fira Code', 'JetBrains Mono', Menlo, Consolas, monospace;
+  /* Anthropic font stacks (used by claude theme) */
+  --font-anthropic-ui: 'Anthropic Sans', system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-anthropic-serif: 'Anthropic Serif', Georgia, 'Times New Roman', serif;
+  --font-anthropic-mono: 'Anthropic Mono', ui-monospace, monospace;
   --radius: 12px;
   --radius-sm: 8px;
   --radius-lg: 20px;
@@ -126,50 +174,90 @@
   --btn-primary-text: var(--accent);
 }
 
-/* ---- Claude Theme (怀旧版 — 精确还原Claude官网) ---- */
+/* ---- Claude Theme (精确还原Claude.ai官网) ---- */
 [data-theme="claude"] {
-  --bg-primary: #faf9f5;
-  --bg-secondary: #f1f0ea;
-  --bg-tertiary: #eae8e1;
-  --bg-card: #ffffff;
+  /* Font overrides — use Anthropic font family */
+  --font-family: var(--font-anthropic-ui);
+  --font-display: var(--font-anthropic-serif);
+  --font-mono: var(--font-anthropic-mono);
+  /* Claude response uses serif, user message uses sans */
+  --font-claude-response: var(--font-anthropic-serif);
+  --font-claude-user: var(--font-anthropic-ui);
+
+  /* Backgrounds — from claude.ai HSL tokens */
+  --bg-primary: #faf9f5;     /* bg-100: page background */
+  --bg-secondary: #f5f4ed;   /* bg-200: card surfaces */
+  --bg-tertiary: #f0eee6;    /* bg-300: user bubble, hover */
+  --bg-card: #ffffff;         /* bg-000: composer, elevated surfaces */
   --bg-card-hover: #f5f4ee;
-  --bg-input: #f1f0ea;
-  --text-primary: #141413;
-  --text-secondary: #3d3d3a;
-  --text-muted: #9b9b97;
-  --accent: #D97657;
+  --bg-input: #f5f4ed;
+
+  /* Text — exact from claude.ai */
+  --text-primary: #141413;    /* text-100 */
+  --text-secondary: #3d3d3a;  /* text-200 */
+  --text-muted: #73726c;      /* text-500 — corrected from #9b9b97 */
+
+  /* Accent — Claude uses blue, not orange */
+  --accent: #D97657;          /* keep coral for spark/branding elements */
   --accent-light: #E89272;
   --accent-bg: rgba(217, 118, 87, 0.08);
+  --accent-blue: #2c84db;     /* claude.ai's actual accent-100 */
+
+  /* Borders — 0.5px style from claude.ai */
   --border: rgba(31, 30, 29, 0.08);
-  --border-strong: rgba(31, 30, 29, 0.12);
-  /* Claude official shadow: exact values from claude.ai, border thinned */
-  --shadow: 0 3px 15px rgba(0, 0, 0, 0.05), 0 0 0 0.5px rgba(31, 30, 29, 0.12);
-  --shadow-sm: 0 3px 15px rgba(0, 0, 0, 0.08), 0 0 0 0.5px rgba(31, 30, 29, 0.2);
+  --border-strong: rgba(31, 30, 29, 0.15);
+  --border-sidebar: rgba(31, 30, 29, 0.15);
+
+  /* Shadows — exact from claude.ai composer */
+  --shadow: 0 3px 15px rgba(0, 0, 0, 0.035), 0 0 0 0.5px rgba(31, 30, 29, 0.15);
+  --shadow-sm: 0 3px 15px rgba(0, 0, 0, 0.05), 0 0 0 0.5px rgba(31, 30, 29, 0.12);
   --shadow-xs: 0 0 0 0.5px rgba(31, 30, 29, 0.08);
   --shadow-inset: inset 0 0 0 0.5px rgba(31, 30, 29, 0.1);
+
+  /* Surfaces — flat, no neumorphism */
+  --surface-raised: #ffffff;
+  --surface-soft: rgba(255, 255, 255, 0.6);
+  --surface-inset: #f5f4ed;
+
+  /* Sidebar — matches claude.ai nav */
   --sidebar-bg: #faf9f5;
   --sidebar-text: #3d3d3a;
-  --sidebar-hover: #f1f0ea;
-  --sidebar-active: #eae8e1;
-  --message-human-bg: #f1f0ea;
+  --sidebar-hover: #f5f4ed;
+  --sidebar-active: #f0eee6;
+  --sidebar-width: 260px;
+
+  /* Messages — claude.ai exact */
+  --message-human-bg: #f0eee6;  /* bg-300 */
   --message-human-text: #141413;
   --message-assistant-bg: transparent;
+
+  /* Thinking/Tool blocks — minimal gray */
   --thinking-bg: rgba(0, 0, 0, 0.02);
   --thinking-border: rgba(31, 30, 29, 0.06);
-  --thinking-text: #6b6b69;
+  --thinking-text: #73726c;
   --tool-bg: rgba(0, 0, 0, 0.02);
   --tool-border: rgba(31, 30, 29, 0.06);
   --flag-bg: rgba(244, 67, 54, 0.04);
   --flag-border: rgba(244, 67, 54, 0.12);
   --flag-text: #c62828;
+
+  /* Misc */
   --separator-color: rgba(31, 30, 29, 0.06);
   --scrollbar-thumb: rgba(31, 30, 29, 0.12);
   --scrollbar-track: transparent;
-  --code-bg: #f1f0ea;
+  --code-bg: #f5f4ed;
   --backdrop-blur: none;
   --gradient-header: linear-gradient(135deg, #D97657 0%, #E89272 100%);
   --btn-primary-bg: #3B3B3B;
   --btn-primary-text: #fff;
+  --ring-accent-soft: 0 0 0 1px rgba(44, 132, 219, 0.3), 0 0 0 4px rgba(44, 132, 219, 0.08);
+
+  /* Layout overrides */
+  --content-max-width: 680px;
+  --radius: 10px;
+  --radius-sm: 6px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
 }
 
 /* ---- Auto Theme (follow system preference) ---- */

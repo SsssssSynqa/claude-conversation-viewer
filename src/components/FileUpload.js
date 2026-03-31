@@ -8,6 +8,14 @@ import { createIcon } from '../utils/icons.js';
 import { SPARK_SVG } from '../utils/spark.js';
 import { t } from '../i18n.js';
 import ParseWorker from '../parser/worker.js?worker&inline';
+import imgBubbles from '../assets/clawd/IMG_bubbles.GIF';
+import imgCelebrate from '../assets/clawd/IMG_celebrate.GIF';
+import imgIdea from '../assets/clawd/IMG_idea.GIF';
+import imgLove from '../assets/clawd/IMG_love.GIF';
+import imgMusic from '../assets/clawd/IMG_music.GIF';
+import imgRepair from '../assets/clawd/IMG_repair.GIF';
+import imgThinking from '../assets/clawd/IMG_thinking.GIF';
+import imgWatch from '../assets/clawd/IMG_watch.GIF';
 
 // SPARK_SVG imported from shared module '../utils/spark.js'
 
@@ -362,22 +370,19 @@ export class FileUpload {
     screen.textContent = '';
     screen.className = 'loading-screen';
 
-    // Clawd crab animation
+    // Clawd gif animation (random pick)
     const clawdContainer = document.createElement('div');
     clawdContainer.className = 'clawd-container';
     clawdContainer.id = 'clawd-container';
+    clawdContainer.style.cssText = 'display:flex;align-items:center;justify-content:center;';
 
-    const crab = document.createElement('div');
-    crab.className = 'clawd-crab';
-    clawdContainer.appendChild(crab);
-
-    // Bubbles
-    for (let i = 0; i < 5; i++) {
-      const bubble = document.createElement('div');
-      bubble.className = 'clawd-bubble';
-      bubble.style.animationDelay = `${i * 0.4}s`;
-      clawdContainer.appendChild(bubble);
-    }
+    const clawdGifs = [imgBubbles, imgCelebrate, imgIdea, imgLove, imgMusic, imgRepair, imgThinking, imgWatch];
+    const idx = Math.floor(Math.random() * clawdGifs.length);
+    const gif = document.createElement('img');
+    gif.src = clawdGifs[idx];
+    gif.alt = 'Clawd loading';
+    gif.style.cssText = 'width:100px;height:100px;image-rendering:pixelated;';
+    clawdContainer.appendChild(gif);
 
     screen.appendChild(clawdContainer);
 

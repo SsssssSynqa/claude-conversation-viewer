@@ -38,6 +38,7 @@ export class MessageView {
       state.on('desensitizeWords', () => { if (state.get('desensitize')) this.renderConversation(); }),
       state.on('highlightMessageIndex', () => this._applyHighlightFromState()),
       state.on('exportCollection', () => this.renderConversation()),
+      state.on('theme', () => this.renderConversation()),
     );
   }
 
@@ -220,10 +221,16 @@ export class MessageView {
       prevTimestamp = msg.createdAt;
 
       const isHuman = msg.sender === 'human';
+      const isClaude = state.get('theme') === 'claude';
       const msgEl = document.createElement('div');
       msgEl.className = 'message-block ' + (isHuman ? 'message-human' : 'message-assistant');
       msgEl.dataset.msgIndex = mi;
-      msgEl.style.cssText = 'position:relative;background:' + (isHuman ? 'var(--message-human-bg)' : 'var(--message-assistant-bg)') + ';';
+      // Claude theme: let CSS handle all styling (no inline bg)
+      if (isClaude) {
+        msgEl.style.cssText = 'position:relative;';
+      } else {
+        msgEl.style.cssText = 'position:relative;background:' + (isHuman ? 'var(--message-human-bg)' : 'var(--message-assistant-bg)') + ';';
+      }
 
       // Selection checkbox (only in select mode)
       if (this.selectMode) {
@@ -249,9 +256,20 @@ export class MessageView {
       // Sender name
       const senderEl = document.createElement('div');
       senderEl.className = 'message-sender';
-      senderEl.style.cssText = 'font-weight:600;font-size:0.85rem;margin-bottom:6px;display:flex;align-items:center;gap:6px;color:' + (isHuman ? 'var(--accent)' : 'var(--text-primary)') + ';';
-      senderEl.appendChild(createIcon(isHuman ? 'user' : 'bot', 14));
-      senderEl.appendChild(document.createTextNode(isHuman ? (names.human || 'Human') : (names.assistant || 'Assistant')));
+      if (isClaude) {
+        // Claude theme: human has no sender, assistant shows name with spark icon
+        if (isHuman) {
+          senderEl.style.cssText = 'display:none;';
+        } else {
+          senderEl.style.cssText = 'font-weight:430;font-size:0.78rem;margin-bottom:4px;display:flex;align-items:center;gap:6px;color:var(--text-muted);';
+          senderEl.appendChild(createIcon('sparkles', 13));
+          senderEl.appendChild(document.createTextNode(names.assistant || 'Claude'));
+        }
+      } else {
+        senderEl.style.cssText = 'font-weight:600;font-size:0.85rem;margin-bottom:6px;display:flex;align-items:center;gap:6px;color:' + (isHuman ? 'var(--accent)' : 'var(--text-primary)') + ';';
+        senderEl.appendChild(createIcon(isHuman ? 'user' : 'bot', 14));
+        senderEl.appendChild(document.createTextNode(isHuman ? (names.human || 'Human') : (names.assistant || 'Assistant')));
+      }
       msgEl.appendChild(senderEl);
 
       // Message content
@@ -270,13 +288,29 @@ export class MessageView {
         bubble.appendChild(filesEl);
       }
 
-      for (const block of msg.contentBlocks) {
-        switch (block.type) {
-          case 'text': this.renderTextBlock(bubble, block); break;
-          case 'thinking': if (showThinking) this.renderThinkingBlock(bubble, block); break;
-          case 'tool_use': if (showToolUse) this.renderToolBlock(bubble, block); break;
-          case 'tool_result': if (showToolUse) this.renderToolResultBlock(bubble, block); break;
-          case 'flag': if (showFlags) this.renderFlagBlock(bubble, block); break;
+      if (isClaude && !isHuman) {
+        // Claude theme: group thinking+tool into a timeline, text renders separately
+        const timelineBlocks = [];
+        const textBlocks = [];
+        const flagBlocks = [];
+        for (const block of msg.contentBlocks) {
+          if (block.type === 'thinking' && showThinking) timelineBlocks.push(block);
+          else if ((block.type === 'tool_use' || block.type === 'tool_result') && showToolUse) timelineBlocks.push(block);
+          else if (block.type === 'text') textBlocks.push(block);
+          else if (block.type === 'flag' && showFlags) flagBlocks.push(block);
+        }
+        if (timelineBlocks.length > 0) this._renderClaudeTimeline(bubble, timelineBlocks);
+        for (const block of textBlocks) this.renderTextBlock(bubble, block);
+        for (const block of flagBlocks) this.renderFlagBlock(bubble, block);
+      } else {
+        for (const block of msg.contentBlocks) {
+          switch (block.type) {
+            case 'text': this.renderTextBlock(bubble, block); break;
+            case 'thinking': if (showThinking) this.renderThinkingBlock(bubble, block); break;
+            case 'tool_use': if (showToolUse) this.renderToolBlock(bubble, block); break;
+            case 'tool_result': if (showToolUse) this.renderToolResultBlock(bubble, block); break;
+            case 'flag': if (showFlags) this.renderFlagBlock(bubble, block); break;
+          }
         }
       }
       msgEl.appendChild(bubble);
@@ -541,6 +575,127 @@ export class MessageView {
     template.innerHTML = safeHtml;
     div.appendChild(template.content);
     parent.appendChild(div);
+  }
+
+  /** Claude theme: timeline-style thinking/tool rendering */
+  _renderClaudeTimeline(parent, blocks) {
+    const thinkingBlocks = blocks.filter(b => b.type === 'thinking');
+    const toolBlocks = blocks.filter(b => b.type === 'tool_use' || b.type === 'tool_result');
+    const lastThinking = thinkingBlocks[thinkingBlocks.length - 1];
+    const summaryText = lastThinking?.summaries?.[0] || (toolBlocks.length > 0 ? toolBlocks[0].toolName : 'Thinking...');
+
+    const wrapper = document.createElement('div');
+    wrapper.style.cssText = 'margin:12px 0 16px;font-family:var(--font-anthropic-ui);';
+
+    // Collapsible summary line
+    const summaryLine = document.createElement('div');
+    summaryLine.style.cssText = 'display:flex;align-items:center;gap:6px;cursor:pointer;color:var(--text-secondary);font-size:0.85rem;line-height:1.4;user-select:none;';
+    const summarySpan = document.createElement('span');
+    summarySpan.style.cssText = 'flex:1;';
+    summarySpan.textContent = summaryText;
+    const chevron = document.createElement('span');
+    chevron.style.cssText = 'font-size:0.75rem;transition:transform 0.2s;color:var(--text-muted);';
+    chevron.textContent = '\u25BE';
+    summaryLine.appendChild(summarySpan);
+    summaryLine.appendChild(chevron);
+    wrapper.appendChild(summaryLine);
+
+    // Timeline container (initially hidden)
+    const timeline = document.createElement('div');
+    timeline.style.cssText = 'margin-top:12px;padding-left:4px;display:none;';
+
+    let isExpanded = false;
+    summaryLine.addEventListener('click', () => {
+      isExpanded = !isExpanded;
+      timeline.style.display = isExpanded ? 'block' : 'none';
+      chevron.style.transform = isExpanded ? 'rotate(180deg)' : '';
+    });
+
+    // Build timeline nodes
+    const items = [];
+    for (const block of blocks) {
+      if (block.type === 'thinking') {
+        const text = block.summaries?.[0] || (block.thinking ? block.thinking.substring(0, 120) + '\u2026' : 'Thinking...');
+        items.push({ type: 'thinking', text, detail: block.thinking });
+      } else if (block.type === 'tool_use') {
+        items.push({ type: 'tool', text: block.toolName || 'Tool', detail: block.toolInput ? JSON.stringify(block.toolInput, null, 2) : '' });
+      } else if (block.type === 'tool_result') {
+        items.push({ type: 'result', text: typeof block.result === 'string' ? block.result.substring(0, 80) : 'Result', detail: typeof block.result === 'string' ? block.result : JSON.stringify(block.result, null, 2) });
+      }
+    }
+
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i];
+      const isLast = i === items.length - 1;
+
+      const row = document.createElement('div');
+      row.style.cssText = 'display:flex;gap:10px;min-height:28px;';
+
+      // Left: icon + connector line
+      const iconCol = document.createElement('div');
+      iconCol.style.cssText = 'display:flex;flex-direction:column;align-items:center;width:20px;flex-shrink:0;';
+
+      const iconCircle = document.createElement('div');
+      iconCircle.style.cssText = 'width:20px;height:20px;border-radius:50%;border:1.5px solid var(--text-muted);display:flex;align-items:center;justify-content:center;flex-shrink:0;';
+      // Use createIcon for the icon inside the circle
+      if (item.type === 'thinking') {
+        iconCircle.appendChild(createIcon('clock', 10));
+      } else {
+        iconCircle.appendChild(createIcon('tool', 10));
+      }
+      iconCircle.querySelector('svg').style.cssText = 'color:var(--text-muted);';
+      iconCol.appendChild(iconCircle);
+
+      // Vertical connector line (not for last item)
+      if (!isLast) {
+        const line = document.createElement('div');
+        line.style.cssText = 'width:1.5px;flex:1;background:var(--border-strong,rgba(31,30,29,0.12));min-height:8px;margin:3px 0;';
+        iconCol.appendChild(line);
+      }
+      row.appendChild(iconCol);
+
+      // Right: text content
+      const textCol = document.createElement('div');
+      textCol.style.cssText = 'flex:1;padding-top:1px;font-size:0.82rem;line-height:1.5;color:var(--text-secondary);min-width:0;';
+      textCol.textContent = item.text;
+
+      if (item.detail && item.type === 'thinking') {
+        textCol.style.cursor = 'pointer';
+        const fullText = item.detail;
+        let expanded = false;
+        textCol.addEventListener('click', () => {
+          expanded = !expanded;
+          if (expanded) {
+            textCol.style.whiteSpace = 'pre-wrap';
+            textCol.style.wordBreak = 'break-word';
+            textCol.textContent = desensitize(fullText);
+          } else {
+            textCol.style.whiteSpace = '';
+            textCol.textContent = item.text;
+          }
+        });
+      }
+
+      row.appendChild(textCol);
+      timeline.appendChild(row);
+    }
+
+    // Add "Done" node at the end
+    const doneRow = document.createElement('div');
+    doneRow.style.cssText = 'display:flex;gap:10px;min-height:24px;margin-top:2px;';
+    const doneIcon = document.createElement('div');
+    doneIcon.style.cssText = 'width:20px;height:20px;border-radius:50%;border:1.5px solid var(--text-muted);display:flex;align-items:center;justify-content:center;flex-shrink:0;';
+    doneIcon.appendChild(createIcon('check', 10));
+    doneIcon.querySelector('svg').style.cssText = 'color:var(--text-muted);';
+    const doneText = document.createElement('div');
+    doneText.style.cssText = 'font-size:0.82rem;color:var(--text-secondary);padding-top:1px;font-weight:500;';
+    doneText.textContent = 'Done';
+    doneRow.appendChild(doneIcon);
+    doneRow.appendChild(doneText);
+    timeline.appendChild(doneRow);
+
+    wrapper.appendChild(timeline);
+    parent.appendChild(wrapper);
   }
 
   renderThinkingBlock(parent, block) {

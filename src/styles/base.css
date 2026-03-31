@@ -955,3 +955,143 @@ button {
     gap: 12px;
   }
 }
+
+/* ============================================
+   Claude Theme — Sidebar & Global Overrides
+   Flat design matching claude.ai, no neumorphism
+   ============================================ */
+
+[data-theme="claude"] .sidebar {
+  background: var(--sidebar-bg);
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  border-right: 0.5px solid var(--border-strong, rgba(31,30,29,0.15));
+  margin: 0;
+  font-family: var(--font-anthropic-ui);
+}
+
+[data-theme="claude"] .sidebar-brand {
+  padding: 14px 16px 10px;
+}
+
+[data-theme="claude"] .sidebar-brand-logo {
+  width: 28px;
+  height: 28px;
+}
+
+[data-theme="claude"] .sidebar-title-text {
+  font-family: var(--font-anthropic-serif);
+  font-size: 1rem;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+
+[data-theme="claude"] .sidebar-pill {
+  border-radius: 6px;
+  box-shadow: none;
+  background: transparent;
+  font-family: var(--font-anthropic-ui);
+  font-size: 0.82rem;
+  font-weight: 400;
+  padding: 6px 10px;
+  min-height: auto;
+}
+
+[data-theme="claude"] .sidebar-pill.pill-flat {
+  box-shadow: none;
+  background: transparent;
+}
+
+[data-theme="claude"] .sidebar-pill.pill-flat:hover {
+  background: var(--sidebar-hover);
+  box-shadow: none;
+}
+
+[data-theme="claude"] .sidebar-pill.pill-active {
+  background: var(--sidebar-active);
+  box-shadow: none;
+}
+
+[data-theme="claude"] .sidebar-pill .nav-icon {
+  color: var(--text-muted);
+}
+
+[data-theme="claude"] .sidebar-foldable summary {
+  font-family: var(--font-anthropic-ui);
+  font-size: 0.72rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+
+[data-theme="claude"] .conversation-list-item {
+  font-size: 0.82rem;
+  font-weight: 400;
+  border-radius: 6px;
+  padding: 6px 10px;
+  color: var(--sidebar-text);
+}
+
+[data-theme="claude"] .conversation-list-item:hover {
+  background: var(--sidebar-hover);
+}
+
+[data-theme="claude"] .conversation-list-item.active {
+  background: var(--sidebar-active);
+}
+
+/* Claude theme: flat content area */
+[data-theme="claude"] .content-area {
+  padding: 0;
+}
+
+/* Claude theme: upload & config zones */
+[data-theme="claude"] .upload-zone,
+[data-theme="claude"] .name-config {
+  font-family: var(--font-anthropic-ui);
+}
+
+/* Claude theme: buttons — dark pill style */
+[data-theme="claude"] .neu-primary-btn {
+  background: var(--btn-primary-bg) !important;
+  color: var(--btn-primary-text) !important;
+  box-shadow: none !important;
+  border: none !important;
+  font-family: var(--font-anthropic-ui);
+}
+
+[data-theme="claude"] .neu-ghost-btn {
+  box-shadow: none;
+  border: 0.5px solid rgba(31, 30, 29, 0.12);
+  font-family: var(--font-anthropic-ui);
+}
+
+[data-theme="claude"] .neu-ghost-btn:hover {
+  background: var(--sidebar-hover);
+  box-shadow: none;
+}
+
+/* Claude theme: toggle switches */
+[data-theme="claude"] .toggle-track {
+  box-shadow: inset 0 0 0 0.5px rgba(31, 30, 29, 0.12);
+}
+
+[data-theme="claude"] .toggle-thumb {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Claude theme: stats panel cards */
+[data-theme="claude"] .neu-soft-card,
+[data-theme="claude"] .neu-panel,
+[data-theme="claude"] .neu-action-tile {
+  box-shadow: none;
+  border: 0.5px solid rgba(31, 30, 29, 0.08);
+  background: var(--bg-card);
+  font-family: var(--font-anthropic-ui);
+}
+
+[data-theme="claude"] .neu-action-tile:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}

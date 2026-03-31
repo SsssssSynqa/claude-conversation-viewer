@@ -345,106 +345,212 @@
   }
 }
 
-/* ---- Claude Theme Message Overrides ---- */
-[data-theme="claude"] .message-block {
-  background: none !important;
-  border-bottom: none !important;
-  padding: 6px 24px;
-  max-width: 768px;
+/* ============================================
+   Claude Theme — Precise replica of claude.ai UI
+   ============================================ */
+
+/* Global: use Anthropic fonts, flat surfaces */
+[data-theme="claude"] .message-header-card,
+[data-theme="claude"] .message-block,
+[data-theme="claude"] .selection-toolbar {
+  border: none;
+  box-shadow: none;
+}
+
+[data-theme="claude"] .message-header-card {
+  background: var(--bg-primary);
+  box-shadow: none;
+  border-bottom: 0.5px solid var(--border-strong, rgba(31,30,29,0.1));
+  border-radius: 0;
+  padding: 16px 24px;
+  max-width: var(--content-max-width);
   margin: 0 auto;
   width: 100%;
 }
 
+/* ---- Message block base ---- */
+[data-theme="claude"] .message-block {
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 4px 0;
+  max-width: var(--content-max-width);
+  margin: 0 auto 2px;
+  width: 100%;
+  border-radius: 0;
+}
+
+/* ---- Human message: right-aligned bubble ---- */
 [data-theme="claude"] .message-block.message-human {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
+  margin-top: 16px;
+  margin-bottom: 4px;
+}
+
+[data-theme="claude"] .message-block.message-human .message-sender {
+  display: none !important;
 }
 
 [data-theme="claude"] .message-block.message-human .message-bubble {
   background: var(--message-human-bg);
   color: var(--message-human-text);
-  padding: 14px 18px;
-  border-radius: 20px 20px 4px 20px;
-  max-width: 75%;
+  padding: 8px 12px;
+  border-radius: 9px;
+  max-width: 85%;
   word-break: break-word;
+  font-family: var(--font-anthropic-ui);
 }
 
 [data-theme="claude"] .message-block.message-human .message-bubble .message-text {
   color: var(--message-human-text);
+  font-family: var(--font-anthropic-ui);
+  font-size: 0.9rem;
+  line-height: 1.6;
 }
 
 [data-theme="claude"] .message-block.message-human .message-bubble .message-text a {
-  color: var(--accent);
+  color: var(--accent-blue, #2c84db);
 }
 
 [data-theme="claude"] .message-block.message-human .message-bubble .message-text code {
   background: rgba(0, 0, 0, 0.06);
   color: var(--message-human-text);
+  font-family: var(--font-anthropic-mono);
 }
 
 [data-theme="claude"] .message-block.message-human .message-bubble .message-text pre {
   background: rgba(0, 0, 0, 0.04);
 }
 
+/* ---- Assistant message: left-aligned, serif font ---- */
 [data-theme="claude"] .message-block.message-assistant {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  margin-top: 4px;
+  margin-bottom: 4px;
+}
+
+[data-theme="claude"] .message-block.message-assistant .message-sender {
+  font-size: 0.78rem !important;
+  font-weight: 430 !important;
+  color: var(--text-muted) !important;
+  margin-bottom: 4px !important;
 }
 
 [data-theme="claude"] .message-block.message-assistant .message-bubble {
   max-width: 100%;
-  padding: 8px 0;
+  padding: 4px 6px 4px 6px;
 }
 
-/* Claude theme: hide sender name but keep action buttons visible */
-[data-theme="claude"] .message-header .message-sender {
-  display: none;
-}
-[data-theme="claude"] .message-header .message-time {
-  display: none;
+[data-theme="claude"] .message-block.message-assistant .message-bubble .message-text {
+  font-family: var(--font-anthropic-serif);
+  font-size: 0.92rem;
+  line-height: 1.65;
+  color: var(--text-primary);
 }
 
+[data-theme="claude"] .message-block.message-assistant .message-bubble .message-text h1,
+[data-theme="claude"] .message-block.message-assistant .message-bubble .message-text h2,
+[data-theme="claude"] .message-block.message-assistant .message-bubble .message-text h3,
+[data-theme="claude"] .message-block.message-assistant .message-bubble .message-text h4 {
+  font-family: var(--font-anthropic-serif);
+}
+
+[data-theme="claude"] .message-block.message-assistant .message-bubble .message-text code {
+  font-family: var(--font-anthropic-mono);
+  background: rgba(0, 0, 0, 0.04);
+  border: 0.5px solid rgba(31, 30, 29, 0.1);
+}
+
+[data-theme="claude"] .message-block.message-assistant .message-bubble .message-text pre {
+  background: rgba(255, 255, 255, 0.5);
+  border: 0.5px solid rgba(31, 30, 29, 0.1);
+  border-radius: 8px;
+}
+
+[data-theme="claude"] .message-block.message-assistant .message-bubble .message-text pre code {
+  font-family: var(--font-anthropic-mono);
+  border: none;
+  background: none;
+}
+
+[data-theme="claude"] .message-block.message-assistant .message-bubble .message-text a {
+  color: var(--accent-blue, #2c84db);
+}
+
+/* ---- Time separator ---- */
 [data-theme="claude"] .time-separator {
-  max-width: 768px;
+  max-width: var(--content-max-width);
   margin: 0 auto;
   width: 100%;
+  font-family: var(--font-anthropic-ui);
+  font-size: 0.75rem;
+  color: var(--text-muted);
 }
 
-/* Claude theme thinking — minimal gray style like Claude's */
+/* ---- Thinking blocks — minimal gray, Claude.ai style ---- */
 [data-theme="claude"] .thinking-block {
-  background: rgba(0, 0, 0, 0.03) !important;
-  border: 1px solid rgba(0, 0, 0, 0.06) !important;
+  background: rgba(0, 0, 0, 0.02) !important;
+  border: 0.5px solid rgba(31, 30, 29, 0.08) !important;
   border-radius: 8px !important;
+  box-shadow: none !important;
+  font-family: var(--font-anthropic-ui);
 }
 
 [data-theme="claude"] .thinking-block summary {
-  color: #8b8580 !important;
+  color: var(--text-muted) !important;
   font-size: 0.82rem !important;
+  font-family: var(--font-anthropic-ui) !important;
 }
 
 [data-theme="claude"] .thinking-block .badge-thinking {
-  background: rgba(0, 0, 0, 0.05) !important;
-  color: #8b8580 !important;
-  border-color: rgba(0, 0, 0, 0.1) !important;
+  background: rgba(0, 0, 0, 0.04) !important;
+  color: var(--text-muted) !important;
+  border-color: rgba(31, 30, 29, 0.08) !important;
 }
 
-/* Claude theme toolbar — warm background */
-/* Claude theme: unified section title color */
+/* ---- Tool blocks — same minimal style ---- */
+[data-theme="claude"] .tool-block,
+[data-theme="claude"] .tool-result-block {
+  background: rgba(0, 0, 0, 0.02) !important;
+  border: 0.5px solid rgba(31, 30, 29, 0.08) !important;
+  border-radius: 8px !important;
+  box-shadow: none !important;
+}
+
+/* ---- Section titles ---- */
 [data-theme="claude"] .name-config-title,
 [data-theme="claude"] .upload-screen div[style*="font-weight:600"] {
-  color: #6E6E6E !important;
+  color: var(--text-muted) !important;
+  font-family: var(--font-anthropic-ui) !important;
 }
 [data-theme="claude"] {
-  --section-title-color: #6E6E6E;
+  --section-title-color: var(--text-muted);
 }
 
-/* Claude theme toolbar removed — title now in sidebar */
-
-/* Claude theme scrollbar in messages */
+/* ---- Scrollbar & background ---- */
 [data-theme="claude"] .messages-scroll {
   background: var(--bg-primary);
+}
+
+/* ---- Search/Export panels: flat style ---- */
+[data-theme="claude"] .search-panel-header,
+[data-theme="claude"] .export-panel-header,
+[data-theme="claude"] .export-section,
+[data-theme="claude"] .search-result-item,
+[data-theme="claude"] .export-list-item,
+[data-theme="claude"] .collection-group {
+  box-shadow: none;
+  border: 0.5px solid rgba(31, 30, 29, 0.08);
+}
+
+[data-theme="claude"] .search-input-shell,
+[data-theme="claude"] .export-toolbar-group {
+  box-shadow: none;
+  border: 0.5px solid rgba(31, 30, 29, 0.1);
 }
 
 /* Settings Panel */
