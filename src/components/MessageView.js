@@ -581,16 +581,16 @@ export class MessageView {
     const wrapper = document.createElement('div');
     wrapper.style.cssText = 'margin:8px 0 12px;font-family:var(--font-anthropic-serif);';
 
-    // Collapsible summary line — serif font, muted color, ∨ chevron
+    // Collapsible summary line — muted gray, serif font, matching official 10.5px
     const summaryLine = document.createElement('div');
-    summaryLine.style.cssText = 'display:inline-flex;align-items:center;gap:6px;cursor:pointer;color:var(--text-secondary);font-size:0.8125rem;line-height:1.65;user-select:none;border-radius:6px;padding:2px 6px;margin-left:-6px;transition:background 0.15s;';
+    summaryLine.style.cssText = 'display:inline-flex;align-items:center;gap:6px;cursor:pointer;color:var(--text-muted);font-size:10.5px;line-height:1.65;user-select:none;border-radius:6px;padding:2px 6px;margin-left:-6px;transition:background 0.15s;';
     summaryLine.addEventListener('mouseenter', () => summaryLine.style.background = 'var(--sidebar-hover)');
     summaryLine.addEventListener('mouseleave', () => summaryLine.style.background = '');
     const summarySpan = document.createElement('span');
     summarySpan.textContent = summaryText;
     const chevron = document.createElement('span');
-    chevron.style.cssText = 'font-size:0.65rem;color:var(--text-muted);display:inline-block;margin-left:2px;';
-    chevron.textContent = '\u276F'; // › right chevron when collapsed
+    chevron.style.cssText = 'font-size:0.7rem;color:var(--text-muted);display:inline-block;margin-left:2px;';
+    chevron.textContent = '\u203A'; // › right single guillemet when collapsed
     summaryLine.appendChild(summarySpan);
     summaryLine.appendChild(chevron);
     wrapper.appendChild(summaryLine);
@@ -603,7 +603,7 @@ export class MessageView {
     summaryLine.addEventListener('click', () => {
       isExpanded = !isExpanded;
       timeline.style.display = isExpanded ? 'block' : 'none';
-      chevron.textContent = isExpanded ? '\u2304' : '\u276F'; // ⌄ down when expanded, › right when collapsed
+      chevron.textContent = isExpanded ? '\u2304' : '\u203A'; // ⌄ down when expanded, › right when collapsed
     });
 
     // Build timeline node data
@@ -620,8 +620,8 @@ export class MessageView {
     }
 
     const iconColor = 'var(--text-muted)';
-    const iconSize = '18px';
-    const iconSvgSize = 9;
+    const iconSize = '22px';
+    const iconSvgSize = 11;
     const lineColor = 'rgba(31,30,29,0.12)';
 
     for (let i = 0; i < items.length; i++) {
