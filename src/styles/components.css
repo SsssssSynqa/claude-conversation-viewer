@@ -557,7 +557,14 @@
   border: 0.5px solid rgba(31, 30, 29, 0.08);
 }
 
-[data-theme="claude"] .search-input-shell,
+[data-theme="claude"] .search-input-shell {
+  background: #ffffff;
+  border-radius: 20px;
+  border: 1px solid transparent;
+  box-shadow: rgba(0, 0, 0, 0.075) 0px 3px 15px, rgba(31, 30, 29, 0.3) 0px 0px 0px 0.5px;
+  min-height: 46px;
+}
+
 [data-theme="claude"] .export-toolbar-group {
   box-shadow: none;
   border: 0.5px solid rgba(31, 30, 29, 0.1);
