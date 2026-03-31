@@ -676,32 +676,10 @@ export class MessageView {
       }
       row.appendChild(iconCol);
 
-      // Right: text (10.5px, text-200 color, sans-serif)
+      // Right: text (10.5px, text-200 color, sans-serif) — directly visible, no second click
       const textCol = document.createElement('div');
       textCol.style.cssText = 'flex:1;padding-top:2px;font-size:10.5px;line-height:1.4;color:var(--text-secondary);min-width:0;font-family:var(--font-anthropic-ui);';
       textCol.textContent = item.text;
-
-      if (item.detail && item.type === 'thinking') {
-        textCol.style.cursor = 'pointer';
-        const fullText = item.detail;
-        let textExpanded = false;
-        textCol.addEventListener('click', (e) => {
-          e.stopPropagation();
-          textExpanded = !textExpanded;
-          if (textExpanded) {
-            textCol.style.whiteSpace = 'pre-wrap';
-            textCol.style.wordBreak = 'break-word';
-            textCol.style.maxHeight = '300px';
-            textCol.style.overflowY = 'auto';
-            textCol.textContent = desensitize(fullText);
-          } else {
-            textCol.style.whiteSpace = '';
-            textCol.style.maxHeight = '';
-            textCol.style.overflowY = '';
-            textCol.textContent = item.text;
-          }
-        });
-      }
 
       row.appendChild(textCol);
       timeline.appendChild(row);
