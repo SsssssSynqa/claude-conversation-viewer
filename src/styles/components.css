@@ -396,18 +396,19 @@
 [data-theme="claude"] .message-block.message-human .message-bubble {
   background: var(--message-human-bg);
   color: var(--message-human-text);
-  padding: 8px 12px;
+  padding: 7.5px 12px;
   border-radius: 9px;
   max-width: 85%;
   word-break: break-word;
   font-family: var(--font-anthropic-ui);
+  display: inline-flex;
 }
 
 [data-theme="claude"] .message-block.message-human .message-bubble .message-text {
   color: var(--message-human-text);
   font-family: var(--font-anthropic-ui);
-  font-size: 0.9rem;
-  line-height: 1.6;
+  font-size: 12px;
+  line-height: 18px;
 }
 
 [data-theme="claude"] .message-block.message-human .message-bubble .message-text a {
@@ -447,7 +448,7 @@
 
 [data-theme="claude"] .message-block.message-assistant .message-bubble .message-text {
   font-family: var(--font-anthropic-serif);
-  font-size: 0.92rem;
+  font-size: 13px;
   line-height: 1.65;
   color: var(--text-primary);
 }

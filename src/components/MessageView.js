@@ -257,14 +257,8 @@ export class MessageView {
       const senderEl = document.createElement('div');
       senderEl.className = 'message-sender';
       if (isClaude) {
-        // Claude theme: human has no sender, assistant shows name with spark icon
-        if (isHuman) {
-          senderEl.style.cssText = 'display:none;';
-        } else {
-          senderEl.style.cssText = 'font-weight:430;font-size:0.78rem;margin-bottom:4px;display:flex;align-items:center;gap:6px;color:var(--text-muted);';
-          senderEl.appendChild(createIcon('sparkles', 13));
-          senderEl.appendChild(document.createTextNode(names.assistant || 'Claude'));
-        }
+        // Claude theme: no sender name for either human or assistant (matches official)
+        senderEl.style.cssText = 'display:none;';
       } else {
         senderEl.style.cssText = 'font-weight:600;font-size:0.85rem;margin-bottom:6px;display:flex;align-items:center;gap:6px;color:' + (isHuman ? 'var(--accent)' : 'var(--text-primary)') + ';';
         senderEl.appendChild(createIcon(isHuman ? 'user' : 'bot', 14));
@@ -577,7 +571,7 @@ export class MessageView {
     parent.appendChild(div);
   }
 
-  /** Claude theme: timeline-style thinking/tool rendering */
+  /** Claude theme: timeline-style thinking/tool rendering (matches claude.ai) */
   _renderClaudeTimeline(parent, blocks) {
     const thinkingBlocks = blocks.filter(b => b.type === 'thinking');
     const toolBlocks = blocks.filter(b => b.type === 'tool_use' || b.type === 'tool_result');
@@ -585,33 +579,34 @@ export class MessageView {
     const summaryText = lastThinking?.summaries?.[0] || (toolBlocks.length > 0 ? toolBlocks[0].toolName : 'Thinking...');
 
     const wrapper = document.createElement('div');
-    wrapper.style.cssText = 'margin:12px 0 16px;font-family:var(--font-anthropic-ui);';
+    wrapper.style.cssText = 'margin:8px 0 12px;font-family:var(--font-anthropic-serif);';
 
-    // Collapsible summary line
+    // Collapsible summary line — serif font, muted color, ∨ chevron
     const summaryLine = document.createElement('div');
-    summaryLine.style.cssText = 'display:flex;align-items:center;gap:6px;cursor:pointer;color:var(--text-secondary);font-size:0.85rem;line-height:1.4;user-select:none;';
+    summaryLine.style.cssText = 'display:inline-flex;align-items:center;gap:6px;cursor:pointer;color:var(--text-secondary);font-size:0.8125rem;line-height:1.65;user-select:none;border-radius:6px;padding:2px 6px;margin-left:-6px;transition:background 0.15s;';
+    summaryLine.addEventListener('mouseenter', () => summaryLine.style.background = 'var(--sidebar-hover)');
+    summaryLine.addEventListener('mouseleave', () => summaryLine.style.background = '');
     const summarySpan = document.createElement('span');
-    summarySpan.style.cssText = 'flex:1;';
     summarySpan.textContent = summaryText;
     const chevron = document.createElement('span');
-    chevron.style.cssText = 'font-size:0.75rem;transition:transform 0.2s;color:var(--text-muted);';
-    chevron.textContent = '\u25BE';
+    chevron.style.cssText = 'font-size:0.65rem;color:var(--text-muted);display:inline-block;margin-left:2px;';
+    chevron.textContent = '\u276F'; // › right chevron when collapsed
     summaryLine.appendChild(summarySpan);
     summaryLine.appendChild(chevron);
     wrapper.appendChild(summaryLine);
 
     // Timeline container (initially hidden)
     const timeline = document.createElement('div');
-    timeline.style.cssText = 'margin-top:12px;padding-left:4px;display:none;';
+    timeline.style.cssText = 'margin-top:8px;padding-left:2px;display:none;';
 
     let isExpanded = false;
     summaryLine.addEventListener('click', () => {
       isExpanded = !isExpanded;
       timeline.style.display = isExpanded ? 'block' : 'none';
-      chevron.style.transform = isExpanded ? 'rotate(180deg)' : '';
+      chevron.textContent = isExpanded ? '\u2304' : '\u276F'; // ⌄ down when expanded, › right when collapsed
     });
 
-    // Build timeline nodes
+    // Build timeline node data
     const items = [];
     for (const block of blocks) {
       if (block.type === 'thinking') {
@@ -624,39 +619,39 @@ export class MessageView {
       }
     }
 
+    const iconColor = 'var(--text-muted)';
+    const iconSize = '18px';
+    const iconSvgSize = 9;
+    const lineColor = 'rgba(31,30,29,0.12)';
+
     for (let i = 0; i < items.length; i++) {
       const item = items[i];
       const isLast = i === items.length - 1;
 
       const row = document.createElement('div');
-      row.style.cssText = 'display:flex;gap:10px;min-height:28px;';
+      row.style.cssText = 'display:flex;gap:8px;';
 
-      // Left: icon + connector line
+      // Left: icon + connector line column
       const iconCol = document.createElement('div');
-      iconCol.style.cssText = 'display:flex;flex-direction:column;align-items:center;width:20px;flex-shrink:0;';
+      iconCol.style.cssText = 'display:flex;flex-direction:column;align-items:center;width:' + iconSize + ';flex-shrink:0;';
 
       const iconCircle = document.createElement('div');
-      iconCircle.style.cssText = 'width:20px;height:20px;border-radius:50%;border:1.5px solid var(--text-muted);display:flex;align-items:center;justify-content:center;flex-shrink:0;';
-      // Use createIcon for the icon inside the circle
-      if (item.type === 'thinking') {
-        iconCircle.appendChild(createIcon('clock', 10));
-      } else {
-        iconCircle.appendChild(createIcon('tool', 10));
-      }
-      iconCircle.querySelector('svg').style.cssText = 'color:var(--text-muted);';
+      iconCircle.style.cssText = 'width:' + iconSize + ';height:' + iconSize + ';border-radius:50%;border:1px solid ' + iconColor + ';display:flex;align-items:center;justify-content:center;flex-shrink:0;opacity:0.6;';
+      const icon = createIcon(item.type === 'thinking' ? 'clock' : 'tool', iconSvgSize);
+      icon.style.cssText = 'color:' + iconColor + ';';
+      iconCircle.appendChild(icon);
       iconCol.appendChild(iconCircle);
 
-      // Vertical connector line (not for last item)
       if (!isLast) {
         const line = document.createElement('div');
-        line.style.cssText = 'width:1.5px;flex:1;background:var(--border-strong,rgba(31,30,29,0.12));min-height:8px;margin:3px 0;';
+        line.style.cssText = 'width:1px;flex:1;background:' + lineColor + ';min-height:6px;margin:2px 0;';
         iconCol.appendChild(line);
       }
       row.appendChild(iconCol);
 
-      // Right: text content
+      // Right: text
       const textCol = document.createElement('div');
-      textCol.style.cssText = 'flex:1;padding-top:1px;font-size:0.82rem;line-height:1.5;color:var(--text-secondary);min-width:0;';
+      textCol.style.cssText = 'flex:1;padding-top:1px;font-size:0.7rem;line-height:1.4;color:var(--text-secondary);min-width:0;font-family:var(--font-anthropic-ui);';
       textCol.textContent = item.text;
 
       if (item.detail && item.type === 'thinking') {
@@ -668,9 +663,13 @@ export class MessageView {
           if (expanded) {
             textCol.style.whiteSpace = 'pre-wrap';
             textCol.style.wordBreak = 'break-word';
+            textCol.style.maxHeight = '300px';
+            textCol.style.overflowY = 'auto';
             textCol.textContent = desensitize(fullText);
           } else {
             textCol.style.whiteSpace = '';
+            textCol.style.maxHeight = '';
+            textCol.style.overflowY = '';
             textCol.textContent = item.text;
           }
         });
@@ -680,17 +679,18 @@ export class MessageView {
       timeline.appendChild(row);
     }
 
-    // Add "Done" node at the end
+    // "Done" node
     const doneRow = document.createElement('div');
-    doneRow.style.cssText = 'display:flex;gap:10px;min-height:24px;margin-top:2px;';
-    const doneIcon = document.createElement('div');
-    doneIcon.style.cssText = 'width:20px;height:20px;border-radius:50%;border:1.5px solid var(--text-muted);display:flex;align-items:center;justify-content:center;flex-shrink:0;';
-    doneIcon.appendChild(createIcon('check', 10));
-    doneIcon.querySelector('svg').style.cssText = 'color:var(--text-muted);';
+    doneRow.style.cssText = 'display:flex;gap:8px;margin-top:1px;';
+    const doneIconWrap = document.createElement('div');
+    doneIconWrap.style.cssText = 'width:' + iconSize + ';height:' + iconSize + ';border-radius:50%;border:1px solid ' + iconColor + ';display:flex;align-items:center;justify-content:center;flex-shrink:0;opacity:0.6;';
+    const checkIcon = createIcon('check', iconSvgSize);
+    checkIcon.style.cssText = 'color:' + iconColor + ';';
+    doneIconWrap.appendChild(checkIcon);
     const doneText = document.createElement('div');
-    doneText.style.cssText = 'font-size:0.82rem;color:var(--text-secondary);padding-top:1px;font-weight:500;';
+    doneText.style.cssText = 'font-size:0.7rem;color:var(--text-secondary);padding-top:1px;font-family:var(--font-anthropic-ui);';
     doneText.textContent = 'Done';
-    doneRow.appendChild(doneIcon);
+    doneRow.appendChild(doneIconWrap);
     doneRow.appendChild(doneText);
     timeline.appendChild(doneRow);
 
