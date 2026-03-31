@@ -645,7 +645,7 @@ export class MessageView {
     const items = [];
     for (const block of blocks) {
       if (block.type === 'thinking') {
-        items.push({ type: 'thinking', text: block.summaries?.[0] || (block.thinking ? block.thinking.substring(0, 200) + '\u2026' : 'Thinking...') });
+        items.push({ type: 'thinking', text: block.thinking || block.summaries?.[0] || 'Thinking...' });
       } else if (block.type === 'tool_use') {
         items.push({ type: 'tool', text: block.toolName || 'Tool' });
       } else if (block.type === 'tool_result') {

@@ -453,7 +453,7 @@
 
 [data-theme="claude"] .message-block.message-assistant .message-bubble .message-text {
   font-family: var(--font-anthropic-serif);
-  font-size: 13px;
+  font-size: 12px;
   line-height: 1.65;
   color: var(--text-primary);
 }
