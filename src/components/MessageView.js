@@ -651,9 +651,9 @@ export class MessageView {
     const makeStepIcon = (type) => {
       const wrap = document.createElement('div');
       wrap.style.cssText = 'width:16px;height:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--text-muted);';
-      wrap.appendChild(createIcon(type === 'thinking' ? 'clock' : type === 'done' ? 'check' : 'tool', 16));
-      const svg = wrap.querySelector('svg');
-      if (svg) { svg.setAttribute('fill', 'currentColor'); svg.setAttribute('stroke', 'none'); svg.style.cssText = 'color:inherit;'; }
+      const icon = createIcon(type === 'thinking' ? 'clock' : type === 'done' ? 'check' : 'tool', 14);
+      icon.style.cssText = 'color:var(--text-muted);';
+      wrap.appendChild(icon);
       return wrap;
     };
 
