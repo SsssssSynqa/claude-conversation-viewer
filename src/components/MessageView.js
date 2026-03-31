@@ -666,7 +666,7 @@ export class MessageView {
       }
       row.appendChild(iconCol);
       const textEl = document.createElement('div');
-      textEl.style.cssText = 'flex:1;padding-top:2px;' + (showLine ? 'padding-bottom:6px;' : '') + 'font-size:10.5px;line-height:1.4;color:var(--text-secondary);font-family:var(--font-anthropic-ui);';
+      textEl.style.cssText = 'flex:1;padding-top:2px;' + (showLine ? 'padding-bottom:20px;' : '') + 'font-size:10.5px;line-height:1.4;color:var(--text-secondary);font-family:var(--font-anthropic-ui);';
       textEl.textContent = text;
       row.appendChild(textEl);
       return row;
