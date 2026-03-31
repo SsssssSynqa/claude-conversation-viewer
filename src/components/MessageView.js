@@ -580,7 +580,7 @@ export class MessageView {
     parent.appendChild(div);
   }
 
-  /** Claude theme: timeline-style thinking/tool rendering (matches claude.ai) */
+  /** Claude theme: timeline-style thinking/tool rendering (precise claude.ai replica) */
   _renderClaudeTimeline(parent, blocks) {
     const thinkingBlocks = blocks.filter(b => b.type === 'thinking');
     const toolBlocks = blocks.filter(b => b.type === 'tool_use' || b.type === 'tool_result');
@@ -588,31 +588,49 @@ export class MessageView {
     const summaryText = lastThinking?.summaries?.[0] || (toolBlocks.length > 0 ? toolBlocks[0].toolName : 'Thinking...');
 
     const wrapper = document.createElement('div');
-    wrapper.style.cssText = 'margin:8px 0 12px;font-family:var(--font-anthropic-serif);';
+    wrapper.style.cssText = 'margin:8px 0 4px;font-family:var(--font-anthropic-ui);';
 
-    // Collapsible summary line — muted gray, serif font, matching official 10.5px
-    const summaryLine = document.createElement('div');
-    summaryLine.style.cssText = 'display:inline-flex;align-items:center;gap:6px;cursor:pointer;color:var(--text-muted);font-size:10.5px;line-height:1.65;user-select:none;border-radius:6px;padding:2px 6px;margin-left:-6px;transition:background 0.15s;';
-    summaryLine.addEventListener('mouseenter', () => summaryLine.style.background = 'var(--sidebar-hover)');
-    summaryLine.addEventListener('mouseleave', () => summaryLine.style.background = '');
+    // Chevron SVG (down arrow, rotated -90 when collapsed) — exact claude.ai path
+    const makeChevronSvg = () => {
+      const ns = 'http://www.w3.org/2000/svg';
+      const svg = document.createElementNS(ns, 'svg');
+      svg.setAttribute('width', '16');
+      svg.setAttribute('height', '16');
+      svg.setAttribute('viewBox', '0 0 20 20');
+      svg.setAttribute('fill', 'currentColor');
+      const path = document.createElementNS(ns, 'path');
+      path.setAttribute('d', 'M14.128 7.165a.502.502 0 0 1 .744.67l-4.5 5-.078.07a.5.5 0 0 1-.666-.07l-4.5-5-.06-.082a.501.501 0 0 1 .729-.656l.075.068L10 11.752z');
+      svg.appendChild(path);
+      return svg;
+    };
+
+    // Summary button — 10.5px, sans-serif, muted color, with SVG chevron
+    const summaryBtn = document.createElement('button');
+    summaryBtn.style.cssText = 'display:inline-flex;align-items:center;gap:3px;cursor:pointer;color:var(--text-muted);font-size:10.5px;line-height:1.4;font-family:var(--font-anthropic-ui);user-select:none;border:none;background:none;padding:3px 6px;margin-left:-6px;border-radius:6px;transition:background 0.15s;';
+    summaryBtn.addEventListener('mouseenter', () => summaryBtn.style.background = 'var(--sidebar-hover)');
+    summaryBtn.addEventListener('mouseleave', () => summaryBtn.style.background = '');
+
     const summarySpan = document.createElement('span');
+    summarySpan.style.cssText = 'overflow:hidden;text-overflow:ellipsis;white-space:nowrap;';
     summarySpan.textContent = summaryText;
-    const chevron = document.createElement('span');
-    chevron.style.cssText = 'font-size:0.7rem;color:var(--text-muted);display:inline-block;margin-left:2px;';
-    chevron.textContent = '\u203A'; // › right single guillemet when collapsed
-    summaryLine.appendChild(summarySpan);
-    summaryLine.appendChild(chevron);
-    wrapper.appendChild(summaryLine);
+
+    const chevronWrap = document.createElement('span');
+    chevronWrap.style.cssText = 'display:inline-flex;flex-shrink:0;transition:transform 0.2s;transform:rotate(-90deg);';
+    chevronWrap.appendChild(makeChevronSvg());
+
+    summaryBtn.appendChild(summarySpan);
+    summaryBtn.appendChild(chevronWrap);
+    wrapper.appendChild(summaryBtn);
 
     // Timeline container (initially hidden)
     const timeline = document.createElement('div');
-    timeline.style.cssText = 'margin-top:8px;padding-left:2px;display:none;';
+    timeline.style.cssText = 'margin-top:4px;padding-left:2px;display:none;overflow:hidden;transition:max-height 0.3s ease-out;';
 
     let isExpanded = false;
-    summaryLine.addEventListener('click', () => {
+    summaryBtn.addEventListener('click', () => {
       isExpanded = !isExpanded;
       timeline.style.display = isExpanded ? 'block' : 'none';
-      chevron.textContent = isExpanded ? '\u2304' : '\u203A'; // ⌄ down when expanded, › right when collapsed
+      chevronWrap.style.transform = isExpanded ? 'rotate(0deg)' : 'rotate(-90deg)';
     });
 
     // Build timeline node data
@@ -628,10 +646,16 @@ export class MessageView {
       }
     }
 
-    const iconColor = 'var(--text-muted)';
-    const iconSize = '22px';
-    const iconSvgSize = 11;
-    const lineColor = 'rgba(31,30,29,0.12)';
+    // Icon: 16x16 container, 20x20 SVG fill, color text-500 (muted)
+    // Connector line: 1px wide, bg-border-300 rgba(31,30,29,0.15)
+    const makeStepIcon = (type) => {
+      const wrap = document.createElement('div');
+      wrap.style.cssText = 'width:16px;height:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--text-muted);';
+      wrap.appendChild(createIcon(type === 'thinking' ? 'clock' : type === 'done' ? 'check' : 'tool', 16));
+      const svg = wrap.querySelector('svg');
+      if (svg) { svg.setAttribute('fill', 'currentColor'); svg.setAttribute('stroke', 'none'); svg.style.cssText = 'color:inherit;'; }
+      return wrap;
+    };
 
     for (let i = 0; i < items.length; i++) {
       const item = items[i];
@@ -640,36 +664,31 @@ export class MessageView {
       const row = document.createElement('div');
       row.style.cssText = 'display:flex;gap:8px;';
 
-      // Left: icon + connector line column
+      // Left: icon column (flex col, 16px wide, pt-1)
       const iconCol = document.createElement('div');
-      iconCol.style.cssText = 'display:flex;flex-direction:column;align-items:center;width:' + iconSize + ';flex-shrink:0;';
-
-      const iconCircle = document.createElement('div');
-      iconCircle.style.cssText = 'width:' + iconSize + ';height:' + iconSize + ';border-radius:50%;border:1px solid ' + iconColor + ';display:flex;align-items:center;justify-content:center;flex-shrink:0;opacity:0.6;';
-      const icon = createIcon(item.type === 'thinking' ? 'clock' : 'tool', iconSvgSize);
-      icon.style.cssText = 'color:' + iconColor + ';';
-      iconCircle.appendChild(icon);
-      iconCol.appendChild(iconCircle);
+      iconCol.style.cssText = 'display:flex;flex-direction:column;align-items:center;width:16px;flex-shrink:0;padding-top:3px;';
+      iconCol.appendChild(makeStepIcon(item.type));
 
       if (!isLast) {
         const line = document.createElement('div');
-        line.style.cssText = 'width:1px;flex:1;background:' + lineColor + ';min-height:6px;margin:2px 0;';
+        line.style.cssText = 'width:1px;flex:1;margin-top:3px;background:rgba(31,30,29,0.15);';
         iconCol.appendChild(line);
       }
       row.appendChild(iconCol);
 
-      // Right: text
+      // Right: text (10.5px, text-200 color, sans-serif)
       const textCol = document.createElement('div');
-      textCol.style.cssText = 'flex:1;padding-top:1px;font-size:0.7rem;line-height:1.4;color:var(--text-secondary);min-width:0;font-family:var(--font-anthropic-ui);';
+      textCol.style.cssText = 'flex:1;padding-top:2px;font-size:10.5px;line-height:1.4;color:var(--text-secondary);min-width:0;font-family:var(--font-anthropic-ui);';
       textCol.textContent = item.text;
 
       if (item.detail && item.type === 'thinking') {
         textCol.style.cursor = 'pointer';
         const fullText = item.detail;
-        let expanded = false;
-        textCol.addEventListener('click', () => {
-          expanded = !expanded;
-          if (expanded) {
+        let textExpanded = false;
+        textCol.addEventListener('click', (e) => {
+          e.stopPropagation();
+          textExpanded = !textExpanded;
+          if (textExpanded) {
             textCol.style.whiteSpace = 'pre-wrap';
             textCol.style.wordBreak = 'break-word';
             textCol.style.maxHeight = '300px';
@@ -690,16 +709,14 @@ export class MessageView {
 
     // "Done" node
     const doneRow = document.createElement('div');
-    doneRow.style.cssText = 'display:flex;gap:8px;margin-top:1px;';
-    const doneIconWrap = document.createElement('div');
-    doneIconWrap.style.cssText = 'width:' + iconSize + ';height:' + iconSize + ';border-radius:50%;border:1px solid ' + iconColor + ';display:flex;align-items:center;justify-content:center;flex-shrink:0;opacity:0.6;';
-    const checkIcon = createIcon('check', iconSvgSize);
-    checkIcon.style.cssText = 'color:' + iconColor + ';';
-    doneIconWrap.appendChild(checkIcon);
+    doneRow.style.cssText = 'display:flex;gap:8px;';
+    const doneIconCol = document.createElement('div');
+    doneIconCol.style.cssText = 'display:flex;flex-direction:column;align-items:center;width:16px;flex-shrink:0;padding-top:3px;';
+    doneIconCol.appendChild(makeStepIcon('done'));
     const doneText = document.createElement('div');
-    doneText.style.cssText = 'font-size:0.7rem;color:var(--text-secondary);padding-top:1px;font-family:var(--font-anthropic-ui);';
+    doneText.style.cssText = 'font-size:10.5px;color:var(--text-secondary);padding-top:2px;font-family:var(--font-anthropic-ui);';
     doneText.textContent = 'Done';
-    doneRow.appendChild(doneIconWrap);
+    doneRow.appendChild(doneIconCol);
     doneRow.appendChild(doneText);
     timeline.appendChild(doneRow);
 
