@@ -580,123 +580,104 @@ export class MessageView {
     parent.appendChild(div);
   }
 
-  /** Claude theme: timeline-style thinking/tool rendering (precise claude.ai replica) */
+  /** Claude theme: timeline-style thinking/tool rendering */
   _renderClaudeTimeline(parent, blocks) {
     const thinkingBlocks = blocks.filter(b => b.type === 'thinking');
     const toolBlocks = blocks.filter(b => b.type === 'tool_use' || b.type === 'tool_result');
     const lastThinking = thinkingBlocks[thinkingBlocks.length - 1];
     const summaryText = lastThinking?.summaries?.[0] || (toolBlocks.length > 0 ? toolBlocks[0].toolName : 'Thinking...');
+    const ns = 'http://www.w3.org/2000/svg';
+
+    // SVG helpers — icons from reference, sizes from claude.ai
+    const makeSvg = (w, h) => {
+      const svg = document.createElementNS(ns, 'svg');
+      svg.setAttribute('width', w); svg.setAttribute('height', h);
+      svg.setAttribute('viewBox', '0 0 24 24');
+      svg.setAttribute('fill', 'none'); svg.setAttribute('stroke', 'currentColor');
+      svg.setAttribute('stroke-width', '1.5');
+      svg.setAttribute('stroke-linecap', 'round'); svg.setAttribute('stroke-linejoin', 'round');
+      svg.style.display = 'block';
+      return svg;
+    };
+    const addPath = (svg, d) => { const p = document.createElementNS(ns, 'path'); p.setAttribute('d', d); svg.appendChild(p); };
+    const addCircle = (svg, cx, cy, r) => { const c = document.createElementNS(ns, 'circle'); c.setAttribute('cx', cx); c.setAttribute('cy', cy); c.setAttribute('r', r); svg.appendChild(c); };
+    const addPolyline = (svg, pts) => { const pl = document.createElementNS(ns, 'polyline'); pl.setAttribute('points', pts); svg.appendChild(pl); };
+
+    // Icon SVGs from reference HTML — rendered at 16x16 to match claude.ai
+    const makeChevronRight = () => { const s = makeSvg('12', '12'); addPath(s, 'm9 18 6-6-6-6'); return s; };
+    const makeChevronDown = () => { const s = makeSvg('12', '12'); addPath(s, 'm6 9 6 6 6-6'); return s; };
+    const makeClockIcon = () => { const s = makeSvg('16', '16'); addPath(s, 'M 12 2 A 10 10 0 1 1 2 12'); addPath(s, 'M 3.34 7 v0 M 7 3.34 v0'); addPolyline(s, '12 6 12 12 16 14'); return s; };
+    const makeToolIcon = () => { const s = makeSvg('16', '16'); addCircle(s, '12', '12', '10'); addCircle(s, '12', '12', '4'); return s; };
+    const makeDoneIcon = () => { const s = makeSvg('16', '16'); addCircle(s, '12', '12', '10'); addPath(s, 'm9 12 2 2 4-4'); return s; };
 
     const wrapper = document.createElement('div');
     wrapper.style.cssText = 'margin:8px 0 4px;font-family:var(--font-anthropic-ui);';
 
-    // Chevron SVG (down arrow, rotated -90 when collapsed) — exact claude.ai path
-    const makeChevronSvg = () => {
-      const ns = 'http://www.w3.org/2000/svg';
-      const svg = document.createElementNS(ns, 'svg');
-      svg.setAttribute('width', '16');
-      svg.setAttribute('height', '16');
-      svg.setAttribute('viewBox', '0 0 20 20');
-      svg.setAttribute('fill', 'currentColor');
-      const path = document.createElementNS(ns, 'path');
-      path.setAttribute('d', 'M14.128 7.165a.502.502 0 0 1 .744.67l-4.5 5-.078.07a.5.5 0 0 1-.666-.07l-4.5-5-.06-.082a.501.501 0 0 1 .729-.656l.075.068L10 11.752z');
-      svg.appendChild(path);
-      return svg;
-    };
-
-    // Summary button — 10.5px, sans-serif, muted color, with SVG chevron
-    const summaryBtn = document.createElement('button');
-    summaryBtn.style.cssText = 'display:inline-flex;align-items:center;gap:3px;cursor:pointer;color:var(--text-muted);font-size:10.5px;line-height:1.4;font-family:var(--font-anthropic-ui);user-select:none;border:none;background:none;padding:3px 6px;margin-left:-6px;border-radius:6px;transition:background 0.15s;';
-    summaryBtn.addEventListener('mouseenter', () => summaryBtn.style.background = 'var(--sidebar-hover)');
+    // Summary button — 10.5px sans-serif, muted color (from claude.ai)
+    const summaryBtn = document.createElement('div');
+    summaryBtn.style.cssText = 'display:inline-flex;align-items:center;gap:4px;cursor:pointer;color:var(--text-muted);font-size:10.5px;line-height:1.4;padding:3px 6px;margin-left:-6px;border-radius:6px;transition:background 0.15s;user-select:none;';
+    summaryBtn.addEventListener('mouseenter', () => summaryBtn.style.background = 'rgba(0,0,0,0.04)');
     summaryBtn.addEventListener('mouseleave', () => summaryBtn.style.background = 'none');
 
     const summarySpan = document.createElement('span');
-    summarySpan.style.cssText = 'overflow:hidden;text-overflow:ellipsis;white-space:nowrap;';
     summarySpan.textContent = summaryText;
+    summaryBtn.appendChild(summarySpan);
 
     const chevronWrap = document.createElement('span');
-    chevronWrap.style.cssText = 'display:inline-flex;flex-shrink:0;transition:transform 0.2s;transform:rotate(-90deg);';
-    chevronWrap.appendChild(makeChevronSvg());
-
-    summaryBtn.appendChild(summarySpan);
+    chevronWrap.style.cssText = 'display:inline-flex;flex-shrink:0;color:var(--text-muted);';
+    chevronWrap.appendChild(makeChevronRight());
     summaryBtn.appendChild(chevronWrap);
     wrapper.appendChild(summaryBtn);
 
-    // Timeline container (initially hidden)
+    // Timeline (initially hidden)
     const timeline = document.createElement('div');
-    timeline.style.cssText = 'margin-top:4px;padding-left:2px;display:none;overflow:hidden;transition:max-height 0.3s ease-out;';
+    timeline.style.cssText = 'margin-top:4px;padding-left:2px;display:none;flex-direction:column;';
 
     let isExpanded = false;
     summaryBtn.addEventListener('click', () => {
       isExpanded = !isExpanded;
-      timeline.style.display = isExpanded ? 'block' : 'none';
-      chevronWrap.style.transform = isExpanded ? 'rotate(0deg)' : 'rotate(-90deg)';
+      timeline.style.display = isExpanded ? 'flex' : 'none';
+      chevronWrap.textContent = '';
+      chevronWrap.appendChild(isExpanded ? makeChevronDown() : makeChevronRight());
     });
 
-    // Build timeline node data
+    // Build items
     const items = [];
     for (const block of blocks) {
       if (block.type === 'thinking') {
-        const text = block.summaries?.[0] || (block.thinking ? block.thinking.substring(0, 120) + '\u2026' : 'Thinking...');
-        items.push({ type: 'thinking', text, detail: block.thinking });
+        items.push({ type: 'thinking', text: block.summaries?.[0] || (block.thinking ? block.thinking.substring(0, 200) + '\u2026' : 'Thinking...') });
       } else if (block.type === 'tool_use') {
-        items.push({ type: 'tool', text: block.toolName || 'Tool', detail: block.toolInput ? JSON.stringify(block.toolInput, null, 2) : '' });
+        items.push({ type: 'tool', text: block.toolName || 'Tool' });
       } else if (block.type === 'tool_result') {
-        items.push({ type: 'result', text: typeof block.result === 'string' ? block.result.substring(0, 80) : 'Result', detail: typeof block.result === 'string' ? block.result : JSON.stringify(block.result, null, 2) });
+        items.push({ type: 'result', text: typeof block.result === 'string' ? block.result.substring(0, 80) : 'Result' });
       }
     }
 
-    // Icon: 16x16 container, 20x20 SVG fill, color text-500 (muted)
-    // Connector line: 1px wide, bg-border-300 rgba(31,30,29,0.15)
-    const makeStepIcon = (type) => {
-      const wrap = document.createElement('div');
-      wrap.style.cssText = 'width:16px;height:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--text-muted);';
-      const icon = createIcon(type === 'thinking' ? 'clock' : type === 'done' ? 'check' : 'tool', 14);
-      icon.style.cssText = 'color:var(--text-muted);';
-      wrap.appendChild(icon);
-      return wrap;
+    const makeRow = (iconFn, text, showLine) => {
+      const row = document.createElement('div');
+      row.style.cssText = 'display:flex;gap:8px;align-items:stretch;';
+      const iconCol = document.createElement('div');
+      iconCol.style.cssText = 'display:flex;flex-direction:column;align-items:center;width:16px;flex-shrink:0;padding-top:3px;color:var(--text-muted);';
+      iconCol.appendChild(iconFn());
+      if (showLine) {
+        const line = document.createElement('div');
+        line.style.cssText = 'width:1px;flex:1;margin:3px 0;background:rgba(31,30,29,0.15);';
+        iconCol.appendChild(line);
+      }
+      row.appendChild(iconCol);
+      const textEl = document.createElement('div');
+      textEl.style.cssText = 'flex:1;padding-top:2px;' + (showLine ? 'padding-bottom:6px;' : '') + 'font-size:10.5px;line-height:1.4;color:var(--text-secondary);font-family:var(--font-anthropic-ui);';
+      textEl.textContent = text;
+      row.appendChild(textEl);
+      return row;
     };
 
     for (let i = 0; i < items.length; i++) {
       const item = items[i];
-      const isLast = i === items.length - 1;
-
-      const row = document.createElement('div');
-      row.style.cssText = 'display:flex;gap:8px;';
-
-      // Left: icon column (flex col, 16px wide, pt-1)
-      const iconCol = document.createElement('div');
-      iconCol.style.cssText = 'display:flex;flex-direction:column;align-items:center;width:16px;flex-shrink:0;padding-top:3px;';
-      iconCol.appendChild(makeStepIcon(item.type));
-
-      if (!isLast) {
-        const line = document.createElement('div');
-        line.style.cssText = 'width:1px;flex:1;margin-top:3px;background:rgba(31,30,29,0.15);';
-        iconCol.appendChild(line);
-      }
-      row.appendChild(iconCol);
-
-      // Right: text (10.5px, text-200 color, sans-serif) — directly visible, no second click
-      const textCol = document.createElement('div');
-      textCol.style.cssText = 'flex:1;padding-top:2px;font-size:10.5px;line-height:1.4;color:var(--text-secondary);min-width:0;font-family:var(--font-anthropic-ui);';
-      textCol.textContent = item.text;
-
-      row.appendChild(textCol);
-      timeline.appendChild(row);
+      const iconFn = item.type === 'thinking' ? makeClockIcon : makeToolIcon;
+      timeline.appendChild(makeRow(iconFn, item.text, true));
     }
-
-    // "Done" node
-    const doneRow = document.createElement('div');
-    doneRow.style.cssText = 'display:flex;gap:8px;';
-    const doneIconCol = document.createElement('div');
-    doneIconCol.style.cssText = 'display:flex;flex-direction:column;align-items:center;width:16px;flex-shrink:0;padding-top:3px;';
-    doneIconCol.appendChild(makeStepIcon('done'));
-    const doneText = document.createElement('div');
-    doneText.style.cssText = 'font-size:10.5px;color:var(--text-secondary);padding-top:2px;font-family:var(--font-anthropic-ui);';
-    doneText.textContent = 'Done';
-    doneRow.appendChild(doneIconCol);
-    doneRow.appendChild(doneText);
-    timeline.appendChild(doneRow);
+    timeline.appendChild(makeRow(makeDoneIcon, 'Done', false));
 
     wrapper.appendChild(timeline);
     parent.appendChild(wrapper);
