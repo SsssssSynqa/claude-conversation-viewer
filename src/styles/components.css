@@ -413,6 +413,10 @@
   line-height: 18px;
 }
 
+[data-theme="claude"] .message-block.message-human .message-bubble .message-text p:last-child {
+  margin-bottom: 0;
+}
+
 [data-theme="claude"] .message-block.message-human .message-bubble .message-text a {
   color: var(--accent-blue, #2c84db);
 }
@@ -452,6 +456,10 @@
   font-size: 13px;
   line-height: 1.65;
   color: var(--text-primary);
+}
+
+[data-theme="claude"] .message-block.message-assistant .message-bubble .message-text p:last-child {
+  margin-bottom: 0;
 }
 
 [data-theme="claude"] .message-block.message-assistant .message-bubble .message-text h1,
