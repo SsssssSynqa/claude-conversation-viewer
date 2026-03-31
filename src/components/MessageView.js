@@ -311,7 +311,11 @@ export class MessageView {
 
       // ---- Message Footer: timestamp + action buttons ----
       const footer = document.createElement('div');
-      footer.style.cssText = 'display:flex;justify-content:space-between;align-items:center;margin-top:12px;opacity:0.55;transition:opacity 0.15s;';
+      if (isClaude) {
+        footer.style.cssText = 'display:flex;justify-content:space-between;align-items:center;margin-top:4px;opacity:0;height:0;overflow:hidden;transition:all 0.15s;';
+      } else {
+        footer.style.cssText = 'display:flex;justify-content:space-between;align-items:center;margin-top:12px;opacity:0.55;transition:opacity 0.15s;';
+      }
 
       const timeEl = document.createElement('span');
       timeEl.style.cssText = 'font-size:0.72rem;color:var(--text-muted);';
@@ -342,8 +346,13 @@ export class MessageView {
       msgEl.appendChild(footer);
 
       // Show footer on hover
-      msgEl.addEventListener('mouseenter', () => footer.style.opacity = '1');
-      msgEl.addEventListener('mouseleave', () => footer.style.opacity = '0');
+      if (isClaude) {
+        msgEl.addEventListener('mouseenter', () => { footer.style.opacity = '1'; footer.style.height = 'auto'; footer.style.overflow = 'visible'; });
+        msgEl.addEventListener('mouseleave', () => { footer.style.opacity = '0'; footer.style.height = '0'; footer.style.overflow = 'hidden'; });
+      } else {
+        msgEl.addEventListener('mouseenter', () => footer.style.opacity = '1');
+        msgEl.addEventListener('mouseleave', () => { if (!footer.dataset.pinned) footer.style.opacity = '0.55'; });
+      }
 
       scrollContainer.appendChild(msgEl);
     }
