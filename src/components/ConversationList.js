@@ -99,63 +99,77 @@ export class ConversationList {
       groups.get(key).push({ conv, index: i });
     }
 
+    const isClaude = (state.get('theme') === 'claude');
+
     for (const [monthKey, items] of groups) {
       // Month header
       const header = document.createElement('div');
-      header.style.cssText = 'padding:10px 12px 4px;font-size:10px;color:var(--text-muted);font-weight:600;';
+      if (isClaude) {
+        header.style.cssText = 'padding:12px 12px 4px;font-size:9px;color:var(--text-muted);font-weight:430;';
+      } else {
+        header.style.cssText = 'padding:10px 12px 4px;font-size:10px;color:var(--text-muted);font-weight:600;';
+      }
       header.textContent = formatMonthLabel(monthKey);
       this.listEl.appendChild(header);
 
       for (const { conv, index } of items) {
         const item = document.createElement('div');
         const isActive = index === currentIndex;
-        item.className = 'sidebar-pill conversation-list-item ' + (isActive ? 'pill-active' : 'pill-flat');
-        item.style.cssText = `
-          padding: 10px 12px;
-          margin: 4px 0;
-          cursor: pointer;
-          font-size: 12px;
-          height: auto;
-          flex-direction: column;
-          align-items: flex-start;
-          gap: 3px;
-        `;
+        item.className = 'conversation-list-item ' + (isClaude ? '' : 'sidebar-pill ' + (isActive ? 'pill-active' : 'pill-flat'));
+
+        if (isClaude) {
+          item.style.cssText = 'padding:4.5px 12px;margin:1px 0;cursor:pointer;border-radius:4.5px;height:24px;display:flex;align-items:center;overflow:hidden;'
+            + (isActive ? 'background:var(--bg-tertiary);' : '');
+        } else {
+          item.style.cssText = 'padding:10px 12px;margin:4px 0;cursor:pointer;font-size:12px;height:auto;flex-direction:column;align-items:flex-start;gap:3px;';
+        }
 
         // Title
         const titleEl = document.createElement('div');
-        titleEl.style.cssText = 'font-size:0.82rem;color:var(--sidebar-text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:500;';
+        if (isClaude) {
+          titleEl.style.cssText = 'font-size:9px;color:var(--text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:430;line-height:12px;';
+        } else {
+          titleEl.style.cssText = 'font-size:0.82rem;color:var(--sidebar-text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:500;';
+        }
         titleEl.textContent = conv.name || t('convList.unnamed');
         item.appendChild(titleEl);
 
-        // Meta line
-        const meta = document.createElement('div');
-        meta.style.cssText = 'font-size:0.7rem;color:var(--text-muted);margin-top:1px;display:flex;gap:6px;align-items:center;flex-wrap:wrap;';
+        // Meta line (hidden in claude theme — official sidebar has no meta)
+        if (!isClaude) {
+          const meta = document.createElement('div');
+          meta.style.cssText = 'font-size:0.7rem;color:var(--text-muted);margin-top:1px;display:flex;gap:6px;align-items:center;flex-wrap:wrap;';
 
-        const dateSpan = document.createElement('span');
-        dateSpan.textContent = formatDate(conv.createdAt);
-        meta.appendChild(dateSpan);
+          const dateSpan = document.createElement('span');
+          dateSpan.textContent = formatDate(conv.createdAt);
+          meta.appendChild(dateSpan);
 
-        const countSpan = document.createElement('span');
-        countSpan.textContent = conv.stats.messageCount + t('convList.msgCount');
-        meta.appendChild(countSpan);
+          const countSpan = document.createElement('span');
+          countSpan.textContent = conv.stats.messageCount + t('convList.msgCount');
+          meta.appendChild(countSpan);
 
-        if (conv.stats.hasThinking) {
-          const thinkBadge = document.createElement('span');
-          thinkBadge.textContent = '\uD83D\uDCAD';
-          thinkBadge.title = t('convList.hasThinking');
-          thinkBadge.style.fontSize = '0.7rem';
-          meta.appendChild(thinkBadge);
+          if (conv.stats.hasThinking) {
+            const thinkBadge = document.createElement('span');
+            thinkBadge.textContent = '\uD83D\uDCAD';
+            thinkBadge.title = t('convList.hasThinking');
+            thinkBadge.style.fontSize = '0.7rem';
+            meta.appendChild(thinkBadge);
+          }
+
+          if (conv.stats.hasFlags) {
+            const flagBadge = document.createElement('span');
+            flagBadge.textContent = '\u26A0\uFE0F';
+            flagBadge.title = t('convList.hasFlags');
+            flagBadge.style.fontSize = '0.7rem';
+            meta.appendChild(flagBadge);
+          }
+
+          item.appendChild(meta);
         }
 
-        if (conv.stats.hasFlags) {
-          const flagBadge = document.createElement('span');
-          flagBadge.textContent = '\u26A0\uFE0F';
-          flagBadge.title = t('convList.hasFlags');
-          flagBadge.style.fontSize = '0.7rem';
-          meta.appendChild(flagBadge);
+        if (isClaude) {
+          item.addEventListener('mouseenter', () => { if (!isActive) item.style.background = 'var(--sidebar-hover)'; });
+          item.addEventListener('mouseleave', () => { if (!isActive) item.style.background = 'none'; });
         }
-
-        item.appendChild(meta);
 
         item.addEventListener('click', () => {
           state.set('viewMode', 'conversation');
