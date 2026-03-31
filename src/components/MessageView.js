@@ -608,7 +608,7 @@ export class MessageView {
     const summaryBtn = document.createElement('button');
     summaryBtn.style.cssText = 'display:inline-flex;align-items:center;gap:3px;cursor:pointer;color:var(--text-muted);font-size:10.5px;line-height:1.4;font-family:var(--font-anthropic-ui);user-select:none;border:none;background:none;padding:3px 6px;margin-left:-6px;border-radius:6px;transition:background 0.15s;';
     summaryBtn.addEventListener('mouseenter', () => summaryBtn.style.background = 'var(--sidebar-hover)');
-    summaryBtn.addEventListener('mouseleave', () => summaryBtn.style.background = '');
+    summaryBtn.addEventListener('mouseleave', () => summaryBtn.style.background = 'none');
 
     const summarySpan = document.createElement('span');
     summarySpan.style.cssText = 'overflow:hidden;text-overflow:ellipsis;white-space:nowrap;';
