@@ -661,7 +661,7 @@ export class MessageView {
       iconCol.appendChild(iconFn());
       if (showLine) {
         const line = document.createElement('div');
-        line.style.cssText = 'width:1px;flex:1;margin:3px 0;background:rgba(31,30,29,0.15);';
+        line.style.cssText = 'width:1px;flex:1;margin:2px 0;background:rgba(31,30,29,0.15);min-height:4px;';
         iconCol.appendChild(line);
       }
       row.appendChild(iconCol);
