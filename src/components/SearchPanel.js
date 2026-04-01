@@ -60,7 +60,7 @@ export class SearchPanel {
     searchInput.id = 'search-panel-input';
     searchInput.className = 'search-field';
     if (isClaude) {
-      searchInput.style.cssText = 'flex:1;padding:12px 16px 12px 40px;color:var(--text-primary);font-size:12px;font-family:var(--font-family);background:transparent;border:none;outline:none;width:100%;';
+      searchInput.style.cssText = 'width:100%;padding:14px 16px 8px;color:var(--text-primary);font-size:12px;font-family:var(--font-family);background:transparent;border:none;outline:none;';
     } else {
       searchInput.style.cssText = 'flex:1;padding:14px 16px 14px 42px;color:var(--text-primary);font-size:0.95rem;font-family:var(--font-family);';
     }
@@ -86,18 +86,46 @@ export class SearchPanel {
     const inputWrapper = document.createElement('div');
     inputWrapper.className = 'search-input-shell';
     if (isClaude) {
-      inputWrapper.style.cssText = 'flex:1;position:relative;background:#ffffff;border-radius:20px;border:1px solid transparent;box-shadow:rgba(0,0,0,0.075) 0px 3px 15px, rgba(31,30,29,0.3) 0px 0px 0px 0.5px;';
+      inputWrapper.style.cssText = 'flex:1;position:relative;background:#ffffff;border-radius:20px;border:1px solid transparent;box-shadow:rgba(0,0,0,0.075) 0px 3px 15px, rgba(31,30,29,0.3) 0px 0px 0px 0.5px;display:flex;flex-direction:column;';
     } else {
       inputWrapper.style.cssText = 'flex:1;position:relative;box-shadow:var(--shadow-inset);';
     }
 
-    const searchIcon = document.createElement('span');
-    searchIcon.className = 'search-input-icon';
-    searchIcon.style.cssText = 'position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--text-muted);pointer-events:none;display:flex;align-items:center;justify-content:center;';
-    searchIcon.appendChild(createIcon('search', isClaude ? 16 : 18));
-    inputWrapper.appendChild(searchIcon);
-    inputWrapper.appendChild(searchInput);
-    searchRow.appendChild(inputWrapper);
+    if (isClaude) {
+      inputWrapper.appendChild(searchInput);
+      // Bottom toolbar (decorative, matching claude.ai composer)
+      const toolbar = document.createElement('div');
+      toolbar.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:6px 12px 10px;';
+      const plusBtn = document.createElement('span');
+      plusBtn.style.cssText = 'width:24px;height:24px;display:flex;align-items:center;justify-content:center;color:var(--text-muted);cursor:default;';
+      plusBtn.appendChild(createIcon('plus', 18));
+      toolbar.appendChild(plusBtn);
+      const rightGroup = document.createElement('div');
+      rightGroup.style.cssText = 'display:flex;align-items:center;gap:4px;font-family:var(--font-family);';
+      const modelName = document.createElement('span');
+      modelName.style.cssText = 'font-size:13px;color:var(--text-primary);';
+      modelName.textContent = 'Opus 4.6';
+      const extLabel = document.createElement('span');
+      extLabel.style.cssText = 'font-size:11px;color:var(--text-muted);';
+      extLabel.textContent = 'Extended \u2304';
+      const audioBars = document.createElement('span');
+      audioBars.style.cssText = 'font-size:14px;color:var(--text-primary);margin-left:6px;letter-spacing:-0.5px;';
+      audioBars.textContent = '\u2759\u2758\u2759\u2758\u2759';
+      rightGroup.appendChild(modelName);
+      rightGroup.appendChild(extLabel);
+      rightGroup.appendChild(audioBars);
+      toolbar.appendChild(rightGroup);
+      inputWrapper.appendChild(toolbar);
+      searchRow.appendChild(inputWrapper);
+    } else {
+      const searchIcon = document.createElement('span');
+      searchIcon.className = 'search-input-icon';
+      searchIcon.style.cssText = 'position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--text-muted);pointer-events:none;display:flex;align-items:center;justify-content:center;';
+      searchIcon.appendChild(createIcon('search', 18));
+      inputWrapper.appendChild(searchIcon);
+      inputWrapper.appendChild(searchInput);
+      searchRow.appendChild(inputWrapper);
+    }
 
     header.appendChild(searchRow);
 
