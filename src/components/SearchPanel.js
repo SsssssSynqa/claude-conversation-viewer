@@ -52,23 +52,31 @@ export class SearchPanel {
     searchRow.className = 'search-config-row';
     searchRow.style.cssText = 'margin-bottom:14px;width:100%;';
 
+    const isClaude = (state.get('theme') === 'claude');
+
     const searchInput = document.createElement('input');
     searchInput.type = 'text';
     searchInput.placeholder = t('search.placeholder');
     searchInput.id = 'search-panel-input';
     searchInput.className = 'search-field';
-    searchInput.style.cssText = `
-      flex: 1;
-      padding: 14px 16px 14px 42px;
-      color: var(--text-primary);
-      font-size: 0.95rem;
-      font-family: var(--font-family);
-    `;
+    if (isClaude) {
+      searchInput.style.cssText = 'flex:1;padding:12px 16px 12px 40px;color:var(--text-primary);font-size:12px;font-family:var(--font-family);background:transparent;border:none;outline:none;width:100%;';
+    } else {
+      searchInput.style.cssText = 'flex:1;padding:14px 16px 14px 42px;color:var(--text-primary);font-size:0.95rem;font-family:var(--font-family);';
+    }
     searchInput.addEventListener('focus', () => {
-      inputWrapper.style.boxShadow = 'var(--ring-accent-soft)';
+      if (isClaude) {
+        inputWrapper.style.boxShadow = 'rgba(0,0,0,0.1) 0px 3px 15px, rgba(31,30,29,0.4) 0px 0px 0px 0.5px';
+      } else {
+        inputWrapper.style.boxShadow = 'var(--ring-accent-soft)';
+      }
     });
     searchInput.addEventListener('blur', () => {
-      inputWrapper.style.boxShadow = 'var(--shadow-inset)';
+      if (isClaude) {
+        inputWrapper.style.boxShadow = 'rgba(0,0,0,0.075) 0px 3px 15px, rgba(31,30,29,0.3) 0px 0px 0px 0.5px';
+      } else {
+        inputWrapper.style.boxShadow = 'var(--shadow-inset)';
+      }
     });
     searchInput.addEventListener('input', () => {
       clearTimeout(this.searchTimer);
@@ -77,12 +85,16 @@ export class SearchPanel {
 
     const inputWrapper = document.createElement('div');
     inputWrapper.className = 'search-input-shell';
-    inputWrapper.style.cssText = 'flex:1;position:relative;box-shadow:var(--shadow-inset);';
+    if (isClaude) {
+      inputWrapper.style.cssText = 'flex:1;position:relative;background:#ffffff;border-radius:20px;border:1px solid transparent;box-shadow:rgba(0,0,0,0.075) 0px 3px 15px, rgba(31,30,29,0.3) 0px 0px 0px 0.5px;';
+    } else {
+      inputWrapper.style.cssText = 'flex:1;position:relative;box-shadow:var(--shadow-inset);';
+    }
 
     const searchIcon = document.createElement('span');
     searchIcon.className = 'search-input-icon';
-    searchIcon.style.cssText = 'position:absolute;left:16px;top:50%;transform:translateY(-50%);color:var(--text-muted);pointer-events:none;display:flex;align-items:center;justify-content:center;';
-    searchIcon.appendChild(createIcon('search', 18));
+    searchIcon.style.cssText = 'position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--text-muted);pointer-events:none;display:flex;align-items:center;justify-content:center;';
+    searchIcon.appendChild(createIcon('search', isClaude ? 16 : 18));
     inputWrapper.appendChild(searchIcon);
     inputWrapper.appendChild(searchInput);
     searchRow.appendChild(inputWrapper);
