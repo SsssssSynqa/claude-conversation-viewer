@@ -31,19 +31,24 @@ export class SearchPanel {
     container.className = 'content-shell';
     container.style.cssText = 'flex:1;overflow:hidden;display:flex;flex-direction:column;';
 
+    const isClaude = (state.get('theme') === 'claude');
+
     // ---- Search Header ----
     const header = document.createElement('div');
     header.className = 'search-panel-header';
-    header.style.cssText = `
-      padding: 20px 24px 16px;
-      border-bottom: 1px solid var(--border);
-      flex-shrink: 0;
-      background: var(--bg-secondary);
-    `;
+    if (isClaude) {
+      header.style.cssText = 'padding:20px 24px 16px;border-bottom:none;flex-shrink:0;background:transparent;';
+    } else {
+      header.style.cssText = 'padding:20px 24px 16px;border-bottom:1px solid var(--border);flex-shrink:0;background:var(--bg-secondary);';
+    }
     header.classList.add('content-constrained');
 
     const title = document.createElement('h2');
-    title.style.cssText = 'font-size:1.15rem;font-weight:600;margin-bottom:16px;color:var(--text-primary);';
+    if (isClaude) {
+      title.style.cssText = 'display:none;';
+    } else {
+      title.style.cssText = 'font-size:1.15rem;font-weight:600;margin-bottom:16px;color:var(--text-primary);';
+    }
     title.textContent = t('search.title');
     header.appendChild(title);
 
@@ -51,8 +56,6 @@ export class SearchPanel {
     const searchRow = document.createElement('div');
     searchRow.className = 'search-config-row';
     searchRow.style.cssText = 'margin-bottom:14px;width:100%;';
-
-    const isClaude = (state.get('theme') === 'claude');
 
     const searchInput = document.createElement('input');
     searchInput.type = 'text';
@@ -66,14 +69,14 @@ export class SearchPanel {
     }
     searchInput.addEventListener('focus', () => {
       if (isClaude) {
-        inputWrapper.style.boxShadow = 'rgba(0,0,0,0.1) 0px 3px 15px, rgba(31,30,29,0.4) 0px 0px 0px 0.5px';
+        inputWrapper.style.boxShadow = 'rgba(0,0,0,0.075) 0px 3px 15px, rgba(31,30,29,0.25) 0px 0px 0px 0.5px';
       } else {
         inputWrapper.style.boxShadow = 'var(--ring-accent-soft)';
       }
     });
     searchInput.addEventListener('blur', () => {
       if (isClaude) {
-        inputWrapper.style.boxShadow = 'rgba(0,0,0,0.075) 0px 3px 15px, rgba(31,30,29,0.3) 0px 0px 0px 0.5px';
+        inputWrapper.style.boxShadow = 'rgba(0,0,0,0.035) 0px 3px 15px, rgba(31,30,29,0.15) 0px 0px 0px 0.5px';
       } else {
         inputWrapper.style.boxShadow = 'var(--shadow-inset)';
       }
@@ -86,7 +89,7 @@ export class SearchPanel {
     const inputWrapper = document.createElement('div');
     inputWrapper.className = 'search-input-shell';
     if (isClaude) {
-      inputWrapper.style.cssText = 'flex:1;position:relative;background:#ffffff;border-radius:20px;border:1px solid transparent;box-shadow:rgba(0,0,0,0.075) 0px 3px 15px, rgba(31,30,29,0.3) 0px 0px 0px 0.5px;display:flex;flex-direction:column;padding:10.5px;gap:9px;';
+      inputWrapper.style.cssText = 'width:100%;max-width:506px;margin:0 auto;position:relative;background:#ffffff;border-radius:20px;border:1px solid transparent;box-shadow:rgba(0,0,0,0.035) 0px 3px 15px, rgba(31,30,29,0.15) 0px 0px 0px 0.5px;display:flex;flex-direction:column;padding:10.5px;gap:9px;box-sizing:content-box;';
     } else {
       inputWrapper.style.cssText = 'flex:1;position:relative;box-shadow:var(--shadow-inset);';
     }
@@ -100,7 +103,7 @@ export class SearchPanel {
 
       // + button (exact SVG from claude.ai)
       const plusWrap = document.createElement('span');
-      plusWrap.style.cssText = 'width:28px;height:28px;display:flex;align-items:center;justify-content:center;color:var(--text-muted);cursor:default;border-radius:8px;';
+      plusWrap.style.cssText = 'width:24px;height:24px;display:flex;align-items:center;justify-content:center;color:var(--text-muted);cursor:default;border-radius:6px;';
       const plusSvg = document.createElementNS(ns, 'svg');
       plusSvg.setAttribute('width', '20'); plusSvg.setAttribute('height', '20');
       plusSvg.setAttribute('viewBox', '0 0 20 20'); plusSvg.setAttribute('fill', 'currentColor');
@@ -129,7 +132,7 @@ export class SearchPanel {
       chevSvg.appendChild(chevPath); chevWrap.appendChild(chevSvg);
       // Audio bars (exact: 6 rects, viewBox 0 0 21 21)
       const audioWrap = document.createElement('span');
-      audioWrap.style.cssText = 'display:inline-flex;color:var(--text-primary);margin-left:8px;';
+      audioWrap.style.cssText = 'width:24px;height:24px;display:inline-flex;align-items:center;justify-content:center;color:var(--text-primary);margin-left:8px;';
       const audioSvg = document.createElementNS(ns, 'svg');
       audioSvg.setAttribute('width', '20'); audioSvg.setAttribute('height', '20');
       audioSvg.setAttribute('viewBox', '0 0 21 21'); audioSvg.setAttribute('fill', 'none');

@@ -840,6 +840,7 @@ button {
 }
 
 .sidebar.collapsed .sidebar-title-text,
+.sidebar.collapsed .sidebar-brand-img,
 .sidebar.collapsed .sidebar-collapse-btn,
 .sidebar.collapsed .sidebar-foldable,
 .sidebar.collapsed .pill-row,
@@ -985,6 +986,18 @@ button {
   font-size: 1rem;
   font-weight: 400;
   letter-spacing: -0.01em;
+}
+
+[data-theme="claude"] .sidebar-collapse-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: 4.5px;
+  color: var(--text-primary);
+  font-size: 0;
+}
+
+[data-theme="claude"] .sidebar-collapse-btn:hover {
+  background: var(--sidebar-hover);
 }
 
 [data-theme="claude"] .sidebar-pill {

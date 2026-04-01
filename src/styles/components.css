@@ -561,7 +561,7 @@
   background: #ffffff;
   border-radius: 20px;
   border: 1px solid transparent;
-  box-shadow: rgba(0, 0, 0, 0.075) 0px 3px 15px, rgba(31, 30, 29, 0.3) 0px 0px 0px 0.5px;
+  box-shadow: rgba(0, 0, 0, 0.035) 0px 3px 15px, rgba(31, 30, 29, 0.15) 0px 0px 0px 0.5px;
   min-height: auto;
 }
 

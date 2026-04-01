@@ -8,6 +8,10 @@ import { createIcon } from '../utils/icons.js';
 import { SPARK_SVG } from '../utils/spark.js';
 import { t } from '../i18n.js';
 import ParseWorker from '../parser/worker.js?worker&inline';
+import logoEn from '../assets/logo-en.png';
+import logoZh from '../assets/logo-zh.png';
+import logoEnDark from '../assets/logo-en-dark.png';
+import logoZhDark from '../assets/logo-zh-dark.png';
 import imgBubbles from '../assets/clawd/IMG_bubbles.GIF';
 import imgCelebrate from '../assets/clawd/IMG_celebrate.GIF';
 import imgIdea from '../assets/clawd/IMG_idea.GIF';
@@ -30,27 +34,22 @@ export class FileUpload {
     screen.className = 'upload-screen';
     screen.id = 'upload-screen';
 
-    // Title — Claude greeting style with spark logo
+    // Title — Logo image for all themes
+    const curTheme = state.get('theme');
+    const lang = state.get('language') || 'zh';
+    const isDark = (curTheme === 'dark' || (curTheme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches));
     const greetingRow = document.createElement('div');
-    greetingRow.style.cssText = 'display:flex;align-items:center;gap:9px;justify-content:center;';
+    greetingRow.style.cssText = 'display:flex;align-items:center;gap:9px;justify-content:center;margin-bottom:20px;';
 
-    // Spark logo (hardcoded SVG asset, safe for innerHTML)
-    const sparkEl = document.createElement('span');
-    sparkEl.style.cssText = 'width:24px;height:24px;display:inline-flex;color:var(--accent);flex-shrink:0;';
-    const sparkTemplate = document.createElement('template');
-    sparkTemplate.innerHTML = SPARK_SVG; // Safe: hardcoded constant, not user input
-    sparkEl.appendChild(sparkTemplate.content);
-    greetingRow.appendChild(sparkEl);
-
-    const h1 = document.createElement('h1');
-    h1.style.cssText = 'font-family:var(--font-display);font-size:28px;font-weight:330;color:var(--text-secondary);line-height:1.3;';
-    const claudeSpan = document.createElement('span');
-    claudeSpan.style.cssText = 'font-size:30px;vertical-align:-4px;';
-    claudeSpan.textContent = 'Claude ';
-    h1.appendChild(claudeSpan);
-    h1.appendChild(document.createTextNode(t('upload.title')));
-    greetingRow.appendChild(h1);
-    greetingRow.style.cssText += 'margin-bottom:20px;';
+    const logoImg = document.createElement('img');
+    if (isDark) {
+      logoImg.src = lang === 'zh' ? logoZhDark : logoEnDark;
+    } else {
+      logoImg.src = lang === 'zh' ? logoZh : logoEn;
+    }
+    logoImg.alt = lang === 'zh' ? 'Claude 记忆刻痕' : 'Claude Engram';
+    logoImg.style.cssText = 'height:32px;width:auto;';
+    greetingRow.appendChild(logoImg);
     screen.appendChild(greetingRow);
 
     // Upload zone — styled as Claude's input box (right after title, no subtitle between)

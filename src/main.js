@@ -17,6 +17,10 @@ import { createIcon } from './utils/icons.js';
 import { createSparkIcon } from './utils/spark.js';
 import { showLoading, hideLoading } from './components/Loading.js';
 import { t } from './i18n.js';
+import logoEn from './assets/logo-en.png';
+import logoZh from './assets/logo-zh.png';
+import logoEnDark from './assets/logo-en-dark.png';
+import logoZhDark from './assets/logo-zh-dark.png';
 
 // ---- Page title ----
 document.title = t('page.title');
@@ -75,29 +79,50 @@ function renderMainView() {
   sidebar.className = 'sidebar';
   sidebar.id = 'sidebar';
 
-  // Sidebar title with spark logo — generous top padding
+  // Sidebar title with logo
   const sidebarTitle = document.createElement('div');
   sidebarTitle.className = 'sidebar-brand';
+  const curTheme = state.get('theme');
+  const lang = state.get('language') || 'zh';
+  const isDark = (curTheme === 'dark' || (curTheme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches));
+  // Spark icon for collapsed state
   const brandLogoBtn = document.createElement('button');
   brandLogoBtn.type = 'button';
   brandLogoBtn.className = 'sidebar-brand-logo';
   brandLogoBtn.title = t('sidebar.title');
   brandLogoBtn.appendChild(createSparkIcon(16));
   brandLogoBtn.addEventListener('click', () => {
-    if (state.get('sidebarCollapsed')) {
-      state.set('sidebarCollapsed', false);
-    }
+    if (state.get('sidebarCollapsed')) state.set('sidebarCollapsed', false);
   });
   sidebarTitle.appendChild(brandLogoBtn);
-  const titleText = document.createElement('span');
-  titleText.className = 'sidebar-title-text sidebar-expand-only';
-  titleText.textContent = t('sidebar.title');
-  sidebarTitle.appendChild(titleText);
+  // Logo image (replaces text title)
+  const sidebarLogo = document.createElement('img');
+  if (isDark) {
+    sidebarLogo.src = lang === 'zh' ? logoZhDark : logoEnDark;
+  } else {
+    sidebarLogo.src = lang === 'zh' ? logoZh : logoEn;
+  }
+  sidebarLogo.alt = t('sidebar.title');
+  sidebarLogo.className = 'sidebar-brand-img sidebar-expand-only';
+  sidebarLogo.style.cssText = 'height:18px;width:auto;cursor:pointer;';
+  sidebarLogo.addEventListener('click', () => {
+    if (state.get('sidebarCollapsed')) state.set('sidebarCollapsed', false);
+  });
+  sidebarTitle.appendChild(sidebarLogo);
   const collapseBtn = document.createElement('button');
   collapseBtn.type = 'button';
   collapseBtn.className = 'sidebar-collapse-btn sidebar-expand-only';
-  collapseBtn.textContent = '‹';
   collapseBtn.title = 'Collapse sidebar';
+  // Claude.ai panel icon (two-panel SVG)
+  const collapseSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  collapseSvg.setAttribute('width', '20');
+  collapseSvg.setAttribute('height', '20');
+  collapseSvg.setAttribute('viewBox', '0 0 20 20');
+  collapseSvg.setAttribute('fill', 'currentColor');
+  const collapsePath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  collapsePath.setAttribute('d', 'M16.5 4A1.5 1.5 0 0 1 18 5.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 2 14.5v-9A1.5 1.5 0 0 1 3.5 4zM7 15h9.5a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5H7zM3.5 5a.5.5 0 0 0-.5.5v9a.5.5 0 0 0 .5.5H6V5z');
+  collapseSvg.appendChild(collapsePath);
+  collapseBtn.appendChild(collapseSvg);
   collapseBtn.addEventListener('click', () => {
     state.set('sidebarCollapsed', true);
   });
