@@ -60,7 +60,7 @@ export class SearchPanel {
     searchInput.id = 'search-panel-input';
     searchInput.className = 'search-field';
     if (isClaude) {
-      searchInput.style.cssText = 'width:100%;padding:14px 16px 8px;color:var(--text-primary);font-size:12px;font-family:var(--font-family);background:transparent;border:none;outline:none;';
+      searchInput.style.cssText = 'width:100%;padding:0;color:var(--text-primary);font-size:12px;line-height:17px;font-family:var(--font-family);background:transparent;border:none;outline:none;';
     } else {
       searchInput.style.cssText = 'flex:1;padding:14px 16px 14px 42px;color:var(--text-primary);font-size:0.95rem;font-family:var(--font-family);';
     }
@@ -86,7 +86,7 @@ export class SearchPanel {
     const inputWrapper = document.createElement('div');
     inputWrapper.className = 'search-input-shell';
     if (isClaude) {
-      inputWrapper.style.cssText = 'flex:1;position:relative;background:#ffffff;border-radius:20px;border:1px solid transparent;box-shadow:rgba(0,0,0,0.075) 0px 3px 15px, rgba(31,30,29,0.3) 0px 0px 0px 0.5px;display:flex;flex-direction:column;';
+      inputWrapper.style.cssText = 'flex:1;position:relative;background:#ffffff;border-radius:20px;border:1px solid transparent;box-shadow:rgba(0,0,0,0.075) 0px 3px 15px, rgba(31,30,29,0.3) 0px 0px 0px 0.5px;display:flex;flex-direction:column;padding:10.5px;gap:9px;';
     } else {
       inputWrapper.style.cssText = 'flex:1;position:relative;box-shadow:var(--shadow-inset);';
     }
@@ -96,7 +96,7 @@ export class SearchPanel {
       inputWrapper.appendChild(searchInput);
       // Bottom toolbar (exact claude.ai composer replica)
       const toolbar = document.createElement('div');
-      toolbar.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:4px 10px 8px;';
+      toolbar.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:0;gap:6px;';
 
       // + button (exact SVG from claude.ai)
       const plusWrap = document.createElement('span');
