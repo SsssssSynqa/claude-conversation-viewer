@@ -92,28 +92,60 @@ export class SearchPanel {
     }
 
     if (isClaude) {
+      const ns = 'http://www.w3.org/2000/svg';
       inputWrapper.appendChild(searchInput);
-      // Bottom toolbar (decorative, matching claude.ai composer)
+      // Bottom toolbar (exact claude.ai composer replica)
       const toolbar = document.createElement('div');
-      toolbar.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:6px 12px 10px;';
-      const plusBtn = document.createElement('span');
-      plusBtn.style.cssText = 'width:24px;height:24px;display:flex;align-items:center;justify-content:center;color:var(--text-muted);cursor:default;';
-      plusBtn.appendChild(createIcon('plus', 18));
-      toolbar.appendChild(plusBtn);
+      toolbar.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:4px 10px 8px;';
+
+      // + button (exact SVG from claude.ai)
+      const plusWrap = document.createElement('span');
+      plusWrap.style.cssText = 'width:28px;height:28px;display:flex;align-items:center;justify-content:center;color:var(--text-muted);cursor:default;border-radius:8px;';
+      const plusSvg = document.createElementNS(ns, 'svg');
+      plusSvg.setAttribute('width', '20'); plusSvg.setAttribute('height', '20');
+      plusSvg.setAttribute('viewBox', '0 0 20 20'); plusSvg.setAttribute('fill', 'currentColor');
+      const plusPath = document.createElementNS(ns, 'path');
+      plusPath.setAttribute('d', 'M10 3a.5.5 0 0 1 .5.5v6h6l.1.01a.5.5 0 0 1 0 .98l-.1.01h-6v6a.5.5 0 0 1-1 0v-6h-6a.5.5 0 0 1 0-1h6v-6A.5.5 0 0 1 10 3');
+      plusSvg.appendChild(plusPath); plusWrap.appendChild(plusSvg);
+      toolbar.appendChild(plusWrap);
+
+      // Right: model name + chevron + audio icon
       const rightGroup = document.createElement('div');
-      rightGroup.style.cssText = 'display:flex;align-items:center;gap:4px;font-family:var(--font-family);';
+      rightGroup.style.cssText = 'display:flex;align-items:center;gap:2px;font-family:var(--font-family);';
       const modelName = document.createElement('span');
-      modelName.style.cssText = 'font-size:13px;color:var(--text-primary);';
+      modelName.style.cssText = 'font-size:12px;color:var(--text-primary);';
       modelName.textContent = 'Opus 4.6';
       const extLabel = document.createElement('span');
-      extLabel.style.cssText = 'font-size:11px;color:var(--text-muted);';
-      extLabel.textContent = 'Extended \u2304';
-      const audioBars = document.createElement('span');
-      audioBars.style.cssText = 'font-size:14px;color:var(--text-primary);margin-left:6px;letter-spacing:-0.5px;';
-      audioBars.textContent = '\u2759\u2758\u2759\u2758\u2759';
+      extLabel.style.cssText = 'font-size:12px;color:var(--text-muted);font-style:italic;margin-left:4px;';
+      extLabel.textContent = 'Extended';
+      // Chevron (exact claude.ai SVG)
+      const chevWrap = document.createElement('span');
+      chevWrap.style.cssText = 'display:inline-flex;color:var(--text-muted);margin-left:1px;';
+      const chevSvg = document.createElementNS(ns, 'svg');
+      chevSvg.setAttribute('width', '16'); chevSvg.setAttribute('height', '16');
+      chevSvg.setAttribute('viewBox', '0 0 20 20'); chevSvg.setAttribute('fill', 'currentColor');
+      const chevPath = document.createElementNS(ns, 'path');
+      chevPath.setAttribute('d', 'M14.128 7.165a.502.502 0 0 1 .744.67l-4.5 5-.078.07a.5.5 0 0 1-.666-.07l-4.5-5-.06-.082a.501.501 0 0 1 .729-.656l.075.068L10 11.752z');
+      chevSvg.appendChild(chevPath); chevWrap.appendChild(chevSvg);
+      // Audio bars (exact: 6 rects, viewBox 0 0 21 21)
+      const audioWrap = document.createElement('span');
+      audioWrap.style.cssText = 'display:inline-flex;color:var(--text-primary);margin-left:8px;';
+      const audioSvg = document.createElementNS(ns, 'svg');
+      audioSvg.setAttribute('width', '20'); audioSvg.setAttribute('height', '20');
+      audioSvg.setAttribute('viewBox', '0 0 21 21'); audioSvg.setAttribute('fill', 'none');
+      const barPositions = [0, 4, 8, 12, 16, 20];
+      for (const x of barPositions) {
+        const rect = document.createElementNS(ns, 'rect');
+        rect.setAttribute('x', x); rect.setAttribute('y', '7.5');
+        rect.setAttribute('width', '1'); rect.setAttribute('height', '6');
+        rect.setAttribute('rx', '0.5'); rect.setAttribute('fill', 'currentColor');
+        audioSvg.appendChild(rect);
+      }
+      audioWrap.appendChild(audioSvg);
       rightGroup.appendChild(modelName);
       rightGroup.appendChild(extLabel);
-      rightGroup.appendChild(audioBars);
+      rightGroup.appendChild(chevWrap);
+      rightGroup.appendChild(audioWrap);
       toolbar.appendChild(rightGroup);
       inputWrapper.appendChild(toolbar);
       searchRow.appendChild(inputWrapper);
