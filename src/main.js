@@ -85,23 +85,27 @@ function renderMainView() {
   const curTheme = state.get('theme');
   const lang = state.get('language') || 'zh';
   const isDark = (curTheme === 'dark' || (curTheme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches));
-  // Spark icon for collapsed state
+  // Spark icon for collapsed state only
   const brandLogoBtn = document.createElement('button');
   brandLogoBtn.type = 'button';
-  brandLogoBtn.className = 'sidebar-brand-logo';
+  brandLogoBtn.className = 'sidebar-brand-logo sidebar-collapse-only';
   brandLogoBtn.title = t('sidebar.title');
   brandLogoBtn.appendChild(createSparkIcon(16));
   brandLogoBtn.addEventListener('click', () => {
     if (state.get('sidebarCollapsed')) state.set('sidebarCollapsed', false);
   });
   sidebarTitle.appendChild(brandLogoBtn);
-  // Logo image (replaces text title)
+  // Logo image (replaces text title) — theme-aware
   const sidebarLogo = document.createElement('img');
-  if (isDark) {
-    sidebarLogo.src = lang === 'zh' ? logoZhDark : logoEnDark;
-  } else {
-    sidebarLogo.src = lang === 'zh' ? logoZh : logoEn;
+  function updateSidebarLogo() {
+    const th = state.get('theme');
+    const ln = state.get('language') || 'zh';
+    const dk = (th === 'dark' || (th === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches));
+    sidebarLogo.src = dk ? (ln === 'zh' ? logoZhDark : logoEnDark) : (ln === 'zh' ? logoZh : logoEn);
   }
+  updateSidebarLogo();
+  state.on('theme', updateSidebarLogo);
+  state.on('language', updateSidebarLogo);
   sidebarLogo.alt = t('sidebar.title');
   sidebarLogo.className = 'sidebar-brand-img sidebar-expand-only';
   sidebarLogo.style.cssText = 'height:18px;width:auto;cursor:pointer;';

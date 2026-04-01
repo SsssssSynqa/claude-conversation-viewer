@@ -851,6 +851,10 @@ button {
   display: none !important;
 }
 
+.sidebar:not(.collapsed) .sidebar-collapse-only {
+  display: none !important;
+}
+
 .sidebar .sidebar-expand-only,
 .sidebar .sidebar-pill-label {
   opacity: 1;
