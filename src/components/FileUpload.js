@@ -34,20 +34,25 @@ export class FileUpload {
     screen.className = 'upload-screen';
     screen.id = 'upload-screen';
 
-    // Title — Logo image for all themes
-    const curTheme = state.get('theme');
-    const lang = state.get('language') || 'zh';
-    const isDark = (curTheme === 'dark' || (curTheme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches));
+    // Title — Logo image, auto-updates on theme/language change
     const greetingRow = document.createElement('div');
     greetingRow.style.cssText = 'display:flex;align-items:center;gap:9px;justify-content:center;margin-bottom:20px;';
 
     const logoImg = document.createElement('img');
-    if (isDark) {
-      logoImg.src = lang === 'zh' ? logoZhDark : logoEnDark;
-    } else {
-      logoImg.src = lang === 'zh' ? logoZh : logoEn;
+    function updateUploadLogo() {
+      const th = state.get('theme');
+      const ln = state.get('language') || 'zh';
+      const dk = (th === 'dark' || (th === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches));
+      if (dk) {
+        logoImg.src = ln === 'zh' ? logoZhDark : logoEnDark;
+      } else {
+        logoImg.src = ln === 'zh' ? logoZh : logoEn;
+      }
+      logoImg.alt = ln === 'zh' ? 'Claude 记忆刻痕' : 'Claude Engram';
     }
-    logoImg.alt = lang === 'zh' ? 'Claude 记忆刻痕' : 'Claude Engram';
+    updateUploadLogo();
+    state.on('theme', updateUploadLogo);
+    state.on('language', updateUploadLogo);
     logoImg.style.cssText = 'height:32px;width:auto;';
     greetingRow.appendChild(logoImg);
     screen.appendChild(greetingRow);
