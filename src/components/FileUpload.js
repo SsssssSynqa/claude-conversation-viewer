@@ -247,7 +247,38 @@ export class FileUpload {
       });
       themeSwitcher.appendChild(btn);
     }
-    screen.appendChild(themeSwitcher);
+    // Language switcher (beside theme switcher)
+    const langSwitcher = document.createElement('div');
+    langSwitcher.style.cssText = 'display:flex;gap:4px;padding:6px;border-radius:18px;border:none;background:var(--bg-card);box-shadow:var(--shadow);margin-left:8px;';
+    const langs = [{id: 'zh', label: '中文'}, {id: 'en', label: 'EN'}];
+    for (const lo of langs) {
+      const btn = document.createElement('button');
+      btn.dataset.lang = lo.id;
+      const isActive = state.get('lang') === lo.id;
+      btn.style.cssText = `display:flex;align-items:center;justify-content:center;padding:0 12px;height:36px;border:none;border-radius:12px;cursor:pointer;transition:all 0.15s;font-size:13px;font-weight:600;color:${isActive ? 'var(--accent)' : 'var(--text-muted)'};${isActive ? 'background:var(--accent-bg);box-shadow:var(--shadow-inset);' : 'background:transparent;'}`;
+      btn.textContent = lo.label;
+      btn.addEventListener('click', () => {
+        state.set('lang', lo.id);
+        localStorage.setItem('cv-lang', lo.id);
+        langSwitcher.querySelectorAll('button').forEach(b => {
+          const active = b.dataset.lang === lo.id;
+          b.style.background = active ? 'var(--accent-bg)' : 'transparent';
+          b.style.boxShadow = active ? 'var(--shadow-inset)' : 'none';
+          b.style.color = active ? 'var(--accent)' : 'var(--text-muted)';
+        });
+        // Re-render the whole upload screen to update all text
+        this.container.textContent = '';
+        this.render();
+      });
+      langSwitcher.appendChild(btn);
+    }
+
+    // Wrap theme + lang switchers in a row
+    const switcherRow = document.createElement('div');
+    switcherRow.style.cssText = 'display:flex;align-items:center;justify-content:center;gap:8px;';
+    switcherRow.appendChild(themeSwitcher);
+    switcherRow.appendChild(langSwitcher);
+    screen.appendChild(switcherRow);
 
     // Hints at the very bottom
     const hintsWrapper = document.createElement('div');
