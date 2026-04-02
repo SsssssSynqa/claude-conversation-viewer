@@ -83,7 +83,7 @@ function renderMainView() {
   const sidebarTitle = document.createElement('div');
   sidebarTitle.className = 'sidebar-brand';
   const curTheme = state.get('theme');
-  const lang = state.get('language') || 'zh';
+  const lang = state.get('lang') || 'zh';
   const isDark = (curTheme === 'dark' || (curTheme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches));
   // Spark icon for collapsed state only
   const brandLogoBtn = document.createElement('button');
@@ -99,13 +99,13 @@ function renderMainView() {
   const sidebarLogo = document.createElement('img');
   function updateSidebarLogo() {
     const th = state.get('theme');
-    const ln = state.get('language') || 'zh';
+    const ln = state.get('lang') || 'zh';
     const dk = (th === 'dark' || (th === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches));
     sidebarLogo.src = dk ? (ln === 'zh' ? logoZhDark : logoEnDark) : (ln === 'zh' ? logoZh : logoEn);
   }
   updateSidebarLogo();
   state.on('theme', updateSidebarLogo);
-  state.on('language', updateSidebarLogo);
+  state.on('lang', updateSidebarLogo);
   sidebarLogo.alt = t('sidebar.title');
   sidebarLogo.className = 'sidebar-brand-img sidebar-expand-only';
   sidebarLogo.style.cssText = 'height:18px;width:auto;cursor:pointer;';

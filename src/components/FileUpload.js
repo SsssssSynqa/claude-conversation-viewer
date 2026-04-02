@@ -41,7 +41,7 @@ export class FileUpload {
     const logoImg = document.createElement('img');
     function updateUploadLogo() {
       const th = state.get('theme');
-      const ln = state.get('language') || 'zh';
+      const ln = state.get('lang') || 'zh';
       const dk = (th === 'dark' || (th === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches));
       if (dk) {
         logoImg.src = ln === 'zh' ? logoZhDark : logoEnDark;
@@ -52,7 +52,7 @@ export class FileUpload {
     }
     updateUploadLogo();
     state.on('theme', updateUploadLogo);
-    state.on('language', updateUploadLogo);
+    state.on('lang', updateUploadLogo);
     logoImg.style.cssText = 'height:32px;width:auto;';
     greetingRow.appendChild(logoImg);
     screen.appendChild(greetingRow);
