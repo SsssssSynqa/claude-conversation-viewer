@@ -104,8 +104,8 @@ function renderMainView() {
     sidebarLogo.src = dk ? (ln === 'zh' ? logoZhDark : logoEnDark) : (ln === 'zh' ? logoZh : logoEn);
   }
   updateSidebarLogo();
-  state.on('theme', updateSidebarLogo);
-  state.on('lang', updateSidebarLogo);
+  _mainViewCleanups.push(state.on('theme', updateSidebarLogo));
+  _mainViewCleanups.push(state.on('lang', updateSidebarLogo));
   sidebarLogo.alt = t('sidebar.title');
   sidebarLogo.className = 'sidebar-brand-img sidebar-expand-only';
   sidebarLogo.style.cssText = 'height:18px;width:auto;cursor:pointer;';
@@ -283,28 +283,28 @@ function renderMainView() {
     { id: 'toggle-desensitize', label: t('sidebar.desensitize'), key: 'desensitize' },
   ];
 
-  for (const t of toggles) {
+  for (const toggle of toggles) {
     const row = document.createElement('div');
     row.className = 'sidebar-toggle-row';
 
     const labelText = document.createElement('span');
     labelText.className = 'sidebar-toggle-label';
-    labelText.textContent = t.label;
+    labelText.textContent = toggle.label;
     row.appendChild(labelText);
 
     // Neumorphic switch
     const neuSwitch = document.createElement('div');
-    neuSwitch.className = 'neu-switch' + (state.get(t.key) ? ' active' : '');
+    neuSwitch.className = 'neu-switch' + (state.get(toggle.key) ? ' active' : '');
     const handle = document.createElement('div');
     handle.className = 'switch-handle';
     neuSwitch.appendChild(handle);
 
     const input = document.createElement('input');
     input.type = 'checkbox';
-    input.id = t.id;
-    input.checked = state.get(t.key);
+    input.id = toggle.id;
+    input.checked = state.get(toggle.key);
     input.style.display = 'none';
-    input.addEventListener('change', (e) => state.set(t.key, e.target.checked));
+    input.addEventListener('change', (e) => state.set(toggle.key, e.target.checked));
 
     neuSwitch.addEventListener('click', () => {
       input.checked = !input.checked;

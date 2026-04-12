@@ -227,7 +227,7 @@ export class ExportPanel {
       meta.style.cssText = 'font-size:0.7rem;color:var(--text-muted);margin-top:2px;';
       const firstTs = conv.messages[0]?.createdAt;
       const lastTs = conv.messages[conv.messages.length - 1]?.createdAt;
-      let metaText = t('export.msgCount', { n: conv.stats.messageCount });
+      let metaText = conv.stats.messageCount + t('export.msgCount');
       if (firstTs && lastTs) {
         metaText += ' \u00B7 ' + formatTimestamp(firstTs) + ' \u2014 ' + formatTimestamp(lastTs);
       }
