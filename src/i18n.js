@@ -11,6 +11,7 @@ const zh = {
 
   // Sidebar (main.js)
   'sidebar.title': 'Claude 记忆刻痕',
+  'sidebar.menu': '侧栏',
   'sidebar.search': '搜索中心',
   'sidebar.stats': '统计总览',
   'sidebar.export': '导出中心',
@@ -188,6 +189,7 @@ const en = {
 
   // Sidebar
   'sidebar.title': 'Claude Engram',
+  'sidebar.menu': 'Menu',
   'sidebar.search': 'Search',
   'sidebar.stats': 'Statistics',
   'sidebar.export': 'Export',

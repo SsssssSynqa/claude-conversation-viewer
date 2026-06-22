@@ -79,6 +79,14 @@ function renderMainView() {
   sidebar.className = 'sidebar';
   sidebar.id = 'sidebar';
 
+  let mobileMenuBtn = null;
+  const setMobileSidebarOpen = (open) => {
+    sidebar.classList.toggle('mobile-open', open);
+    layout.classList.toggle('mobile-sidebar-open', open);
+    mobileMenuBtn?.setAttribute('aria-expanded', open ? 'true' : 'false');
+  };
+  const closeMobileSidebar = () => setMobileSidebarOpen(false);
+
   // Sidebar title with logo
   const sidebarTitle = document.createElement('div');
   sidebarTitle.className = 'sidebar-brand';
@@ -131,6 +139,15 @@ function renderMainView() {
     state.set('sidebarCollapsed', true);
   });
   sidebarTitle.appendChild(collapseBtn);
+
+  const mobileCloseBtn = document.createElement('button');
+  mobileCloseBtn.type = 'button';
+  mobileCloseBtn.className = 'mobile-sidebar-close';
+  mobileCloseBtn.title = 'Close sidebar';
+  mobileCloseBtn.setAttribute('aria-label', 'Close sidebar');
+  mobileCloseBtn.appendChild(createIcon('close', 18));
+  mobileCloseBtn.addEventListener('click', closeMobileSidebar);
+  sidebarTitle.appendChild(mobileCloseBtn);
   sidebar.appendChild(sidebarTitle);
 
   // Sidebar function buttons — neumorphic pills
@@ -480,8 +497,64 @@ function renderMainView() {
   contentArea.className = 'content-area';
   contentArea.id = 'content-area';
 
+  const mobileSidebarBackdrop = document.createElement('button');
+  mobileSidebarBackdrop.type = 'button';
+  mobileSidebarBackdrop.className = 'mobile-sidebar-backdrop';
+  mobileSidebarBackdrop.setAttribute('aria-label', 'Close sidebar');
+  mobileSidebarBackdrop.addEventListener('click', closeMobileSidebar);
+
+  const mobileBottomNav = document.createElement('nav');
+  mobileBottomNav.className = 'mobile-bottom-nav';
+  mobileBottomNav.setAttribute('aria-label', t('sidebar.title'));
+
+  const createMobileNavButton = (nav) => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'mobile-bottom-nav-btn';
+    button.id = nav.id;
+    button.setAttribute('aria-label', nav.label);
+    if (nav.controls) button.setAttribute('aria-controls', nav.controls);
+    if (nav.expanded != null) button.setAttribute('aria-expanded', nav.expanded);
+
+    const iconWrap = document.createElement('span');
+    iconWrap.className = 'nav-icon';
+    iconWrap.appendChild(createIcon(nav.icon, 17));
+    button.appendChild(iconWrap);
+
+    const labelSpan = document.createElement('span');
+    labelSpan.className = 'mobile-bottom-nav-label';
+    labelSpan.textContent = nav.label;
+    button.appendChild(labelSpan);
+    button.addEventListener('click', nav.action);
+    return button;
+  };
+
+  mobileMenuBtn = createMobileNavButton({
+    id: 'mobile-sidebar-btn',
+    icon: 'menu',
+    label: t('sidebar.menu'),
+    controls: 'sidebar',
+    expanded: 'false',
+    action: () => setMobileSidebarOpen(!sidebar.classList.contains('mobile-open')),
+  });
+
+  mobileBottomNav.appendChild(mobileMenuBtn);
+  for (const nav of navItems) {
+    mobileBottomNav.appendChild(createMobileNavButton({
+      id: nav.id.replace('sidebar-', 'mobile-'),
+      icon: nav.icon,
+      label: nav.label,
+      action: () => {
+        closeMobileSidebar();
+        nav.action();
+      },
+    }));
+  }
+
   layout.appendChild(sidebar);
   layout.appendChild(contentArea);
+  layout.appendChild(mobileSidebarBackdrop);
+  layout.appendChild(mobileBottomNav);
   app.appendChild(layout);
 
   // Components
@@ -490,7 +563,14 @@ function renderMainView() {
 
   // ---- Nav active state helper ----
   function updateNavActive(mode) {
-    const allBtns = ['sidebar-search-btn', 'sidebar-export-btn', 'sidebar-stats-btn'];
+    const allBtns = [
+      'sidebar-search-btn',
+      'sidebar-export-btn',
+      'sidebar-stats-btn',
+      'mobile-search-btn',
+      'mobile-export-btn',
+      'mobile-stats-btn',
+    ];
     const activeId = mode === 'search' ? 'sidebar-search-btn'
       : mode === 'export' ? 'sidebar-export-btn'
       : mode === 'stats' ? 'sidebar-stats-btn'
@@ -498,8 +578,10 @@ function renderMainView() {
     for (const id of allBtns) {
       const el = document.getElementById(id);
       if (!el) continue;
+      const desktopId = id.replace('mobile-', 'sidebar-');
+      const isActive = desktopId === activeId;
       el.classList.remove('pill-flat', 'pill-active');
-      el.classList.add(id === activeId ? 'pill-active' : 'pill-flat');
+      el.classList.add(isActive ? 'pill-active' : 'pill-flat');
     }
   }
   // Make it accessible for stats button action
@@ -507,6 +589,7 @@ function renderMainView() {
 
   // ---- View Mode switching ----
   _mainViewCleanups.push(state.on('viewMode', (mode) => {
+    closeMobileSidebar();
     const area = document.getElementById('content-area');
     if (!area) return;
     if (mode !== 'stats') area.classList.remove('stats-panel-shell');
@@ -532,6 +615,7 @@ function renderMainView() {
   }));
 
   _mainViewCleanups.push(state.on('currentConversationIndex', (idx) => {
+    if (idx >= 0) closeMobileSidebar();
     // When a conversation is selected from stats/list, switch to conversation mode
     if (idx >= 0 && state.get('viewMode') === 'stats') {
       state.set('viewMode', 'conversation');
@@ -552,6 +636,18 @@ function renderMainView() {
   };
   _mainViewCleanups.push(state.on('sidebarCollapsed', applySidebarCollapsed));
   applySidebarCollapsed(state.get('sidebarCollapsed'));
+
+  const handleMobileSidebarKeydown = (event) => {
+    if (event.key === 'Escape') closeMobileSidebar();
+  };
+  document.addEventListener('keydown', handleMobileSidebarKeydown);
+  _mainViewCleanups.push(() => document.removeEventListener('keydown', handleMobileSidebarKeydown));
+
+  const handleMobileSidebarResize = () => {
+    if (window.innerWidth > 768) closeMobileSidebar();
+  };
+  window.addEventListener('resize', handleMobileSidebarResize);
+  _mainViewCleanups.push(() => window.removeEventListener('resize', handleMobileSidebarResize));
 
   // Initial active state on load
   requestAnimationFrame(() => updateNavActive(state.get('viewMode')));
