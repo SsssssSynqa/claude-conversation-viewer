@@ -509,6 +509,7 @@ function renderMainView() {
   _mainViewCleanups.push(state.on('viewMode', (mode) => {
     const area = document.getElementById('content-area');
     if (!area) return;
+    if (mode !== 'stats') area.classList.remove('stats-panel-shell');
     updateNavActive(mode);
     if (mode === 'search') {
       messageView?.destroy?.(); messageView = null;

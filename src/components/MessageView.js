@@ -43,12 +43,15 @@ export class MessageView {
   }
 
   render() {
+    this.container.classList.add('content-area');
+    this.container.classList.remove('content-shell');
     this.container.style.cssText = 'flex:1;overflow:hidden;display:flex;flex-direction:column;position:relative;';
     this.renderEmpty();
   }
 
   renderEmpty() {
     this.container.textContent = '';
+    this.container.classList.remove('stats-panel-shell');
     this.selectedIndices.clear();
     this._removeSelectionToolbar();
     const conversations = state.get('conversations') || [];
@@ -77,6 +80,7 @@ export class MessageView {
     const allInCollection = allMessageKeys.length > 0 && allMessageKeys.every(key => collection.some(item => item.key === key));
 
     this.container.textContent = '';
+    this.container.classList.remove('stats-panel-shell');
     this._removeSelectionToolbar();
 
     // ---- Header ----
@@ -85,11 +89,14 @@ export class MessageView {
     header.style.cssText = 'flex-shrink:0;';
 
     const headerTop = document.createElement('div');
+    headerTop.className = 'message-header-top';
     headerTop.style.cssText = 'display:flex;justify-content:space-between;align-items:flex-start;gap:12px;';
 
     const titleSection = document.createElement('div');
+    titleSection.className = 'message-title-section';
     titleSection.style.cssText = 'flex:1;min-width:0;';
     const titleEl = document.createElement('h2');
+    titleEl.className = 'message-title';
     titleEl.style.cssText = 'font-family:var(--font-display);font-size:1.2rem;font-weight:400;margin-bottom:4px;';
     titleEl.textContent = conv.name || t('msgView.unnamed');
     titleSection.appendChild(titleEl);
@@ -99,12 +106,14 @@ export class MessageView {
     const lastMsg = conv.messages[conv.messages.length - 1];
     if (firstMsg?.createdAt && lastMsg?.createdAt) {
       const timeSpan = document.createElement('div');
+      timeSpan.className = 'message-time-range';
       timeSpan.style.cssText = 'font-size:0.78rem;color:var(--text-muted);margin-bottom:4px;';
       timeSpan.textContent = formatTimestamp(firstMsg.createdAt) + ' \u2014 ' + formatTimestamp(lastMsg.createdAt);
       titleSection.appendChild(timeSpan);
     }
 
     const metaEl = document.createElement('div');
+    metaEl.className = 'message-meta';
     metaEl.style.cssText = 'font-size:0.78rem;color:var(--text-muted);display:flex;gap:12px;flex-wrap:wrap;';
     const statItems = [conv.stats.messageCount + t('msgView.msgCount'), (names.human || 'Human') + ': ' + conv.stats.humanChars.toLocaleString() + ' 字', (names.assistant || 'Assistant') + ': ' + conv.stats.assistantChars.toLocaleString() + ' 字'];
     if (conv.stats.hasThinking) statItems.push(conv.stats.thinkingCount + ' 次思考');
@@ -114,10 +123,12 @@ export class MessageView {
 
     // Header buttons
     const headerBtns = document.createElement('div');
+    headerBtns.className = 'message-header-actions';
     headerBtns.style.cssText = 'display:flex;gap:8px;flex-shrink:0;align-items:center;flex-wrap:wrap;justify-content:flex-end;';
 
     // Toggle switch — pill shape with sliding circle
     const toggleOuter = document.createElement('div');
+    toggleOuter.className = 'message-mode-toggle';
     toggleOuter.style.cssText = 'display:flex;align-items:center;gap:8px;flex-shrink:0;cursor:pointer;';
 
     const toggleLabel = document.createElement('span');

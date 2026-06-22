@@ -7,10 +7,10 @@ import { state } from './store/state.js';
 
 const zh = {
   // Page
-  'page.title': 'Claude 对话记忆查看器',
+  'page.title': 'Claude 记忆刻痕',
 
   // Sidebar (main.js)
-  'sidebar.title': 'Claude 对话记忆查看器',
+  'sidebar.title': 'Claude 记忆刻痕',
   'sidebar.search': '搜索中心',
   'sidebar.stats': '统计总览',
   'sidebar.export': '导出中心',
@@ -32,11 +32,11 @@ const zh = {
   'theme.claude': '怀旧版',
 
   // FileUpload
-  'upload.title': '对话记忆查看器',
+  'upload.title': '记忆刻痕',
   'upload.dropzone': '点击选择 或拖拽 conversations.json 到这里',
   'upload.subtitle': '上传 Claude 导出的 JSON 文件，回顾和整理你与Claude的每一段对话',
   'upload.hint': 'Claude Settings → Data Export → 下载的 conversations.json',
-  'upload.footer': 'Claude对话记忆查看器 · Made with love by Sylux & Synqa',
+  'upload.footer': 'Claude 记忆刻痕 · Made with love by Sylux & Synqa',
   'upload.namesTitle': '显示名称设置',
   'upload.humanName': '用户显示名',
   'upload.assistantName': '助手显示名',
@@ -184,10 +184,10 @@ const zh = {
 
 const en = {
   // Page
-  'page.title': 'Claude Conversation Viewer',
+  'page.title': 'Claude Engram',
 
   // Sidebar
-  'sidebar.title': 'Claude Conversation Viewer',
+  'sidebar.title': 'Claude Engram',
   'sidebar.search': 'Search',
   'sidebar.stats': 'Statistics',
   'sidebar.export': 'Export',
@@ -209,11 +209,11 @@ const en = {
   'theme.claude': 'Claude',
 
   // FileUpload
-  'upload.title': 'Conversation Viewer',
+  'upload.title': 'Engram',
   'upload.dropzone': 'Click or drag conversations.json here',
   'upload.subtitle': 'Upload your Claude JSON export to revisit every conversation',
   'upload.hint': 'Claude Settings → Data Export → conversations.json',
-  'upload.footer': 'Claude Conversation Viewer · Made with love by Sylux & Synqa',
+  'upload.footer': 'Claude Engram · Made with love by Sylux & Synqa',
   'upload.namesTitle': 'Display Names',
   'upload.humanName': 'User name',
   'upload.assistantName': 'Assistant name',

@@ -345,6 +345,334 @@
   }
 }
 
+@container (max-width: 760px) {
+  .message-header-top {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 12px !important;
+  }
+
+  .message-title-section {
+    width: 100%;
+  }
+
+  .message-title {
+    font-size: 1.08rem !important;
+    line-height: 1.28;
+    overflow-wrap: anywhere;
+  }
+
+  .message-time-range {
+    line-height: 1.45;
+  }
+
+  .message-meta {
+    gap: 6px 10px !important;
+    line-height: 1.45;
+  }
+
+  .message-header-actions {
+    width: 100%;
+    justify-content: flex-start !important;
+    gap: 8px !important;
+  }
+
+  .message-header-actions .neu-ghost-btn,
+  .message-mode-toggle {
+    min-height: 40px;
+  }
+
+  .message-header-actions .neu-ghost-btn {
+    flex: 1 1 auto;
+    justify-content: center;
+    min-width: min(100%, 136px);
+  }
+}
+
+@container (max-width: 520px) {
+  .message-header-card {
+    margin-top: 8px;
+    padding: 12px 12px !important;
+  }
+
+  [data-theme="claude"] .message-header-card {
+    padding: 12px 14px !important;
+  }
+
+  .message-mode-toggle {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .message-header-actions .neu-ghost-btn {
+    flex-basis: calc(50% - 4px);
+    font-size: 0.74rem !important;
+    padding: 0 10px;
+  }
+
+  .export-dropdown {
+    left: 0 !important;
+    right: auto !important;
+    min-width: 180px !important;
+  }
+
+  .messages-scroll {
+    padding: 10px 0 !important;
+  }
+}
+
+/* ---- Stats panel responsive hooks ---- */
+.stats-panel-inner,
+.stats-panel-overlay {
+  width: 100%;
+  min-width: 0;
+}
+
+.stats-card,
+.stats-card * {
+  min-width: 0;
+}
+
+.stats-card-grid,
+.stats-milestone-grid,
+.stats-activity-grid,
+.stats-think-grid,
+.stats-word-columns {
+  min-width: 0;
+}
+
+.stats-word-copy {
+  min-width: 0;
+}
+
+.stats-card-value {
+  overflow-wrap: anywhere;
+}
+
+.stats-line-chart {
+  display: block;
+  max-width: 100%;
+}
+
+@container (max-width: 900px) {
+  .stats-panel-shell {
+    padding: 20px 14px !important;
+  }
+
+  .stats-panel-inner {
+    max-width: 100% !important;
+  }
+
+  .stats-card-grid,
+  .stats-think-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 12px !important;
+  }
+
+  .stats-word-card {
+    grid-column: span 2 !important;
+  }
+
+  .stats-milestone-grid,
+  .stats-activity-grid,
+  .stats-word-columns {
+    grid-template-columns: 1fr !important;
+  }
+
+  .stats-card {
+    padding: 14px 14px !important;
+    border-radius: 18px !important;
+  }
+
+  .stats-card-value {
+    font-size: 1.48rem !important;
+    letter-spacing: 0 !important;
+    line-height: 1.12;
+  }
+
+  .stats-thinking-value {
+    font-size: 1rem !important;
+    overflow-wrap: anywhere;
+  }
+
+  .stats-title-row,
+  .stats-word-title-row {
+    align-items: flex-start !important;
+    gap: 12px;
+  }
+
+  .stats-screenshot-btn {
+    min-height: 40px;
+    padding: 0 12px !important;
+  }
+
+  .stats-word-card {
+    align-items: center !important;
+    gap: 12px;
+  }
+
+  .stats-ring {
+    width: 108px !important;
+    height: 108px !important;
+  }
+
+  .stats-ring > svg {
+    width: 108px !important;
+    height: 108px !important;
+  }
+
+  .stats-ring-hole {
+    width: 68px !important;
+    height: 68px !important;
+  }
+
+  .stats-ring-hole span {
+    font-size: 16px !important;
+  }
+
+  .stats-weekday-bars {
+    justify-content: space-between !important;
+    gap: 8px !important;
+    height: 150px !important;
+  }
+
+  .stats-hour-heatmap,
+  .stats-hour-labels {
+    grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+  }
+
+  .stats-monthly-bars {
+    justify-content: flex-start !important;
+    gap: 12px;
+    overflow-x: auto;
+    padding: 0 2px 10px !important;
+    scroll-snap-type: x proximity;
+  }
+
+  .stats-monthly-bar-group {
+    flex: 0 0 40px !important;
+    scroll-snap-align: start;
+  }
+
+  .stats-chart-legend {
+    flex-wrap: wrap;
+  }
+
+  .stats-heatmap-card {
+    padding: 12px !important;
+  }
+
+  .stats-word-cloud {
+    padding: 12px !important;
+    justify-content: flex-start !important;
+  }
+}
+
+@container (max-width: 420px) {
+  .stats-panel-shell {
+    padding: 14px 10px !important;
+  }
+
+  .stats-title-row {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+
+  .stats-title {
+    font-size: 0.95rem !important;
+  }
+
+  .stats-screenshot-btn {
+    justify-content: center;
+    width: 100%;
+  }
+
+  .stats-card-grid,
+  .stats-think-grid {
+    gap: 10px !important;
+  }
+
+  .stats-card {
+    padding: 13px 12px !important;
+    border-radius: 16px !important;
+  }
+
+  .stats-card-label {
+    font-size: 0.72rem !important;
+    margin-bottom: 7px !important;
+    line-height: 1.35;
+  }
+
+  .stats-card-value {
+    font-size: 1.34rem !important;
+  }
+
+  .stats-word-card {
+    gap: 10px;
+  }
+
+  .stats-ring {
+    width: 96px !important;
+    height: 96px !important;
+  }
+
+  .stats-ring > svg {
+    width: 96px !important;
+    height: 96px !important;
+  }
+
+  .stats-ring-hole {
+    width: 60px !important;
+    height: 60px !important;
+  }
+
+  .stats-section-title {
+    font-size: 0.94rem !important;
+    margin-top: 20px !important;
+    margin-bottom: 12px !important;
+  }
+
+  .stats-rank-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    padding: 10px 14px !important;
+  }
+
+  .stats-rank-name,
+  .stats-rank-count {
+    white-space: normal !important;
+  }
+
+  .stats-weekday-bars {
+    gap: 5px !important;
+  }
+
+  .stats-word-title-row {
+    align-items: center !important;
+  }
+}
+
+@media (max-width: 900px) {
+  .message-header-top {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+
+  .stats-panel-shell {
+    padding: 20px 14px !important;
+  }
+
+  .stats-card-grid,
+  .stats-think-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .stats-word-card {
+    grid-column: span 2 !important;
+  }
+}
+
 /* ============================================
    Claude Theme — Precise replica of claude.ai UI
    ============================================ */

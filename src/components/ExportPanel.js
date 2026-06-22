@@ -32,7 +32,8 @@ export class ExportPanel {
     // Clean up previous subscription
     this._unsubCollection?.();
     container.textContent = '';
-    container.className = 'content-shell';
+    container.classList.remove('stats-panel-shell');
+    container.classList.add('content-area', 'content-shell');
     container.style.cssText = 'flex:1;overflow:hidden;display:flex;flex-direction:column;';
 
     // Header

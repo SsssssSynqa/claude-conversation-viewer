@@ -25,8 +25,11 @@ export class StatsPanel {
     if (conversations.length === 0) return;
     const stats = this.computeStats(conversations);
     container.textContent = '';
+    container.classList.remove('content-shell');
+    container.classList.add('content-area', 'stats-panel-shell');
     container.style.cssText = 'flex:1;overflow-y:auto;padding:32px 24px;';
     const inner = document.createElement('div');
+    inner.className = 'stats-panel-inner';
     inner.style.cssText = 'max-width:920px;margin:0 auto;';
     this.buildStatsContent(inner, stats, conversations);
     container.appendChild(inner);
@@ -40,6 +43,7 @@ export class StatsPanel {
     this.overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:900;overflow-y:auto;padding:40px 20px;';
     this.overlay.addEventListener('click', (e) => { if (e.target === this.overlay) this.hide(); });
     const panel = document.createElement('div');
+    panel.className = 'stats-panel-overlay';
     panel.style.cssText = 'max-width:860px;margin:0 auto;background:var(--bg-card);border-radius:var(--radius-lg);padding:32px;box-shadow:var(--shadow);';
     this.buildStatsContent(panel, stats, conversations);
     this.overlay.appendChild(panel);
@@ -55,9 +59,11 @@ export class StatsPanel {
 
     // Title row with screenshot button
     const titleRow = document.createElement('div');
+    titleRow.className = 'stats-title-row';
     titleRow.style.cssText = 'display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;';
 
     const title = document.createElement('h2');
+    title.className = 'stats-title';
     title.style.cssText = 'font-size:1rem;font-weight:800;color:var(--text-primary);display:flex;align-items:center;gap:10px;letter-spacing:0.5px;';
     const mainDot = document.createElement('span');
     mainDot.style.cssText = 'width:10px;height:10px;border-radius:50%;background:var(--accent);box-shadow:inset 1px 1px 2px rgba(255,255,255,0.4),0 0 8px rgba(217,118,87,0.4);flex-shrink:0;';
@@ -66,6 +72,7 @@ export class StatsPanel {
     titleRow.appendChild(title);
 
     const screenshotBtn = document.createElement('button');
+    screenshotBtn.className = 'stats-screenshot-btn';
     screenshotBtn.style.cssText = 'padding:6px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);background:transparent;color:var(--text-secondary);cursor:pointer;font-size:12px;transition:all 0.15s;white-space:nowrap;display:flex;align-items:center;gap:4px;';
     screenshotBtn.appendChild(createIcon('save', 14));
     screenshotBtn.appendChild(document.createTextNode(t('stats.saveImage')));
@@ -97,6 +104,7 @@ export class StatsPanel {
 
     // ---- Basic Stats Cards (floating directly on background, no outer wrapper) ----
     const cardsGrid = document.createElement('div');
+    cardsGrid.className = 'stats-card-grid';
     cardsGrid.style.cssText = 'display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:14px;';
 
     // Row 1: 4 basic counts (matching Figma layout)
@@ -109,11 +117,14 @@ export class StatsPanel {
 
     for (const s of row1Stats) {
       const card = this._neuCard();
+      card.classList.add('stats-metric-card');
       const label = document.createElement('div');
+      label.className = 'stats-card-label';
       label.style.cssText = 'font-size:0.75rem;color:var(--text-muted);margin-bottom:8px;';
       label.textContent = s.label;
       card.appendChild(label);
       const val = document.createElement('div');
+      val.className = 'stats-card-value';
       val.style.cssText = 'font-size:1.8rem;font-weight:800;color:var(--text-primary);letter-spacing:-0.5px;';
       val.textContent = String(s.value);
       card.appendChild(val);
@@ -132,17 +143,21 @@ export class StatsPanel {
 
     for (const s of wordCountCards) {
       const card = this._neuCard();
+      card.classList.add('stats-word-card');
       card.style.gridColumn = 'span 2';
       card.style.display = 'flex';
       card.style.alignItems = 'center';
       card.style.justifyContent = 'space-between';
 
       const textDiv = document.createElement('div');
+      textDiv.className = 'stats-word-copy';
       const label = document.createElement('div');
+      label.className = 'stats-card-label';
       label.style.cssText = 'font-size:0.75rem;color:var(--text-muted);margin-bottom:8px;';
       label.textContent = s.label;
       textDiv.appendChild(label);
       const val = document.createElement('div');
+      val.className = 'stats-card-value';
       val.style.cssText = 'font-size:1.8rem;font-weight:800;color:var(--text-primary);letter-spacing:-0.5px;';
       val.textContent = s.value;
       textDiv.appendChild(val);
@@ -152,6 +167,7 @@ export class StatsPanel {
       const isDark = document.documentElement.dataset.theme === 'dark';
       const ringSize = isDark ? 150 : 140;
       const ringWrap = document.createElement('div');
+      ringWrap.className = 'stats-ring';
       const grooveInset = isDark
         ? 'inset 6px 6px 12px rgba(0,0,0,0.42), inset -4px -4px 8px rgba(255,255,255,0.02)'
         : 'inset 5px 5px 10px rgba(163,177,198,0.28), inset -5px -5px 10px rgba(255,255,255,0.8)';
@@ -206,6 +222,7 @@ export class StatsPanel {
         ? '12px 12px 24px rgba(0,0,0,0.5), -12px -12px 24px rgba(255,255,255,0.03)'
         : '9px 9px 16px rgba(163,177,198,0.5), -9px -9px 16px rgba(255,255,255,0.7)';
       const hole = document.createElement('div');
+      hole.className = 'stats-ring-hole';
       hole.style.cssText = `width:${holeSize}px;height:${holeSize}px;border-radius:50%;background:var(--bg-primary);`
         + `box-shadow:${holeShadow};display:flex;justify-content:center;align-items:center;z-index:10;`;
       hole.innerHTML = `<span style="font-size:${isDark ? '20' : '18'}px;font-weight:700;color:${cEnd};${isDark ? 'text-shadow:2px 2px 4px rgba(0,0,0,0.5);' : 'text-shadow:1px 1px 1px rgba(255,255,255,0.8);'}">${s.pct}%</span>`;
@@ -225,11 +242,14 @@ export class StatsPanel {
 
     for (const s of row3Stats) {
       const card = this._neuCard();
+      card.classList.add('stats-metric-card');
       const label = document.createElement('div');
+      label.className = 'stats-card-label';
       label.style.cssText = 'font-size:0.75rem;color:var(--text-muted);margin-bottom:8px;';
       label.textContent = s.label;
       card.appendChild(label);
       const val = document.createElement('div');
+      val.className = 'stats-card-value';
       val.style.cssText = 'font-size:1.8rem;font-weight:800;color:var(--text-primary);letter-spacing:-0.5px;';
       val.textContent = String(s.value);
       card.appendChild(val);
@@ -241,6 +261,7 @@ export class StatsPanel {
     // ---- First & Last Conversation (cards float directly) ----
     if (stats.firstConv && stats.lastConv) {
       const milestoneRow = document.createElement('div');
+      milestoneRow.className = 'stats-milestone-grid';
       milestoneRow.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;';
 
       milestoneRow.appendChild(this._milestoneCard(t('stats.firstConv'), stats.firstConv.name || '未命名', formatTimestamp(stats.firstConv.createdAt)));
@@ -253,6 +274,7 @@ export class StatsPanel {
     if (stats.yearlyData && stats.yearlyData.length > 0) {
       parent.appendChild(this._sectionTitle(t('stats.yearOverview')));
       const yearGrid = document.createElement('div');
+      yearGrid.className = 'stats-year-grid';
       yearGrid.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:14px;';
       for (const yr of stats.yearlyData) {
         const card = this._neuCard();
@@ -289,6 +311,7 @@ export class StatsPanel {
     if (stats.dateHeatmap && Object.keys(stats.dateHeatmap).length > 0) {
       parent.appendChild(this._sectionTitle(t('stats.heatmap')));
       const heatCard = this._neuCard();
+      heatCard.classList.add('stats-heatmap-card');
       heatCard.style.padding = '16px 22px';
       heatCard.appendChild(this._buildHeatmapCalendar(stats.dateHeatmap));
       heatCard.style.marginBottom = '14px';
@@ -298,20 +321,24 @@ export class StatsPanel {
     // ---- TOP 5 Longest Conversations (in a single raised card) ----
     parent.appendChild(this._sectionTitle(t('stats.top5')));
     const topCard = this._neuCard();
+    topCard.classList.add('stats-rank-card');
     topCard.style.marginBottom = '14px';
     topCard.style.padding = '8px 0';
     for (let i = 0; i < Math.min(5, stats.topConversations.length); i++) {
       const conv = stats.topConversations[i];
       const item = document.createElement('div');
+      item.className = 'stats-rank-row';
       item.style.cssText = 'display:flex;justify-content:space-between;padding:10px 20px;font-size:0.85rem;cursor:pointer;border-radius:var(--radius-sm);transition:background 0.15s;';
       if (i < Math.min(5, stats.topConversations.length) - 1) item.style.borderBottom = '1px solid var(--separator-color)';
       item.addEventListener('mouseenter', () => item.style.background = 'var(--bg-card-hover)');
       item.addEventListener('mouseleave', () => item.style.background = '');
       const name = document.createElement('span');
+      name.className = 'stats-rank-name';
       name.style.cssText = 'color:var(--text-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;margin-right:12px;';
       name.textContent = (i + 1) + '. ' + (conv.name || '未命名');
       item.appendChild(name);
       const count = document.createElement('span');
+      count.className = 'stats-rank-count';
       count.style.cssText = 'color:var(--text-muted);white-space:nowrap;';
       count.textContent = conv.stats.messageCount + t('stats.top5msgs') + (conv.stats.humanChars + conv.stats.assistantChars).toLocaleString() + t('stats.top5chars');
       item.appendChild(count);
@@ -337,18 +364,22 @@ export class StatsPanel {
     if (stats.deepNightConvs.length > 0) {
       parent.appendChild(this._sectionTitle(t('stats.lateNightRank')));
       const nightCard = this._neuCard();
+      nightCard.classList.add('stats-rank-card');
       nightCard.style.marginBottom = '14px';
       nightCard.style.padding = '8px 0';
       for (let i = 0; i < Math.min(5, stats.deepNightConvs.length); i++) {
         const item = stats.deepNightConvs[i];
         const row = document.createElement('div');
+        row.className = 'stats-rank-row';
         row.style.cssText = 'display:flex;justify-content:space-between;padding:8px 20px;font-size:0.85rem;';
         if (i < Math.min(5, stats.deepNightConvs.length) - 1) row.style.borderBottom = '1px solid var(--separator-color)';
         const name = document.createElement('span');
+        name.className = 'stats-rank-name';
         name.style.cssText = 'color:var(--text-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;margin-right:12px;';
         name.textContent = '\uD83C\uDF19 ' + (item.name || '未命名');
         row.appendChild(name);
         const count = document.createElement('span');
+        count.className = 'stats-rank-count';
         count.style.cssText = 'color:var(--text-muted);white-space:nowrap;';
         count.textContent = item.lateCount + ' 条深夜消息';
         row.appendChild(count);
@@ -359,20 +390,24 @@ export class StatsPanel {
 
     parent.appendChild(this._sectionTitle(t('stats.rhythm')));
     const rhythmSection = document.createElement('div');
+    rhythmSection.className = 'stats-rhythm-section';
     rhythmSection.style.cssText = 'margin-bottom:24px;';
 
     // ---- Weekday + Monthly Line Chart side by side ----
     const activityRow = document.createElement('div');
+    activityRow.className = 'stats-activity-grid';
     activityRow.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;';
 
     // Weekday: neumorphic groove bars (slot track + pill inside)
     const weekdayCard = this._neuCard();
+    weekdayCard.classList.add('stats-chart-card');
     weekdayCard.style.cssText += 'background:var(--surface-soft);box-shadow:var(--shadow-xs);';
     const weekdayTitle = document.createElement('div');
     weekdayTitle.style.cssText = 'font-size:0.85rem;font-weight:600;color:var(--text-primary);margin-bottom:16px;';
     weekdayTitle.textContent = '星期几最爱聊天';
     weekdayCard.appendChild(weekdayTitle);
     const weekdayBar = document.createElement('div');
+    weekdayBar.className = 'stats-weekday-bars';
     weekdayBar.style.cssText = 'display:flex;gap:22px;justify-content:center;height:170px;';
     const weekdays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
     const maxWeekday = Math.max(...stats.weekdayActivity, 1);
@@ -407,12 +442,14 @@ export class StatsPanel {
     // Monthly line chart goes next to weekday
     if (stats.monthlyData.labels.length > 1) {
       const chartCard1 = this._neuCard();
+      chartCard1.classList.add('stats-chart-card');
       chartCard1.style.cssText += 'background:var(--surface-soft);box-shadow:var(--shadow-xs);';
       const chartTitle1 = document.createElement('div');
       chartTitle1.style.cssText = 'font-size:0.85rem;font-weight:600;color:var(--text-primary);margin-bottom:12px;';
       chartTitle1.textContent = '每月对话频率';
       chartCard1.appendChild(chartTitle1);
       const canvas1 = document.createElement('canvas');
+      canvas1.className = 'stats-line-chart';
       canvas1.style.cssText = 'width:100%;height:180px;';
       chartCard1.appendChild(canvas1);
       activityRow.appendChild(chartCard1);
@@ -427,12 +464,14 @@ export class StatsPanel {
     // ---- Hourly Activity (own row) ----
     if (stats.hourlyActivity.some(v => v > 0)) {
       const hourCard = this._neuCard();
+      hourCard.classList.add('stats-chart-card');
       hourCard.style.cssText += 'background:var(--surface-soft);box-shadow:var(--shadow-xs);margin-bottom:14px;';
       const hourTitle = document.createElement('div');
       hourTitle.style.cssText = 'font-size:0.85rem;font-weight:600;color:var(--text-primary);margin-bottom:16px;';
       hourTitle.textContent = '每日活跃时段';
       hourCard.appendChild(hourTitle);
       const heatmap = document.createElement('div');
+      heatmap.className = 'stats-hour-heatmap';
       heatmap.style.cssText = 'display:grid;grid-template-columns:repeat(12,1fr);grid-template-rows:repeat(2,1fr);gap:4px;margin-bottom:8px;';
       const maxHour = Math.max(...stats.hourlyActivity);
       for (let h = 0; h < 24; h++) {
@@ -446,6 +485,7 @@ export class StatsPanel {
       }
       hourCard.appendChild(heatmap);
       const hourLabels = document.createElement('div');
+      hourLabels.className = 'stats-hour-labels';
       hourLabels.style.cssText = 'display:grid;grid-template-columns:repeat(12,1fr);gap:4px;';
       for (let h = 0; h < 24; h += 2) {
         const label = document.createElement('div');
@@ -461,6 +501,7 @@ export class StatsPanel {
     if (stats.monthlyData.labels.length > 1) {
 
       const chartCard2 = this._neuCard();
+      chartCard2.classList.add('stats-chart-card');
       chartCard2.style.cssText += 'background:var(--surface-soft);box-shadow:var(--shadow-xs);';
       const chartTitle2 = document.createElement('div');
       chartTitle2.style.cssText = 'font-size:0.85rem;font-weight:600;color:var(--text-primary);margin-bottom:12px;';
@@ -472,10 +513,12 @@ export class StatsPanel {
       const aVals = stats.monthlyData.assistantChars;
       const maxWordVal = Math.max(...hVals, ...aVals, 1);
       const barRow = document.createElement('div');
+      barRow.className = 'stats-monthly-bars';
       barRow.style.cssText = 'display:flex;justify-content:space-between;align-items:flex-end;height:200px;padding:0 10px;';
       const trackH = 170;
       stats.monthlyData.labels.forEach((lbl, i) => {
         const grp = document.createElement('div');
+        grp.className = 'stats-monthly-bar-group';
         grp.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:6px;flex:1;';
         const pair = document.createElement('div');
         pair.style.cssText = 'display:flex;gap:4px;align-items:flex-end;justify-content:center;';
@@ -515,6 +558,7 @@ export class StatsPanel {
       chartCard2.appendChild(barRow);
       // Legend
       const legend = document.createElement('div');
+      legend.className = 'stats-chart-legend';
       legend.style.cssText = 'display:flex;justify-content:center;gap:16px;margin-top:8px;font-size:0.65rem;color:var(--text-muted);';
       legend.innerHTML = `<span style="display:flex;align-items:center;gap:4px;"><span style="width:8px;height:8px;border-radius:50%;background:#7c6eea;display:inline-block;"></span>${names.human || 'Human'}</span>`
         + `<span style="display:flex;align-items:center;gap:4px;"><span style="width:8px;height:8px;border-radius:50%;background:#D97657;display:inline-block;"></span>${names.assistant || 'Assistant'}</span>`;
@@ -526,6 +570,7 @@ export class StatsPanel {
     // ---- Word Cloud (Top Words) — in a raised card ----
     if (stats.topHumanWords.length > 0 || stats.topAssistantWords.length > 0) {
       const wordTitleRow = document.createElement('div');
+      wordTitleRow.className = 'stats-word-title-row';
       wordTitleRow.style.cssText = 'display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;';
       const wordTitle = this._sectionTitle('高频词');
       wordTitle.style.marginBottom = '14px';
@@ -544,10 +589,12 @@ export class StatsPanel {
       parent.appendChild(wordTitleRow);
 
       const wordCard = this._neuCard();
+      wordCard.classList.add('stats-word-cloud-card');
       wordCard.style.marginBottom = '14px';
 
       // Two columns
       const columns = document.createElement('div');
+      columns.className = 'stats-word-columns';
       columns.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:12px;';
 
       const humanCol = document.createElement('div');
@@ -578,8 +625,10 @@ export class StatsPanel {
     if (stats.topEmojis.length > 0) {
       parent.appendChild(this._sectionTitle('常用 Emoji'));
       const emojiCard = this._neuCard();
+      emojiCard.classList.add('stats-emoji-card');
       emojiCard.style.marginBottom = '14px';
       const emojiRow = document.createElement('div');
+      emojiRow.className = 'stats-emoji-row';
       emojiRow.style.cssText = 'display:flex;flex-wrap:wrap;gap:12px;';
       for (const e of stats.topEmojis.slice(0, 15)) {
         const item = document.createElement('div');
@@ -602,6 +651,7 @@ export class StatsPanel {
     if (stats.totalThinkingCount > 0) {
       parent.appendChild(this._sectionTitle('思考统计'));
       const thinkGrid = document.createElement('div');
+      thinkGrid.className = 'stats-think-grid';
       thinkGrid.style.cssText = 'display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:14px;';
       const thinkStats = [
         { label: '总思考次数', value: stats.totalThinkingCount.toLocaleString() + ' 次' },
@@ -611,11 +661,14 @@ export class StatsPanel {
       ];
       for (const s of thinkStats) {
         const card = this._neuCard();
+        card.classList.add('stats-thinking-card');
         const label = document.createElement('div');
+        label.className = 'stats-card-label';
         label.style.cssText = 'font-size:0.75rem;color:var(--text-muted);margin-bottom:8px;';
         label.textContent = s.label;
         card.appendChild(label);
         const val = document.createElement('div');
+        val.className = 'stats-thinking-value';
         val.style.cssText = 'font-size:1.2rem;font-weight:600;color:var(--thinking-text);';
         val.textContent = s.value;
         card.appendChild(val);
@@ -628,6 +681,7 @@ export class StatsPanel {
     if (stats.topTitleWords.length > 0) {
       parent.appendChild(this._sectionTitle('对话标题高频词'));
       const titleCard = this._neuCard();
+      titleCard.classList.add('stats-title-cloud-card');
       titleCard.style.marginBottom = '14px';
       const titleCloudContainer = document.createElement('div');
       this._renderWordCloud(titleCloudContainer, stats.topTitleWords, stats.allTitleWords, 'title');
@@ -822,6 +876,7 @@ export class StatsPanel {
 
   _renderWordCloud(container, visibleWords, allWords, type) {
     container.textContent = '';
+    container.className = 'stats-word-cloud';
     container.style.cssText = 'display:flex;flex-wrap:wrap;gap:6px;padding:16px;background:var(--bg-secondary);border-radius:var(--radius-sm);justify-content:center;align-items:center;';
 
     if (visibleWords.length === 0) {
@@ -892,12 +947,14 @@ export class StatsPanel {
   /** Neumorphic card — convex / raised (matching Figma design) */
   _neuCard() {
     const el = document.createElement('div');
+    el.className = 'stats-card';
     el.style.cssText = 'background:var(--bg-card);border-radius:var(--radius-lg);padding:16px 18px;text-align:left;box-shadow:var(--shadow);';
     return el;
   }
 
   _sectionTitle(text) {
     const el = document.createElement('h3');
+    el.className = 'stats-section-title';
     el.style.cssText = 'font-size:1rem;font-weight:800;margin-bottom:16px;margin-top:24px;color:var(--text-primary);display:flex;align-items:center;gap:10px;letter-spacing:0.5px;';
     const dot = document.createElement('span');
     dot.style.cssText = 'width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 6px rgba(217,118,87,0.4);flex-shrink:0;';
@@ -910,15 +967,19 @@ export class StatsPanel {
 
   _milestoneCard(label, name, time) {
     const card = this._neuCard();
+    card.classList.add('stats-milestone-card');
     const labelEl = document.createElement('div');
+    labelEl.className = 'stats-card-label';
     labelEl.style.cssText = 'font-size:0.7rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;';
     labelEl.textContent = label;
     card.appendChild(labelEl);
     const nameEl = document.createElement('div');
+    nameEl.className = 'stats-milestone-name';
     nameEl.style.cssText = 'font-size:0.9rem;font-weight:600;color:var(--text-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;';
     nameEl.textContent = name;
     card.appendChild(nameEl);
     const timeEl = document.createElement('div');
+    timeEl.className = 'stats-milestone-time';
     timeEl.style.cssText = 'font-size:0.75rem;color:var(--text-muted);margin-top:2px;';
     timeEl.textContent = time;
     card.appendChild(timeEl);
@@ -927,6 +988,7 @@ export class StatsPanel {
 
   _buildHeatmapCalendar(dateHeatmap) {
     const container = document.createElement('div');
+    container.className = 'stats-heatmap-scroll';
     container.style.cssText = 'overflow-x:auto;padding-bottom:4px;';
 
     const dates = Object.keys(dateHeatmap).sort();
