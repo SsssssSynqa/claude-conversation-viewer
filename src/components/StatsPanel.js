@@ -3,7 +3,7 @@
  */
 
 import { state, resetSidebarFilter } from '../store/state.js';
-import { drawAreaComparisonChart, drawLineChart } from '../utils/charts.js';
+import { drawAreaComparisonChart, drawLineChart, drawRadialActivityChart } from '../utils/charts.js';
 import { formatMonthKey, formatMonthLabel, formatTimestamp, formatLocalDateStamp, getHourOfDay } from '../utils/time.js';
 import html2canvas from 'html2canvas';
 import { desensitize } from '../utils/desensitize.js';
@@ -449,28 +449,22 @@ export class StatsPanel {
       hourTitle.className = 'stats-chart-title';
       hourTitle.textContent = '每日活跃时段';
       hourCard.appendChild(hourTitle);
-      const heatmap = document.createElement('div');
-      heatmap.className = 'stats-hour-wave';
-      const maxHour = Math.max(...stats.hourlyActivity);
-      for (let h = 0; h < 24; h++) {
-        const cell = document.createElement('div');
-        const intensity = maxHour > 0 ? stats.hourlyActivity[h] / maxHour : 0;
-        cell.className = 'stats-hour-tick';
-        cell.style.setProperty('--hour-scale', String(Math.max(0.08, intensity)));
-        cell.title = `${h}:00 — ${stats.hourlyActivity[h]} 条消息`;
-        heatmap.appendChild(cell);
-      }
-      hourCard.appendChild(heatmap);
-      const hourLabels = document.createElement('div');
-      hourLabels.className = 'stats-hour-labels';
-      for (let h = 0; h < 24; h++) {
-        const label = document.createElement('div');
-        label.className = 'stats-hour-label';
-        label.textContent = h % 6 === 0 ? h + ':00' : '';
-        hourLabels.appendChild(label);
-      }
-      hourCard.appendChild(hourLabels);
+      const activityClock = document.createElement('canvas');
+      activityClock.className = 'stats-hour-clock';
+      activityClock.setAttribute('role', 'img');
+      const peakHour = stats.hourlyActivity.indexOf(Math.max(...stats.hourlyActivity));
+      const activityLabel = `24 小时活跃节律图，峰值为 ${peakHour}:00，${stats.hourlyActivity[peakHour]} 条消息`;
+      activityClock.setAttribute('aria-label', activityLabel);
+      activityClock.title = activityLabel;
+      hourCard.appendChild(activityClock);
       rhythmSection.appendChild(hourCard);
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          drawRadialActivityChart(activityClock, stats.hourlyActivity, {
+            color: this._cssVar('--stats-human'),
+          });
+        });
+      });
     }
 
     // ---- Monthly Word Count (own row) ----

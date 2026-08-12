@@ -135,10 +135,10 @@
   --stats-grid: rgba(223, 229, 237, 0.09);
   --stats-track: #22262c;
   --stats-heat-0: #25292f;
-  --stats-heat-1: #343f40;
-  --stats-heat-2: #506463;
-  --stats-heat-3: #8b6f61;
-  --stats-heat-4: #df8968;
+  --stats-heat-1: #4b322b;
+  --stats-heat-2: #764534;
+  --stats-heat-3: #ad5e44;
+  --stats-heat-4: #e48a66;
   --stats-card-surface: linear-gradient(145deg, #292d34 0%, #24282e 100%);
   --stats-card-shadow: 11px 11px 24px rgba(11, 13, 16, 0.46),
     -9px -9px 20px rgba(255, 255, 255, 0.018),
@@ -207,24 +207,27 @@
   --stats-trend: #c66d4e;
   --stats-grid: rgba(61, 69, 68, 0.09);
   --stats-track: #e4e7e3;
-  --stats-heat-0: #e8ebe7;
-  --stats-heat-1: #d8e1dc;
-  --stats-heat-2: #afc5bd;
-  --stats-heat-3: #e8b5a1;
-  --stats-heat-4: #d67858;
-  --stats-page-surface: #f1f2ef;
-  --stats-card-surface: linear-gradient(145deg, #f8f8f5 0%, #eceeeb 100%);
-  --stats-card-shadow: 13px 13px 28px rgba(155, 162, 160, 0.22),
-    -11px -11px 25px rgba(255, 255, 253, 0.96),
-    inset 1px 1px 0 rgba(255, 255, 255, 0.74),
-    inset -1px -1px 0 rgba(90, 101, 98, 0.035);
-  --stats-card-shadow-hover: 16px 16px 32px rgba(151, 159, 156, 0.24),
-    -12px -12px 27px rgba(255, 255, 254, 0.98),
-    inset 1px 1px 0 rgba(255, 255, 255, 0.82);
+  --stats-heat-0: #e2e6e1;
+  --stats-heat-1: #f4d8cc;
+  --stats-heat-2: #ecb49e;
+  --stats-heat-3: #df8c6c;
+  --stats-heat-4: #d26948;
+  --stats-page-surface: #e9ede8;
+  --stats-card-surface: linear-gradient(145deg, #f6f8f4 0%, #edf0ec 100%);
+  --stats-card-shadow: 8px 8px 17px rgba(121, 132, 126, 0.22),
+    -7px -7px 15px rgba(255, 255, 253, 0.98),
+    0 2px 4px rgba(101, 112, 106, 0.08),
+    inset 1px 1px 0 rgba(255, 255, 255, 0.96),
+    inset -1px -1px 0 rgba(99, 111, 105, 0.12);
+  --stats-card-shadow-hover: 11px 11px 21px rgba(119, 130, 124, 0.24),
+    -9px -9px 18px rgba(255, 255, 253, 1),
+    0 3px 6px rgba(101, 112, 106, 0.09),
+    inset 1px 1px 0 rgba(255, 255, 255, 1),
+    inset -1px -1px 0 rgba(99, 111, 105, 0.13);
   --stats-inset-shadow: inset 4px 4px 9px rgba(157, 166, 162, 0.2),
     inset -3px -3px 8px rgba(255, 255, 253, 0.86);
   --stats-hero-surface: radial-gradient(circle at 82% 18%, rgba(214, 120, 88, 0.095), transparent 46%),
-    linear-gradient(145deg, #faf9f6 0%, #eceeeb 76%);
+    linear-gradient(145deg, #fafbf8 0%, #edf0ec 76%);
 }
 
 /* ---- Claude Theme (精确还原Claude.ai官网) ---- */
@@ -311,9 +314,9 @@
   --stats-grid: rgba(31, 30, 29, 0.1);
   --stats-track: #f0eee6;
   --stats-heat-0: #f0eee6;
-  --stats-heat-1: #d9dfda;
-  --stats-heat-2: #9eb2ad;
-  --stats-heat-3: #ca927b;
+  --stats-heat-1: #f2d6ca;
+  --stats-heat-2: #e9ad95;
+  --stats-heat-3: #db8565;
   --stats-heat-4: #c86647;
   --stats-hero-surface: var(--bg-card);
   --stats-page-surface: var(--bg-primary);

@@ -11,6 +11,7 @@ export function drawLineChart(canvas, data, opts = {}) {
   const dpr = window.devicePixelRatio || 1;
   const w = canvas.clientWidth;
   const h = canvas.clientHeight;
+  if (w < 80 || h < 80) return;
   canvas.width = w * dpr;
   canvas.height = h * dpr;
   ctx.scale(dpr, dpr);
@@ -192,6 +193,99 @@ export function drawAreaComparisonChart(canvas, data) {
   for (let i = 0; i < data.labels.length; i += labelSkip) {
     ctx.fillText(data.labels[i], padding.left + stepX * i, h - 11);
   }
+}
+
+/**
+ * Draw a 24-hour radial clock. The circular structure makes the daily cycle legible at a glance,
+ * while each ray keeps the exact hour value available as a proportional length.
+ */
+export function drawRadialActivityChart(canvas, values, opts = {}) {
+  const ctx = canvas.getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
+  const w = canvas.clientWidth;
+  const h = canvas.clientHeight;
+  if (w < 80 || h < 80) return;
+  canvas.width = w * dpr;
+  canvas.height = h * dpr;
+  ctx.scale(dpr, dpr);
+
+  const styles = getComputedStyle(document.documentElement);
+  const color = opts.color || styles.getPropertyValue('--stats-human').trim() || '#d67858';
+  const trackColor = styles.getPropertyValue('--stats-track').trim() || 'rgba(128,128,128,0.12)';
+  const gridColor = styles.getPropertyValue('--stats-grid').trim() || 'rgba(128,128,128,0.12)';
+  const textColor = styles.getPropertyValue('--text-primary').trim() || '#252321';
+  const mutedColor = styles.getPropertyValue('--text-muted').trim() || '#7b7771';
+  const chartFont = styles.getPropertyValue('--stats-font-ui').trim() || 'system-ui, sans-serif';
+  const dataFont = styles.getPropertyValue('--stats-font-data').trim() || chartFont;
+
+  const centerX = w / 2;
+  const centerY = h / 2 + 4;
+  const outerLimit = Math.min(w, h) / 2 - 24;
+  const innerRadius = Math.min(64, outerLimit * 0.48);
+  const minRay = Math.max(13, outerLimit * 0.11);
+  const maxRay = Math.max(38, outerLimit - innerRadius - minRay - 6);
+  const maxValue = Math.max(...values, 1);
+  const peakValue = Math.max(...values);
+  const peakHour = Math.max(0, values.indexOf(peakValue));
+
+  ctx.lineCap = 'round';
+  for (let hour = 0; hour < 24; hour++) {
+    const angle = (hour / 24) * Math.PI * 2 - Math.PI / 2;
+    const start = innerRadius + 13;
+    const intensity = values[hour] / maxValue;
+    const trackEnd = start + minRay + maxRay;
+    const valueEnd = start + minRay + maxRay * intensity;
+
+    ctx.beginPath();
+    ctx.moveTo(centerX + Math.cos(angle) * start, centerY + Math.sin(angle) * start);
+    ctx.lineTo(centerX + Math.cos(angle) * trackEnd, centerY + Math.sin(angle) * trackEnd);
+    ctx.strokeStyle = withAlpha(trackColor, 0.72);
+    ctx.lineWidth = 5;
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(centerX + Math.cos(angle) * start, centerY + Math.sin(angle) * start);
+    ctx.lineTo(centerX + Math.cos(angle) * valueEnd, centerY + Math.sin(angle) * valueEnd);
+    ctx.strokeStyle = withAlpha(color, 0.38 + intensity * 0.62);
+    ctx.lineWidth = hour === peakHour ? 8 : 6;
+    ctx.stroke();
+  }
+
+  ctx.beginPath();
+  ctx.arc(centerX, centerY, innerRadius, 0, Math.PI * 2);
+  ctx.strokeStyle = gridColor;
+  ctx.lineWidth = 1;
+  ctx.stroke();
+
+  const markers = [
+    { hour: 0, label: '0  夜' },
+    { hour: 6, label: '6  晨' },
+    { hour: 12, label: '12  昼' },
+    { hour: 18, label: '18  暮' },
+  ];
+  ctx.font = `500 11px ${chartFont}`;
+  ctx.fillStyle = mutedColor;
+  for (const marker of markers) {
+    const angle = (marker.hour / 24) * Math.PI * 2 - Math.PI / 2;
+    const radius = outerLimit + 11;
+    const x = centerX + Math.cos(angle) * radius;
+    const y = centerY + Math.sin(angle) * radius;
+    ctx.textAlign = marker.hour === 6 ? 'left' : marker.hour === 18 ? 'right' : 'center';
+    ctx.textBaseline = marker.hour === 0 ? 'bottom' : marker.hour === 12 ? 'top' : 'middle';
+    ctx.fillText(marker.label, x, y);
+  }
+
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillStyle = mutedColor;
+  ctx.font = `500 10px ${chartFont}`;
+  ctx.fillText('活跃峰值', centerX, centerY - 24);
+  ctx.fillStyle = textColor;
+  ctx.font = `500 25px ${dataFont}`;
+  ctx.fillText(`${peakHour}:00`, centerX, centerY + 1);
+  ctx.fillStyle = color;
+  ctx.font = `600 10px ${chartFont}`;
+  ctx.fillText(`${peakValue.toLocaleString()} 条消息`, centerX, centerY + 28);
 }
 
 /**

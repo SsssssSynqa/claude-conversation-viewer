@@ -65,6 +65,27 @@ Synqa 对第二版提出三项明确纠正：不要卡片内再套数字框；�
 - 每月字数由 34 条胶囊槽柱改为双面积趋势图，直接比较双方时间走势。
 - 两个百分比环与 Claude 卡片边框/阴影仍无 diff。
 
+## Fourth visual pass
+
+Synqa 继续指出每日活跃表现力不足、时光矩阵需要橙色，以及亮色新拟态边缘仍然发糊。
+
+- 每日活跃从线性竖柱彻底改为 24 小时放射时钟：24 根射线按小时顺时针排列，长度与
+  消息量成比例，中央直接标出峰值小时和消息数，四个方位标记夜 / 晨 / 昼 / 暮。
+- 时光矩阵的所有非空强度级统一改为由浅橙到深陶土橙；空值仍保持中性，避免把“没有
+  活跃”误编码成低强度活跃。
+- 亮色统计底板与卡片拉开明度差，卡片阴影由大范围低对比模糊改为近距离双向投影、底部
+  落影、1px 高光边和反光侧暗边，建立明确的凸起方向。
+- 两个百分比环源码与样式无 diff；Claude 卡片继续使用原 0.5px 官方风格阴影契约。
+
+## Fourth-pass local verification
+
+- `npm run build` 与 `npx impeccable --json src/components/StatsPanel.js` 均通过。
+- 亮色桌面截图确认放射时钟、橙色矩阵与卡片凸起边缘；暗色和 Claude 的热力阶均为橙色。
+- 亮 / 暗 / Claude 三主题无页面横向溢出；390px 手机布局无横向溢出。
+- Claude 卡片 computed style 仍为 `0 3px 15px rgba(0,0,0,.035) + 0.5px outline`，
+  `border-radius: 16px`；百分比环尺寸和阴影保持原值。
+- 保存图片已成功生成 `数据雕塑_2026-08-12.png`；当前浏览器控制台 error/warning 为 0。
+
 ## Local verification
 
 - `npm run build`：通过，生成单文件 `dist/index.html`。
