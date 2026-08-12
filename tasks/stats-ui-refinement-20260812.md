@@ -23,7 +23,27 @@
 
 ## Status
 
-`complete / awaiting Synqa visual acceptance`
+`rework code complete / awaiting production release and Synqa visual acceptance`
+
+## Synqa rejection and structural rework
+
+第一版于 2026-08-12 被 Synqa 退回：肉眼变化不足，数字字体看起来没有改变，整体像只
+换了颜色。根因是仍沿用旧版四等分卡片轮廓，并把数据字体设成与旧界面非常接近的
+Anthropic Sans；实现差异没有转化成视觉差异。
+
+第二版已作结构性返工：
+
+- 主指标区由四张等宽卡片改为六列非对称仪表盘：总窗口数成为双层主牌，消息数/思考数
+  为并列副牌，思考总时间横跨双列。
+- 统计数字真实加载内置 Anthropic Serif，不再依赖近似系统字体；小型数据使用
+  Anthropic Mono，建立明显的字形与尺度对比。
+- 亮/暗主题的主指标增加内凹数字槽，卡片改为非对称圆角的软雕塑表面；Claude 主题只
+  使用新构图和字体，原官方边框/阴影仍保持不变。
+- 星期分布从旧竖向胶囊改为七行横向比较尺，年度卡片改为大年份 + 数据列构图。
+- 两个已确认百分比环的源码、尺寸、色彩、阴影和响应式规则仍无 diff。
+
+返工后的 1280px 与 390px 三主题检查均无页面横向溢出；数字 computed font 为
+`Anthropic Serif`，Claude 卡片 computed shadow 仍与原 `--shadow` 契约一致。
 
 ## Local verification
 

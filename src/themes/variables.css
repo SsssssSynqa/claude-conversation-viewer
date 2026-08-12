@@ -58,7 +58,8 @@
   --stats-font-ui: 'Anthropic Sans', 'PingFang SC', 'Hiragino Sans GB', 'Noto Sans CJK SC',
     'Microsoft YaHei', system-ui, sans-serif;
   --stats-font-display: 'Anthropic Serif', 'Songti SC', 'Noto Serif CJK SC', STSong, serif;
-  --stats-font-data: 'Anthropic Sans', 'PingFang SC', 'Noto Sans CJK SC', system-ui, sans-serif;
+  --stats-font-data: 'Anthropic Serif', 'Songti SC', Georgia, serif;
+  --stats-font-microdata: 'Anthropic Mono', 'SFMono-Regular', Consolas, ui-monospace, monospace;
   --radius: 12px;
   --radius-sm: 8px;
   --radius-lg: 20px;
@@ -148,6 +149,12 @@
     inset 1px 1px 0 rgba(255, 255, 255, 0.032);
   --stats-inset-shadow: inset 4px 4px 9px rgba(9, 11, 14, 0.5),
     inset -3px -3px 7px rgba(255, 255, 255, 0.018);
+  --stats-display-surface: #20242a;
+  --stats-display-shadow: inset 5px 5px 10px rgba(8, 10, 13, 0.58),
+    inset -4px -4px 9px rgba(255, 255, 255, 0.022),
+    0 1px 0 rgba(255, 255, 255, 0.025);
+  --stats-hero-surface: radial-gradient(circle at 82% 18%, rgba(227, 139, 104, 0.16), transparent 45%),
+    linear-gradient(145deg, #2d3138 0%, #24282e 74%);
 }
 
 /* ---- Light Theme (开灯版 — 新拟态亮色) ---- */
@@ -218,6 +225,12 @@
     inset 1px 1px 0 rgba(255, 255, 255, 0.72);
   --stats-inset-shadow: inset 4px 4px 9px rgba(170, 154, 139, 0.28),
     inset -3px -3px 8px rgba(255, 253, 248, 0.78);
+  --stats-display-surface: #e4dcd2;
+  --stats-display-shadow: inset 5px 5px 10px rgba(165, 147, 131, 0.3),
+    inset -4px -4px 9px rgba(255, 253, 248, 0.78),
+    0 1px 0 rgba(255, 255, 255, 0.56);
+  --stats-hero-surface: radial-gradient(circle at 82% 18%, rgba(200, 109, 79, 0.13), transparent 46%),
+    linear-gradient(145deg, #f4eee7 0%, #e8dfd5 74%);
 }
 
 /* ---- Claude Theme (精确还原Claude.ai官网) ---- */
@@ -308,6 +321,9 @@
   --stats-heat-2: #9eb2ad;
   --stats-heat-3: #ca927b;
   --stats-heat-4: #c86647;
+  --stats-display-surface: #f0eee6;
+  --stats-display-shadow: none;
+  --stats-hero-surface: var(--bg-card);
 
   /* Layout overrides */
   --content-max-width: 680px;

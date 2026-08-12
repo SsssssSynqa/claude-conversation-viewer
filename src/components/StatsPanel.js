@@ -110,9 +110,9 @@ export class StatsPanel {
       { label: t('stats.thinkingTime'), value: this.formatMs(stats.totalThinkingMs) },
     ];
 
-    for (const s of row1Stats) {
+    row1Stats.forEach((s, index) => {
       const card = this._neuCard();
-      card.classList.add('stats-metric-card');
+      card.classList.add('stats-metric-card', 'stats-primary-metric', `stats-primary-metric-${index + 1}`);
       const label = document.createElement('div');
       label.className = 'stats-card-label';
       label.textContent = s.label;
@@ -122,7 +122,7 @@ export class StatsPanel {
       val.textContent = String(s.value);
       card.appendChild(val);
       cardsGrid.appendChild(card);
-    }
+    });
 
     // Row 2: 2 wider word count cards with percentage rings (span 2 cols each)
     const totalChars = stats.totalAssistantChars + stats.totalHumanChars;
@@ -229,7 +229,7 @@ export class StatsPanel {
 
     for (const s of row3Stats) {
       const card = this._neuCard();
-      card.classList.add('stats-metric-card');
+      card.classList.add('stats-metric-card', 'stats-secondary-metric');
       const label = document.createElement('div');
       label.className = 'stats-card-label';
       label.textContent = s.label;
@@ -266,6 +266,8 @@ export class StatsPanel {
         yearLabel.className = 'stats-year-label';
         yearLabel.textContent = yr.year + t('stats.year');
         card.appendChild(yearLabel);
+        const yearData = document.createElement('div');
+        yearData.className = 'stats-year-data';
         const rows = [
           [t('stats.yearConvs'), yr.convCount],
           [t('stats.yearMsgs'), yr.msgCount.toLocaleString()],
@@ -284,8 +286,9 @@ export class StatsPanel {
           v.className = 'stats-year-value';
           v.textContent = value;
           row.appendChild(v);
-          card.appendChild(row);
+          yearData.appendChild(row);
         }
+        card.appendChild(yearData);
         yearGrid.appendChild(card);
       }
       parent.appendChild(yearGrid);
@@ -380,7 +383,7 @@ export class StatsPanel {
     const activityRow = document.createElement('div');
     activityRow.className = 'stats-activity-grid';
 
-    // Weekday: neumorphic groove bars (slot track + pill inside)
+    // Weekday: horizontal meters make the seven-day comparison readable at a glance.
     const weekdayCard = this._neuCard();
     weekdayCard.classList.add('stats-chart-card');
     const weekdayTitle = document.createElement('div');
@@ -391,24 +394,26 @@ export class StatsPanel {
     weekdayBar.className = 'stats-weekday-bars';
     const weekdays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
     const maxWeekday = Math.max(...stats.weekdayActivity, 1);
-    const trackH = 140;
     for (let d = 0; d < 7; d++) {
       const col = document.createElement('div');
       col.className = 'stats-weekday-column';
+      const label = document.createElement('div');
+      label.className = 'stats-axis-label stats-weekday-label';
+      label.textContent = weekdays[d];
+      col.appendChild(label);
       const track = document.createElement('div');
       track.className = 'stats-weekday-track';
-      track.style.height = `${trackH}px`;
-      const pct = Math.max(8, (stats.weekdayActivity[d] / maxWeekday) * 100);
+      const pct = Math.max(5, (stats.weekdayActivity[d] / maxWeekday) * 100);
       const fill = document.createElement('div');
       fill.className = 'stats-weekday-fill';
       fill.style.setProperty('--bar-scale', String(pct / 100));
       fill.title = stats.weekdayActivity[d] + ' 条消息';
       track.appendChild(fill);
       col.appendChild(track);
-      const label = document.createElement('div');
-      label.className = 'stats-axis-label';
-      label.textContent = weekdays[d];
-      col.appendChild(label);
+      const count = document.createElement('div');
+      count.className = 'stats-weekday-count';
+      count.textContent = stats.weekdayActivity[d].toLocaleString();
+      col.appendChild(count);
       weekdayBar.appendChild(col);
     }
     weekdayCard.appendChild(weekdayBar);
@@ -613,7 +618,6 @@ export class StatsPanel {
       parent.appendChild(this._sectionTitle('思考统计'));
       const thinkGrid = document.createElement('div');
       thinkGrid.className = 'stats-think-grid';
-      thinkGrid.style.cssText = 'display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:14px;';
       const thinkStats = [
         { label: '总思考次数', value: stats.totalThinkingCount.toLocaleString() + ' 次' },
         { label: '累计思考时间', value: this.formatMs(stats.totalThinkingMs) },
@@ -625,12 +629,10 @@ export class StatsPanel {
         card.classList.add('stats-thinking-card');
         const label = document.createElement('div');
         label.className = 'stats-card-label';
-        label.style.cssText = 'font-size:0.75rem;color:var(--text-muted);margin-bottom:8px;';
         label.textContent = s.label;
         card.appendChild(label);
         const val = document.createElement('div');
         val.className = 'stats-thinking-value';
-        val.style.cssText = 'font-size:1.2rem;font-weight:600;color:var(--thinking-text);';
         val.textContent = s.value;
         card.appendChild(val);
         thinkGrid.appendChild(card);

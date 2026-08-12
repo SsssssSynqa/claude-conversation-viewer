@@ -4,9 +4,9 @@
 
 | 交付项 | 状态 | 具体范围 | 验收边界 |
 |---|---|---|---|
-| 统计导览 UI 完善 | code complete / awaiting acceptance | 字体层级、非环状图表、数据卡片排版、统计页配色 | Synqa 视觉验收 |
-| 亮/暗新拟态重绘 | code complete / awaiting acceptance | 已重做 surface、边框、阴影；两个百分比环状图不动 | 三主题截图对照 |
-| Claude 伪官端保留 | code complete / awaiting acceptance | 统计卡片继续使用原边框/阴影契约 | computed style 已对照 |
-| 生产发布 | complete | 发布 `20260812T130713Z-51a72f2` 到 NSP 域名，保留回滚备份 | 公网 200、三方 SHA-256 一致、浏览器无报错 |
+| 统计导览 UI 完善 | code complete / awaiting acceptance | 已完成非对称指标仪表盘、Serif 数字牌面与横向星期比较尺返工 | Synqa 视觉验收 |
+| 亮/暗新拟态重绘 | code complete / awaiting acceptance | 新增内凹数字槽、非对称软雕塑卡片；两个百分比环状图不动 | 新旧轮廓对照 |
+| Claude 伪官端保留 | code complete / awaiting acceptance | 新构图沿用统计卡片原边框/阴影契约 | computed style 已对照 |
+| 生产发布 | in progress | 第一版已上线但未通过视觉验收；返工版待覆盖发布 | 线上视觉验收 |
 
 详细账本：[`tasks/stats-ui-refinement-20260812.md`](./tasks/stats-ui-refinement-20260812.md)
