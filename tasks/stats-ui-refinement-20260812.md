@@ -137,4 +137,38 @@ Synqa 继续指出每日活跃表现力不足、时光矩阵需要橙色，以�
 ## Acceptance boundary
 
 - 自动化通过不代替 Synqa 的视觉验收。
-- 本轮不改统计计算、数据解析、存储格式或其他页面。
+- 本轮不改统计计算、数据解析或存储格式；在 Synqa 后续明确要求下，亮/暗主题的侧边栏、
+  搜索、导出与会话页也已纳入同一设计系统，Claude 主题仍冻结。
+
+## Fifth pass · full-site system and interactive charts
+
+- 调研流程与依据记录在 `docs/UI_RESEARCH_20260812.md`；重新编写 `DESIGN.md`，并通过
+  `@google/design.md@0.4.0 lint`（0 error / 0 warning）。
+- 亮/暗主题收敛为 **Porcelain Relief**：统一 Anthropic Sans/CJK 字体栈、语义字号、
+  陶土橙/矿物青数据色、清晰近边高光与右下落影；Claude 视觉 token 不改。
+- 侧边栏、主题/语言切换、设置开关、搜索、导出、会话与统计使用同一层级语法；搜索结果、
+  导出列表和助手消息不再逐层套卡。
+- 月对话频率、每日活跃时段和每月字数新增统一交互层：pointer hover、click/tap 锁定、
+  Arrow/Home/End 导航、Enter/Space 锁定、Escape 关闭、DOM tooltip、屏幕阅读器数据表与
+  ResizeObserver 重绘。
+- 交互控件改用原生 `button` / `checkbox`；导出菜单补齐 `aria-expanded`、Escape 与焦点恢复；
+  统计 overlay 补齐 dialog、焦点圈与 Escape。
+
+## Fifth-pass verification and production
+
+- 设计提交 `3c9dc86`，实现提交 `bd84165`，导图兼容修复 `4d5b830`。
+- `npm run build`、`git diff --check`、敏感信息扫描通过；Vite 仅保留项目既有的
+  `inlineDynamicImports` deprecation warning。
+- Playwright 使用 72 段合成 Claude 导出数据验证亮/暗/Claude、桌面/移动端、搜索、导出、
+  会话、三张图 hover/锁定/键盘与隐藏表；浏览器控制台 error 为 0。
+- 无障碍数据表分别为 17 / 24 / 17 行；统计导图生成
+  `数据雕塑_2026-08-12.png`，PNG data URL 长度 2,070,902，导出状态复原。
+- Claude token 区块 SHA-256 在改前改后均为
+  `07e59912cf2e19a2dc54c8c20c0b2df92fc085622500af8a791e07a8899351e4`；
+  两个百分比环实现区块均为
+  `45a7ad60ed368f979be57bf45702f41160280c090152b9271ad4fc7b68950579`。
+- 最终发布号 `20260812T225134Z-4d5b830`；覆盖前备份为
+  `/var/backups/claude-conversation-viewer/index.html.before-20260812T225134Z-4d5b830`。
+- 本地、服务器与公网 SHA-256 一致：
+  `e74fbf5048023f2386b831319acbf3ddc389b45ee634fdf6f41e04ea4b11e001`；公网 HTTP 200，
+  `Cache-Control: no-store, must-revalidate`。

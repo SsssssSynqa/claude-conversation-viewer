@@ -6,12 +6,12 @@
 - [x] 完成 PDF、新拟态、图表交互、字体与 UI Skills 调研。
 - [x] 完成上传页、侧边栏、搜索、导出、会话、统计与移动端只读审计。
 - [x] 使用 `create-design-md` 编写新设计规范，并通过 Google DESIGN.md 0.4.0 lint / DTCG export。
-- [ ] 将亮/暗主题收敛到统一 semantic tokens、字体角色与新拟态 elevation grammar。
-- [ ] 清理侧边栏、搜索、导出、会话与设置页的框中框和页面私有字号。
-- [ ] 为三张目标图表实现 hover、点击/触控、键盘、tooltip、隐藏数据表与 ResizeObserver。
-- [ ] 验证 Claude computed styles 与两个环图绘制未发生视觉变化。
-- [ ] 完成桌面/移动端、亮/暗/Claude、导图、键盘与无障碍回归。
-- [ ] 更新建设账本、分批提交并覆盖部署生产。
+- [x] 将亮/暗主题收敛到统一 semantic tokens、字体角色与新拟态 elevation grammar。
+- [x] 清理侧边栏、搜索、导出、会话与设置页的框中框和页面私有字号。
+- [x] 为三张目标图表实现 hover、点击/触控、键盘、tooltip、隐藏数据表与 ResizeObserver。
+- [x] 验证 Claude computed styles 与两个环图绘制未发生视觉变化。
+- [x] 完成桌面/移动端、亮/暗/Claude、导图、键盘与无障碍回归。
+- [x] 更新建设账本、分批提交并覆盖部署生产。
 
 调研记录：[`docs/UI_RESEARCH_20260812.md`](../docs/UI_RESEARCH_20260812.md)
 设计规范：[`DESIGN.md`](../DESIGN.md)
