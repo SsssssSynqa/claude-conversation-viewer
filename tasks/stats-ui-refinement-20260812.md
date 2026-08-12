@@ -23,7 +23,7 @@
 
 ## Status
 
-`rework code complete / awaiting production release and Synqa visual acceptance`
+`rework deployed / awaiting Synqa visual acceptance`
 
 ## Synqa rejection and structural rework
 
@@ -44,6 +44,15 @@ Anthropic Sans；实现差异没有转化成视觉差异。
 
 返工后的 1280px 与 390px 三主题检查均无页面横向溢出；数字 computed font 为
 `Anthropic Serif`，Claude 卡片 computed shadow 仍与原 `--shadow` 契约一致。
+
+## Rework production verification
+
+- 返工提交：`71bb04c`（`refactor: 重做统计导览数字与构图`）。
+- 发布号：`20260812T133639Z-71bb04c`；覆盖前第一版仍保留独立回滚备份。
+- 本地构建、服务器文件与公网响应 SHA-256 一致：
+  `b6796336ef32e9b8e407c998494c88890cc374ee19c2f380a0655011d80086f9`。
+- 公网返回 200、`Cache-Control: no-store, must-revalidate`；返工 marker 命中，浏览器加载
+  标题与上传入口正常，控制台 error/warning 为 0。
 
 ## Local verification
 
