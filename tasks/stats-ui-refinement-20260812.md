@@ -19,11 +19,11 @@
 - [x] 重画星期分布、月度趋势、小时热力与每月字数图表。
 - [x] 保持两个已确认环状图和 Claude 主题卡片边框无回归。
 - [x] 完成 build、紫色扫描、桌面/手机三主题与图片保存验收。
-- [ ] 提交、部署 NSP 域名并完成线上验收。
+- [x] 提交、部署 NSP 域名并完成线上验收。
 
 ## Status
 
-`code complete / awaiting production release and Synqa acceptance`
+`complete / awaiting Synqa visual acceptance`
 
 ## Local verification
 
@@ -34,6 +34,15 @@
 - 两个百分比环的源码与响应式 CSS 无 diff；computed style 保持原尺寸/阴影。
 - Claude 卡片 computed style 继续命中原 `--shadow` 与 `--radius-lg` 契约。
 - 保存图片完成状态为 `截图中... → ✓ 已保存 → 保存为图片`，无控制台错误。
+
+## Production verification
+
+- 实现提交：`51a72f2`（`feat: 完善统计导览三主题界面`）。
+- 发布号：`20260812T130713Z-51a72f2`；替换前线上单文件已生成可回滚备份。
+- 本地构建、服务器文件与公网响应 SHA-256 一致：
+  `3e3474b2cad50d80b0ab94002875a6809f0ba84882682b23e4301a0ead3d8752`。
+- 公网 `/claude-viewer/` 返回 200，统计样式 marker 命中；浏览器加载标题、上传入口正常，
+  控制台 error/warning 为 0。
 
 ## Skill critique baseline
 
