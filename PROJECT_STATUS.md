@@ -4,6 +4,9 @@
 
 | 交付项 | 状态 | 具体范围 | 验收边界 |
 |---|---|---|---|
+| 全站亮/暗设计系统 | in progress | 调研、全站审计与新 `DESIGN.md` 已完成；准备收敛 semantic tokens、字体、表面层级 | 全页面桌面/移动端视觉验收 |
+| 三张交互图表 | in progress | 交互合同已定义；待实现 hover、锁定、键盘、隐藏数据表与 ResizeObserver | 精确值与输入方式回归 |
+| Claude 视觉冻结 | in progress | 已记录改动前 computed styles 与长图；实现阶段只允许语义/性能修复 | 改前改后 computed matrix |
 | 统计导览 UI 完善 | code complete / awaiting acceptance | 每日活跃已改为 24 小时放射时钟；时光矩阵恢复橙色热力阶 | Synqa 视觉验收 |
 | 亮/暗新拟态重绘 | code complete / awaiting acceptance | 亮色卡片已改为近距离明暗边与清晰凸起投影；两个百分比环状图不动 | 新旧轮廓对照 |
 | Claude 伪官端保留 | code complete / awaiting acceptance | 新构图沿用统计卡片原边框/阴影契约 | computed style 已对照 |
