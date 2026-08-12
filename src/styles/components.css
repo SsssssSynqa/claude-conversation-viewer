@@ -430,6 +430,10 @@
   font-kerning: normal;
 }
 
+.stats-panel-shell {
+  background: var(--stats-page-surface);
+}
+
 .stats-card,
 .stats-card * {
   min-width: 0;
@@ -622,30 +626,13 @@
 }
 
 .stats-metric-card .stats-card-value {
-  width: 100%;
-  min-height: 58px;
   margin-top: auto;
-  padding: 13px 15px 11px;
-  display: flex;
-  align-items: center;
-  border-radius: 14px 7px 14px 7px;
-  background: var(--stats-display-surface);
-  box-shadow: var(--stats-display-shadow);
 }
 
 .stats-primary-metric-1 .stats-card-value {
-  min-height: 148px;
-  padding: 18px;
   font-size: 4rem;
   font-weight: 440;
   letter-spacing: -0.11em;
-}
-
-[data-theme="claude"] .stats-metric-card .stats-card-value {
-  padding-left: 0;
-  padding-right: 0;
-  background: transparent;
-  box-shadow: none;
 }
 
 .stats-word-card {
@@ -878,83 +865,48 @@
   font-variant-numeric: tabular-nums;
 }
 
-.stats-hour-heatmap,
 .stats-hour-labels {
   display: grid;
-  grid-template-columns: repeat(12, minmax(0, 1fr));
-  gap: 7px;
-}
-
-.stats-hour-heatmap {
-  margin-bottom: 10px;
-}
-
-.stats-hour-cell {
-  aspect-ratio: 1.45;
-  border-radius: 6px;
-  box-shadow: inset 0 0 0 1px var(--border);
-  transition: transform 180ms cubic-bezier(.22,1,.36,1), filter 180ms ease;
-}
-
-.stats-hour-cell:hover {
-  transform: translateY(-2px);
-  filter: saturate(1.08);
-}
-
-.stats-hour-level-0 { background: var(--stats-heat-0); }
-.stats-hour-level-1 { background: var(--stats-heat-1); }
-.stats-hour-level-2 { background: var(--stats-heat-2); }
-.stats-hour-level-3 { background: var(--stats-heat-3); }
-.stats-hour-level-4 { background: var(--stats-heat-4); }
-
-.stats-hour-label {
-  text-align: center;
-}
-
-.stats-monthly-bars {
-  height: 210px;
-  padding: 0 6px;
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 8px;
-}
-
-.stats-monthly-bar-group {
-  display: flex;
-  min-width: 0;
-  flex: 1 1 0;
-  flex-direction: column;
-  align-items: center;
-  gap: 9px;
-}
-
-.stats-monthly-bar-pair {
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
+  grid-template-columns: repeat(24, minmax(0, 1fr));
   gap: 5px;
 }
 
-.stats-monthly-track {
-  width: 12px;
-  display: flex;
-  align-items: flex-end;
-  padding: 2px;
-  overflow: hidden;
-  border-radius: 999px;
-  background: var(--stats-track);
-  box-shadow: var(--stats-inset-shadow);
+.stats-hour-wave {
+  height: 176px;
+  padding: 8px 4px 0;
+  display: grid;
+  grid-template-columns: repeat(24, minmax(0, 1fr));
+  align-items: end;
+  gap: 5px;
+  border-bottom: 1px solid var(--stats-grid);
 }
 
-.stats-monthly-fill {
+.stats-hour-tick {
+  height: 100%;
+  min-height: 8px;
+  border-radius: 999px 999px 3px 3px;
+  background: linear-gradient(to top, var(--stats-human), var(--accent-light));
+  opacity: calc(0.42 + var(--hour-scale) * 0.58);
+  transform: scaleY(var(--hour-scale));
+  transform-origin: center bottom;
+  transition: transform 220ms cubic-bezier(.22,1,.36,1), opacity 180ms ease;
+}
+
+.stats-hour-tick:hover {
+  opacity: 1;
+  transform: scaleY(var(--hour-scale)) scaleX(1.24);
+}
+
+.stats-hour-label {
+  padding-top: 10px;
+  text-align: center;
+}
+
+.stats-comparison-chart {
+  display: block;
   width: 100%;
-  min-height: 4px;
-  border-radius: 999px;
+  height: 244px;
 }
-
-.stats-monthly-fill-human { background: var(--stats-human); }
-.stats-monthly-fill-assistant { background: var(--stats-assistant); }
 
 .stats-chart-legend {
   display: flex;
@@ -1111,22 +1063,13 @@
     height: auto !important;
   }
 
-  .stats-hour-heatmap,
+  .stats-hour-wave,
   .stats-hour-labels {
-    grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+    gap: 3px;
   }
 
-  .stats-monthly-bars {
-    justify-content: flex-start !important;
-    gap: 12px;
-    overflow-x: auto;
-    padding: 0 2px 10px !important;
-    scroll-snap-type: x proximity;
-  }
-
-  .stats-monthly-bar-group {
-    flex: 0 0 38px !important;
-    scroll-snap-align: start;
+  .stats-comparison-chart {
+    height: 220px;
   }
 
   .stats-chart-legend {
@@ -1245,7 +1188,7 @@
   .stats-card,
   .stats-screenshot-btn,
   .stats-weekday-fill,
-  .stats-hour-cell,
+  .stats-hour-tick,
   .stats-calendar-cell {
     transition: none !important;
   }

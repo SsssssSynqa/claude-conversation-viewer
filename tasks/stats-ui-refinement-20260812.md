@@ -54,6 +54,17 @@ Anthropic Sans；实现差异没有转化成视觉差异。
 - 公网返回 200、`Cache-Control: no-store, must-revalidate`；返工 marker 命中，浏览器加载
   标题与上传入口正常，控制台 error/warning 为 0。
 
+## Third visual pass
+
+Synqa 对第二版提出三项明确纠正：不要卡片内再套数字框；亮色新拟态需要更干净；每日
+活跃与每月字数需要真正重画。
+
+- 已删除所有指标卡内部的凹槽 surface / shadow，数字直接排在卡片表面。
+- 亮色统计区改为暖白瓷底与中性灰绿阴影，去掉原来的灰褐综合色；不改全局其他页面。
+- 每日活跃由两排 24 个色块改为连续 24 小时波形柱，保留 0/6/12/18 点坐标。
+- 每月字数由 34 条胶囊槽柱改为双面积趋势图，直接比较双方时间走势。
+- 两个百分比环与 Claude 卡片边框/阴影仍无 diff。
+
 ## Local verification
 
 - `npm run build`：通过，生成单文件 `dist/index.html`。

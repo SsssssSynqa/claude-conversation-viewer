@@ -3,7 +3,7 @@
  */
 
 import { state, resetSidebarFilter } from '../store/state.js';
-import { drawLineChart } from '../utils/charts.js';
+import { drawAreaComparisonChart, drawLineChart } from '../utils/charts.js';
 import { formatMonthKey, formatMonthLabel, formatTimestamp, formatLocalDateStamp, getHourOfDay } from '../utils/time.js';
 import html2canvas from 'html2canvas';
 import { desensitize } from '../utils/desensitize.js';
@@ -450,20 +450,20 @@ export class StatsPanel {
       hourTitle.textContent = '每日活跃时段';
       hourCard.appendChild(hourTitle);
       const heatmap = document.createElement('div');
-      heatmap.className = 'stats-hour-heatmap';
+      heatmap.className = 'stats-hour-wave';
       const maxHour = Math.max(...stats.hourlyActivity);
       for (let h = 0; h < 24; h++) {
         const cell = document.createElement('div');
         const intensity = maxHour > 0 ? stats.hourlyActivity[h] / maxHour : 0;
-        const level = intensity === 0 ? 0 : Math.min(4, Math.max(1, Math.ceil(intensity * 4)));
-        cell.className = `stats-hour-cell stats-hour-level-${level}`;
+        cell.className = 'stats-hour-tick';
+        cell.style.setProperty('--hour-scale', String(Math.max(0.08, intensity)));
         cell.title = `${h}:00 — ${stats.hourlyActivity[h]} 条消息`;
         heatmap.appendChild(cell);
       }
       hourCard.appendChild(heatmap);
       const hourLabels = document.createElement('div');
       hourLabels.className = 'stats-hour-labels';
-      for (let h = 0; h < 24; h += 2) {
+      for (let h = 0; h < 24; h++) {
         const label = document.createElement('div');
         label.className = 'stats-hour-label';
         label.textContent = h % 6 === 0 ? h + ':00' : '';
@@ -483,46 +483,9 @@ export class StatsPanel {
       chartTitle2.textContent = '每月字数';
       chartCard2.appendChild(chartTitle2);
 
-      const hVals = stats.monthlyData.humanChars;
-      const aVals = stats.monthlyData.assistantChars;
-      const maxWordVal = Math.max(...hVals, ...aVals, 1);
-      const barRow = document.createElement('div');
-      barRow.className = 'stats-monthly-bars';
-      const trackH = 170;
-      stats.monthlyData.labels.forEach((lbl, i) => {
-        const grp = document.createElement('div');
-        grp.className = 'stats-monthly-bar-group';
-        const pair = document.createElement('div');
-        pair.className = 'stats-monthly-bar-pair';
-        const t1 = document.createElement('div');
-        t1.className = 'stats-monthly-track';
-        t1.style.height = `${trackH}px`;
-        const pct1 = Math.max(4, (hVals[i] / maxWordVal) * 100);
-        const f1 = document.createElement('div');
-        f1.className = 'stats-monthly-fill stats-monthly-fill-human';
-        f1.style.height = `${pct1}%`;
-        f1.title = `${names.human || 'Human'}: ${hVals[i].toLocaleString()} 字`;
-        t1.appendChild(f1);
-        // Assistant (orange) track + pill
-        const t2 = document.createElement('div');
-        t2.className = 'stats-monthly-track';
-        t2.style.height = `${trackH}px`;
-        const pct2 = Math.max(4, (aVals[i] / maxWordVal) * 100);
-        const f2 = document.createElement('div');
-        f2.className = 'stats-monthly-fill stats-monthly-fill-assistant';
-        f2.style.height = `${pct2}%`;
-        f2.title = `${names.assistant || 'Assistant'}: ${aVals[i].toLocaleString()} 字`;
-        t2.appendChild(f2);
-        pair.appendChild(t1);
-        pair.appendChild(t2);
-        grp.appendChild(pair);
-        const lab = document.createElement('div');
-        lab.className = 'stats-axis-label';
-        lab.textContent = lbl;
-        grp.appendChild(lab);
-        barRow.appendChild(grp);
-      });
-      chartCard2.appendChild(barRow);
+      const canvas2 = document.createElement('canvas');
+      canvas2.className = 'stats-comparison-chart';
+      chartCard2.appendChild(canvas2);
       // Legend
       const legend = document.createElement('div');
       legend.className = 'stats-chart-legend';
@@ -530,6 +493,15 @@ export class StatsPanel {
         + `<span><i class="stats-legend-swatch stats-legend-assistant"></i>${names.assistant || 'Assistant'}</span>`;
       chartCard2.appendChild(legend);
       rhythmSection.appendChild(chartCard2);
+      requestAnimationFrame(() => {
+        drawAreaComparisonChart(canvas2, {
+          labels: stats.monthlyData.labels,
+          series: [
+            { name: names.human || 'Human', values: stats.monthlyData.humanChars, color: this._cssVar('--stats-human') },
+            { name: names.assistant || 'Assistant', values: stats.monthlyData.assistantChars, color: this._cssVar('--stats-assistant') },
+          ],
+        });
+      });
     }
     parent.appendChild(rhythmSection);
 

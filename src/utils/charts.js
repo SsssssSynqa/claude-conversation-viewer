@@ -111,6 +111,90 @@ export function drawLineChart(canvas, data, opts = {}) {
 }
 
 /**
+ * Draw two comparable monthly series as quiet translucent ribbons.
+ * The chart deliberately avoids individual bar tracks so the overall rhythm is visible first.
+ */
+export function drawAreaComparisonChart(canvas, data) {
+  const ctx = canvas.getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
+  const w = canvas.clientWidth;
+  const h = canvas.clientHeight;
+  canvas.width = w * dpr;
+  canvas.height = h * dpr;
+  ctx.scale(dpr, dpr);
+
+  const padding = { top: 18, right: 18, bottom: 34, left: 50 };
+  const chartW = w - padding.left - padding.right;
+  const chartH = h - padding.top - padding.bottom;
+  const styles = getComputedStyle(document.documentElement);
+  const textColor = styles.getPropertyValue('--text-muted').trim() || 'rgba(128,128,128,0.8)';
+  const gridColor = styles.getPropertyValue('--stats-grid').trim() || 'rgba(128,128,128,0.12)';
+  const chartFont = styles.getPropertyValue('--stats-font-ui').trim() || 'system-ui, sans-serif';
+  const maxVal = Math.max(...data.series.flatMap(series => series.values), 1);
+
+  ctx.font = `10px ${chartFont}`;
+  ctx.fillStyle = textColor;
+  ctx.strokeStyle = gridColor;
+  ctx.lineWidth = 0.6;
+  ctx.textAlign = 'right';
+  for (let i = 0; i <= 3; i++) {
+    const y = padding.top + (chartH / 3) * i;
+    ctx.beginPath();
+    ctx.moveTo(padding.left, y);
+    ctx.lineTo(w - padding.right, y);
+    ctx.stroke();
+    ctx.fillText(formatNumber(maxVal - (maxVal / 3) * i), padding.left - 9, y + 3);
+  }
+
+  if (data.labels.length < 2) return;
+  const stepX = chartW / (data.labels.length - 1);
+
+  data.series.forEach((series, seriesIndex) => {
+    const points = series.values.map((value, index) => ({
+      x: padding.left + stepX * index,
+      y: padding.top + chartH - (value / maxVal) * chartH,
+    }));
+
+    const tracePath = () => {
+      ctx.moveTo(points[0].x, points[0].y);
+      for (let i = 0; i < points.length - 1; i++) {
+        const current = points[i];
+        const next = points[i + 1];
+        const midX = (current.x + next.x) / 2;
+        ctx.bezierCurveTo(midX, current.y, midX, next.y, next.x, next.y);
+      }
+    };
+
+    ctx.beginPath();
+    tracePath();
+    ctx.lineTo(points.at(-1).x, padding.top + chartH);
+    ctx.lineTo(points[0].x, padding.top + chartH);
+    ctx.closePath();
+    const gradient = ctx.createLinearGradient(0, padding.top, 0, padding.top + chartH);
+    gradient.addColorStop(0, withAlpha(series.color, seriesIndex === 0 ? 0.24 : 0.18));
+    gradient.addColorStop(1, withAlpha(series.color, 0.015));
+    ctx.fillStyle = gradient;
+    ctx.fill();
+
+    ctx.beginPath();
+    tracePath();
+    ctx.strokeStyle = series.color;
+    ctx.lineWidth = seriesIndex === 0 ? 2.2 : 2.6;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.stroke();
+  });
+
+  ctx.fillStyle = textColor;
+  ctx.font = `10px ${chartFont}`;
+  ctx.textAlign = 'center';
+  const labelSkip = Math.max(1, Math.ceil(data.labels.length / 9));
+  for (let i = 0; i < data.labels.length; i += labelSkip) {
+    ctx.fillText(data.labels[i], padding.left + stepX * i, h - 11);
+  }
+}
+
+/**
  * Draw a grouped bar chart with rounded bars.
  */
 export function drawBarChart(canvas, data, opts = {}) {
@@ -214,4 +298,15 @@ function formatNumber(n) {
   if (n >= 1000000) return (n / 1000000).toFixed(1) + 'M';
   if (n >= 1000) return (n / 1000).toFixed(1) + 'K';
   return Math.round(n).toString();
+}
+
+function withAlpha(color, alpha) {
+  if (/^#[0-9a-f]{6}$/i.test(color)) {
+    const value = color.slice(1);
+    const red = parseInt(value.slice(0, 2), 16);
+    const green = parseInt(value.slice(2, 4), 16);
+    const blue = parseInt(value.slice(4, 6), 16);
+    return `rgba(${red}, ${green}, ${blue}, ${alpha})`;
+  }
+  return color;
 }
