@@ -432,7 +432,8 @@ export class SearchPanel {
 
       // Individual results
       for (const r of group.results) {
-        const item = document.createElement('div');
+        const item = document.createElement('button');
+        item.type = 'button';
         item.className = 'search-result-item';
         item.style.cssText = `
           padding: 16px 18px;

@@ -6,6 +6,7 @@ import './themes/variables.css';
 import './styles/base.css';
 import './styles/components.css';
 import './styles/clawd.css';
+import './styles/refinement.css';
 import { state, saveDesensitizeWords, saveExportCollection, resetSidebarFilter } from './store/state.js';
 import { FileUpload } from './components/FileUpload.js';
 import { ConversationList } from './components/ConversationList.js';
@@ -163,7 +164,8 @@ function renderMainView() {
   ];
 
   for (const nav of navItems) {
-    const pill = document.createElement('div');
+    const pill = document.createElement('button');
+    pill.type = 'button';
     pill.className = 'sidebar-pill pill-flat';
     pill.id = nav.id;
     const iconWrap = document.createElement('span');
@@ -196,6 +198,8 @@ function renderMainView() {
   const themeTrack = document.createElement('div');
   themeTrack.className = 'sidebar-pill toggle-track track-3';
   themeTrack.id = 'sidebar-theme-track';
+  themeTrack.setAttribute('role', 'radiogroup');
+  themeTrack.setAttribute('aria-label', '主题');
 
   const themeThumb = document.createElement('div');
   themeThumb.className = 'toggle-thumb';
@@ -224,9 +228,13 @@ function renderMainView() {
 
   for (let i = 0; i < themeOptions.length; i++) {
     const opt = themeOptions[i];
-    const optDiv = document.createElement('div');
+    const optDiv = document.createElement('button');
+    optDiv.type = 'button';
     optDiv.className = 'toggle-option' + (opt.theme === currentTheme ? ' active' : '');
     optDiv.dataset.theme = opt.theme;
+    optDiv.setAttribute('role', 'radio');
+    optDiv.setAttribute('aria-label', THEME_LABELS[opt.theme]);
+    optDiv.setAttribute('aria-checked', opt.theme === currentTheme ? 'true' : 'false');
     const optIcon = opt.icon === 'spark' ? createSparkIcon(14, true) : createIcon(opt.icon, 16);
     optDiv.appendChild(optIcon);
     optDiv.addEventListener('click', () => {
@@ -245,7 +253,9 @@ function renderMainView() {
     if (track) {
       syncThemeThumb(t);
       track.querySelectorAll('.toggle-option').forEach(el => {
-        el.classList.toggle('active', el.dataset.theme === t);
+        const active = el.dataset.theme === t;
+        el.classList.toggle('active', active);
+        el.setAttribute('aria-checked', active ? 'true' : 'false');
       });
     }
     // Re-render stats panel so ring charts pick up new theme shadows
@@ -310,8 +320,9 @@ function renderMainView() {
     row.appendChild(labelText);
 
     // Neumorphic switch
-    const neuSwitch = document.createElement('div');
+    const neuSwitch = document.createElement('label');
     neuSwitch.className = 'neu-switch' + (state.get(t.key) ? ' active' : '');
+    neuSwitch.setAttribute('aria-label', t.label);
     const handle = document.createElement('div');
     handle.className = 'switch-handle';
     neuSwitch.appendChild(handle);
@@ -320,17 +331,14 @@ function renderMainView() {
     input.type = 'checkbox';
     input.id = t.id;
     input.checked = state.get(t.key);
-    input.style.display = 'none';
-    input.addEventListener('change', (e) => state.set(t.key, e.target.checked));
-
-    neuSwitch.addEventListener('click', () => {
-      input.checked = !input.checked;
-      input.dispatchEvent(new Event('change'));
-      neuSwitch.classList.toggle('active', input.checked);
+    input.className = 'visually-hidden neu-switch-input';
+    input.setAttribute('aria-label', t.label);
+    input.addEventListener('change', (e) => {
+      state.set(t.key, e.target.checked);
+      neuSwitch.classList.toggle('active', e.target.checked);
     });
-
+    neuSwitch.appendChild(input);
     row.appendChild(neuSwitch);
-    row.appendChild(input);
     settingsContent.appendChild(row);
   }
 
@@ -460,6 +468,8 @@ function renderMainView() {
   const langTrack = document.createElement('div');
   langTrack.className = 'sidebar-pill toggle-track track-2';
   langTrack.id = 'sidebar-lang-track';
+  langTrack.setAttribute('role', 'radiogroup');
+  langTrack.setAttribute('aria-label', '语言');
   const langThumb = document.createElement('div');
   langThumb.className = 'toggle-thumb';
   langTrack.appendChild(langThumb);
@@ -472,9 +482,12 @@ function renderMainView() {
   if (langIdx > 0) langThumb.style.transform = `translateX(${langIdx * 100}%)`;
   for (let i = 0; i < langOptions.length; i++) {
     const lo = langOptions[i];
-    const loDiv = document.createElement('div');
+    const loDiv = document.createElement('button');
+    loDiv.type = 'button';
     loDiv.className = 'toggle-option' + (lo.lang === currentLang ? ' active' : '');
     loDiv.dataset.lang = lo.lang;
+    loDiv.setAttribute('role', 'radio');
+    loDiv.setAttribute('aria-checked', lo.lang === currentLang ? 'true' : 'false');
     loDiv.style.cssText = 'font-weight:700;letter-spacing:0.5px;font-size:13px;';
     loDiv.textContent = lo.label;
     loDiv.addEventListener('click', () => {
@@ -582,6 +595,8 @@ function renderMainView() {
       const isActive = desktopId === activeId;
       el.classList.remove('pill-flat', 'pill-active');
       el.classList.add(isActive ? 'pill-active' : 'pill-flat');
+      if (isActive) el.setAttribute('aria-current', 'page');
+      else el.removeAttribute('aria-current');
     }
   }
   // Make it accessible for stats button action

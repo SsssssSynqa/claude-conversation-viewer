@@ -4,6 +4,7 @@
 
 import { state, resetSidebarFilter } from '../store/state.js';
 import { drawAreaComparisonChart, drawLineChart, drawRadialActivityChart } from '../utils/charts.js';
+import { mountInteractiveCanvasChart } from '../utils/chartInteraction.js';
 import { formatMonthKey, formatMonthLabel, formatTimestamp, formatLocalDateStamp, getHourOfDay } from '../utils/time.js';
 import html2canvas from 'html2canvas';
 import { desensitize } from '../utils/desensitize.js';
@@ -13,6 +14,9 @@ import { t } from '../i18n.js';
 export class StatsPanel {
   constructor() {
     this.overlay = null;
+    this._chartControllers = [];
+    this._overlayTrigger = null;
+    this._overlayKeydown = null;
   }
 
   toggle() {
@@ -24,6 +28,7 @@ export class StatsPanel {
     const conversations = state.get('conversations') || [];
     if (conversations.length === 0) return;
     const stats = this.computeStats(conversations);
+    this._destroyCharts();
     container.textContent = '';
     container.classList.remove('content-shell');
     container.classList.add('content-area', 'stats-panel-shell');
@@ -39,19 +44,58 @@ export class StatsPanel {
     const conversations = state.get('conversations') || [];
     if (conversations.length === 0) return;
     const stats = this.computeStats(conversations);
+    this._destroyCharts();
     this.overlay = document.createElement('div');
+    this._overlayTrigger = document.activeElement;
+    this.overlay.setAttribute('role', 'dialog');
+    this.overlay.setAttribute('aria-modal', 'true');
+    this.overlay.setAttribute('aria-label', t('stats.title'));
     this.overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:900;overflow-y:auto;padding:40px 20px;';
     this.overlay.addEventListener('click', (e) => { if (e.target === this.overlay) this.hide(); });
     const panel = document.createElement('div');
     panel.className = 'stats-panel-overlay';
+    panel.tabIndex = -1;
     panel.style.cssText = 'max-width:860px;margin:0 auto;background:var(--bg-card);border-radius:var(--radius-lg);padding:32px;box-shadow:var(--shadow);';
     this.buildStatsContent(panel, stats, conversations);
     this.overlay.appendChild(panel);
     document.body.appendChild(this.overlay);
+    this._overlayKeydown = (event) => {
+      if (event.key === 'Escape') {
+        this.hide();
+        return;
+      }
+      if (event.key !== 'Tab') return;
+      const focusable = [...panel.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')]
+        .filter(element => !element.disabled && !element.hidden);
+      if (focusable.length === 0) {
+        event.preventDefault();
+        panel.focus();
+        return;
+      }
+      const first = focusable[0];
+      const last = focusable.at(-1);
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+    document.addEventListener('keydown', this._overlayKeydown);
+    panel.focus();
   }
 
   hide() {
-    if (this.overlay) { this.overlay.remove(); this.overlay = null; }
+    if (this._overlayKeydown) document.removeEventListener('keydown', this._overlayKeydown);
+    this._overlayKeydown = null;
+    if (this.overlay) {
+      this._destroyCharts();
+      this.overlay.remove();
+      this.overlay = null;
+    }
+    if (this._overlayTrigger?.isConnected) this._overlayTrigger.focus();
+    this._overlayTrigger = null;
   }
 
   buildStatsContent(parent, stats, conversations) {
@@ -78,6 +122,9 @@ export class StatsPanel {
       screenshotBtn.textContent = t('stats.saving');
       screenshotBtn.disabled = true;
       try {
+        this._chartControllers.forEach(controller => controller.setExporting(true));
+        parent.classList.add('is-exporting');
+        await new Promise(resolve => requestAnimationFrame(resolve));
         const canvas = await html2canvas(parent, {
           backgroundColor: getComputedStyle(document.body).backgroundColor,
           scale: 2,
@@ -92,6 +139,9 @@ export class StatsPanel {
       } catch (e) {
         screenshotBtn.textContent = '截图失败';
         setTimeout(() => { screenshotBtn.textContent = ''; screenshotBtn.appendChild(createIcon('save', 14)); screenshotBtn.appendChild(document.createTextNode(t('stats.saveImage'))); screenshotBtn.disabled = false; }, 1500);
+      } finally {
+        parent.classList.remove('is-exporting');
+        this._chartControllers.forEach(controller => controller.setExporting(false));
       }
     });
     titleRow.appendChild(screenshotBtn);
@@ -429,13 +479,30 @@ export class StatsPanel {
       chartCard1.appendChild(chartTitle1);
       const canvas1 = document.createElement('canvas');
       canvas1.className = 'stats-line-chart';
-      canvas1.style.cssText = 'width:100%;height:180px;';
-      chartCard1.appendChild(canvas1);
+      const stage1 = document.createElement('div');
+      stage1.className = 'stats-chart-stage';
+      stage1.appendChild(canvas1);
+      chartCard1.appendChild(stage1);
       activityRow.appendChild(chartCard1);
       rhythmSection.appendChild(activityRow);
-      requestAnimationFrame(() => {
-        drawLineChart(canvas1, { labels: stats.monthlyData.labels, values: stats.monthlyData.convCounts }, { color: this._cssVar('--stats-trend') });
+      const monthlyFrequencyController = mountInteractiveCanvasChart({
+        stage: stage1,
+        canvas: canvas1,
+        title: '每月对话频率',
+        itemCount: stats.monthlyData.labels.length,
+        draw: activeIndex => drawLineChart(
+          canvas1,
+          { labels: stats.monthlyData.labels, values: stats.monthlyData.convCounts },
+          { color: this._cssVar('--stats-trend'), activeIndex },
+        ),
+        formatTooltip: index => ({
+          title: formatMonthLabel(stats.monthlyData.keys[index]),
+          lines: [{ label: '对话数', value: `${stats.monthlyData.convCounts[index].toLocaleString()} 段` }],
+        }),
+        tableHeaders: ['月份', '对话数'],
+        tableRows: stats.monthlyData.keys.map((key, index) => [formatMonthLabel(key), `${stats.monthlyData.convCounts[index]} 段`]),
       });
+      this._chartControllers.push(monthlyFrequencyController);
     } else {
       rhythmSection.appendChild(activityRow);
     }
@@ -451,20 +518,32 @@ export class StatsPanel {
       hourCard.appendChild(hourTitle);
       const activityClock = document.createElement('canvas');
       activityClock.className = 'stats-hour-clock';
-      activityClock.setAttribute('role', 'img');
       const peakHour = stats.hourlyActivity.indexOf(Math.max(...stats.hourlyActivity));
-      const activityLabel = `24 小时活跃节律图，峰值为 ${peakHour}:00，${stats.hourlyActivity[peakHour]} 条消息`;
-      activityClock.setAttribute('aria-label', activityLabel);
-      activityClock.title = activityLabel;
-      hourCard.appendChild(activityClock);
+      const stage2 = document.createElement('div');
+      stage2.className = 'stats-chart-stage stats-hour-stage';
+      stage2.appendChild(activityClock);
+      hourCard.appendChild(stage2);
       rhythmSection.appendChild(hourCard);
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          drawRadialActivityChart(activityClock, stats.hourlyActivity, {
-            color: this._cssVar('--stats-human'),
-          });
-        });
+      const hourlyController = mountInteractiveCanvasChart({
+        stage: stage2,
+        canvas: activityClock,
+        title: `每日活跃时段，峰值 ${peakHour}:00`,
+        itemCount: 24,
+        draw: activeIndex => drawRadialActivityChart(activityClock, stats.hourlyActivity, {
+          color: this._cssVar('--stats-human'),
+          activeIndex,
+        }),
+        formatTooltip: hour => ({
+          title: `${String(hour).padStart(2, '0')}:00–${String((hour + 1) % 24).padStart(2, '0')}:00`,
+          lines: [{ label: '消息数', value: `${stats.hourlyActivity[hour].toLocaleString()} 条` }],
+        }),
+        tableHeaders: ['时段', '消息数'],
+        tableRows: stats.hourlyActivity.map((value, hour) => [
+          `${String(hour).padStart(2, '0')}:00–${String((hour + 1) % 24).padStart(2, '0')}:00`,
+          `${value} 条`,
+        ]),
       });
+      this._chartControllers.push(hourlyController);
     }
 
     // ---- Monthly Word Count (own row) ----
@@ -479,7 +558,10 @@ export class StatsPanel {
 
       const canvas2 = document.createElement('canvas');
       canvas2.className = 'stats-comparison-chart';
-      chartCard2.appendChild(canvas2);
+      const stage3 = document.createElement('div');
+      stage3.className = 'stats-chart-stage';
+      stage3.appendChild(canvas2);
+      chartCard2.appendChild(stage3);
       // Legend
       const legend = document.createElement('div');
       legend.className = 'stats-chart-legend';
@@ -487,15 +569,35 @@ export class StatsPanel {
         + `<span><i class="stats-legend-swatch stats-legend-assistant"></i>${names.assistant || 'Assistant'}</span>`;
       chartCard2.appendChild(legend);
       rhythmSection.appendChild(chartCard2);
-      requestAnimationFrame(() => {
-        drawAreaComparisonChart(canvas2, {
-          labels: stats.monthlyData.labels,
-          series: [
-            { name: names.human || 'Human', values: stats.monthlyData.humanChars, color: this._cssVar('--stats-human') },
-            { name: names.assistant || 'Assistant', values: stats.monthlyData.assistantChars, color: this._cssVar('--stats-assistant') },
-          ],
-        });
+      const monthlyWordsData = {
+        labels: stats.monthlyData.labels,
+        series: [
+          { name: names.human || 'Human', values: stats.monthlyData.humanChars, color: this._cssVar('--stats-human') },
+          { name: names.assistant || 'Assistant', values: stats.monthlyData.assistantChars, color: this._cssVar('--stats-assistant') },
+        ],
+      };
+      const monthlyWordsController = mountInteractiveCanvasChart({
+        stage: stage3,
+        canvas: canvas2,
+        title: '每月字数',
+        itemCount: stats.monthlyData.labels.length,
+        draw: activeIndex => drawAreaComparisonChart(canvas2, monthlyWordsData, { activeIndex }),
+        formatTooltip: index => ({
+          title: formatMonthLabel(stats.monthlyData.keys[index]),
+          lines: monthlyWordsData.series.map(series => ({
+            label: series.name,
+            value: `${series.values[index].toLocaleString()} 字`,
+            color: series.color,
+          })),
+        }),
+        tableHeaders: ['月份', `${names.human || 'Human'}字数`, `${names.assistant || 'Assistant'}字数`],
+        tableRows: stats.monthlyData.keys.map((key, index) => [
+          formatMonthLabel(key),
+          `${stats.monthlyData.humanChars[index]} 字`,
+          `${stats.monthlyData.assistantChars[index]} 字`,
+        ]),
       });
+      this._chartControllers.push(monthlyWordsController);
     }
     parent.appendChild(rhythmSection);
 
@@ -720,6 +822,7 @@ export class StatsPanel {
     // Monthly data
     const monthKeys = [...monthlyMap.keys()].sort();
     const monthlyData = {
+      keys: monthKeys,
       labels: monthKeys.map(k => { const [, m] = k.split('-'); return parseInt(m) + '月'; }),
       convCounts: monthKeys.map(k => monthlyMap.get(k).convCount),
       humanChars: monthKeys.map(k => monthlyMap.get(k).humanChars),
@@ -1067,5 +1170,15 @@ export class StatsPanel {
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
+  }
+
+  _destroyCharts() {
+    this._chartControllers.forEach(controller => controller.destroy());
+    this._chartControllers = [];
+  }
+
+  destroy() {
+    this._destroyCharts();
+    this.hide();
   }
 }

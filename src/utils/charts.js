@@ -11,7 +11,7 @@ export function drawLineChart(canvas, data, opts = {}) {
   const dpr = window.devicePixelRatio || 1;
   const w = canvas.clientWidth;
   const h = canvas.clientHeight;
-  if (w < 80 || h < 80) return;
+  if (w < 80 || h < 80) return null;
   canvas.width = w * dpr;
   canvas.height = h * dpr;
   ctx.scale(dpr, dpr);
@@ -27,81 +27,97 @@ export function drawLineChart(canvas, data, opts = {}) {
   const pointCenter = styles.getPropertyValue('--bg-card').trim() || '#faf9f5';
   const chartFont = styles.getPropertyValue('--stats-font-ui').trim() || 'system-ui, sans-serif';
 
-  // Grid lines (subtle)
-  const gridLines = 4;
   ctx.strokeStyle = gridColor;
   ctx.lineWidth = 0.5;
   ctx.setLineDash([3, 3]);
   ctx.font = `11px ${chartFont}`;
   ctx.fillStyle = textColor;
   ctx.textAlign = 'right';
-  for (let i = 0; i <= gridLines; i++) {
-    const y = padding.top + (chartH / gridLines) * i;
+  for (let i = 0; i <= 4; i++) {
+    const y = padding.top + (chartH / 4) * i;
     ctx.beginPath();
     ctx.moveTo(padding.left, y);
     ctx.lineTo(w - padding.right, y);
     ctx.stroke();
-    const val = Math.round(maxVal - (maxVal / gridLines) * i);
-    ctx.fillText(String(val), padding.left - 8, y + 3);
+    ctx.fillText(String(Math.round(maxVal - (maxVal / 4) * i)), padding.left - 8, y + 3);
   }
   ctx.setLineDash([]);
 
-  if (data.values.length < 2) return;
-
+  if (data.values.length < 2) return null;
   const stepX = chartW / (data.values.length - 1);
-
-  // Build points array
-  const points = data.values.map((v, i) => ({
-    x: padding.left + stepX * i,
-    y: padding.top + chartH - (v / maxVal) * chartH,
+  const points = data.values.map((value, index) => ({
+    x: padding.left + stepX * index,
+    y: padding.top + chartH - (value / maxVal) * chartH,
+    value,
   }));
 
-  // Smooth curve (cardinal spline)
-  ctx.beginPath();
-  ctx.moveTo(points[0].x, points[0].y);
-  for (let i = 0; i < points.length - 1; i++) {
-    const p0 = points[Math.max(i - 1, 0)];
-    const p1 = points[i];
-    const p2 = points[i + 1];
-    const p3 = points[Math.min(i + 2, points.length - 1)];
-    const tension = 0.3;
-    const cp1x = p1.x + (p2.x - p0.x) * tension;
-    const cp1y = p1.y + (p2.y - p0.y) * tension;
-    const cp2x = p2.x - (p3.x - p1.x) * tension;
-    const cp2y = p2.y - (p3.y - p1.y) * tension;
-    ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, p2.x, p2.y);
-  }
+  const tracePath = () => {
+    ctx.moveTo(points[0].x, points[0].y);
+    for (let i = 0; i < points.length - 1; i++) {
+      const p0 = points[Math.max(i - 1, 0)];
+      const p1 = points[i];
+      const p2 = points[i + 1];
+      const p3 = points[Math.min(i + 2, points.length - 1)];
+      const tension = 0.3;
+      ctx.bezierCurveTo(
+        p1.x + (p2.x - p0.x) * tension,
+        p1.y + (p2.y - p0.y) * tension,
+        p2.x - (p3.x - p1.x) * tension,
+        p2.y - (p3.y - p1.y) * tension,
+        p2.x,
+        p2.y,
+      );
+    }
+  };
 
-  // Stroke the line
+  ctx.beginPath();
+  tracePath();
   ctx.strokeStyle = color;
   ctx.lineWidth = 2.5;
   ctx.lineJoin = 'round';
   ctx.lineCap = 'round';
   ctx.stroke();
 
-  // Gradient fill under curve
   const gradient = ctx.createLinearGradient(0, padding.top, 0, padding.top + chartH);
-  gradient.addColorStop(0, color + '20');
-  gradient.addColorStop(1, color + '02');
-  ctx.lineTo(points[points.length - 1].x, padding.top + chartH);
+  gradient.addColorStop(0, withAlpha(color, 0.1255));
+  gradient.addColorStop(1, withAlpha(color, 0.0078));
+  ctx.lineTo(points.at(-1).x, padding.top + chartH);
   ctx.lineTo(points[0].x, padding.top + chartH);
   ctx.closePath();
   ctx.fillStyle = gradient;
   ctx.fill();
 
-  // Dots with white center
-  for (const p of points) {
+  for (const point of points) {
     ctx.beginPath();
-    ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
+    ctx.arc(point.x, point.y, 4, 0, Math.PI * 2);
     ctx.fillStyle = color;
     ctx.fill();
     ctx.beginPath();
-    ctx.arc(p.x, p.y, 2, 0, Math.PI * 2);
+    ctx.arc(point.x, point.y, 2, 0, Math.PI * 2);
     ctx.fillStyle = pointCenter;
     ctx.fill();
   }
 
-  // X labels
+  const activeIndex = Number.isInteger(opts.activeIndex) ? opts.activeIndex : null;
+  if (activeIndex != null && points[activeIndex]) {
+    const active = points[activeIndex];
+    ctx.beginPath();
+    ctx.moveTo(active.x, padding.top);
+    ctx.lineTo(active.x, padding.top + chartH);
+    ctx.strokeStyle = withAlpha(color, 0.34);
+    ctx.lineWidth = 1;
+    ctx.setLineDash([4, 4]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.beginPath();
+    ctx.arc(active.x, active.y, 7, 0, Math.PI * 2);
+    ctx.fillStyle = pointCenter;
+    ctx.fill();
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 3;
+    ctx.stroke();
+  }
+
   ctx.fillStyle = textColor;
   ctx.font = `10px ${chartFont}`;
   ctx.textAlign = 'center';
@@ -109,17 +125,28 @@ export function drawLineChart(canvas, data, opts = {}) {
   for (let i = 0; i < data.labels.length; i += labelSkip) {
     ctx.fillText(data.labels[i], points[i].x, h - padding.bottom + 14);
   }
+
+  return {
+    hitTest(x) {
+      if (x < padding.left - stepX / 2 || x > w - padding.right + stepX / 2) return null;
+      return Math.max(0, Math.min(points.length - 1, Math.round((x - padding.left) / stepX)));
+    },
+    getAnchor(index) {
+      return points[index] ? { x: points[index].x, y: points[index].y } : null;
+    },
+  };
 }
 
 /**
  * Draw two comparable monthly series as quiet translucent ribbons.
  * The chart deliberately avoids individual bar tracks so the overall rhythm is visible first.
  */
-export function drawAreaComparisonChart(canvas, data) {
+export function drawAreaComparisonChart(canvas, data, opts = {}) {
   const ctx = canvas.getContext('2d');
   const dpr = window.devicePixelRatio || 1;
   const w = canvas.clientWidth;
   const h = canvas.clientHeight;
+  if (w < 80 || h < 80) return null;
   canvas.width = w * dpr;
   canvas.height = h * dpr;
   ctx.scale(dpr, dpr);
@@ -147,14 +174,16 @@ export function drawAreaComparisonChart(canvas, data) {
     ctx.fillText(formatNumber(maxVal - (maxVal / 3) * i), padding.left - 9, y + 3);
   }
 
-  if (data.labels.length < 2) return;
+  if (data.labels.length < 2) return null;
   const stepX = chartW / (data.labels.length - 1);
+  const allPoints = [];
 
   data.series.forEach((series, seriesIndex) => {
     const points = series.values.map((value, index) => ({
       x: padding.left + stepX * index,
       y: padding.top + chartH - (value / maxVal) * chartH,
     }));
+    allPoints.push(points);
 
     const tracePath = () => {
       ctx.moveTo(points[0].x, points[0].y);
@@ -186,6 +215,29 @@ export function drawAreaComparisonChart(canvas, data) {
     ctx.stroke();
   });
 
+  const activeIndex = Number.isInteger(opts.activeIndex) ? opts.activeIndex : null;
+  if (activeIndex != null && allPoints[0]?.[activeIndex]) {
+    const activeX = allPoints[0][activeIndex].x;
+    ctx.beginPath();
+    ctx.moveTo(activeX, padding.top);
+    ctx.lineTo(activeX, padding.top + chartH);
+    ctx.strokeStyle = gridColor;
+    ctx.lineWidth = 1;
+    ctx.setLineDash([4, 4]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    data.series.forEach((series, seriesIndex) => {
+      const point = allPoints[seriesIndex][activeIndex];
+      ctx.beginPath();
+      ctx.arc(point.x, point.y, 5, 0, Math.PI * 2);
+      ctx.fillStyle = styles.getPropertyValue('--bg-card').trim() || '#fff';
+      ctx.fill();
+      ctx.strokeStyle = series.color;
+      ctx.lineWidth = 2.5;
+      ctx.stroke();
+    });
+  }
+
   ctx.fillStyle = textColor;
   ctx.font = `10px ${chartFont}`;
   ctx.textAlign = 'center';
@@ -193,6 +245,18 @@ export function drawAreaComparisonChart(canvas, data) {
   for (let i = 0; i < data.labels.length; i += labelSkip) {
     ctx.fillText(data.labels[i], padding.left + stepX * i, h - 11);
   }
+
+  return {
+    hitTest(x) {
+      if (x < padding.left - stepX / 2 || x > w - padding.right + stepX / 2) return null;
+      return Math.max(0, Math.min(data.labels.length - 1, Math.round((x - padding.left) / stepX)));
+    },
+    getAnchor(index) {
+      const points = allPoints.map(series => series[index]).filter(Boolean);
+      if (!points.length) return null;
+      return { x: points[0].x, y: Math.min(...points.map(point => point.y)) };
+    },
+  };
 }
 
 /**
@@ -204,7 +268,7 @@ export function drawRadialActivityChart(canvas, values, opts = {}) {
   const dpr = window.devicePixelRatio || 1;
   const w = canvas.clientWidth;
   const h = canvas.clientHeight;
-  if (w < 80 || h < 80) return;
+  if (w < 80 || h < 80) return null;
   canvas.width = w * dpr;
   canvas.height = h * dpr;
   ctx.scale(dpr, dpr);
@@ -227,6 +291,7 @@ export function drawRadialActivityChart(canvas, values, opts = {}) {
   const maxValue = Math.max(...values, 1);
   const peakValue = Math.max(...values);
   const peakHour = Math.max(0, values.indexOf(peakValue));
+  const activeHour = Number.isInteger(opts.activeIndex) ? opts.activeIndex : null;
 
   ctx.lineCap = 'round';
   for (let hour = 0; hour < 24; hour++) {
@@ -247,8 +312,15 @@ export function drawRadialActivityChart(canvas, values, opts = {}) {
     ctx.moveTo(centerX + Math.cos(angle) * start, centerY + Math.sin(angle) * start);
     ctx.lineTo(centerX + Math.cos(angle) * valueEnd, centerY + Math.sin(angle) * valueEnd);
     ctx.strokeStyle = withAlpha(color, 0.38 + intensity * 0.62);
-    ctx.lineWidth = hour === peakHour ? 8 : 6;
+    ctx.lineWidth = hour === activeHour ? 10 : hour === peakHour ? 8 : 6;
     ctx.stroke();
+
+    if (hour === activeHour) {
+      ctx.beginPath();
+      ctx.arc(centerX + Math.cos(angle) * valueEnd, centerY + Math.sin(angle) * valueEnd, 5, 0, Math.PI * 2);
+      ctx.fillStyle = color;
+      ctx.fill();
+    }
   }
 
   ctx.beginPath();
@@ -275,17 +347,40 @@ export function drawRadialActivityChart(canvas, values, opts = {}) {
     ctx.fillText(marker.label, x, y);
   }
 
+  const centerHour = activeHour ?? peakHour;
+  const centerValue = values[centerHour] || 0;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.fillStyle = mutedColor;
   ctx.font = `500 10px ${chartFont}`;
-  ctx.fillText('活跃峰值', centerX, centerY - 24);
+  ctx.fillText(activeHour == null ? '活跃峰值' : '当前时段', centerX, centerY - 24);
   ctx.fillStyle = textColor;
-  ctx.font = `500 25px ${dataFont}`;
-  ctx.fillText(`${peakHour}:00`, centerX, centerY + 1);
+  ctx.font = `${activeHour == null ? 500 : 600} 25px ${dataFont}`;
+  ctx.fillText(`${centerHour}:00`, centerX, centerY + 1);
   ctx.fillStyle = color;
   ctx.font = `600 10px ${chartFont}`;
-  ctx.fillText(`${peakValue.toLocaleString()} 条消息`, centerX, centerY + 28);
+  ctx.fillText(`${centerValue.toLocaleString()} 条消息`, centerX, centerY + 28);
+
+  return {
+    hitTest(x, y) {
+      const dx = x - centerX;
+      const dy = y - centerY;
+      const radius = Math.hypot(dx, dy);
+      if (radius < innerRadius || radius > outerLimit + 20) return null;
+      const normalized = (Math.atan2(dy, dx) + Math.PI / 2 + Math.PI * 2) % (Math.PI * 2);
+      return Math.round(normalized / (Math.PI * 2) * 24) % 24;
+    },
+    getAnchor(hour) {
+      if (hour == null) return null;
+      const angle = (hour / 24) * Math.PI * 2 - Math.PI / 2;
+      const intensity = values[hour] / maxValue;
+      const radius = innerRadius + 13 + minRay + maxRay * intensity;
+      return {
+        x: centerX + Math.cos(angle) * radius,
+        y: centerY + Math.sin(angle) * radius,
+      };
+    },
+  };
 }
 
 /**

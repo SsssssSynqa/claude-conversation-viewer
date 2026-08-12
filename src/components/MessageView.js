@@ -24,6 +24,7 @@ export class MessageView {
       if (!this.activeExportDropdown) return;
       if (this.activeExportDropdown.wrapper.contains(e.target)) return;
       this.activeExportDropdown.dropdown.classList.add('hidden');
+      this.activeExportDropdown.trigger.setAttribute('aria-expanded', 'false');
       this.activeExportDropdown = null;
     };
     document.addEventListener('click', this.handleDocumentClick);
@@ -127,7 +128,8 @@ export class MessageView {
     headerBtns.style.cssText = 'display:flex;gap:8px;flex-shrink:0;align-items:center;flex-wrap:wrap;justify-content:flex-end;';
 
     // Toggle switch — pill shape with sliding circle
-    const toggleOuter = document.createElement('div');
+    const toggleOuter = document.createElement('button');
+    toggleOuter.type = 'button';
     toggleOuter.className = 'message-mode-toggle';
     toggleOuter.style.cssText = 'display:flex;align-items:center;gap:8px;flex-shrink:0;cursor:pointer;';
 
@@ -144,6 +146,7 @@ export class MessageView {
 
     toggleOuter.appendChild(toggleLabel);
     toggleOuter.appendChild(toggleTrack);
+    toggleOuter.setAttribute('aria-pressed', this.selectMode ? 'true' : 'false');
     toggleOuter.addEventListener('click', () => {
       this.selectMode = !this.selectMode;
       if (!this.selectMode) this.selectedIndices.clear();
@@ -169,23 +172,44 @@ export class MessageView {
     const exportWrapper = document.createElement('div');
     exportWrapper.style.cssText = 'position:relative;';
     const exportBtn = this._headerBtn(t('msgView.exportThis'), 'export');
+    exportBtn.setAttribute('aria-haspopup', 'menu');
+    exportBtn.setAttribute('aria-expanded', 'false');
     exportBtn.appendChild(document.createTextNode(' \u25BE'));
     exportBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       const willOpen = dropdown.classList.contains('hidden');
       if (this.activeExportDropdown && this.activeExportDropdown.dropdown !== dropdown) {
         this.activeExportDropdown.dropdown.classList.add('hidden');
+        this.activeExportDropdown.trigger.setAttribute('aria-expanded', 'false');
       }
       dropdown.classList.toggle('hidden');
-      this.activeExportDropdown = willOpen ? { wrapper: exportWrapper, dropdown } : null;
+      exportBtn.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+      this.activeExportDropdown = willOpen ? { wrapper: exportWrapper, dropdown, trigger: exportBtn } : null;
+    });
+    exportBtn.addEventListener('keydown', (event) => {
+      if (event.key !== 'Escape' || dropdown.classList.contains('hidden')) return;
+      dropdown.classList.add('hidden');
+      exportBtn.setAttribute('aria-expanded', 'false');
+      this.activeExportDropdown = null;
+      exportBtn.focus();
     });
     exportWrapper.appendChild(exportBtn);
 
     const dropdown = document.createElement('div');
     dropdown.className = 'export-dropdown hidden';
+    dropdown.setAttribute('role', 'menu');
     dropdown.style.cssText = 'position:absolute;right:0;top:100%;margin-top:4px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);box-shadow:var(--shadow);z-index:100;min-width:160px;overflow:hidden;';
+    dropdown.addEventListener('keydown', (event) => {
+      if (event.key !== 'Escape') return;
+      dropdown.classList.add('hidden');
+      exportBtn.setAttribute('aria-expanded', 'false');
+      this.activeExportDropdown = null;
+      exportBtn.focus();
+    });
     for (const fmt of [{key:'md',label:'Markdown'},{key:'txt',label:'纯文本'},{key:'html',label:'HTML'},{key:'json',label:'JSON'}]) {
-      const item = document.createElement('div');
+      const item = document.createElement('button');
+      item.type = 'button';
+      item.setAttribute('role', 'menuitem');
       item.style.cssText = 'padding:8px 14px;cursor:pointer;font-size:0.82rem;color:var(--text-secondary);transition:background 0.15s;';
       item.textContent = fmt.label;
       item.addEventListener('mouseenter', () => item.style.background = 'var(--bg-card-hover)');
@@ -193,6 +217,7 @@ export class MessageView {
       item.addEventListener('click', (e) => {
         e.stopPropagation();
         dropdown.classList.add('hidden');
+        exportBtn.setAttribute('aria-expanded', 'false');
         this.activeExportDropdown = null;
         this._quickExportConversation(conv, fmt.key);
       });
@@ -322,6 +347,7 @@ export class MessageView {
 
       // ---- Message Footer: timestamp + action buttons ----
       const footer = document.createElement('div');
+      footer.className = 'message-footer-actions';
       if (isClaude) {
         footer.style.cssText = 'display:flex;justify-content:space-between;align-items:center;margin-top:4px;opacity:0;transition:opacity 0.15s;';
       } else {
@@ -576,6 +602,7 @@ export class MessageView {
     for (const unsubscribe of this.unsubscribers) unsubscribe();
     this.unsubscribers = [];
     document.removeEventListener('click', this.handleDocumentClick);
+    this.statsPanel.destroy();
     this.activeExportDropdown = null;
   }
 

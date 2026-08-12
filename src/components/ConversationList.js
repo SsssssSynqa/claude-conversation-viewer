@@ -113,9 +113,11 @@ export class ConversationList {
       this.listEl.appendChild(header);
 
       for (const { conv, index } of items) {
-        const item = document.createElement('div');
+        const item = document.createElement('button');
+        item.type = 'button';
         const isActive = index === currentIndex;
         item.className = 'conversation-list-item ' + (isClaude ? '' : 'sidebar-pill ' + (isActive ? 'pill-active' : 'pill-flat'));
+        if (isActive) item.setAttribute('aria-current', 'page');
 
         if (isClaude) {
           item.style.cssText = 'padding:6px 12px;margin:2px 0;cursor:pointer;border-radius:6px;height:auto;display:flex;flex-direction:column;align-items:flex-start;gap:2px;overflow:hidden;'
