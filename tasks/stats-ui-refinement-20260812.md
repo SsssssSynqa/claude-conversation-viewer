@@ -75,6 +75,17 @@ Synqa 对第二版提出三项明确纠正：不要卡片内再套数字框；�
 - Claude 卡片 computed style 继续命中原 `--shadow` 与 `--radius-lg` 契约。
 - 保存图片完成状态为 `截图中... → ✓ 已保存 → 保存为图片`，无控制台错误。
 
+## Third-pass production verification
+
+- 第三版提交：`772ee85`（`refactor: 简化统计卡片并重画节律图表`）。
+- 发布号：`20260812T141025Z-772ee85`；覆盖前文件备份为
+  `/var/backups/claude-conversation-viewer/index.html.before-20260812T141025Z-772ee85`。
+- 本地构建与公网响应 SHA-256 一致：
+  `ddb763fc52d6412748052cd5ad2147a1cf74f922a8ec33da23d0770737fe81dc`。
+- 公网返回 200、`Cache-Control: no-store, must-revalidate`；`stats-hour-wave`、
+  `stats-comparison-chart`、`stats-page-surface` 三个第三版 marker 均命中。
+- 公网浏览器加载标题、上传入口正常，第三版图表样式已进入产物，控制台 error/warning 为 0。
+
 ## Production verification
 
 - 实现提交：`51a72f2`（`feat: 完善统计导览三主题界面`）。
