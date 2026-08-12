@@ -19,16 +19,19 @@ export function drawLineChart(canvas, data, opts = {}) {
   const chartW = w - padding.left - padding.right;
   const chartH = h - padding.top - padding.bottom;
   const maxVal = Math.max(...data.values, 1);
-  const color = opts.color || '#7c6eea';
-  const textColor = getComputedStyle(document.documentElement).getPropertyValue('--text-muted').trim() || 'rgba(128,128,128,0.8)';
-  const gridColor = getComputedStyle(document.documentElement).getPropertyValue('--border').trim() || 'rgba(128,128,128,0.12)';
+  const styles = getComputedStyle(document.documentElement);
+  const color = opts.color || styles.getPropertyValue('--stats-trend').trim() || '#b96145';
+  const textColor = styles.getPropertyValue('--text-muted').trim() || 'rgba(128,128,128,0.8)';
+  const gridColor = styles.getPropertyValue('--stats-grid').trim() || 'rgba(128,128,128,0.12)';
+  const pointCenter = styles.getPropertyValue('--bg-card').trim() || '#faf9f5';
+  const chartFont = styles.getPropertyValue('--stats-font-ui').trim() || 'system-ui, sans-serif';
 
   // Grid lines (subtle)
   const gridLines = 4;
   ctx.strokeStyle = gridColor;
   ctx.lineWidth = 0.5;
   ctx.setLineDash([3, 3]);
-  ctx.font = '10px -apple-system, sans-serif';
+  ctx.font = `11px ${chartFont}`;
   ctx.fillStyle = textColor;
   ctx.textAlign = 'right';
   for (let i = 0; i <= gridLines; i++) {
@@ -93,13 +96,13 @@ export function drawLineChart(canvas, data, opts = {}) {
     ctx.fill();
     ctx.beginPath();
     ctx.arc(p.x, p.y, 2, 0, Math.PI * 2);
-    ctx.fillStyle = '#fff';
+    ctx.fillStyle = pointCenter;
     ctx.fill();
   }
 
   // X labels
   ctx.fillStyle = textColor;
-  ctx.font = '9px -apple-system, sans-serif';
+  ctx.font = `10px ${chartFont}`;
   ctx.textAlign = 'center';
   const labelSkip = Math.max(1, Math.floor(data.labels.length / 8));
   for (let i = 0; i < data.labels.length; i += labelSkip) {
@@ -122,8 +125,10 @@ export function drawBarChart(canvas, data, opts = {}) {
   const padding = { top: 20, right: 20, bottom: 50, left: 52 };
   const chartW = w - padding.left - padding.right;
   const chartH = h - padding.top - padding.bottom;
-  const textColor = getComputedStyle(document.documentElement).getPropertyValue('--text-muted').trim() || 'rgba(128,128,128,0.8)';
-  const gridColor = getComputedStyle(document.documentElement).getPropertyValue('--border').trim() || 'rgba(128,128,128,0.12)';
+  const styles = getComputedStyle(document.documentElement);
+  const textColor = styles.getPropertyValue('--text-muted').trim() || 'rgba(128,128,128,0.8)';
+  const gridColor = styles.getPropertyValue('--stats-grid').trim() || 'rgba(128,128,128,0.12)';
+  const chartFont = styles.getPropertyValue('--stats-font-ui').trim() || 'system-ui, sans-serif';
 
   // Max stacked value
   let maxVal = 0;
@@ -139,7 +144,7 @@ export function drawBarChart(canvas, data, opts = {}) {
   ctx.strokeStyle = gridColor;
   ctx.lineWidth = 0.5;
   ctx.setLineDash([3, 3]);
-  ctx.font = '10px -apple-system, sans-serif';
+  ctx.font = `11px ${chartFont}`;
   ctx.fillStyle = textColor;
   ctx.textAlign = 'right';
   for (let i = 0; i <= gridLines; i++) {
@@ -179,7 +184,7 @@ export function drawBarChart(canvas, data, opts = {}) {
 
   // X labels
   ctx.fillStyle = textColor;
-  ctx.font = '9px -apple-system, sans-serif';
+  ctx.font = `10px ${chartFont}`;
   ctx.textAlign = 'center';
   const labelSkip = Math.max(1, Math.floor(data.labels.length / 8));
   for (let i = 0; i < data.labels.length; i += labelSkip) {
@@ -188,7 +193,7 @@ export function drawBarChart(canvas, data, opts = {}) {
   }
 
   // Legend (centered at bottom)
-  ctx.font = '10px -apple-system, sans-serif';
+  ctx.font = `11px ${chartFont}`;
   let totalLegendW = 0;
   for (const s of data.series) totalLegendW += ctx.measureText(s.name).width + 28;
   let legendX = (w - totalLegendW) / 2;

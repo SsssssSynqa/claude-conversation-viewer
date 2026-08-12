@@ -3,7 +3,7 @@
  */
 
 import { state, resetSidebarFilter } from '../store/state.js';
-import { drawLineChart, drawBarChart } from '../utils/charts.js';
+import { drawLineChart } from '../utils/charts.js';
 import { formatMonthKey, formatMonthLabel, formatTimestamp, formatLocalDateStamp, getHourOfDay } from '../utils/time.js';
 import html2canvas from 'html2canvas';
 import { desensitize } from '../utils/desensitize.js';
@@ -60,24 +60,20 @@ export class StatsPanel {
     // Title row with screenshot button
     const titleRow = document.createElement('div');
     titleRow.className = 'stats-title-row';
-    titleRow.style.cssText = 'display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;';
 
     const title = document.createElement('h2');
     title.className = 'stats-title';
-    title.style.cssText = 'font-size:1rem;font-weight:800;color:var(--text-primary);display:flex;align-items:center;gap:10px;letter-spacing:0.5px;';
     const mainDot = document.createElement('span');
-    mainDot.style.cssText = 'width:10px;height:10px;border-radius:50%;background:var(--accent);box-shadow:inset 1px 1px 2px rgba(255,255,255,0.4),0 0 8px rgba(217,118,87,0.4);flex-shrink:0;';
+    mainDot.className = 'stats-title-mark';
     title.appendChild(mainDot);
     title.appendChild(document.createTextNode(t('stats.title')));
     titleRow.appendChild(title);
 
     const screenshotBtn = document.createElement('button');
+    screenshotBtn.type = 'button';
     screenshotBtn.className = 'stats-screenshot-btn';
-    screenshotBtn.style.cssText = 'padding:6px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);background:transparent;color:var(--text-secondary);cursor:pointer;font-size:12px;transition:all 0.15s;white-space:nowrap;display:flex;align-items:center;gap:4px;';
     screenshotBtn.appendChild(createIcon('save', 14));
     screenshotBtn.appendChild(document.createTextNode(t('stats.saveImage')));
-    screenshotBtn.addEventListener('mouseenter', () => { screenshotBtn.style.borderColor = 'var(--accent)'; screenshotBtn.style.color = 'var(--accent)'; });
-    screenshotBtn.addEventListener('mouseleave', () => { screenshotBtn.style.borderColor = 'var(--border)'; screenshotBtn.style.color = 'var(--text-secondary)'; });
     screenshotBtn.addEventListener('click', async () => {
       screenshotBtn.textContent = t('stats.saving');
       screenshotBtn.disabled = true;
@@ -105,7 +101,6 @@ export class StatsPanel {
     // ---- Basic Stats Cards (floating directly on background, no outer wrapper) ----
     const cardsGrid = document.createElement('div');
     cardsGrid.className = 'stats-card-grid';
-    cardsGrid.style.cssText = 'display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:14px;';
 
     // Row 1: 4 basic counts (matching Figma layout)
     const row1Stats = [
@@ -120,12 +115,10 @@ export class StatsPanel {
       card.classList.add('stats-metric-card');
       const label = document.createElement('div');
       label.className = 'stats-card-label';
-      label.style.cssText = 'font-size:0.75rem;color:var(--text-muted);margin-bottom:8px;';
       label.textContent = s.label;
       card.appendChild(label);
       const val = document.createElement('div');
       val.className = 'stats-card-value';
-      val.style.cssText = 'font-size:1.8rem;font-weight:800;color:var(--text-primary);letter-spacing:-0.5px;';
       val.textContent = String(s.value);
       card.appendChild(val);
       cardsGrid.appendChild(card);
@@ -144,21 +137,15 @@ export class StatsPanel {
     for (const s of wordCountCards) {
       const card = this._neuCard();
       card.classList.add('stats-word-card');
-      card.style.gridColumn = 'span 2';
-      card.style.display = 'flex';
-      card.style.alignItems = 'center';
-      card.style.justifyContent = 'space-between';
 
       const textDiv = document.createElement('div');
       textDiv.className = 'stats-word-copy';
       const label = document.createElement('div');
       label.className = 'stats-card-label';
-      label.style.cssText = 'font-size:0.75rem;color:var(--text-muted);margin-bottom:8px;';
       label.textContent = s.label;
       textDiv.appendChild(label);
       const val = document.createElement('div');
       val.className = 'stats-card-value';
-      val.style.cssText = 'font-size:1.8rem;font-weight:800;color:var(--text-primary);letter-spacing:-0.5px;';
       val.textContent = s.value;
       textDiv.appendChild(val);
       card.appendChild(textDiv);
@@ -245,12 +232,10 @@ export class StatsPanel {
       card.classList.add('stats-metric-card');
       const label = document.createElement('div');
       label.className = 'stats-card-label';
-      label.style.cssText = 'font-size:0.75rem;color:var(--text-muted);margin-bottom:8px;';
       label.textContent = s.label;
       card.appendChild(label);
       const val = document.createElement('div');
       val.className = 'stats-card-value';
-      val.style.cssText = 'font-size:1.8rem;font-weight:800;color:var(--text-primary);letter-spacing:-0.5px;';
       val.textContent = String(s.value);
       card.appendChild(val);
       cardsGrid.appendChild(card);
@@ -262,7 +247,6 @@ export class StatsPanel {
     if (stats.firstConv && stats.lastConv) {
       const milestoneRow = document.createElement('div');
       milestoneRow.className = 'stats-milestone-grid';
-      milestoneRow.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;';
 
       milestoneRow.appendChild(this._milestoneCard(t('stats.firstConv'), stats.firstConv.name || '未命名', formatTimestamp(stats.firstConv.createdAt)));
       milestoneRow.appendChild(this._milestoneCard(t('stats.latestConv'), stats.lastConv.name || '未命名', formatTimestamp(stats.lastConv.createdAt)));
@@ -275,11 +259,11 @@ export class StatsPanel {
       parent.appendChild(this._sectionTitle(t('stats.yearOverview')));
       const yearGrid = document.createElement('div');
       yearGrid.className = 'stats-year-grid';
-      yearGrid.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:14px;';
       for (const yr of stats.yearlyData) {
         const card = this._neuCard();
+        card.classList.add('stats-year-card');
         const yearLabel = document.createElement('div');
-        yearLabel.style.cssText = 'font-size:1.2rem;font-weight:700;color:var(--accent);margin-bottom:10px;';
+        yearLabel.className = 'stats-year-label';
         yearLabel.textContent = yr.year + t('stats.year');
         card.appendChild(yearLabel);
         const rows = [
@@ -291,13 +275,13 @@ export class StatsPanel {
         ];
         for (const [label, value] of rows) {
           const row = document.createElement('div');
-          row.style.cssText = 'display:flex;justify-content:space-between;font-size:0.8rem;padding:3px 0;';
+          row.className = 'stats-year-row';
           const l = document.createElement('span');
-          l.style.color = 'var(--text-muted)';
+          l.className = 'stats-year-key';
           l.textContent = label;
           row.appendChild(l);
           const v = document.createElement('span');
-          v.style.cssText = 'color:var(--text-primary);font-weight:500;';
+          v.className = 'stats-year-value';
           v.textContent = value;
           row.appendChild(v);
           card.appendChild(row);
@@ -391,47 +375,38 @@ export class StatsPanel {
     parent.appendChild(this._sectionTitle(t('stats.rhythm')));
     const rhythmSection = document.createElement('div');
     rhythmSection.className = 'stats-rhythm-section';
-    rhythmSection.style.cssText = 'margin-bottom:24px;';
 
     // ---- Weekday + Monthly Line Chart side by side ----
     const activityRow = document.createElement('div');
     activityRow.className = 'stats-activity-grid';
-    activityRow.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;';
 
     // Weekday: neumorphic groove bars (slot track + pill inside)
     const weekdayCard = this._neuCard();
     weekdayCard.classList.add('stats-chart-card');
-    weekdayCard.style.cssText += 'background:var(--surface-soft);box-shadow:var(--shadow-xs);';
     const weekdayTitle = document.createElement('div');
-    weekdayTitle.style.cssText = 'font-size:0.85rem;font-weight:600;color:var(--text-primary);margin-bottom:16px;';
+    weekdayTitle.className = 'stats-chart-title';
     weekdayTitle.textContent = '星期几最爱聊天';
     weekdayCard.appendChild(weekdayTitle);
     const weekdayBar = document.createElement('div');
     weekdayBar.className = 'stats-weekday-bars';
-    weekdayBar.style.cssText = 'display:flex;gap:22px;justify-content:center;height:170px;';
     const weekdays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
     const maxWeekday = Math.max(...stats.weekdayActivity, 1);
     const trackH = 140;
     for (let d = 0; d < 7; d++) {
       const col = document.createElement('div');
-      col.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:6px;';
-      // Groove track — Syner's neumorphic physics
+      col.className = 'stats-weekday-column';
       const track = document.createElement('div');
-      track.style.cssText = `width:24px;height:${trackH}px;border-radius:20px;`
-        + 'background:var(--bg-card);box-shadow:var(--shadow-inset);'
-        + 'display:flex;align-items:flex-end;padding:4px;box-sizing:border-box;';
-      // Data pill — Syner's glossy capsule: diagonal gradient + outer shadow + inner highlight
+      track.className = 'stats-weekday-track';
+      track.style.height = `${trackH}px`;
       const pct = Math.max(8, (stats.weekdayActivity[d] / maxWeekday) * 100);
       const fill = document.createElement('div');
-      fill.style.cssText = `width:100%;height:${pct}%;border-radius:16px;transition:height 0.3s ease;`
-        + 'background:linear-gradient(145deg, #ea9d85, #D97657);'
-        + 'box-shadow:2px 2px 5px rgba(163,177,198,0.4),'
-        + 'inset 2px 2px 4px rgba(255,255,255,0.5);';
+      fill.className = 'stats-weekday-fill';
+      fill.style.setProperty('--bar-scale', String(pct / 100));
       fill.title = stats.weekdayActivity[d] + ' 条消息';
       track.appendChild(fill);
       col.appendChild(track);
       const label = document.createElement('div');
-      label.style.cssText = 'font-size:0.65rem;color:var(--text-muted);';
+      label.className = 'stats-axis-label';
       label.textContent = weekdays[d];
       col.appendChild(label);
       weekdayBar.appendChild(col);
@@ -443,9 +418,8 @@ export class StatsPanel {
     if (stats.monthlyData.labels.length > 1) {
       const chartCard1 = this._neuCard();
       chartCard1.classList.add('stats-chart-card');
-      chartCard1.style.cssText += 'background:var(--surface-soft);box-shadow:var(--shadow-xs);';
       const chartTitle1 = document.createElement('div');
-      chartTitle1.style.cssText = 'font-size:0.85rem;font-weight:600;color:var(--text-primary);margin-bottom:12px;';
+      chartTitle1.className = 'stats-chart-title';
       chartTitle1.textContent = '每月对话频率';
       chartCard1.appendChild(chartTitle1);
       const canvas1 = document.createElement('canvas');
@@ -455,7 +429,7 @@ export class StatsPanel {
       activityRow.appendChild(chartCard1);
       rhythmSection.appendChild(activityRow);
       requestAnimationFrame(() => {
-        drawLineChart(canvas1, { labels: stats.monthlyData.labels, values: stats.monthlyData.convCounts }, {});
+        drawLineChart(canvas1, { labels: stats.monthlyData.labels, values: stats.monthlyData.convCounts }, { color: this._cssVar('--stats-trend') });
       });
     } else {
       rhythmSection.appendChild(activityRow);
@@ -465,31 +439,28 @@ export class StatsPanel {
     if (stats.hourlyActivity.some(v => v > 0)) {
       const hourCard = this._neuCard();
       hourCard.classList.add('stats-chart-card');
-      hourCard.style.cssText += 'background:var(--surface-soft);box-shadow:var(--shadow-xs);margin-bottom:14px;';
+      hourCard.classList.add('stats-hour-card');
       const hourTitle = document.createElement('div');
-      hourTitle.style.cssText = 'font-size:0.85rem;font-weight:600;color:var(--text-primary);margin-bottom:16px;';
+      hourTitle.className = 'stats-chart-title';
       hourTitle.textContent = '每日活跃时段';
       hourCard.appendChild(hourTitle);
       const heatmap = document.createElement('div');
       heatmap.className = 'stats-hour-heatmap';
-      heatmap.style.cssText = 'display:grid;grid-template-columns:repeat(12,1fr);grid-template-rows:repeat(2,1fr);gap:4px;margin-bottom:8px;';
       const maxHour = Math.max(...stats.hourlyActivity);
       for (let h = 0; h < 24; h++) {
         const cell = document.createElement('div');
         const intensity = maxHour > 0 ? stats.hourlyActivity[h] / maxHour : 0;
-        cell.style.cssText = `aspect-ratio:1;border-radius:8px;background:var(--accent);opacity:${Math.max(0.06, intensity * 0.85)};transition:opacity 0.15s;`;
+        const level = intensity === 0 ? 0 : Math.min(4, Math.max(1, Math.ceil(intensity * 4)));
+        cell.className = `stats-hour-cell stats-hour-level-${level}`;
         cell.title = `${h}:00 — ${stats.hourlyActivity[h]} 条消息`;
-        cell.addEventListener('mouseenter', () => cell.style.opacity = '1');
-        cell.addEventListener('mouseleave', () => cell.style.opacity = String(Math.max(0.06, intensity * 0.85)));
         heatmap.appendChild(cell);
       }
       hourCard.appendChild(heatmap);
       const hourLabels = document.createElement('div');
       hourLabels.className = 'stats-hour-labels';
-      hourLabels.style.cssText = 'display:grid;grid-template-columns:repeat(12,1fr);gap:4px;';
       for (let h = 0; h < 24; h += 2) {
         const label = document.createElement('div');
-        label.style.cssText = 'text-align:center;font-size:0.6rem;color:var(--text-muted);';
+        label.className = 'stats-hour-label';
         label.textContent = h % 6 === 0 ? h + ':00' : '';
         hourLabels.appendChild(label);
       }
@@ -502,55 +473,46 @@ export class StatsPanel {
 
       const chartCard2 = this._neuCard();
       chartCard2.classList.add('stats-chart-card');
-      chartCard2.style.cssText += 'background:var(--surface-soft);box-shadow:var(--shadow-xs);';
       const chartTitle2 = document.createElement('div');
-      chartTitle2.style.cssText = 'font-size:0.85rem;font-weight:600;color:var(--text-primary);margin-bottom:12px;';
+      chartTitle2.className = 'stats-chart-title';
       chartTitle2.textContent = '每月字数';
       chartCard2.appendChild(chartTitle2);
 
-      // DOM neumorphic grouped bar chart — Syner's physics
       const hVals = stats.monthlyData.humanChars;
       const aVals = stats.monthlyData.assistantChars;
       const maxWordVal = Math.max(...hVals, ...aVals, 1);
       const barRow = document.createElement('div');
       barRow.className = 'stats-monthly-bars';
-      barRow.style.cssText = 'display:flex;justify-content:space-between;align-items:flex-end;height:200px;padding:0 10px;';
       const trackH = 170;
       stats.monthlyData.labels.forEach((lbl, i) => {
         const grp = document.createElement('div');
         grp.className = 'stats-monthly-bar-group';
-        grp.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:6px;flex:1;';
         const pair = document.createElement('div');
-        pair.style.cssText = 'display:flex;gap:4px;align-items:flex-end;justify-content:center;';
-        // Human (purple) track + pill
+        pair.className = 'stats-monthly-bar-pair';
         const t1 = document.createElement('div');
-        t1.style.cssText = `width:18px;height:${trackH}px;border-radius:9px;background:var(--bg-primary);`
-          + 'box-shadow:inset 3px 3px 6px rgba(163,177,198,0.5),inset -3px -3px 6px rgba(255,255,255,0.7);'
-          + 'display:flex;align-items:flex-end;padding:2px;box-sizing:border-box;';
+        t1.className = 'stats-monthly-track';
+        t1.style.height = `${trackH}px`;
         const pct1 = Math.max(4, (hVals[i] / maxWordVal) * 100);
         const f1 = document.createElement('div');
-        f1.style.cssText = `width:100%;height:${pct1}%;border-radius:7px;`
-          + 'background:linear-gradient(145deg,#9b8ff0,#7c6eea);'
-          + 'box-shadow:1px 1px 4px rgba(163,177,198,0.4),inset 1px 1px 2px rgba(255,255,255,0.5);';
+        f1.className = 'stats-monthly-fill stats-monthly-fill-human';
+        f1.style.height = `${pct1}%`;
         f1.title = `${names.human || 'Human'}: ${hVals[i].toLocaleString()} 字`;
         t1.appendChild(f1);
         // Assistant (orange) track + pill
         const t2 = document.createElement('div');
-        t2.style.cssText = `width:18px;height:${trackH}px;border-radius:9px;background:var(--bg-primary);`
-          + 'box-shadow:inset 3px 3px 6px rgba(163,177,198,0.5),inset -3px -3px 6px rgba(255,255,255,0.7);'
-          + 'display:flex;align-items:flex-end;padding:2px;box-sizing:border-box;';
+        t2.className = 'stats-monthly-track';
+        t2.style.height = `${trackH}px`;
         const pct2 = Math.max(4, (aVals[i] / maxWordVal) * 100);
         const f2 = document.createElement('div');
-        f2.style.cssText = `width:100%;height:${pct2}%;border-radius:7px;`
-          + 'background:linear-gradient(145deg,#ea9d85,#D97657);'
-          + 'box-shadow:1px 1px 4px rgba(163,177,198,0.4),inset 1px 1px 2px rgba(255,255,255,0.5);';
+        f2.className = 'stats-monthly-fill stats-monthly-fill-assistant';
+        f2.style.height = `${pct2}%`;
         f2.title = `${names.assistant || 'Assistant'}: ${aVals[i].toLocaleString()} 字`;
         t2.appendChild(f2);
         pair.appendChild(t1);
         pair.appendChild(t2);
         grp.appendChild(pair);
         const lab = document.createElement('div');
-        lab.style.cssText = 'font-size:0.65rem;color:var(--text-muted);white-space:nowrap;';
+        lab.className = 'stats-axis-label';
         lab.textContent = lbl;
         grp.appendChild(lab);
         barRow.appendChild(grp);
@@ -559,9 +521,8 @@ export class StatsPanel {
       // Legend
       const legend = document.createElement('div');
       legend.className = 'stats-chart-legend';
-      legend.style.cssText = 'display:flex;justify-content:center;gap:16px;margin-top:8px;font-size:0.65rem;color:var(--text-muted);';
-      legend.innerHTML = `<span style="display:flex;align-items:center;gap:4px;"><span style="width:8px;height:8px;border-radius:50%;background:#7c6eea;display:inline-block;"></span>${names.human || 'Human'}</span>`
-        + `<span style="display:flex;align-items:center;gap:4px;"><span style="width:8px;height:8px;border-radius:50%;background:#D97657;display:inline-block;"></span>${names.assistant || 'Assistant'}</span>`;
+      legend.innerHTML = `<span><i class="stats-legend-swatch stats-legend-human"></i>${names.human || 'Human'}</span>`
+        + `<span><i class="stats-legend-swatch stats-legend-assistant"></i>${names.assistant || 'Assistant'}</span>`;
       chartCard2.appendChild(legend);
       rhythmSection.appendChild(chartCard2);
     }
@@ -948,16 +909,14 @@ export class StatsPanel {
   _neuCard() {
     const el = document.createElement('div');
     el.className = 'stats-card';
-    el.style.cssText = 'background:var(--bg-card);border-radius:var(--radius-lg);padding:16px 18px;text-align:left;box-shadow:var(--shadow);';
     return el;
   }
 
   _sectionTitle(text) {
     const el = document.createElement('h3');
     el.className = 'stats-section-title';
-    el.style.cssText = 'font-size:1rem;font-weight:800;margin-bottom:16px;margin-top:24px;color:var(--text-primary);display:flex;align-items:center;gap:10px;letter-spacing:0.5px;';
     const dot = document.createElement('span');
-    dot.style.cssText = 'width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 6px rgba(217,118,87,0.4);flex-shrink:0;';
+    dot.className = 'stats-section-mark';
     el.appendChild(dot);
     const span = document.createElement('span');
     span.textContent = text;
@@ -970,20 +929,21 @@ export class StatsPanel {
     card.classList.add('stats-milestone-card');
     const labelEl = document.createElement('div');
     labelEl.className = 'stats-card-label';
-    labelEl.style.cssText = 'font-size:0.7rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;';
     labelEl.textContent = label;
     card.appendChild(labelEl);
     const nameEl = document.createElement('div');
     nameEl.className = 'stats-milestone-name';
-    nameEl.style.cssText = 'font-size:0.9rem;font-weight:600;color:var(--text-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;';
     nameEl.textContent = name;
     card.appendChild(nameEl);
     const timeEl = document.createElement('div');
     timeEl.className = 'stats-milestone-time';
-    timeEl.style.cssText = 'font-size:0.75rem;color:var(--text-muted);margin-top:2px;';
     timeEl.textContent = time;
     card.appendChild(timeEl);
     return card;
+  }
+
+  _cssVar(name) {
+    return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
   }
 
   _buildHeatmapCalendar(dateHeatmap) {
@@ -1068,15 +1028,9 @@ export class StatsPanel {
         const intensity = cell.count / maxCount;
         // Neumorphic physics levels: 0=deep inset, 1-4=increasing raised
         const level = cell.count === 0 ? 0 : intensity < 0.25 ? 1 : intensity < 0.5 ? 2 : intensity < 0.75 ? 3 : 4;
-        const isDark = document.documentElement.dataset.theme === 'dark';
-        const cellStyles = {
-          0: `background:var(--bg-card);box-shadow:var(--shadow-inset);`,
-          1: `background:#f1cfc2;box-shadow:${isDark ? 'none' : 'inset 2px 2px 4px rgba(165,178,196,0.3),inset -2px -2px 4px rgba(255,255,255,0.6)'};${isDark ? 'background:#4a3530;' : ''}`,
-          2: `background:#e6aa95;box-shadow:none;${isDark ? 'background:#6b4a3e;' : ''}`,
-          3: `background:#df8a6f;box-shadow:2px 2px 4px rgba(165,178,196,0.3),-2px -2px 4px rgba(255,255,255,0.5);${isDark ? 'background:#8a5a45;box-shadow:2px 2px 4px rgba(0,0,0,0.3),-2px -2px 4px rgba(255,255,255,0.03);' : ''}`,
-          4: `background:var(--accent);box-shadow:3px 3px 5px rgba(165,178,196,0.4),-2px -2px 5px rgba(255,255,255,0.6);transform:scale(1.05);z-index:2;${isDark ? 'box-shadow:3px 3px 5px rgba(0,0,0,0.4),-2px -2px 5px rgba(255,255,255,0.03);' : ''}`,
-        };
-        el.style.cssText = `width:${CELL}px;height:${CELL}px;border-radius:4px;transition:transform 0.2s;position:relative;${cellStyles[level]}`;
+        el.className = `stats-calendar-cell stats-calendar-level-${level}`;
+        el.style.width = `${CELL}px`;
+        el.style.height = `${CELL}px`;
         el.title = cell.dayKey + ': ' + cell.count + ' 条消息';
         weekCol.appendChild(el);
       }
@@ -1089,11 +1043,9 @@ export class StatsPanel {
     const legend = document.createElement('div');
     legend.style.cssText = 'display:flex;align-items:center;gap:4px;margin-top:12px;justify-content:flex-start;font-size:0.55rem;color:var(--text-muted);font-weight:600;padding-left:26px;';
     legend.appendChild(document.createTextNode('Less'));
-    const legendColors = ['var(--bg-card)', '#f1cfc2', '#e6aa95', '#df8a6f', 'var(--accent)'];
-    const legendShadows = ['var(--shadow-inset)', 'none', 'none', '1px 1px 3px rgba(165,178,196,0.3)', '2px 2px 4px rgba(165,178,196,0.3)'];
     for (let i = 0; i < 5; i++) {
       const box = document.createElement('div');
-      box.style.cssText = `width:12px;height:12px;border-radius:3px;background:${legendColors[i]};box-shadow:${legendShadows[i]};`;
+      box.className = `stats-calendar-legend-cell stats-calendar-level-${i}`;
       legend.appendChild(box);
     }
     legend.appendChild(document.createTextNode('More'));

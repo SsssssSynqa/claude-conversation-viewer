@@ -55,6 +55,10 @@
   --font-anthropic-ui: 'Anthropic Sans', system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   --font-anthropic-serif: 'Anthropic Serif', Georgia, 'Times New Roman', serif;
   --font-anthropic-mono: 'Anthropic Mono', ui-monospace, monospace;
+  --stats-font-ui: 'Anthropic Sans', 'PingFang SC', 'Hiragino Sans GB', 'Noto Sans CJK SC',
+    'Microsoft YaHei', system-ui, sans-serif;
+  --stats-font-display: 'Anthropic Serif', 'Songti SC', 'Noto Serif CJK SC', STSong, serif;
+  --stats-font-data: 'Anthropic Sans', 'PingFang SC', 'Noto Sans CJK SC', system-ui, sans-serif;
   --radius: 12px;
   --radius-sm: 8px;
   --radius-lg: 20px;
@@ -123,6 +127,27 @@
   --gradient-header: linear-gradient(135deg, #e38b68 0%, #f1b18f 100%);
   --btn-primary-bg: var(--accent-bg);
   --btn-primary-text: var(--accent);
+  /* Statistics — mineral ink + terracotta, refined dark neumorphism */
+  --stats-human: #e38b68;
+  --stats-assistant: #8ea6a4;
+  --stats-trend: #d78061;
+  --stats-grid: rgba(223, 229, 237, 0.09);
+  --stats-track: #22262c;
+  --stats-heat-0: #25292f;
+  --stats-heat-1: #343f40;
+  --stats-heat-2: #506463;
+  --stats-heat-3: #8b6f61;
+  --stats-heat-4: #df8968;
+  --stats-card-surface: linear-gradient(145deg, #292d34 0%, #24282e 100%);
+  --stats-card-shadow: 11px 11px 24px rgba(11, 13, 16, 0.46),
+    -9px -9px 20px rgba(255, 255, 255, 0.018),
+    inset 1px 1px 0 rgba(255, 255, 255, 0.026),
+    inset -1px -1px 0 rgba(0, 0, 0, 0.2);
+  --stats-card-shadow-hover: 14px 14px 28px rgba(9, 11, 14, 0.5),
+    -10px -10px 22px rgba(255, 255, 255, 0.022),
+    inset 1px 1px 0 rgba(255, 255, 255, 0.032);
+  --stats-inset-shadow: inset 4px 4px 9px rgba(9, 11, 14, 0.5),
+    inset -3px -3px 7px rgba(255, 255, 255, 0.018);
 }
 
 /* ---- Light Theme (开灯版 — 新拟态亮色) ---- */
@@ -172,6 +197,27 @@
   --gradient-header: linear-gradient(135deg, #cf7656 0%, #e39a7f 100%);
   --btn-primary-bg: var(--accent-bg);
   --btn-primary-text: var(--accent);
+  /* Statistics — warm paper + mineral ink, refined light neumorphism */
+  --stats-human: #c86d4f;
+  --stats-assistant: #5d7978;
+  --stats-trend: #b96145;
+  --stats-grid: rgba(73, 61, 52, 0.11);
+  --stats-track: #e2dbd1;
+  --stats-heat-0: #e5ded5;
+  --stats-heat-1: #cbd4cf;
+  --stats-heat-2: #94aaa5;
+  --stats-heat-3: #c9937d;
+  --stats-heat-4: #c86d4f;
+  --stats-card-surface: linear-gradient(145deg, #f2ede6 0%, #e8e1d8 100%);
+  --stats-card-shadow: 12px 12px 26px rgba(167, 150, 134, 0.3),
+    -10px -10px 24px rgba(255, 252, 246, 0.88),
+    inset 1px 1px 0 rgba(255, 255, 255, 0.64),
+    inset -1px -1px 0 rgba(105, 84, 68, 0.045);
+  --stats-card-shadow-hover: 15px 15px 30px rgba(158, 141, 125, 0.33),
+    -11px -11px 25px rgba(255, 253, 248, 0.92),
+    inset 1px 1px 0 rgba(255, 255, 255, 0.72);
+  --stats-inset-shadow: inset 4px 4px 9px rgba(170, 154, 139, 0.28),
+    inset -3px -3px 8px rgba(255, 253, 248, 0.78);
 }
 
 /* ---- Claude Theme (精确还原Claude.ai官网) ---- */
@@ -251,6 +297,17 @@
   --btn-primary-bg: #3B3B3B;
   --btn-primary-text: #fff;
   --ring-accent-soft: 0 0 0 1px rgba(44, 132, 219, 0.3), 0 0 0 4px rgba(44, 132, 219, 0.08);
+  /* Statistics colors only. Card borders/shadows continue using exact Claude tokens above. */
+  --stats-human: #c86647;
+  --stats-assistant: #5b7474;
+  --stats-trend: #b85f43;
+  --stats-grid: rgba(31, 30, 29, 0.1);
+  --stats-track: #f0eee6;
+  --stats-heat-0: #f0eee6;
+  --stats-heat-1: #d9dfda;
+  --stats-heat-2: #9eb2ad;
+  --stats-heat-3: #ca927b;
+  --stats-heat-4: #c86647;
 
   /* Layout overrides */
   --content-max-width: 680px;

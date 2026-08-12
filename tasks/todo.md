@@ -1,4 +1,17 @@
-# 贴纸拼团 — 付款确认 & 团长核实功能实施计划
+# 当前任务
+
+## 2026-08-12 · 统计导览 UI 完善
+
+- [x] 锁定三主题边界与不可改项。
+- [x] 重构统计字体、非环状图表和卡片信息层级。
+- [x] 完成三主题、桌面/手机与保存图片回归。
+- [ ] 构建、提交、部署 NSP 域名并完成线上验收。
+
+详细账本：[`stats-ui-refinement-20260812.md`](./stats-ui-refinement-20260812.md)
+
+---
+
+# 历史计划：贴纸拼团 — 付款确认 & 团长核实功能实施计划
 
 **文件**: `/Users/arthas/Desktop/Synergia/Claude/claude_sticker_group_buy.html`
 **后端**: Supabase (`orders` 表, `settings` 表)
