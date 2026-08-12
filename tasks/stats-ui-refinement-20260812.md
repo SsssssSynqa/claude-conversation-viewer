@@ -86,6 +86,16 @@ Synqa 继续指出每日活跃表现力不足、时光矩阵需要橙色，以�
   `border-radius: 16px`；百分比环尺寸和阴影保持原值。
 - 保存图片已成功生成 `数据雕塑_2026-08-12.png`；当前浏览器控制台 error/warning 为 0。
 
+## Fourth-pass production verification
+
+- 第四版提交：`7e4fbd3`（`refactor: 重塑每日节律与亮色新拟态`）。
+- 发布号：`20260812T151926Z-7e4fbd3`；覆盖前文件备份为
+  `/var/backups/claude-conversation-viewer/index.html.before-20260812T151926Z-7e4fbd3`。
+- 本地构建、服务器文件与公网响应 SHA-256 一致：
+  `48df2c157492caec8f719bc96639a79da758f15f2349d6d8239242ac213c568a`。
+- 公网返回 200、`Cache-Control: no-store, must-revalidate`；放射时钟 CSS 与橙色热力 token
+  均命中，标题、上传入口正常，浏览器控制台 error/warning 为 0。
+
 ## Local verification
 
 - `npm run build`：通过，生成单文件 `dist/index.html`。
