@@ -565,8 +565,18 @@ export class StatsPanel {
       // Legend
       const legend = document.createElement('div');
       legend.className = 'stats-chart-legend';
-      legend.innerHTML = `<span><i class="stats-legend-swatch stats-legend-human"></i>${names.human || 'Human'}</span>`
-        + `<span><i class="stats-legend-swatch stats-legend-assistant"></i>${names.assistant || 'Assistant'}</span>`;
+      for (const [className, label] of [
+        ['stats-legend-human', names.human || 'Human'],
+        ['stats-legend-assistant', names.assistant || 'Assistant'],
+      ]) {
+        const item = document.createElement('span');
+        const swatch = document.createElement('i');
+        swatch.className = `stats-legend-swatch ${className}`;
+        swatch.setAttribute('aria-hidden', 'true');
+        item.appendChild(swatch);
+        item.appendChild(document.createTextNode(label));
+        legend.appendChild(item);
+      }
       chartCard2.appendChild(legend);
       rhythmSection.appendChild(chartCard2);
       const monthlyWordsData = {

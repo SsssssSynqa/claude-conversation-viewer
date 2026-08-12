@@ -186,9 +186,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 h1{font-size:1.4rem;margin-bottom:4px}
 .meta{color:#999;font-size:0.85rem;margin-bottom:16px}
 .msg{padding:16px;border-bottom:1px solid #eee;margin-bottom:8px}
-.msg.human{background:#f5f0ff}
+.msg.human{background:#f7ebe6}
 .msg-header{display:flex;justify-content:space-between;margin-bottom:8px;font-size:0.85rem}
-.msg-header strong{color:#7c5cbf}
+.msg-header strong{color:#a94f31}
 .msg.assistant .msg-header strong{color:#2d2d2d}
 .msg-header span{color:#999}
 .msg-text{white-space:pre-wrap;word-break:break-word}
