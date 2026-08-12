@@ -105,7 +105,7 @@ button.toggle-option {
   padding: 12px;
   border: 1px solid var(--border);
   border-radius: 12px;
-  background: color-mix(in srgb, var(--bg-primary) 72%, transparent);
+  background: var(--bg-secondary);
   box-shadow: none;
 }
 
@@ -350,7 +350,7 @@ button.toggle-option {
 :is([data-theme="light"], [data-theme="dark"]) .message-block {
   border: 1px solid var(--border);
   border-radius: 18px;
-  background: color-mix(in srgb, var(--bg-card) 54%, transparent);
+  background: var(--bg-card);
   box-shadow: var(--shadow-xs);
 }
 
@@ -463,7 +463,7 @@ button.toggle-option {
   padding: 10px 12px;
   border: 1px solid var(--border-strong);
   border-radius: 12px;
-  background: color-mix(in srgb, var(--bg-card) 94%, transparent);
+  background: var(--bg-card);
   box-shadow: var(--shadow-sm);
   color: var(--text-secondary);
   font-family: var(--font-family);
