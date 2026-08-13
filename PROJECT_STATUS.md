@@ -1,11 +1,11 @@
 # Claude 对话查看器 · 当前建设状态
 
-最后核验：2026-08-13（上传页首屏锚点纠正，待发布）
+最后核验：2026-08-13（上传页首屏锚点纠正，已发布生产）
 
 | 交付项 | 状态 | 具体范围 | 验收证据 / 边界 |
 |---|---|---|---|
 | 全站亮/暗设计系统 | code complete / awaiting acceptance | 删除旧 `refinement.css`，以单一 `tactile.css` 统一亮/暗 Porcelain Relief、排版、密度与组件状态 | 全页面/全尺寸矩阵通过；最终视觉仍由 Synqa 验收 |
-| 上传页三主题几何 | code complete / awaiting release | 504px 桌面内容轴不变；三主题重新共享 `15vh` 上锚点与 `16px` gap | 带缓存 1440×1000：标题/上传 top 均为 150/218；390×844：均为 126.59/194.59；overflow 0 |
+| 上传页三主题几何 | code complete / awaiting acceptance | 504px 桌面内容轴不变；三主题重新共享 `15vh` 上锚点与 `16px` gap | 带缓存 1440×1000：标题/上传 top 均为 150/218；390×844：均为 126.59/194.59；overflow 0 |
 | 会话中央阅读栏 | code complete / awaiting acceptance | 取消左右分散气泡；头部、时间、双方消息统一 920px 中央轴，正文为连续阅读列 | 双方消息实测同 x 轴、884px 宽；桌面/手机长对话截图通过 |
 | 移动端高信息密度 | code complete / awaiting acceptance | 320/390px 独立紧凑编排，不再纵排巨型指标卡 | 320px 统计首屏可见 12 项指标；所有页面无横向溢出 |
 | 三张交互图表 | code complete / awaiting acceptance | 月对话、24 小时、月字数支持 hover、点击/触控锁定、Arrow/Home/End、Enter/Space、Escape、DOM tooltip、隐藏表与 ResizeObserver | 17 / 24 / 17 行数据表；键盘取数与关闭状态通过 |
@@ -14,7 +14,7 @@
 | 安全与依赖 | complete | 修复显示名 DOM XSS、Markdown/HTML 转义、CSP；升级 DOMPurify 与单文件插件传递依赖 | 恶意输入浏览器复测通过；`npm audit` 0；敏感信息扫描无产品命中 |
 | 双语、导出与异常输入 | complete | 中英文词典与插值、消息计数、无紫色导出、畸形会话/消息、思考时长边界 | 16 项源码/逻辑测试通过 |
 | 生产单文件 | complete | `dist/index.html` 已构建；开发夹具不进入生产；CSP 与紫色合同锁定 | 3 项 dist 测试通过；本地/服务器/公网 SHA-256 均为 `83cdf650…6140` |
-| 当前生产 | in progress | 线上仍为 `20260813T013738Z-3643f23`；本地首屏锚点修复已通过门禁，待原子覆盖 | 当前线上仍存在亮/暗与 Claude 的 70px（桌面）/约98.6px（手机）上边距差异 |
+| 当前生产 | code complete / awaiting acceptance | 发布号 `20260813T123159Z-50220dc`，已原子覆盖 `/claude-viewer/` | 公网桌面与手机三主题标题/上传 top 坐标一致，HTTP 200、控制台 0 error/warning；回滚备份已保存 |
 
 ## 全栈复审结论
 
@@ -39,3 +39,12 @@
 - 新门禁：3 项上传几何合同；全量为 19 项源码/逻辑测试 + 3 项生产单文件测试。
 - 浏览器：带缓存桌面/手机三主题标题和上传区 top 坐标完全一致，overflow 0，生产预览控制台 0 error/warning。
 - 证据：`design-plans/audit-20260812/regression/upload-geometry-20260813.json`。
+
+### 生产发布证据
+
+- 修复提交：`50220dc`（`fix: 统一上传页三主题首屏锚点`）。
+- 发布号：`20260813T123159Z-50220dc`。
+- 回滚备份：`/var/backups/claude-conversation-viewer/index.html.before-20260813T123159Z-50220dc`。
+- 本地、服务器与公网 SHA-256：`3b78d722e74922d7094b11901eb4867e5dd46a222a3e19a6381dc564a97a8767`。
+- 公网几何：1440×1000 三主题标题/上传 top 均为 `150 / 218px`；390×844 均为 `126.59 / 194.59px`；overflow 0。
+- 公网：HTTP 200，`Cache-Control: no-store, must-revalidate`，控制台 error/warning 0。
