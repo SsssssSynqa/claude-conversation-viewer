@@ -12,8 +12,8 @@
 | Claude 视觉冻结 | complete | Claude token 区块与既有视觉契约不变；亮/暗覆盖层无 Claude 选择器 | 冻结区块 SHA-256 一致；自动合同测试通过 |
 | 两个百分比环冻结 | complete | 结构、尺寸、颜色、阴影和响应式不改 | 亮/暗覆盖层无环图选择器；自动合同测试通过 |
 | 安全与依赖 | complete | 修复显示名 DOM XSS、Markdown/HTML 转义、CSP；升级 DOMPurify 与单文件插件传递依赖 | 恶意输入浏览器复测通过；`npm audit` 0；敏感信息扫描无产品命中 |
-| 双语、导出与异常输入 | complete | 中英文词典与插值、消息计数、无紫色导出、畸形会话/消息、思考时长边界 | 16 项源码/逻辑测试通过 |
-| 生产单文件 | complete | `dist/index.html` 已构建；开发夹具不进入生产；CSP 与紫色合同锁定 | 3 项 dist 测试通过；本地/服务器/公网 SHA-256 均为 `83cdf650…6140` |
+| 双语、导出与异常输入 | complete | 中英文词典与插值、消息计数、无紫色导出、畸形会话/消息、思考时长与上传几何边界 | 19 项源码/逻辑测试通过 |
+| 生产单文件 | complete | `dist/index.html` 已构建；开发夹具不进入生产；CSP 与紫色合同锁定 | 3 项 dist 测试通过；本地/服务器/公网 SHA-256 均为 `3b78d722…8767` |
 | 当前生产 | code complete / awaiting acceptance | 发布号 `20260813T123159Z-50220dc`，已原子覆盖 `/claude-viewer/` | 公网桌面与手机三主题标题/上传 top 坐标一致，HTTP 200、控制台 0 error/warning；回滚备份已保存 |
 
 ## 全栈复审结论
