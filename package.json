@@ -10,7 +10,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "node --test tests/source-contracts.test.mjs tests/i18n-contracts.test.mjs tests/parser-contracts.test.mjs tests/export-contracts.test.mjs",
+    "test": "node --test tests/source-contracts.test.mjs tests/upload-geometry-contracts.test.mjs tests/i18n-contracts.test.mjs tests/parser-contracts.test.mjs tests/export-contracts.test.mjs",
     "test:dist": "node --test tests/dist-contracts.test.mjs",
     "verify": "npm run test && npm run build && npm run test:dist"
   },

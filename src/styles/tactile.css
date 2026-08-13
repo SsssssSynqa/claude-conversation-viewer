@@ -214,8 +214,6 @@ button.toggle-option {
 
 /* Upload: compact and confidently framed rather than a tiny floating island. */
 :is([data-theme="light"], [data-theme="dark"]) .upload-screen {
-  padding: clamp(34px, 8vh, 80px) 18px 20px;
-  gap: 12px;
   background: var(--bg-primary);
 }
 
@@ -874,10 +872,6 @@ button.toggle-option {
     min-height: 38px !important;
     padding: 0 11px !important;
     border-radius: 10px !important;
-  }
-
-  :is([data-theme="light"], [data-theme="dark"]) .upload-screen {
-    padding-top: 28px;
   }
 
   :is([data-theme="light"], [data-theme="dark"]) .message-header-card {
