@@ -440,6 +440,8 @@
 }
 
 .stats-card-grid,
+.stats-word-card-grid,
+.stats-secondary-grid,
 .stats-milestone-grid,
 .stats-activity-grid,
 .stats-year-grid,
@@ -524,6 +526,29 @@
   grid-auto-flow: row dense;
   gap: 16px;
   margin-bottom: 22px;
+}
+
+.stats-word-card-grid,
+.stats-secondary-grid {
+  display: grid;
+  gap: 16px;
+  margin-bottom: 22px;
+}
+
+.stats-word-card-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.stats-word-card-grid > .stats-word-card {
+  grid-column: span 1;
+}
+
+.stats-secondary-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.stats-secondary-grid .stats-secondary-metric {
+  grid-column: span 1;
 }
 
 .stats-card {

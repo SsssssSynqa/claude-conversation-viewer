@@ -83,3 +83,19 @@ test('亮暗主题覆盖层维持受控规模', async () => {
   assert.doesNotMatch(source, /cubic-bezier\([^)]*1\.56/);
   assert.match(source, /@media \(max-width: 768px\)[\s\S]*\.name-input-group > input[\s\S]*font-size: 16px/);
 });
+
+test('移动端统计使用共享高密度排布且保留完整 Emoji 字素', async () => {
+  const responsive = await readSource('src/styles/responsive.css');
+  assert.match(responsive, /@media \(max-width: 768px\)[\s\S]*\.stats-title-row[\s\S]*flex-direction: row !important/);
+  assert.match(responsive, /\.stats-primary-metric-1[\s\S]*min-height: 58px !important/);
+  assert.match(responsive, /\.stats-activity-grid[\s\S]*grid-template-columns: minmax\(0, 1fr\) !important/);
+  assert.match(responsive, /\.stats-thinking-card[\s\S]*min-height: 58px !important/);
+  assert.match(responsive, /\.stats-heatmap-scroll[\s\S]*overflow-x: auto/);
+  assert.match(responsive, /\.stats-word-card-grid[\s\S]*grid-template-columns: repeat\(2, minmax\(0, 1fr\)\) !important/);
+  assert.doesNotMatch(responsive, /data-theme=/);
+
+  const stats = await readSource('src/components/StatsPanel.js');
+  assert.match(stats, /import \{ extractEmojis \} from '\.\.\/utils\/textStats\.js'/);
+  assert.match(stats, /emojiCard\.classList\.add\('stats-emoji-card'\)/);
+  assert.match(stats, /wordCardsGrid\.className = 'stats-word-card-grid'/);
+});

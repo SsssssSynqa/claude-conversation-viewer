@@ -7,6 +7,7 @@ import './styles/base.css';
 import './styles/components.css';
 import './styles/clawd.css';
 import './styles/tactile.css';
+import './styles/responsive.css';
 import { state, saveDesensitizeWords, saveExportCollection, resetSidebarFilter } from './store/state.js';
 import { FileUpload } from './components/FileUpload.js';
 import { ConversationList } from './components/ConversationList.js';

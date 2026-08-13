@@ -10,6 +10,7 @@ import html2canvas from 'html2canvas';
 import { desensitize } from '../utils/desensitize.js';
 import { createIcon } from '../utils/icons.js';
 import { getLang, t } from '../i18n.js';
+import { extractEmojis } from '../utils/textStats.js';
 
 export class StatsPanel {
   constructor() {
@@ -176,6 +177,8 @@ export class StatsPanel {
     });
 
     // Row 2: 2 wider word count cards with percentage rings (span 2 cols each)
+    const wordCardsGrid = document.createElement('div');
+    wordCardsGrid.className = 'stats-word-card-grid';
     const totalChars = stats.totalAssistantChars + stats.totalHumanChars;
     const assistantPct = totalChars > 0 ? Math.round((stats.totalAssistantChars / totalChars) * 100) : 0;
     const humanPct = totalChars > 0 ? Math.round((stats.totalHumanChars / totalChars) * 100) : 0;
@@ -270,10 +273,13 @@ export class StatsPanel {
       ringWrap.appendChild(hole);
       card.appendChild(ringWrap);
 
-      cardsGrid.appendChild(card);
+      wordCardsGrid.appendChild(card);
     }
+    parent.appendChild(cardsGrid);
 
     // Row 3: 4 more stats
+    const secondaryGrid = document.createElement('div');
+    secondaryGrid.className = 'stats-secondary-grid';
     const row3Stats = [
       { label: t('stats.timeSpan'), value: stats.daySpan },
       { label: t('stats.longestStreak'), value: stats.longestStreak },
@@ -292,10 +298,11 @@ export class StatsPanel {
       val.className = 'stats-card-value';
       val.textContent = String(s.value);
       card.appendChild(val);
-      cardsGrid.appendChild(card);
+      secondaryGrid.appendChild(card);
     }
 
-    parent.appendChild(cardsGrid);
+    parent.appendChild(secondaryGrid);
+    parent.appendChild(wordCardsGrid);
 
     // ---- First & Last Conversation (cards float directly) ----
     if (stats.firstConv && stats.lastConv) {
@@ -684,13 +691,13 @@ export class StatsPanel {
       emojiRow.style.cssText = 'display:flex;flex-wrap:wrap;gap:12px;';
       for (const e of stats.topEmojis.slice(0, 15)) {
         const item = document.createElement('div');
-        item.style.cssText = 'text-align:center;';
+        item.className = 'stats-emoji-item';
         const emoji = document.createElement('div');
-        emoji.style.cssText = 'font-size:1.8rem;';
+        emoji.className = 'stats-emoji-glyph';
         emoji.textContent = e.emoji;
         item.appendChild(emoji);
         const count = document.createElement('div');
-        count.style.cssText = 'font-size:0.7rem;color:var(--text-muted);';
+        count.className = 'stats-emoji-count';
         count.textContent = e.count;
         item.appendChild(count);
         emojiRow.appendChild(item);
@@ -802,7 +809,7 @@ export class StatsPanel {
           if (block.type === 'text' && block.text) {
             const words = this._extractWords(block.text);
             for (const w of words) freqMap.set(w, (freqMap.get(w) || 0) + 1);
-            const emojis = this._extractEmojis(block.text);
+            const emojis = extractEmojis(block.text);
             for (const e of emojis) emojiFreq.set(e, (emojiFreq.get(e) || 0) + 1);
           }
         }
@@ -947,8 +954,8 @@ export class StatsPanel {
       tag.style.cssText = 'display:inline-flex;align-items:center;gap:2px;position:relative;';
 
       const size = type === 'title'
-        ? 0.8 + (word.count / maxFreq) * 2
-        : 0.7 + (word.count / maxFreq) * 1.6;
+        ? 0.76 + (word.count / maxFreq) * 0.82
+        : 0.72 + (word.count / maxFreq) * 0.68;
       const text = document.createElement('span');
       text.className = 'stats-word-token';
       text.style.cssText = `font-size:${size}rem;padding:2px 4px;cursor:default;`;
@@ -1041,7 +1048,6 @@ export class StatsPanel {
   _buildHeatmapCalendar(dateHeatmap) {
     const container = document.createElement('div');
     container.className = 'stats-heatmap-scroll';
-    container.style.cssText = 'overflow-x:auto;padding-bottom:4px;';
 
     const dates = Object.keys(dateHeatmap).sort();
     if (dates.length === 0) return container;
@@ -1057,10 +1063,11 @@ export class StatsPanel {
 
     // Outer wrapper with weekday labels on the left
     const wrapper = document.createElement('div');
-    wrapper.style.cssText = 'display:flex;gap:4px;';
+    wrapper.className = 'stats-calendar-layout';
 
     // Weekday labels column
     const weekdayLabels = document.createElement('div');
+    weekdayLabels.className = 'stats-calendar-weekdays';
     weekdayLabels.style.cssText = `display:flex;flex-direction:column;gap:${GAP}px;justify-content:flex-start;padding-top:${CELL + GAP + 2}px;flex-shrink:0;`;
     for (let d = 0; d < 7; d++) {
       const label = document.createElement('div');
@@ -1072,10 +1079,11 @@ export class StatsPanel {
 
     // Grid area (month labels + cells)
     const gridArea = document.createElement('div');
-    gridArea.style.cssText = 'display:flex;flex-direction:column;';
+    gridArea.className = 'stats-calendar-grid-area';
 
     // Month labels row
     const monthRow = document.createElement('div');
+    monthRow.className = 'stats-calendar-months';
     monthRow.style.cssText = `display:flex;gap:${GAP}px;margin-bottom:4px;`;
     const monthFormatter = new Intl.DateTimeFormat(getLang() === 'en' ? 'en-US' : 'zh-CN', { month: 'short' });
     const monthNames = Array.from({ length: 12 }, (_, month) => monthFormatter.format(new Date(2024, month, 1)));
@@ -1110,11 +1118,13 @@ export class StatsPanel {
 
     // Cell grid
     const grid = document.createElement('div');
-    grid.style.cssText = `display:flex;gap:${GAP}px;`;
+    grid.className = 'stats-calendar-grid';
+    grid.style.gap = `${GAP}px`;
 
     for (const week of weeks) {
       const weekCol = document.createElement('div');
-      weekCol.style.cssText = `display:flex;flex-direction:column;gap:${GAP}px;`;
+      weekCol.className = 'stats-calendar-week';
+      weekCol.style.gap = `${GAP}px`;
 
       for (const cell of week.cells) {
         const el = document.createElement('div');
@@ -1134,6 +1144,7 @@ export class StatsPanel {
 
     // Legend
     const legend = document.createElement('div');
+    legend.className = 'stats-calendar-legend';
     legend.style.cssText = 'display:flex;align-items:center;gap:4px;margin-top:12px;justify-content:flex-start;font-size:0.55rem;color:var(--text-muted);font-weight:600;padding-left:26px;';
     legend.appendChild(document.createTextNode(t('stats.less')));
     for (let i = 0; i < 5; i++) {
@@ -1146,6 +1157,11 @@ export class StatsPanel {
 
     wrapper.appendChild(gridArea);
     container.appendChild(wrapper);
+    if (matchMedia('(max-width: 768px)').matches) {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => { container.scrollLeft = container.scrollWidth; });
+      });
+    }
     return container;
   }
 
@@ -1168,12 +1184,6 @@ export class StatsPanel {
     const chinese = text.match(/[\u4e00-\u9fff]{2,4}/g) || [];
     const english = text.toLowerCase().match(/[a-z]{3,}/g) || [];
     return [...chinese, ...english];
-  }
-
-  _extractEmojis(text) {
-    const emojiRegex = /(\p{Emoji_Presentation}|\p{Extended_Pictographic})/gu;
-    const matches = text.match(emojiRegex) || [];
-    return matches;
   }
 
   formatMs(ms) {

@@ -935,6 +935,11 @@ button.toggle-option {
   :is([data-theme="light"], [data-theme="dark"]) .stats-card {
     padding: 10px 11px !important;
     border-radius: 11px !important;
+    box-shadow: 3px 3px 8px rgba(25, 32, 30, 0.11), -3px -3px 8px rgba(255, 255, 255, 0.66);
+  }
+
+  [data-theme="dark"] .stats-card {
+    box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.25), -2px -2px 7px rgba(255, 255, 255, 0.025);
   }
 
   :is([data-theme="light"], [data-theme="dark"]) .stats-metric-card,
