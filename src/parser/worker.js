@@ -10,14 +10,14 @@ self.onmessage = function (e) {
   const { jsonString } = e.data;
 
   try {
-    self.postMessage({ type: 'status', message: '正在解析 JSON...' });
+    self.postMessage({ type: 'status' });
 
     const raw = JSON.parse(jsonString);
 
     if (!Array.isArray(raw)) {
       self.postMessage({
         type: 'error',
-        message: '数据格式不正确：期望一个对话数组',
+        code: 'INVALID_FORMAT',
       });
       return;
     }
@@ -47,7 +47,8 @@ self.onmessage = function (e) {
   } catch (err) {
     self.postMessage({
       type: 'error',
-      message: `解析失败: ${err.message}`,
+      code: 'PARSE_FAILED',
+      detail: err instanceof Error ? err.message : String(err),
     });
   }
 };

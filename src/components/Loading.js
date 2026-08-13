@@ -13,20 +13,21 @@ const CLAWD_CAPTIONS = () => [t('loading.bubbles'), t('loading.celebrate'), t('l
 
 export function showLoading(container) {
   const idx = Math.floor(Math.random() * CLAWD_GIFS.length);
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const overlay = document.createElement('div');
   overlay.className = 'clawd-loading-overlay';
   overlay.style.cssText = 'position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--bg-primary);z-index:100;transition:opacity 0.3s ease;';
 
   const img = document.createElement('img');
   img.src = CLAWD_GIFS[idx];
-  img.alt = 'Clawd loading';
+  img.alt = t('loading.alt');
   img.style.cssText = 'width:80px;height:80px;image-rendering:pixelated;';
 
   const caption = document.createElement('div');
   caption.style.cssText = 'margin-top:12px;font-size:0.8rem;color:var(--text-muted);font-weight:500;';
   caption.textContent = CLAWD_CAPTIONS()[idx];
 
-  overlay.appendChild(img);
+  if (!reduceMotion) overlay.appendChild(img);
   overlay.appendChild(caption);
   container.style.position = 'relative';
   container.appendChild(overlay);
@@ -35,6 +36,10 @@ export function showLoading(container) {
 
 export function hideLoading(overlay) {
   if (!overlay) return;
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    overlay.remove();
+    return;
+  }
   overlay.style.opacity = '0';
   setTimeout(() => overlay.remove(), 300);
 }

@@ -1,73 +1,73 @@
 ---
 version: alpha
-name: Claude 记忆刻痕 · Porcelain Relief
+name: Claude 记忆刻痕 · Tactile Archive
 description: Claude conversation archive viewer with tactile light and dark themes and a frozen Claude replica theme.
 colors:
-  primary: "#C96342"
-  bg-primary: "#E9ECE9"
-  bg-secondary: "#E4E8E5"
-  bg-card: "#EDF0ED"
-  bg-input: "#E1E5E2"
-  text-primary: "#202522"
-  text-secondary: "#404943"
-  text-muted: "#626D66"
-  accent: "#C96342"
-  accent-ink: "#81351F"
-  border: "rgba(68, 82, 73, 0.13)"
-  border-strong: "rgba(55, 70, 61, 0.22)"
-  stats-human: "#C96342"
+  primary: "#C95F3D"
+  bg-primary: "#F1F2EF"
+  bg-secondary: "#ECEEEB"
+  bg-card: "#F5F6F3"
+  bg-input: "#E8EBE7"
+  text-primary: "#1F2420"
+  text-secondary: "#414943"
+  text-muted: "#5F6861"
+  accent: "#C95F3D"
+  accent-ink: "#853B24"
+  border: "rgba(54, 68, 59, 0.16)"
+  border-strong: "rgba(45, 59, 50, 0.27)"
+  stats-human: "#C95F3D"
   stats-assistant: "#507A76"
 typography:
   page-title:
     fontFamily: "Anthropic Sans, PingFang SC, Hiragino Sans GB, Microsoft YaHei, system-ui, sans-serif"
-    fontSize: 24px
-    fontWeight: 650
-    lineHeight: 1.2
+    fontSize: 19px
+    fontWeight: 680
+    lineHeight: 1.22
     letterSpacing: -0.02em
   section-title:
     fontFamily: "Anthropic Sans, PingFang SC, Hiragino Sans GB, Microsoft YaHei, system-ui, sans-serif"
-    fontSize: 18px
+    fontSize: 14px
     fontWeight: 650
-    lineHeight: 1.3
+    lineHeight: 1.35
     letterSpacing: -0.015em
   card-title:
     fontFamily: "Anthropic Sans, PingFang SC, Hiragino Sans GB, Microsoft YaHei, system-ui, sans-serif"
-    fontSize: 15px
+    fontSize: 13px
     fontWeight: 620
     lineHeight: 1.4
   body:
     fontFamily: "Anthropic Sans, PingFang SC, Hiragino Sans GB, Microsoft YaHei, system-ui, sans-serif"
-    fontSize: 14px
+    fontSize: 13px
     fontWeight: 400
-    lineHeight: 1.65
+    lineHeight: 1.5
   label:
     fontFamily: "Anthropic Sans, PingFang SC, Hiragino Sans GB, Microsoft YaHei, system-ui, sans-serif"
-    fontSize: 13px
+    fontSize: 12px
     fontWeight: 520
     lineHeight: 1.4
   caption:
     fontFamily: "Anthropic Sans, PingFang SC, Hiragino Sans GB, Microsoft YaHei, system-ui, sans-serif"
-    fontSize: 12px
+    fontSize: 11px
     fontWeight: 450
     lineHeight: 1.45
   metric:
     fontFamily: "Anthropic Sans, PingFang SC, Hiragino Sans GB, Microsoft YaHei, system-ui, sans-serif"
-    fontSize: 38px
-    fontWeight: 620
+    fontSize: 28px
+    fontWeight: 680
     lineHeight: 1
     letterSpacing: -0.045em
     fontFeature: "tnum"
   microdata:
     fontFamily: "Anthropic Mono, SFMono-Regular, Consolas, ui-monospace, monospace"
-    fontSize: 12px
+    fontSize: 11px
     fontWeight: 500
     lineHeight: 1.4
     fontFeature: "tnum"
 rounded:
-  sm: 8px
-  base: 12px
-  lg: 18px
-  xl: 24px
+  sm: 7px
+  base: 9px
+  lg: 14px
+  xl: 18px
   full: 999px
 spacing:
   xs: 4px
@@ -92,26 +92,26 @@ Claude 记忆刻痕是面向长期对话回顾、检索、统计与导出的私�
 
 | Role | Light | Dark | Claude（冻结） |
 |---|---|---|---|
-| `bg-primary` | `#E9ECE9` | `#202421` | `#FAF9F5` |
-| `bg-secondary` | `#E4E8E5` | `#252A27` | `#F5F4ED` |
-| `bg-card` | `#EDF0ED` | `#272C29` | `#FFFFFF` |
-| `bg-input` | `#E1E5E2` | `#1E2320` | `#F5F4ED` |
-| `text-primary` | `#202522` | `#F1F4F1` | `#141413` |
-| `text-secondary` | `#404943` | `#CDD5D0` | `#3D3D3A` |
-| `text-muted` | `#626D66` | `#A8B2AC` | `#73726C` |
-| `accent` | `#C96342` | `#E58A67` | `#D97657` |
-| `accent-ink` | `#81351F` | `#F0A88B` | 不新增覆盖 |
-| `stats-assistant` | `#507A76` | `#8AA9A5` | `#5B7474` |
+| `bg-primary` | `#F1F2EF` | `#1E211F` | `#FAF9F5` |
+| `bg-secondary` | `#ECEEEB` | `#232724` | `#F5F4ED` |
+| `bg-card` | `#F5F6F3` | `#252925` | `#FFFFFF` |
+| `bg-input` | `#E8EBE7` | `#1B1F1C` | `#F5F4ED` |
+| `text-primary` | `#1F2420` | `#F2F4F2` | `#141413` |
+| `text-secondary` | `#414943` | `#CBD1CD` | `#3D3D3A` |
+| `text-muted` | `#5F6861` | `#939D97` | `#73726C` |
+| `accent` | `#C95F3D` | `#E57D59` | `#D97657` |
+| `accent-ink` | `#853B24` | `#F2A085` | 不新增覆盖 |
+| `stats-assistant` | `#507A76` | `#86A7A1` | `#5B7474` |
 
 ## Typography
 
 亮色与暗色全站共享一套 Anthropic Sans UI 字体栈；中文依次回退到 PingFang SC、Hiragino Sans GB 与 Microsoft YaHei。页面、侧边栏、搜索、导出、会话和统计不能再各自声明一套字号。大数值也使用 Sans，以 `tabular-nums` 保持表格对齐；Mono 仅用于时间、计数等微数据。Claude 主题继续使用原有 Anthropic Sans / Serif / Mono 分工。
 
-字号只使用 frontmatter 中的八个语义角色。正文不得低于 14px，标签不得低于 13px，caption 只用于时间与次级元数据；移动端输入控件保持至少 16px，避免浏览器自动缩放。大数值的负字距不得超过 `-0.045em`。
+字号只使用 frontmatter 中的八个语义角色。高密度工具界面的常规正文为 13px，标签为 12px，11px caption 只用于时间与次级元数据；长篇对话保持 13px / 1.5 行高。移动端文本输入仍保持 16px，避免浏览器聚焦时自动缩放。大数值的负字距不得超过 `-0.045em`。
 
 ## Layout
 
-全站使用 4 / 8 / 16 / 24 / 32 / 48px 间距序列。页面主体靠留白、对齐和分隔线组织；容器不是默认的分组手段。桌面内容区使用固定最大宽度，侧栏保持独立导航层；移动端改为流式单列，所有触控目标至少 44×44px。
+全站使用 4 / 8 / 16 / 24 / 32 / 48px 间距序列。页面主体靠留白、对齐和分隔线组织；容器不是默认的分组手段。桌面页面共享 920px 中央工作区，对话头部与全部消息落在同一阅读轴；移动端不是桌面卡片的机械单列版，而是紧凑矩阵与流式阅读。高频主导航目标至少 44px，其他高密度控件遵守 WCAG 2.2 AA 的 24px 最小目标并保留清楚间隔。
 
 一个区域最多只有一层主要承载面。搜索标题、结果组、结果行不能层层各自凸起；导出组和会话消息遵循相同原则。每屏只保留一个主视觉机制，统计图表是统计下半区的视觉主角。
 
@@ -130,6 +130,8 @@ hover 只提升 1–2px 并轻微加强阴影；pressed / selected 回到同一�
 **导航与设置。** 桌面与移动端均使用原生 button、link、radio 或 checkbox 语义。当前页设置 `aria-current="page"`；主题、语言与开关必须可通过键盘完成。折叠侧栏保持与展开态相同的信息层级，不引入另一套材质。
 
 **页面标题。** 搜索、导出、会话和“数据雕塑”共享 page-title；一级内容区使用 section-title，图表与卡片使用 card-title。标题自身不做凸起卡片。
+
+**上传页。** 亮色、暗色与 Claude 主题的上传区、缓存条和显示名称承载面共享 504px 最大宽度；主题差异只来自材质，不通过把亮暗主题横向拉宽制造第二套构图。手机继续使用视口内满宽布局。
 
 **三张交互图表。** 每月对话频率、每日活跃时段、每月字数共享 DOM tooltip 与交互状态。鼠标悬停或键盘 focus 显示临时精确值；点击、触控或 Enter 锁定当前值；方向键、Home、End 在数据点间移动；Escape 解锁并关闭。tooltip 必须使用完整年月或完整小时，保持可关闭、可悬停且在指针离开后不残留临时状态。Canvas 提供可聚焦名称和隐藏数据表作为完整回退，并通过 ResizeObserver 在容器变化时重绘。
 

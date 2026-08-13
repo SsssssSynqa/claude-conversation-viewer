@@ -329,12 +329,8 @@ export function drawRadialActivityChart(canvas, values, opts = {}) {
   ctx.lineWidth = 1;
   ctx.stroke();
 
-  const markers = [
-    { hour: 0, label: '0  夜' },
-    { hour: 6, label: '6  晨' },
-    { hour: 12, label: '12  昼' },
-    { hour: 18, label: '18  暮' },
-  ];
+  const markerNames = opts.markerNames || ['night', 'morning', 'noon', 'evening'];
+  const markers = [0, 6, 12, 18].map((hour, index) => ({ hour, label: `${hour}  ${markerNames[index]}` }));
   ctx.font = `500 11px ${chartFont}`;
   ctx.fillStyle = mutedColor;
   for (const marker of markers) {
@@ -353,13 +349,13 @@ export function drawRadialActivityChart(canvas, values, opts = {}) {
   ctx.textBaseline = 'middle';
   ctx.fillStyle = mutedColor;
   ctx.font = `500 10px ${chartFont}`;
-  ctx.fillText(activeHour == null ? '活跃峰值' : '当前时段', centerX, centerY - 24);
+  ctx.fillText(activeHour == null ? (opts.peakLabel || 'Peak') : (opts.currentLabel || 'Current'), centerX, centerY - 24);
   ctx.fillStyle = textColor;
   ctx.font = `${activeHour == null ? 500 : 600} 25px ${dataFont}`;
   ctx.fillText(`${centerHour}:00`, centerX, centerY + 1);
   ctx.fillStyle = color;
   ctx.font = `600 10px ${chartFont}`;
-  ctx.fillText(`${centerValue.toLocaleString()} 条消息`, centerX, centerY + 28);
+  ctx.fillText(opts.valueFormatter ? opts.valueFormatter(centerValue) : centerValue.toLocaleString(), centerX, centerY + 28);
 
   return {
     hitTest(x, y) {

@@ -1,3 +1,5 @@
+import { t } from '../i18n.js';
+
 let chartId = 0;
 
 /**
@@ -28,13 +30,13 @@ export function mountInteractiveCanvasChart({
   live.setAttribute('aria-live', 'polite');
   stage.appendChild(live);
 
-  const table = buildAccessibleTable(`${id}-table`, `${title}完整数据`, tableHeaders, tableRows);
+  const table = buildAccessibleTable(`${id}-table`, t('chart.completeData', { title }), tableHeaders, tableRows);
   stage.appendChild(table);
 
   canvas.tabIndex = 0;
   canvas.classList.add('stats-interactive-canvas');
   canvas.setAttribute('role', 'img');
-  canvas.setAttribute('aria-label', `${title}。悬停或聚焦查看精确数据，点击或按 Enter 锁定，按 Escape 关闭。`);
+  canvas.setAttribute('aria-label', t('chart.instructions', { title }));
   canvas.setAttribute('aria-describedby', `${live.id} ${table.id}`);
 
   let model = null;

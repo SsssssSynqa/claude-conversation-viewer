@@ -45,6 +45,7 @@ export class ConversationList {
     this.searchInput.type = 'text';
     this.searchInput.className = 'history-search-input';
     this.searchInput.placeholder = t('convList.searchPlaceholder');
+    this.searchInput.setAttribute('aria-label', t('convList.searchPlaceholder'));
     this.searchInput.value = state.get('searchQuery') || '';
     this.searchInput.addEventListener('input', () => this.onSearch());
 

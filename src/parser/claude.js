@@ -10,6 +10,7 @@ import { formatDuration } from '../utils/time.js';
  * Parse a single raw conversation object from Claude export JSON.
  */
 export function parseConversation(raw) {
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return null;
   const messages = parseMessages(raw.chat_messages || []);
   if (messages.length === 0) return null;
 
@@ -69,7 +70,8 @@ function parseMessages(chatMessages) {
   let pendingToolUses = [];
 
   for (const raw of chatMessages) {
-    const sender = raw.sender || 'unknown';
+    if (!raw || typeof raw !== 'object' || Array.isArray(raw)) continue;
+    const sender = typeof raw.sender === 'string' ? raw.sender : 'unknown';
     const contentItems = Array.isArray(raw.content) ? raw.content : [];
     const contentBlocks = [];
     let searchTextParts = [];
@@ -79,7 +81,7 @@ function parseMessages(chatMessages) {
 
       switch (item.type) {
         case 'text': {
-          const text = (item.text || '').trim();
+          const text = typeof item.text === 'string' ? item.text.trim() : '';
           if (text) {
             contentBlocks.push({ type: 'text', text });
             searchTextParts.push(text);
@@ -89,7 +91,7 @@ function parseMessages(chatMessages) {
 
         case 'thinking': {
           // CRITICAL: field is item.thinking, NOT item.text
-          const thinking = (item.thinking || '').trim();
+          const thinking = typeof item.thinking === 'string' ? item.thinking.trim() : '';
           if (thinking) {
             const startTs = item.start_timestamp || '';
             const stopTs = item.stop_timestamp || '';
@@ -98,7 +100,9 @@ function parseMessages(chatMessages) {
               durationMs = new Date(stopTs) - new Date(startTs);
               if (isNaN(durationMs) || durationMs < 0) durationMs = 0;
             }
-            const summaries = (item.summaries || []).map(s => s.summary || '').filter(Boolean);
+            const summaries = Array.isArray(item.summaries)
+              ? item.summaries.map(s => (s && typeof s.summary === 'string') ? s.summary : '').filter(Boolean)
+              : [];
             contentBlocks.push({
               type: 'thinking',
               thinking,
@@ -171,7 +175,7 @@ function parseMessages(chatMessages) {
     }
 
     // Also check raw.text as fallback (some messages use this)
-    if (contentBlocks.length === 0 && raw.text) {
+    if (contentBlocks.length === 0 && typeof raw.text === 'string') {
       const text = raw.text.trim();
       if (text) {
         contentBlocks.push({ type: 'text', text });
@@ -185,12 +189,12 @@ function parseMessages(chatMessages) {
     const files = [];
     if (Array.isArray(raw.files)) {
       for (const f of raw.files) {
-        if (f && f.file_name) files.push(f.file_name);
+        if (f && typeof f.file_name === 'string') files.push(f.file_name);
       }
     }
     if (Array.isArray(raw.attachments)) {
       for (const a of raw.attachments) {
-        if (a && a.file_name) files.push(a.file_name);
+        if (a && typeof a.file_name === 'string') files.push(a.file_name);
       }
     }
 
@@ -217,7 +221,8 @@ function extractToolResult(item) {
       return JSON.stringify(c);
     }).join('\n');
   }
-  if (item.text) return item.text;
-  if (item.output) return item.output;
+  if (typeof item.text === 'string') return item.text;
+  if (typeof item.output === 'string') return item.output;
+  if (item.output != null) return JSON.stringify(item.output);
   return '';
 }

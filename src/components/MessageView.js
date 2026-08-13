@@ -72,6 +72,7 @@ export class MessageView {
     if (index < 0 || index >= conversations.length) { this.renderEmpty(); return; }
 
     const conv = conversations[index];
+    this.container.scrollTop = 0;
     const names = state.get('displayNames');
     const showThinking = state.get('showThinking');
     const showToolUse = state.get('showToolUse');
@@ -86,7 +87,7 @@ export class MessageView {
 
     // ---- Header ----
     const header = document.createElement('div');
-    header.className = 'message-header-card';
+    header.className = 'message-header-card content-constrained';
     header.style.cssText = 'flex-shrink:0;';
 
     const headerTop = document.createElement('div');
@@ -96,7 +97,7 @@ export class MessageView {
     const titleSection = document.createElement('div');
     titleSection.className = 'message-title-section';
     titleSection.style.cssText = 'flex:1;min-width:0;';
-    const titleEl = document.createElement('h2');
+    const titleEl = document.createElement('h1');
     titleEl.className = 'message-title';
     titleEl.style.cssText = 'font-family:var(--font-display);font-size:1.2rem;font-weight:400;margin-bottom:4px;';
     titleEl.textContent = conv.name || t('msgView.unnamed');
@@ -116,8 +117,12 @@ export class MessageView {
     const metaEl = document.createElement('div');
     metaEl.className = 'message-meta';
     metaEl.style.cssText = 'font-size:0.78rem;color:var(--text-muted);display:flex;gap:12px;flex-wrap:wrap;';
-    const statItems = [conv.stats.messageCount + t('msgView.msgCount'), (names.human || 'Human') + ': ' + conv.stats.humanChars.toLocaleString() + ' 字', (names.assistant || 'Assistant') + ': ' + conv.stats.assistantChars.toLocaleString() + ' 字'];
-    if (conv.stats.hasThinking) statItems.push(conv.stats.thinkingCount + ' 次思考');
+    const statItems = [
+      `${conv.stats.messageCount} ${t('msgView.msgCount')}`,
+      `${names.human || 'Human'}: ${conv.stats.humanChars.toLocaleString()} ${t('msgView.characters')}`,
+      `${names.assistant || 'Assistant'}: ${conv.stats.assistantChars.toLocaleString()} ${t('msgView.characters')}`,
+    ];
+    if (conv.stats.hasThinking) statItems.push(t('msgView.thoughts', { n: conv.stats.thinkingCount }));
     for (const s of statItems) { const sp = document.createElement('span'); sp.textContent = s; metaEl.appendChild(sp); }
     titleSection.appendChild(metaEl);
     headerTop.appendChild(titleSection);
@@ -187,6 +192,15 @@ export class MessageView {
       this.activeExportDropdown = willOpen ? { wrapper: exportWrapper, dropdown, trigger: exportBtn } : null;
     });
     exportBtn.addEventListener('keydown', (event) => {
+      if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+        event.preventDefault();
+        dropdown.classList.remove('hidden');
+        exportBtn.setAttribute('aria-expanded', 'true');
+        this.activeExportDropdown = { wrapper: exportWrapper, dropdown, trigger: exportBtn };
+        const menuItems = [...dropdown.querySelectorAll('[role="menuitem"]')];
+        menuItems[event.key === 'ArrowDown' ? 0 : menuItems.length - 1]?.focus();
+        return;
+      }
       if (event.key !== 'Escape' || dropdown.classList.contains('hidden')) return;
       dropdown.classList.add('hidden');
       exportBtn.setAttribute('aria-expanded', 'false');
@@ -200,13 +214,32 @@ export class MessageView {
     dropdown.setAttribute('role', 'menu');
     dropdown.style.cssText = 'position:absolute;right:0;top:100%;margin-top:4px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);box-shadow:var(--shadow);z-index:100;min-width:160px;overflow:hidden;';
     dropdown.addEventListener('keydown', (event) => {
+      const items = [...dropdown.querySelectorAll('[role="menuitem"]')];
+      const currentIndex = Math.max(0, items.indexOf(document.activeElement));
+      let nextIndex = null;
+      if (event.key === 'ArrowDown') nextIndex = (currentIndex + 1) % items.length;
+      if (event.key === 'ArrowUp') nextIndex = (currentIndex - 1 + items.length) % items.length;
+      if (event.key === 'Home') nextIndex = 0;
+      if (event.key === 'End') nextIndex = items.length - 1;
+      if (nextIndex != null) {
+        event.preventDefault();
+        items[nextIndex]?.focus();
+        return;
+      }
+      if (event.key === 'Tab') {
+        dropdown.classList.add('hidden');
+        exportBtn.setAttribute('aria-expanded', 'false');
+        this.activeExportDropdown = null;
+        return;
+      }
       if (event.key !== 'Escape') return;
+      event.preventDefault();
       dropdown.classList.add('hidden');
       exportBtn.setAttribute('aria-expanded', 'false');
       this.activeExportDropdown = null;
       exportBtn.focus();
     });
-    for (const fmt of [{key:'md',label:'Markdown'},{key:'txt',label:'纯文本'},{key:'html',label:'HTML'},{key:'json',label:'JSON'}]) {
+    for (const fmt of [{key:'md',label:'Markdown'},{key:'txt',label:t('msgView.plainText')},{key:'html',label:'HTML'},{key:'json',label:'JSON'}]) {
       const item = document.createElement('button');
       item.type = 'button';
       item.setAttribute('role', 'menuitem');
@@ -235,6 +268,10 @@ export class MessageView {
     scrollContainer.className = 'messages-scroll';
     scrollContainer.style.cssText = 'flex:1;overflow-y:auto;padding:16px 0;';
 
+    const messagesInner = document.createElement('div');
+    messagesInner.className = 'messages-inner content-constrained';
+    scrollContainer.appendChild(messagesInner);
+
     let prevTimestamp = null;
 
     for (let mi = 0; mi < conv.messages.length; mi++) {
@@ -251,7 +288,7 @@ export class MessageView {
           sep.style.cssText = 'text-align:center;padding:16px 0;color:var(--text-muted);font-size:0.8rem;';
           const hours = Math.floor(diffMinutes / 60);
           sep.textContent = '\u2014 ' + (hours > 24 ? Math.floor(hours / 24) + t('msgView.daysLater') : hours + t('msgView.hoursLater')) + ' \u2014';
-          scrollContainer.appendChild(sep);
+          messagesInner.appendChild(sep);
         }
       }
       prevTimestamp = msg.createdAt;
@@ -296,7 +333,7 @@ export class MessageView {
         // Claude theme: no sender name for either human or assistant (matches official)
         senderEl.style.cssText = 'display:none;';
       } else {
-        senderEl.style.cssText = 'font-weight:600;font-size:0.85rem;margin-bottom:6px;display:flex;align-items:center;gap:6px;color:' + (isHuman ? 'var(--accent)' : 'var(--text-primary)') + ';';
+        senderEl.style.cssText = 'font-weight:600;font-size:0.85rem;margin-bottom:6px;display:flex;align-items:center;gap:6px;color:' + (isHuman ? 'var(--accent-ink)' : 'var(--text-primary)') + ';';
         senderEl.appendChild(createIcon(isHuman ? 'user' : 'bot', 14));
         senderEl.appendChild(document.createTextNode(isHuman ? (names.human || 'Human') : (names.assistant || 'Assistant')));
       }
@@ -362,8 +399,8 @@ export class MessageView {
       const actionBtns = document.createElement('div');
       actionBtns.style.cssText = 'display:flex;gap:4px;';
 
-      actionBtns.appendChild(this._createActionBtn('复制', () => this._copyMessage(msg)));
-      actionBtns.appendChild(this._createActionBtn(isCollected ? '已精选' : '+精选', () => {
+      actionBtns.appendChild(this._createActionBtn(t('msgView.copy'), () => this._copyMessage(msg)));
+      actionBtns.appendChild(this._createActionBtn(isCollected ? t('msgView.collected') : t('msgView.collect'), () => {
         if (isCollected) return;
         this._addToCollection(conv, mi, msg);
         // Auto enter select mode and select this message
@@ -373,7 +410,7 @@ export class MessageView {
           this.renderConversation();
         }
       }, isCollected));
-      actionBtns.appendChild(this._createActionBtn('选择到这里', () => {
+      actionBtns.appendChild(this._createActionBtn(t('msgView.selectToHere'), () => {
         if (!this.selectMode) { this.selectMode = true; }
         this._selectToHere(mi, conv);
         this.renderConversation();
@@ -391,7 +428,7 @@ export class MessageView {
         msgEl.addEventListener('mouseleave', () => { if (!footer.dataset.pinned) footer.style.opacity = '0.55'; });
       }
 
-      scrollContainer.appendChild(msgEl);
+      messagesInner.appendChild(msgEl);
     }
 
     this.container.appendChild(scrollContainer);
@@ -438,7 +475,7 @@ export class MessageView {
     let text = '';
     for (const block of msg.contentBlocks) {
       if (block.type === 'text') text += block.text + '\n';
-      else if (block.type === 'thinking' && block.thinking) text += '\n[思考过程]\n' + block.thinking + '\n';
+      else if (block.type === 'thinking' && block.thinking) text += `\n[${t('msgView.thinking')}]\n${block.thinking}\n`;
     }
     navigator.clipboard.writeText(text.trim()).catch(() => {});
   }
@@ -473,12 +510,12 @@ export class MessageView {
 
     const info = document.createElement('span');
     info.style.cssText = 'font-size:0.85rem;color:var(--text-primary);font-weight:600;';
-    info.textContent = '已选 ' + this.selectedIndices.size + ' 条';
+    info.textContent = t('msgView.selected', { n: this.selectedIndices.size });
     toolbar.appendChild(info);
 
     toolbar.appendChild(Object.assign(document.createElement('div'), { style: 'flex:1;' }));
 
-    toolbar.appendChild(this._toolbarBtn('复制', () => {
+    toolbar.appendChild(this._toolbarBtn(t('msgView.copy'), () => {
       const sorted = [...this.selectedIndices].sort((a, b) => a - b);
       const names = state.get('displayNames');
       let text = '';
@@ -492,7 +529,7 @@ export class MessageView {
       navigator.clipboard.writeText(text.trim()).catch(() => {});
     }));
 
-    toolbar.appendChild(this._toolbarBtn('加入精选集', () => {
+    toolbar.appendChild(this._toolbarBtn(t('msgView.addToCollection'), () => {
       const collection = state.get('exportCollection') || [];
       for (const idx of this.selectedIndices) {
         const msg = conv.messages[idx];
@@ -504,11 +541,11 @@ export class MessageView {
       saveExportCollection();
     }));
 
-    const exportBtn = this._toolbarBtn('导出选中', () => this._exportMessages(conv, [...this.selectedIndices].sort((a, b) => a - b).map(idx => conv.messages[idx])));
+    const exportBtn = this._toolbarBtn(t('msgView.exportSelected'), () => this._exportMessages(conv, [...this.selectedIndices].sort((a, b) => a - b).map(idx => conv.messages[idx])));
     exportBtn.style.background = 'var(--accent)'; exportBtn.style.color = '#fff'; exportBtn.style.borderColor = 'var(--accent)';
     toolbar.appendChild(exportBtn);
 
-    toolbar.appendChild(this._toolbarBtn('取消', () => { this.selectMode = false; this.selectedIndices.clear(); this.renderConversation(); }));
+    toolbar.appendChild(this._toolbarBtn(t('msgView.cancel'), () => { this.selectMode = false; this.selectedIndices.clear(); this.renderConversation(); }));
 
     this.container.appendChild(toolbar);
   }
@@ -529,7 +566,7 @@ export class MessageView {
     import('../utils/export.js').then(({ exportAsText, exportAsMarkdown, exportAsHTML, downloadFile }) => {
       const options = { includeThinking: state.get('showThinking'), includeToolUse: state.get('showToolUse'), includeFlags: state.get('showFlags'), displayNames: state.get('displayNames') };
       const dateSuffix = formatLocalDateStamp();
-      const nameBase = this._sanitizeFilename(conv.name || '对话');
+      const nameBase = this._sanitizeFilename(conv.name || t('msgView.fileConversation'));
       let content, filename, mimeType;
       switch (format) {
         case 'txt': content = exportAsText([conv], options); filename = `${nameBase}_${dateSuffix}.txt`; mimeType = 'text/plain;charset=utf-8'; break;
@@ -544,24 +581,24 @@ export class MessageView {
   _exportMessages(conv, messages) {
     import('../utils/export.js').then(({ downloadFile }) => {
       const names = state.get('displayNames');
-      let output = `# ${conv.name || '未命名对话'}（节选）\n\n`;
+      let output = `# ${conv.name || t('msgView.unnamed')} (${t('msgView.excerpt')})\n\n`;
       for (const msg of messages) {
         const sender = msg.sender === 'human' ? (names.human || 'Human') : (names.assistant || 'Assistant');
         output += `## ${sender} (${formatTimestamp(msg.createdAt)})\n\n`;
         for (const block of msg.contentBlocks) {
           if (block.type === 'text') output += this._toMarkdownCodeBlock(block.text) + '\n\n';
-          else if (block.type === 'thinking' && block.thinking) output += `> 思考过程\n\n${this._toMarkdownCodeBlock(block.thinking)}\n\n`;
+          else if (block.type === 'thinking' && block.thinking) output += `> ${t('msgView.thinking')}\n\n${this._toMarkdownCodeBlock(block.thinking)}\n\n`;
         }
         output += '---\n\n';
       }
       const dateSuffix = formatLocalDateStamp();
-      const safeName = this._sanitizeFilename(conv.name || '对话');
-      downloadFile(output, `${safeName}_节选_${dateSuffix}.md`, 'text/markdown;charset=utf-8');
+      const safeName = this._sanitizeFilename(conv.name || t('msgView.fileConversation'));
+      downloadFile(output, `${safeName}_${t('msgView.excerpt')}_${dateSuffix}.md`, 'text/markdown;charset=utf-8');
     });
   }
 
   _sanitizeFilename(name) {
-    return (name || '对话').replace(/[/\\?%*:|"<>]/g, '_').trim().slice(0, 120) || '对话';
+    return (name || t('msgView.fileConversation')).replace(/[/\\?%*:|"<>]/g, '_').trim().slice(0, 120) || t('msgView.fileConversation');
   }
 
   _toMarkdownCodeBlock(text) {
@@ -584,7 +621,10 @@ export class MessageView {
       const targetBlock = messageBlocks[msgIndex];
       if (!targetBlock) return;
 
-      targetBlock.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      targetBlock.scrollIntoView({
+        behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+        block: 'center',
+      });
       targetBlock.style.transition = 'box-shadow 0.3s, outline 0.3s';
       targetBlock.style.outline = '2px solid var(--accent)';
       targetBlock.style.boxShadow = '0 0 12px var(--accent-bg)';
@@ -730,7 +770,7 @@ export class MessageView {
     summary.appendChild(createIcon('thought', 14));
     const label = document.createElement('span');
     label.style.fontWeight = '600';
-    label.textContent = '思考过程';
+    label.textContent = t('msgView.thinking');
     summary.appendChild(label);
     if (block.durationText) { const dur = document.createElement('span'); dur.className = 'badge badge-thinking'; dur.textContent = block.durationText; summary.appendChild(dur); }
     if (block.summaries && block.summaries.length > 0) { const st = document.createElement('span'); st.style.cssText = 'color:var(--text-muted);font-size:0.8rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;'; st.textContent = '\u2014 ' + block.summaries[0]; summary.appendChild(st); }

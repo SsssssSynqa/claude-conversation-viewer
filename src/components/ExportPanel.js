@@ -31,6 +31,7 @@ export class ExportPanel {
   render(container) {
     // Clean up previous subscription
     this._unsubCollection?.();
+    container.scrollTop = 0;
     container.textContent = '';
     container.classList.remove('stats-panel-shell');
     container.classList.add('content-area', 'content-shell');
@@ -42,7 +43,7 @@ export class ExportPanel {
     header.style.cssText = 'padding:14px 16px 12px;flex-shrink:0;background:transparent;';
     header.classList.add('content-constrained');
 
-    const title = document.createElement('h2');
+    const title = document.createElement('h1');
     title.style.cssText = 'font-size:1rem;font-weight:600;color:var(--text-primary);margin-bottom:10px;';
     title.textContent = t('export.title');
     header.appendChild(title);
@@ -55,6 +56,8 @@ export class ExportPanel {
     const formatGroup = document.createElement('div');
     formatGroup.className = 'export-toolbar-group';
     formatGroup.style.cssText = 'display:flex;gap:4px;align-items:center;';
+    formatGroup.setAttribute('role', 'radiogroup');
+    formatGroup.setAttribute('aria-label', t('export.format'));
     const formatLabel = document.createElement('span');
     formatLabel.style.cssText = 'font-size:0.74rem;color:var(--text-muted);';
     formatLabel.textContent = t('export.format');
@@ -66,21 +69,42 @@ export class ExportPanel {
       { value: 'html', label: 'HTML' },
       { value: 'json', label: 'JSON' },
     ];
+    const formatButtons = [];
+    const selectFormat = (button) => {
+      this.format = button.dataset.format;
+      formatButtons.forEach(candidate => {
+        const active = candidate === button;
+        candidate.classList.toggle('active', active);
+        candidate.setAttribute('aria-checked', active ? 'true' : 'false');
+        candidate.tabIndex = active ? 0 : -1;
+      });
+    };
     for (const fmt of formats) {
       const btn = document.createElement('button');
+      btn.type = 'button';
       btn.className = 'export-format-btn' + (fmt.value === this.format ? ' active' : '');
       btn.dataset.format = fmt.value;
+      btn.setAttribute('role', 'radio');
+      btn.setAttribute('aria-checked', fmt.value === this.format ? 'true' : 'false');
+      btn.tabIndex = fmt.value === this.format ? 0 : -1;
       btn.style.cssText = 'font-size:0.74rem;';
       btn.textContent = fmt.label;
-      btn.addEventListener('click', () => {
-        this.format = fmt.value;
-        formatGroup.querySelectorAll('button').forEach(b => {
-          const active = b.dataset.format === this.format;
-          b.classList.toggle('active', active);
-        });
-      });
+      btn.addEventListener('click', () => selectFormat(btn));
+      formatButtons.push(btn);
       formatGroup.appendChild(btn);
     }
+    formatGroup.addEventListener('keydown', event => {
+      if (!['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'].includes(event.key)) return;
+      const current = Math.max(0, formatButtons.indexOf(document.activeElement));
+      let next = current;
+      if (event.key === 'Home') next = 0;
+      else if (event.key === 'End') next = formatButtons.length - 1;
+      else if (event.key === 'ArrowRight' || event.key === 'ArrowDown') next = (current + 1) % formatButtons.length;
+      else next = (current - 1 + formatButtons.length) % formatButtons.length;
+      event.preventDefault();
+      selectFormat(formatButtons[next]);
+      formatButtons[next].focus();
+    });
     configRow.appendChild(formatGroup);
 
     // Options toggles (plain inline)
@@ -98,6 +122,7 @@ export class ExportPanel {
       const input = document.createElement('input');
       input.type = 'checkbox';
       input.checked = this.options[opt.key];
+      input.setAttribute('aria-label', opt.label);
       input.style.accentColor = 'var(--accent)';
       input.addEventListener('change', () => { this.options[opt.key] = input.checked; });
       label.appendChild(input);
@@ -113,26 +138,30 @@ export class ExportPanel {
     nameRow.className = 'export-toolbar-group';
     nameRow.style.cssText = 'display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap;';
 
-    const prefixLabel = document.createElement('span');
+    const prefixLabel = document.createElement('label');
     prefixLabel.style.cssText = 'font-size:0.75rem;color:var(--text-muted);';
     prefixLabel.textContent = t('export.filePrefix');
     nameRow.appendChild(prefixLabel);
 
     const prefixInput = document.createElement('input');
     prefixInput.type = 'text';
+    prefixInput.id = 'export-file-prefix';
+    prefixLabel.htmlFor = prefixInput.id;
     prefixInput.placeholder = t('export.optional');
     prefixInput.className = 'export-mini-input';
     prefixInput.style.cssText = 'padding:6px 8px;background:var(--surface-inset);box-shadow:var(--shadow-inset);border-radius:10px;color:var(--text-primary);font-size:0.76rem;width:92px;';
     prefixInput.addEventListener('input', () => { this.options.filePrefix = prefixInput.value; });
     nameRow.appendChild(prefixInput);
 
-    const suffixLabel = document.createElement('span');
+    const suffixLabel = document.createElement('label');
     suffixLabel.style.cssText = 'font-size:0.75rem;color:var(--text-muted);';
     suffixLabel.textContent = t('export.fileSuffix');
     nameRow.appendChild(suffixLabel);
 
     const suffixInput = document.createElement('input');
     suffixInput.type = 'text';
+    suffixInput.id = 'export-file-suffix';
+    suffixLabel.htmlFor = suffixInput.id;
     suffixInput.placeholder = t('export.optional');
     suffixInput.className = 'export-mini-input';
     suffixInput.style.cssText = 'padding:6px 8px;background:var(--surface-inset);box-shadow:var(--shadow-inset);border-radius:10px;color:var(--text-primary);font-size:0.76rem;width:92px;';
@@ -374,7 +403,7 @@ export class ExportPanel {
     // JSON format — export raw message data
     if (this.format === 'json') {
       const jsonData = this._buildCollectionData(collection, conversations);
-      downloadFile(JSON.stringify(jsonData, null, 2), `精选集_${dateSuffix}.json`, 'application/json;charset=utf-8');
+      downloadFile(JSON.stringify(jsonData, null, 2), `${t('export.collectionFile')}_${dateSuffix}.json`, 'application/json;charset=utf-8');
       return;
     }
 
@@ -382,14 +411,15 @@ export class ExportPanel {
     if (this.format === 'html') {
       const fakeConvs = this._buildCollectionAsConversations(collection, conversations);
       const content = exportAsHTML(fakeConvs, { ...this.options, displayNames: names });
-      downloadFile(content, `精选集_${dateSuffix}.html`, 'text/html;charset=utf-8');
+      downloadFile(content, `${t('export.collectionFile')}_${dateSuffix}.html`, 'text/html;charset=utf-8');
       return;
     }
 
     // Text and Markdown formats
     const isTxt = this.format === 'txt';
     const collectionConvs = this._buildCollectionAsConversations(collection, conversations);
-    let output = isTxt ? '精选集导出\n' + '='.repeat(40) + '\n\n' : '# 精选集导出\n\n';
+    const collectionTitle = t('export.collectionDocumentTitle');
+    let output = isTxt ? `${collectionTitle}\n${'='.repeat(40)}\n\n` : `# ${collectionTitle}\n\n`;
 
     output += isTxt
       ? exportAsText(collectionConvs, { ...this.options, displayNames: names })
@@ -397,7 +427,7 @@ export class ExportPanel {
 
     const ext = isTxt ? 'txt' : 'md';
     const mime = isTxt ? 'text/plain;charset=utf-8' : 'text/markdown;charset=utf-8';
-    downloadFile(output, `精选集_${dateSuffix}.${ext}`, mime);
+    downloadFile(output, `${t('export.collectionFile')}_${dateSuffix}.${ext}`, mime);
   }
 
   _buildCollectionData(collection, conversations) {
@@ -452,7 +482,7 @@ export class ExportPanel {
   }
 
   _doExport(conversations) {
-    const nameBase = conversations.length === 1 ? (conversations[0].name || '对话') : '对话导出';
+    const nameBase = conversations.length === 1 ? (conversations[0].name || t('export.conversationFile')) : t('export.conversationsFile');
     const content = this._exportContent(conversations);
     const filename = this._buildFilename(nameBase);
     const mimeMap = { md: 'text/markdown', txt: 'text/plain', html: 'text/html', json: 'application/json' };
@@ -467,7 +497,7 @@ export class ExportPanel {
 
     for (let i = 0; i < conversations.length; i++) {
       const conv = conversations[i];
-      const name = this._sanitizeFilename(conv.name || '未命名_' + i);
+      const name = this._sanitizeFilename(conv.name || t('export.untitledIndexed', { n: i }));
       let content;
       switch (this.format) {
         case 'txt': content = exportAsText([conv], options); break;
@@ -483,13 +513,13 @@ export class ExportPanel {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = '对话导出_' + formatLocalDateStamp() + '.zip';
+    a.download = `${t('export.conversationsFile')}_${formatLocalDateStamp()}.zip`;
     a.click();
     URL.revokeObjectURL(url);
   }
 
   _sectionTitle(text) {
-    const el = document.createElement('div');
+    const el = document.createElement('h2');
     el.className = 'panel-section-title';
     el.textContent = text;
     return el;
@@ -515,6 +545,6 @@ export class ExportPanel {
   }
 
   _sanitizeFilename(name) {
-    return (name || '对话').replace(/[/\\?%*:|"<>]/g, '_').trim().slice(0, 120) || '对话';
+    return (name || t('export.conversationFile')).replace(/[/\\?%*:|"<>]/g, '_').trim().slice(0, 120) || t('export.conversationFile');
   }
 }

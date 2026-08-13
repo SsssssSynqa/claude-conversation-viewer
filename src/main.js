@@ -6,7 +6,7 @@ import './themes/variables.css';
 import './styles/base.css';
 import './styles/components.css';
 import './styles/clawd.css';
-import './styles/refinement.css';
+import './styles/tactile.css';
 import { state, saveDesensitizeWords, saveExportCollection, resetSidebarFilter } from './store/state.js';
 import { FileUpload } from './components/FileUpload.js';
 import { ConversationList } from './components/ConversationList.js';
@@ -25,6 +25,7 @@ import logoZhDark from './assets/logo-zh-dark.png';
 
 // ---- Page title ----
 document.title = t('page.title');
+document.documentElement.lang = (state.get('lang') || 'zh') === 'en' ? 'en' : 'zh-CN';
 
 // ---- Theme ----
 function applyTheme(theme) {
@@ -36,6 +37,31 @@ const THEMES = ['dark', 'light', 'claude'];
 const THEME_ICON_NAMES = { dark: 'moon', light: 'sun', claude: 'flower' };
 const THEME_LABELS = { dark: t('theme.dark'), light: t('theme.light'), claude: t('theme.claude') };
 
+function enableRadioGroupKeyboard(track, selector, activate) {
+  const options = () => [...track.querySelectorAll(selector)];
+  const syncTabStops = () => {
+    const items = options();
+    const checkedIndex = Math.max(0, items.findIndex(item => item.getAttribute('aria-checked') === 'true'));
+    items.forEach((item, index) => { item.tabIndex = index === checkedIndex ? 0 : -1; });
+  };
+  track.addEventListener('keydown', (event) => {
+    if (!['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'].includes(event.key)) return;
+    const items = options();
+    if (items.length === 0) return;
+    const currentIndex = Math.max(0, items.indexOf(document.activeElement));
+    let nextIndex = currentIndex;
+    if (event.key === 'Home') nextIndex = 0;
+    else if (event.key === 'End') nextIndex = items.length - 1;
+    else if (event.key === 'ArrowRight' || event.key === 'ArrowDown') nextIndex = (currentIndex + 1) % items.length;
+    else nextIndex = (currentIndex - 1 + items.length) % items.length;
+    event.preventDefault();
+    activate(items[nextIndex]);
+    syncTabStops();
+    items[nextIndex].focus();
+  });
+  return syncTabStops;
+}
+
 function cycleTheme() {
   const current = state.get('theme');
   const idx = THEMES.indexOf(current);
@@ -43,6 +69,9 @@ function cycleTheme() {
   state.set('theme', next);
 }
 
+if (!THEMES.includes(state.get('theme'))) {
+  state.set('theme', window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+}
 state.on('theme', applyTheme);
 applyTheme(state.get('theme'));
 
@@ -93,7 +122,7 @@ function renderMainView() {
   sidebarTitle.className = 'sidebar-brand';
   const curTheme = state.get('theme');
   const lang = state.get('lang') || 'zh';
-  const isDark = (curTheme === 'dark' || (curTheme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches));
+  const isDark = curTheme === 'dark';
   // Spark icon for collapsed state only
   const brandLogoBtn = document.createElement('button');
   brandLogoBtn.type = 'button';
@@ -109,7 +138,7 @@ function renderMainView() {
   function updateSidebarLogo() {
     const th = state.get('theme');
     const ln = state.get('lang') || 'zh';
-    const dk = (th === 'dark' || (th === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches));
+    const dk = th === 'dark';
     sidebarLogo.src = dk ? (ln === 'zh' ? logoZhDark : logoEnDark) : (ln === 'zh' ? logoZh : logoEn);
   }
   updateSidebarLogo();
@@ -125,7 +154,8 @@ function renderMainView() {
   const collapseBtn = document.createElement('button');
   collapseBtn.type = 'button';
   collapseBtn.className = 'sidebar-collapse-btn sidebar-expand-only';
-  collapseBtn.title = 'Collapse sidebar';
+  collapseBtn.title = t('sidebar.collapse');
+  collapseBtn.setAttribute('aria-label', t('sidebar.collapse'));
   // Claude.ai panel icon (two-panel SVG)
   const collapseSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
   collapseSvg.setAttribute('width', '20');
@@ -144,8 +174,8 @@ function renderMainView() {
   const mobileCloseBtn = document.createElement('button');
   mobileCloseBtn.type = 'button';
   mobileCloseBtn.className = 'mobile-sidebar-close';
-  mobileCloseBtn.title = 'Close sidebar';
-  mobileCloseBtn.setAttribute('aria-label', 'Close sidebar');
+  mobileCloseBtn.title = t('sidebar.close');
+  mobileCloseBtn.setAttribute('aria-label', t('sidebar.close'));
   mobileCloseBtn.appendChild(createIcon('close', 18));
   mobileCloseBtn.addEventListener('click', closeMobileSidebar);
   sidebarTitle.appendChild(mobileCloseBtn);
@@ -184,7 +214,8 @@ function renderMainView() {
   railExpandBtn.type = 'button';
   railExpandBtn.className = 'sidebar-rail-toggle';
   railExpandBtn.textContent = '›';
-  railExpandBtn.title = 'Expand sidebar';
+  railExpandBtn.title = t('sidebar.expand');
+  railExpandBtn.setAttribute('aria-label', t('sidebar.expand'));
   railExpandBtn.addEventListener('click', () => {
     state.set('sidebarCollapsed', false);
   });
@@ -199,7 +230,7 @@ function renderMainView() {
   themeTrack.className = 'sidebar-pill toggle-track track-3';
   themeTrack.id = 'sidebar-theme-track';
   themeTrack.setAttribute('role', 'radiogroup');
-  themeTrack.setAttribute('aria-label', '主题');
+  themeTrack.setAttribute('aria-label', t('sidebar.themeGroup'));
 
   const themeThumb = document.createElement('div');
   themeThumb.className = 'toggle-thumb';
@@ -242,6 +273,10 @@ function renderMainView() {
     });
     themeTrack.appendChild(optDiv);
   }
+  const syncThemeTabStops = enableRadioGroupKeyboard(themeTrack, '.toggle-option', option => {
+    state.set('theme', option.dataset.theme);
+  });
+  syncThemeTabStops();
 
   themeTrackRow.appendChild(themeTrack);
   requestAnimationFrame(() => syncThemeThumb(currentTheme));
@@ -257,6 +292,7 @@ function renderMainView() {
         el.classList.toggle('active', active);
         el.setAttribute('aria-checked', active ? 'true' : 'false');
       });
+      syncThemeTabStops();
     }
     // Re-render stats panel so ring charts pick up new theme shadows
     if (messageView && state.get('viewMode') === 'stats') {
@@ -350,6 +386,7 @@ function renderMainView() {
   const dsInput = document.createElement('input');
   dsInput.type = 'text';
   dsInput.className = 'neu-input';
+  dsInput.setAttribute('aria-label', t('sidebar.desensitizeWords'));
   dsInput.placeholder = t('sidebar.desensitizePlaceholder');
   dsInput.value = (state.get('desensitizeWords') || []).join(', ');
   dsInput.addEventListener('input', () => {
@@ -403,13 +440,14 @@ function renderMainView() {
   // Human name row
   const humanRow = document.createElement('div');
   humanRow.className = 'sidebar-name-row';
-  const humanLabel = document.createElement('span');
+  const humanLabel = document.createElement('label');
   humanLabel.className = 'sidebar-name-label';
   humanLabel.textContent = t('sidebar.userName');
   humanRow.appendChild(humanLabel);
   const humanInput = document.createElement('input');
   humanInput.type = 'text';
   humanInput.id = 'sidebar-name-human';
+  humanLabel.htmlFor = humanInput.id;
   humanInput.className = 'neu-input';
   humanInput.value = names.human;
   humanRow.appendChild(humanInput);
@@ -418,13 +456,14 @@ function renderMainView() {
   // Assistant name row
   const assistantRow = document.createElement('div');
   assistantRow.className = 'sidebar-name-row';
-  const assistantLabel = document.createElement('span');
+  const assistantLabel = document.createElement('label');
   assistantLabel.className = 'sidebar-name-label';
   assistantLabel.textContent = t('sidebar.aiName');
   assistantRow.appendChild(assistantLabel);
   const assistantInput = document.createElement('input');
   assistantInput.type = 'text';
   assistantInput.id = 'sidebar-name-assistant';
+  assistantLabel.htmlFor = assistantInput.id;
   assistantInput.className = 'neu-input';
   assistantInput.value = names.assistant;
   assistantRow.appendChild(assistantInput);
@@ -469,7 +508,7 @@ function renderMainView() {
   langTrack.className = 'sidebar-pill toggle-track track-2';
   langTrack.id = 'sidebar-lang-track';
   langTrack.setAttribute('role', 'radiogroup');
-  langTrack.setAttribute('aria-label', '语言');
+  langTrack.setAttribute('aria-label', t('sidebar.languageGroup'));
   const langThumb = document.createElement('div');
   langThumb.className = 'toggle-thumb';
   langTrack.appendChild(langThumb);
@@ -487,6 +526,7 @@ function renderMainView() {
     loDiv.className = 'toggle-option' + (lo.lang === currentLang ? ' active' : '');
     loDiv.dataset.lang = lo.lang;
     loDiv.setAttribute('role', 'radio');
+    loDiv.setAttribute('aria-label', lo.lang === 'zh' ? t('sidebar.switchChinese') : t('sidebar.switchEnglish'));
     loDiv.setAttribute('aria-checked', lo.lang === currentLang ? 'true' : 'false');
     loDiv.style.cssText = 'font-weight:700;letter-spacing:0.5px;font-size:13px;';
     loDiv.textContent = lo.label;
@@ -498,6 +538,10 @@ function renderMainView() {
     });
     langTrack.appendChild(loDiv);
   }
+  const syncLangTabStops = enableRadioGroupKeyboard(langTrack, '.toggle-option', option => {
+    option.click();
+  });
+  syncLangTabStops();
   themeTrackRow.appendChild(langTrack);
 
   // Append toggle row (theme + lang) after foldables, before search
@@ -506,14 +550,14 @@ function renderMainView() {
   sidebar.appendChild(sidebarActions);
 
   // Content area
-  const contentArea = document.createElement('div');
+  const contentArea = document.createElement('main');
   contentArea.className = 'content-area';
   contentArea.id = 'content-area';
 
   const mobileSidebarBackdrop = document.createElement('button');
   mobileSidebarBackdrop.type = 'button';
   mobileSidebarBackdrop.className = 'mobile-sidebar-backdrop';
-  mobileSidebarBackdrop.setAttribute('aria-label', 'Close sidebar');
+  mobileSidebarBackdrop.setAttribute('aria-label', t('sidebar.close'));
   mobileSidebarBackdrop.addEventListener('click', closeMobileSidebar);
 
   const mobileBottomNav = document.createElement('nav');
@@ -683,3 +727,26 @@ state.on('conversations', (conversations) => {
 });
 
 renderUploadScreen();
+
+// Development-only visual regression entrypoint. Vite removes this branch from
+// production builds because import.meta.env.DEV is statically false there.
+if (import.meta.env.DEV) {
+  const loadSyntheticFixture = () => fetch('/tests/fixtures/conversations.synthetic.json')
+    .then(response => {
+      if (!response.ok) throw new Error(`Fixture request failed: ${response.status}`);
+      return response.blob();
+    })
+    .then(blob => fileUpload.handleFile(new File([blob], 'conversations.synthetic.json', { type: 'application/json' })))
+    .catch(error => console.error('Unable to load visual regression fixture', error));
+
+  if (new URLSearchParams(window.location.search).get('__fixture') === 'synthetic') {
+    loadSyntheticFixture();
+  } else {
+    const fixtureButton = document.createElement('button');
+    fixtureButton.type = 'button';
+    fixtureButton.setAttribute('aria-label', 'Load visual regression fixture');
+    fixtureButton.style.cssText = 'position:fixed;right:2px;bottom:2px;width:8px;height:8px;padding:0;border:0;opacity:0.01;';
+    fixtureButton.addEventListener('click', loadSyntheticFixture);
+    document.body.appendChild(fixtureButton);
+  }
+}

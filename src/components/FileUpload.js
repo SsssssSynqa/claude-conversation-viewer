@@ -6,7 +6,7 @@ import { state } from '../store/state.js';
 import { saveToCache, getCacheInfo, loadFromCache, clearCache } from '../utils/cache.js';
 import { createIcon } from '../utils/icons.js';
 import { SPARK_SVG } from '../utils/spark.js';
-import { t } from '../i18n.js';
+import { getLang, t } from '../i18n.js';
 import ParseWorker from '../parser/worker.js?worker&inline';
 import logoEn from '../assets/logo-en.png';
 import logoZh from '../assets/logo-zh.png';
@@ -30,9 +30,14 @@ export class FileUpload {
   }
 
   render() {
-    const screen = document.createElement('div');
+    const screen = document.createElement('main');
     screen.className = 'upload-screen';
     screen.id = 'upload-screen';
+
+    const pageTitle = document.createElement('h1');
+    pageTitle.className = 'visually-hidden';
+    pageTitle.textContent = t('sidebar.title');
+    screen.appendChild(pageTitle);
 
     // Title — Logo image, auto-updates on theme/language change
     const greetingRow = document.createElement('div');
@@ -61,6 +66,9 @@ export class FileUpload {
     const zone = document.createElement('div');
     zone.className = 'upload-zone';
     zone.id = 'upload-zone';
+    zone.setAttribute('role', 'button');
+    zone.setAttribute('tabindex', '0');
+    zone.setAttribute('aria-label', t('upload.dropzone'));
     zone.style.cssText = 'padding:0;text-align:left;max-width:504px;';
 
     // Text area (fake placeholder)
@@ -124,6 +132,11 @@ export class FileUpload {
     zone.appendChild(fileInput);
 
     zone.addEventListener('click', () => fileInput.click());
+    zone.addEventListener('keydown', (event) => {
+      if (event.key !== 'Enter' && event.key !== ' ') return;
+      event.preventDefault();
+      fileInput.click();
+    });
     zone.addEventListener('dragover', (e) => { e.preventDefault(); zone.classList.add('dragover'); });
     zone.addEventListener('dragleave', () => zone.classList.remove('dragover'));
     zone.addEventListener('drop', (e) => {
@@ -156,9 +169,11 @@ export class FileUpload {
 
     const humanGroup = this.createNameInput(t('upload.humanName'), names.human);
     humanGroup.querySelector('input').id = 'name-human';
+    humanGroup.querySelector('label').htmlFor = 'name-human';
 
     const assistantGroup = this.createNameInput(t('upload.assistantName'), names.assistant);
     assistantGroup.querySelector('input').id = 'name-assistant';
+    assistantGroup.querySelector('label').htmlFor = 'name-assistant';
 
     nameInputs.appendChild(humanGroup);
     nameInputs.appendChild(assistantGroup);
@@ -224,6 +239,8 @@ export class FileUpload {
     for (const th of themes) {
       const btn = document.createElement('button');
       btn.dataset.theme = th.id;
+      btn.type = 'button';
+      btn.setAttribute('aria-label', t(`theme.${th.id}`));
       const isActive = state.get('theme') === th.id;
       btn.style.cssText = `display:flex;align-items:center;justify-content:center;width:36px;height:36px;border:none;border-radius:12px;cursor:pointer;transition:all 0.15s;color:${isActive ? 'var(--accent)' : 'var(--text-muted)'};${isActive ? 'background:var(--accent-bg);box-shadow:var(--shadow-inset);' : 'background:transparent;'}`;
       if (th.iconName) {
@@ -254,6 +271,8 @@ export class FileUpload {
     for (const lo of langs) {
       const btn = document.createElement('button');
       btn.dataset.lang = lo.id;
+      btn.type = 'button';
+      btn.setAttribute('aria-label', lo.id === 'zh' ? '切换为中文' : 'Switch to English');
       const isActive = state.get('lang') === lo.id;
       btn.style.cssText = `display:flex;align-items:center;justify-content:center;padding:0 12px;height:36px;border:none;border-radius:12px;cursor:pointer;transition:all 0.15s;font-size:13px;font-weight:600;color:${isActive ? 'var(--accent)' : 'var(--text-muted)'};${isActive ? 'background:var(--accent-bg);box-shadow:var(--shadow-inset);' : 'background:transparent;'}`;
       btn.textContent = lo.label;
@@ -309,6 +328,8 @@ export class FileUpload {
     const errorBanner = document.createElement('div');
     errorBanner.className = 'banner banner-error hidden';
     errorBanner.id = 'upload-error';
+    errorBanner.setAttribute('role', 'alert');
+    errorBanner.setAttribute('aria-live', 'assertive');
     screen.appendChild(errorBanner);
 
     this.container.appendChild(screen);
@@ -372,7 +393,9 @@ export class FileUpload {
             case 'error':
               state.set('loading', false);
               this.showUploadScreen();
-              this.showError(data.message);
+              this.showError(data.code === 'INVALID_FORMAT'
+                ? t('upload.errorFormat')
+                : t('upload.errorParseDetail', { detail: data.detail || t('upload.errorParse') }));
               worker.terminate();
               break;
           }
@@ -404,6 +427,7 @@ export class FileUpload {
     if (!screen) return;
     screen.textContent = '';
     screen.className = 'loading-screen';
+    screen.setAttribute('aria-busy', 'true');
 
     // Clawd gif animation (random pick)
     const clawdContainer = document.createElement('div');
@@ -413,11 +437,13 @@ export class FileUpload {
 
     const clawdGifs = [imgBubbles, imgCelebrate, imgIdea, imgLove, imgMusic, imgRepair, imgThinking, imgWatch];
     const idx = Math.floor(Math.random() * clawdGifs.length);
-    const gif = document.createElement('img');
-    gif.src = clawdGifs[idx];
-    gif.alt = 'Clawd loading';
-    gif.style.cssText = 'width:100px;height:100px;image-rendering:pixelated;';
-    clawdContainer.appendChild(gif);
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      const gif = document.createElement('img');
+      gif.src = clawdGifs[idx];
+      gif.alt = t('loading.alt');
+      gif.style.cssText = 'width:100px;height:100px;image-rendering:pixelated;';
+      clawdContainer.appendChild(gif);
+    }
 
     screen.appendChild(clawdContainer);
 
@@ -429,6 +455,11 @@ export class FileUpload {
 
     const progressContainer = document.createElement('div');
     progressContainer.className = 'loading-progress';
+    progressContainer.setAttribute('role', 'progressbar');
+    progressContainer.setAttribute('aria-label', t('upload.loading'));
+    progressContainer.setAttribute('aria-valuemin', '0');
+    progressContainer.setAttribute('aria-valuemax', '100');
+    progressContainer.setAttribute('aria-valuenow', '0');
     const progressBar = document.createElement('div');
     progressBar.className = 'loading-progress-bar';
     progressBar.id = 'loading-progress-bar';
@@ -441,7 +472,9 @@ export class FileUpload {
     const text = document.getElementById('loading-text');
     const bar = document.getElementById('loading-progress-bar');
     if (text) text.textContent = t('upload.loadingProgress', { current, total });
-    if (bar) bar.style.width = `${(current / total) * 100}%`;
+    const percent = total > 0 ? Math.round((current / total) * 100) : 0;
+    if (bar) bar.style.width = `${percent}%`;
+    bar?.parentElement?.setAttribute('aria-valuenow', String(percent));
   }
 
   showUploadScreen() {
@@ -471,7 +504,7 @@ export class FileUpload {
     const sizeStr = info.fileSize > 1024 * 1024
       ? (info.fileSize / (1024 * 1024)).toFixed(1) + ' MB'
       : (info.fileSize / 1024).toFixed(0) + ' KB';
-    detail.textContent = `${t('upload.cacheConvs', { n: info.convCount })} · ${sizeStr} · ${date.toLocaleString('zh-CN')}`;
+    detail.textContent = `${t('upload.cacheConvs', { n: info.convCount })} · ${sizeStr} · ${date.toLocaleString(getLang() === 'en' ? 'en-US' : 'zh-CN')}`;
     info_div.appendChild(detail);
     banner.appendChild(info_div);
 
