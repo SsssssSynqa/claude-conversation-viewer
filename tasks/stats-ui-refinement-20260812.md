@@ -172,3 +172,25 @@ Synqa 继续指出每日活跃表现力不足、时光矩阵需要橙色，以�
 - 本地、服务器与公网 SHA-256 一致：
   `e74fbf5048023f2386b831319acbf3ddc389b45ee634fdf6f41e04ea4b11e001`；公网 HTTP 200，
   `Cache-Control: no-store, must-revalidate`。
+
+
+## Sixth pass · full-stack structural rework
+
+第五版被 Synqa 退回后，不再继续局部补丁。本轮依据全栈审计重建亮/暗主题：
+
+- 删除 `refinement.css`，将亮/暗规则收敛到 `tactile.css`，Claude 主题与两个百分比环不进入覆盖层。
+- 桌面会话头部、双方消息与时间分隔统一进入 920px 中央阅读轴，取消左右分散气泡。
+- 320/390px 手机改为高信息密度独立布局；统计首屏不再堆叠巨型卡片。
+- 上传和显示名称区域在亮/暗桌面收窄为 504px，与 Claude 主题一致；320px 手机维持 279px 流式宽度。
+- 修复显示名 DOM XSS、导出消息数、导出紫色、双语残缺、畸形解析、键盘语义与 CSP。
+- 建立 16 项源码/逻辑测试与 3 项生产单文件合同测试。
+
+### Sixth-pass production verification
+
+- 实现提交：`3643f23`。
+- 发布号：`20260813T013738Z-3643f23`。
+- 回滚备份：`/var/backups/claude-conversation-viewer/index.html.before-20260813T013738Z-3643f23`。
+- 本地、服务器与公网 SHA-256 一致：
+  `83cdf65018b27562e3538be6f666f1f4798266bb79902017241adde8f90c6140`。
+- 公网 HTTP 200；桌面上传/名称区域 504px，320px 手机为 279px，overflow 0；控制台 error/warning 0。
+- 全栈复审由 11/32 提升到 30/32，开放 P0/P1 为 0；剩余均为不阻断的 P2 技术债或明确冻结边界。
