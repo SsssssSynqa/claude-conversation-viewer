@@ -569,7 +569,7 @@
 }
 
 [data-theme="light"] .stats-card {
-  border: 1px solid rgba(255, 255, 253, 0.82);
+  border: 1px solid var(--border);
 }
 
 [data-theme="light"] .stats-card:hover,
