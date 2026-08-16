@@ -27,11 +27,13 @@
   z-index: -1;
   pointer-events: none;
   background:
-    radial-gradient(42% 38% at 12% 8%, rgba(217, 119, 87, 0.2), transparent 70%),
-    radial-gradient(46% 42% at 90% 4%, rgba(224, 178, 104, 0.17), transparent 70%),
-    radial-gradient(52% 48% at 84% 92%, rgba(122, 158, 126, 0.18), transparent 72%),
-    radial-gradient(40% 44% at 6% 88%, rgba(126, 166, 168, 0.14), transparent 70%),
-    linear-gradient(180deg, #f4f2ec, #edeee7);
+    radial-gradient(36% 32% at 14% 8%, rgba(217, 119, 87, 0.42), transparent 68%),
+    radial-gradient(26% 22% at 62% 18%, rgba(201, 95, 61, 0.22), transparent 65%),
+    radial-gradient(30% 26% at 86% 8%, rgba(224, 178, 104, 0.38), transparent 66%),
+    radial-gradient(44% 40% at 88% 86%, rgba(122, 158, 126, 0.4), transparent 70%),
+    radial-gradient(32% 28% at 8% 86%, rgba(126, 166, 168, 0.32), transparent 68%),
+    radial-gradient(20% 16% at 42% 55%, rgba(255, 255, 255, 0.55), transparent 70%),
+    linear-gradient(180deg, #f2efe8, #e9ebe2);
 }
 
 /* Let the wash show through the page scaffolding. */
@@ -55,6 +57,7 @@
 ) {
   -webkit-backdrop-filter: var(--glass-blur);
   backdrop-filter: var(--glass-blur);
+  background-image: var(--glass-sheen);
 }
 
 [data-theme="light"] :is(.search-input-shell, .export-toolbar-group) {
@@ -64,7 +67,12 @@
 
 /* Messages: hundreds per conversation — denser tint instead of blur. */
 [data-theme="light"] .message-block {
-  background: rgba(255, 255, 255, 0.62);
+  background: rgba(255, 255, 255, 0.5);
+  background-image: var(--glass-sheen);
+}
+
+[data-theme="light"] .message-block.message-human {
+  background-image: var(--glass-sheen) !important;
 }
 
 /* Fallback when backdrop-filter is unsupported: near-opaque surfaces. */
