@@ -23,6 +23,7 @@
 - 当前代码：`e213049`（`feat: 玻璃透感与反光重做 + 暗色按压金属新拟态`）。
 - 本地 `dist/index.html` 与公网文件逐字节一致，SHA-256 均为 `eed70b6fb93f38b8889061aa24270c6bca3bdba47e46f5c36b29dd6c0ec5da43`。
 - GitHub 公开仓库迁移到 `HailSyner/claude-conversation-viewer`；许可证统一为 MIT。公开部署成立不替代 Synqa 的最终视觉验收。
+- 旧 GitHub Pages workflow 在新仓库因未启用 Pages 产生失败；已改为只运行 `npm run verify` 的 CI，NSP 继续作为唯一记录的正式部署入口。
 
 ## 2026-08-13 · 移动端统计全页密度与功能返工
 
