@@ -16,16 +16,16 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/SsssssSynqa/claude-conversation-viewer.git"
+    "url": "git+https://github.com/HailSyner/claude-conversation-viewer.git"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "type": "module",
   "bugs": {
-    "url": "https://github.com/SsssssSynqa/claude-conversation-viewer/issues"
+    "url": "https://github.com/HailSyner/claude-conversation-viewer/issues"
   },
-  "homepage": "https://github.com/SsssssSynqa/claude-conversation-viewer#readme",
+  "homepage": "https://non-standard-protocol.space/claude-viewer/",
   "devDependencies": {
     "vite": "^8.2.1",
     "vite-plugin-singlefile": "^2.3.3"

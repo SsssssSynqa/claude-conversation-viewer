@@ -2,6 +2,8 @@
 
 一个用于查看和管理Claude对话历史的工具。
 
+在线使用：<https://non-standard-protocol.space/claude-viewer/>
+
 ## 功能特点
 
 - 📊 统计对话数据(字数、消息数、时间跨度)
@@ -18,6 +20,8 @@
 4. 上传JSON文件
 5. 查看、搜索、导出你的对话记忆
 
+导入、解析、搜索和缓存均在浏览器本地完成；应用不提供对话文件上传接口。
+
 ## 如何导出Claude对话
 
 1. 在Claude对话界面点击右上角的"···"菜单
@@ -26,4 +30,4 @@
 
 ## 开源协议
 
-MIT License
+[MIT License](LICENSE)

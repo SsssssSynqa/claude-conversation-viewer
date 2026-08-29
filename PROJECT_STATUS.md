@@ -1,6 +1,6 @@
 # Claude 对话查看器 · 当前建设状态
 
-最后核验：2026-08-13（移动端统计密度返工已部署生产，等待 Synqa 视觉验收）
+最后核验：2026-08-29（当前 `e213049` 单文件与 NSP 线上版本逐字节一致；公开部署已确认，最终视觉仍等待 Synqa 验收）
 
 | 交付项 | 状态 | 具体范围 | 验收证据 / 边界 |
 |---|---|---|---|
@@ -13,8 +13,16 @@
 | 两个百分比环冻结 | complete | 结构、尺寸、颜色、阴影和响应式不改 | 亮/暗覆盖层无环图选择器；自动合同测试通过 |
 | 安全与依赖 | complete | 修复显示名 DOM XSS、Markdown/HTML 转义、CSP；升级 DOMPurify 与单文件插件传递依赖 | 恶意输入浏览器复测通过；`npm audit` 0；敏感信息扫描无产品命中 |
 | 双语、导出与异常输入 | complete | 中英文词典与插值、消息计数、无紫色导出、畸形会话/消息、思考时长与上传几何边界 | 19 项源码/逻辑测试通过 |
-| 生产单文件 | complete | `dist/index.html` 已构建；开发夹具不进入生产；CSP 与紫色合同锁定 | 3 项 dist 测试通过；本地/服务器/公网 SHA-256 均为 `5a95a917…a39` |
-| 当前生产 | code complete / awaiting acceptance | 发布号 `20260813T155317Z-9472c65`，已原子覆盖 `/claude-viewer/` | 公网 390/1440px 三主题 overflow 0；Emoji 6 项；手机思考卡 58px、节律图单列、矩阵横滚至最新日期；HTTP 200、控制台 0 error/warning；回滚备份已保存 |
+| 生产单文件 | complete | `dist/index.html` 已构建；开发夹具不进入生产；CSP 与紫色合同锁定 | 3 项 dist 测试通过；2026-08-29 本地与公网 SHA-256 均为 `eed70b6f…da43` |
+| 当前生产 | code complete / awaiting acceptance | `e213049` 已部署至 NSP 正式入口 `/claude-viewer/` | 2026-08-29 公网 HTTP 200；公网文件与本地 `dist/index.html` 逐字节一致；最终视觉仍由 Synqa 验收 |
+
+## 2026-08-29 · NSP 正式入口与开源元数据核验
+
+- 正式入口：<https://non-standard-protocol.space/claude-viewer/>。
+- 公网响应：HTTP 200，`Cache-Control: no-store, must-revalidate`，`Last-Modified: Sun, 16 Aug 2026 09:17:14 GMT`。
+- 当前代码：`e213049`（`feat: 玻璃透感与反光重做 + 暗色按压金属新拟态`）。
+- 本地 `dist/index.html` 与公网文件逐字节一致，SHA-256 均为 `eed70b6fb93f38b8889061aa24270c6bca3bdba47e46f5c36b29dd6c0ec5da43`。
+- GitHub 公开仓库迁移到 `HailSyner/claude-conversation-viewer`；许可证统一为 MIT。公开部署成立不替代 Synqa 的最终视觉验收。
 
 ## 2026-08-13 · 移动端统计全页密度与功能返工
 

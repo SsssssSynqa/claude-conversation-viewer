@@ -1,8 +1,8 @@
 # Claude 对话记忆查看器 V2 — 翻新计划
 
 ## 项目信息
-- 仓库：`SsssssSynqa/claude-conversation-viewer`
-- 部署：GitHub Pages (GitHub Actions自动部署)
+- 仓库：`HailSyner/claude-conversation-viewer`
+- 部署：NSP 正式域名 <https://non-standard-protocol.space/claude-viewer/>
 - 技术栈：Vite + 原生JS模块化 + CSS变量主题系统
 - 构建：`npm run build` → 单文件 `dist/index.html`
 
