@@ -26,6 +26,10 @@ import imgWatch from '../assets/clawd/IMG_watch.GIF';
 export class FileUpload {
   constructor(container) {
     this.container = container;
+    // Non-persistent, language-aware manifest guide data (structure only).
+    this.manifestData = null;
+    this._importBusy = false;
+    this._worker = null;
     this.render();
   }
 
@@ -118,7 +122,8 @@ export class FileUpload {
     // Hidden file input
     const fileInput = document.createElement('input');
     fileInput.type = 'file';
-    fileInput.accept = '.json';
+    fileInput.accept = '.json,.zip';
+    fileInput.multiple = true;
     fileInput.style.display = 'none';
     fileInput.id = 'file-input';
     zone.appendChild(fileInput);
@@ -129,16 +134,23 @@ export class FileUpload {
     zone.addEventListener('drop', (e) => {
       e.preventDefault();
       zone.classList.remove('dragover');
-      const file = e.dataTransfer.files[0];
-      if (file) this.handleFile(file);
+      const files = Array.from(e.dataTransfer?.files || []);
+      if (files.length) this.handleFiles(files);
     });
     fileInput.addEventListener('change', (e) => {
-      const file = e.target.files[0];
+      const files = Array.from(e.target.files || []);
       e.target.value = '';
-      if (file) this.handleFile(file);
+      if (files.length) this.handleFiles(files);
     });
 
     screen.appendChild(zone);
+
+    // Manifest guide slot (persistent, re-rendered on language change)
+    this.manifestSlot = document.createElement('div');
+    this.manifestSlot.id = 'manifest-guide';
+    this.manifestSlot.style.cssText = 'width:100%;max-width:504px;';
+    screen.appendChild(this.manifestSlot);
+    this.renderManifestGuide();
 
     // Name config
     const nameConfig = document.createElement('div');
@@ -333,70 +345,251 @@ export class FileUpload {
     return group;
   }
 
-  handleFile(file) {
-    if (!file.name.endsWith('.json')) {
-      this.showError(t('upload.errorJson'));
-      return;
-    }
-
+  /**
+   * Import one or more user-selected local files (.json and/or .zip) as a
+   * single transaction. Never fetches, opens, or prefetches anything.
+   */
+  async handleFiles(files) {
+    if (this._importBusy) return;
+    const list = Array.from(files || []);
+    if (list.length === 0) return;
+    this._importBusy = true;
     state.set('loading', true);
     this.showLoading();
 
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      try {
-        const worker = new ParseWorker();
-        worker.onmessage = (msg) => {
-          const data = msg.data;
-          switch (data.type) {
-            case 'progress':
-              state.set('loadingProgress', { current: data.current, total: data.total });
-              this.updateProgress(data.current, data.total);
-              break;
-            case 'done':
-              state.set('loading', false);
-              if (!data.conversations || data.conversations.length === 0) {
-                this.showUploadScreen();
-                this.showError(t('upload.errorEmpty'));
-                worker.terminate();
-                break;
-              }
-              state.set('conversations', data.conversations);
-              // Cache parsed data for next visit
-              saveToCache(data.conversations, {
-                fileName: file.name,
-                fileSize: file.size,
-              }).catch(() => {});
-              worker.terminate();
-              break;
-            case 'error':
-              state.set('loading', false);
-              this.showUploadScreen();
-              this.showError(data.message);
-              worker.terminate();
-              break;
-          }
-        };
-        worker.onerror = (err) => {
-          // Worker crash — fallback to main thread
+    this.runWorkerImport(list);
+  }
+
+  /**
+   * Release the busy lock, tear down the worker, and restore the upload screen.
+   * Call this BEFORE showing any error banner so the banner survives the DOM
+   * rebuild.
+   */
+  finishImport() {
+    this.releaseWorker();
+    this.showUploadScreen();
+  }
+
+  /** Release the busy lock and terminate/drop the current worker. */
+  releaseWorker() {
+    this._importBusy = false;
+    if (this._worker) {
+      try { this._worker.terminate(); } catch (e) { /* ignore */ }
+      this._worker = null;
+    }
+  }
+
+  /**
+   * Post the selected File list to the worker once and handle its messages.
+   * @param {File[]} files
+   */
+  runWorkerImport(files) {
+    let worker;
+    try {
+      worker = new ParseWorker();
+    } catch (err) {
+      state.set('loading', false);
+      this.finishImport();
+      this.showError('upload.errorParse');
+      return;
+    }
+    this._worker = worker;
+
+    worker.onmessage = (msg) => {
+      const data = msg.data || {};
+      switch (data.type) {
+        case 'status':
+          break;
+        case 'progress':
+          state.set('loadingProgress', { current: data.current, total: data.total });
+          this.updateProgress(data.current, data.total);
+          break;
+        case 'manifest':
+          // Guide only — never touches the cache or conversation state.
+          this.manifestData = data.manifest || null;
           state.set('loading', false);
-          this.showUploadScreen();
-          this.showError(t('upload.errorParse'));
-          worker.terminate();
-        };
-        worker.postMessage({ jsonString: e.target.result });
-      } catch (err) {
-        state.set('loading', false);
-        this.showUploadScreen();
-        this.showError(t('upload.errorRead') + ': ' + err.message);
+          this.finishImport();
+          break;
+        case 'no_conversations':
+          // Only non-conversation packages (e.g. memories) were selected.
+          state.set('loading', false);
+          this.finishImport();
+          this.showError('upload.errorNoConversations');
+          break;
+        case 'done':
+          if (!data.conversations || data.conversations.length === 0) {
+            state.set('loading', false);
+            this.finishImport();
+            this.showError('upload.errorEmpty');
+            break;
+          }
+          // Clear loading FIRST so src/main.js's 'conversations' subscriber
+          // (which requires loading === false) actually renders the main view.
+          state.set('loading', false);
+          // Do NOT rebuild the upload screen here: the app transitions to the
+          // main view when conversations are committed below.
+          this.releaseWorker();
+          // Commit as ONE transaction only after a fully successful parse.
+          state.set('conversations', data.conversations);
+          saveToCache(data.conversations, this.cacheMeta(data)).catch(() => {});
+          if (data.duplicates > 0) {
+            this.showError('upload.dedup', { n: data.duplicates });
+          }
+          break;
+        case 'error':
+          state.set('loading', false);
+          this.finishImport();
+          this.showError(this.errorMessageFor(data));
+          break;
+        default:
+          break;
       }
     };
-    reader.onerror = () => {
+    worker.onerror = () => {
       state.set('loading', false);
-      this.showUploadScreen();
-      this.showError(t('upload.errorRead'));
+      this.finishImport();
+      this.showError('upload.errorParse');
     };
-    reader.readAsText(file);
+    try {
+      worker.postMessage({ files });
+    } catch (err) {
+      state.set('loading', false);
+      this.finishImport();
+      this.showError('upload.errorParse');
+    }
+  }
+
+  cacheMeta(data) {
+    const meta = Array.isArray(data.fileMeta) ? data.fileMeta : [];
+    return {
+      fileName: meta.map(m => m.fileName).filter(Boolean).join(', '),
+      fileSize: meta.reduce((sum, m) => sum + (m.fileSize || 0), 0),
+      convCount: data.conversations ? data.conversations.length : 0,
+    };
+  }
+
+  /**
+   * Resolve a worker error code to the active language at the UI boundary.
+   * Unknown codes fall back to a generic parse error.
+   */
+  errorMessageFor(data) {
+    const byCode = {
+      unsupported_selected_file: 'upload.errorJson',
+      unsupported_selected_zip: 'upload.errorMissingConvs',
+      zip_read_failed: 'upload.errorZip',
+      invalid_json: 'upload.errorShape',
+      unsupported_shape: 'upload.errorShape',
+      read_failed: 'upload.errorRead',
+      parse_failed: 'upload.errorParse',
+    };
+    return byCode[data.code] || 'upload.errorParse';
+  }
+
+  setManifestData(manifest) {
+    this.manifestData = manifest || null;
+    this.renderManifestGuide();
+  }
+
+  /**
+   * Render the persistent manifest guide into this.manifestSlot.
+   *
+   * Privacy:
+   *   - No manifest URL, instructions string, or content is persisted or logged.
+   *   - Instructions text is ignored entirely.
+   *   - Each optional link is a user-initiated HTTPS claude.ai anchor only
+   *     (noopener/noreferrer, built with DOM + textContent), validated
+   *     independently. No fetch/prefetch/window.open.
+   */
+  renderManifestGuide() {
+    const slot = this.manifestSlot;
+    if (!slot) return;
+    slot.textContent = '';
+    const data = this.manifestData;
+    if (!data) return;
+
+    const card = document.createElement('div');
+    card.className = 'banner';
+    card.style.cssText = 'margin-top:12px;background:var(--bg-card);border-radius:14px;padding:14px 16px;box-shadow:var(--shadow);text-align:left;font-size:12px;color:var(--text-secondary);line-height:1.5;';
+
+    const header = document.createElement('div');
+    header.style.cssText = 'display:flex;align-items:center;justify-content:space-between;gap:10px;';
+    const title = document.createElement('div');
+    title.style.cssText = 'font-weight:600;color:var(--text-secondary);';
+    title.textContent = t('manifest.title');
+    header.appendChild(title);
+    const dismiss = document.createElement('button');
+    dismiss.type = 'button';
+    dismiss.style.cssText = 'border:none;background:var(--bg-input);color:var(--text-secondary);border-radius:8px;padding:4px 10px;cursor:pointer;font-size:12px;flex-shrink:0;';
+    dismiss.textContent = t('manifest.dismiss');
+    dismiss.addEventListener('click', () => this.setManifestData(null));
+    header.appendChild(dismiss);
+    card.appendChild(header);
+
+    const body = document.createElement('div');
+    body.style.cssText = 'margin-top:8px;';
+    body.textContent = t('manifest.body');
+    card.appendChild(body);
+
+    const counts = document.createElement('div');
+    counts.style.cssText = 'margin-top:8px;color:var(--text-muted);';
+    counts.textContent = t('manifest.partCount', { n: data.totalPartCount })
+      + ' · ' + t('manifest.totalFiles', { n: data.totalFiles });
+    card.appendChild(counts);
+
+    if (data.conversationFiles && data.conversationFiles.length > 0) {
+      const listLabel = document.createElement('div');
+      listLabel.style.cssText = 'margin-top:8px;font-weight:500;color:var(--text-secondary);';
+      listLabel.textContent = t('manifest.files');
+      card.appendChild(listLabel);
+
+      const ul = document.createElement('ul');
+      ul.style.cssText = 'margin:4px 0 0;padding-left:18px;color:var(--text-muted);';
+      for (const f of data.conversationFiles) {
+        const li = document.createElement('li');
+        const nameSpan = document.createElement('span');
+        nameSpan.textContent = f.filename + (f.part ? ` (part ${f.part})` : '');
+        li.appendChild(nameSpan);
+
+        // Per-file link, each URL validated independently.
+        if (this.isSafeClaudeUrl(f.exportUrl)) {
+          li.appendChild(document.createTextNode(' '));
+          const link = document.createElement('a');
+          link.href = f.exportUrl;
+          link.target = '_blank';
+          link.rel = 'noopener noreferrer';
+          link.style.cssText = 'color:var(--accent);text-decoration:none;font-weight:500;';
+          link.textContent = t('manifest.openLink') + ' ↗';
+          li.appendChild(link);
+        }
+        ul.appendChild(li);
+      }
+      card.appendChild(ul);
+    } else {
+      // Manifest with no conversation parts: explain, don't just show "0".
+      const none = document.createElement('div');
+      none.style.cssText = 'margin-top:8px;color:var(--text-muted);';
+      none.textContent = t('manifest.none');
+      card.appendChild(none);
+    }
+
+    const privacy = document.createElement('div');
+    privacy.style.cssText = 'margin-top:8px;color:var(--text-muted);font-size:11px;';
+    privacy.textContent = t('manifest.privacy') + ' ' + t('manifest.ignore');
+    card.appendChild(privacy);
+
+    slot.appendChild(card);
+  }
+
+  isSafeClaudeUrl(url) {
+    if (typeof url !== 'string' || url === '') return false;
+    try {
+      const u = new URL(url);
+      if (u.username || u.password) return false;
+      // Exact HTTPS claude.ai origin only: no subdomains, no nonstandard ports.
+      return u.origin === 'https://claude.ai';
+    } catch (e) {
+      return false;
+    }
   }
 
   showLoading() {
@@ -492,12 +685,12 @@ export class FileUpload {
           state.set('loading', false);
           state.set('conversations', cached.conversations);
         } else {
-          this.showError(t('upload.cacheCorrupt'));
+          this.showError('upload.cacheCorrupt');
           loadBtn.textContent = t('upload.cacheLoad');
           loadBtn.disabled = false;
         }
       } catch (e) {
-        this.showError(t('upload.cacheFail') + e.message);
+        this.showRawError(t('upload.cacheFail') + e.message);
         loadBtn.textContent = t('upload.cacheLoad');
         loadBtn.disabled = false;
       }
@@ -526,12 +719,24 @@ export class FileUpload {
     }
   }
 
-  showError(message) {
+  /**
+   * Show an error banner. `key` is an i18n key resolved in the active language
+   * (both selectable languages are supported); an already-localized custom
+   * message may also be passed for interpolated/raw strings.
+   * @param {string} key
+   * @param {Object} [vars]
+   */
+  showError(key, vars) {
+    this.showRawError(vars ? t(key, vars) : t(key));
+  }
+
+  /** Show a pre-localized message string. */
+  showRawError(text) {
     const banner = document.getElementById('upload-error');
-    if (banner) {
-      banner.textContent = message;
-      banner.classList.remove('hidden');
-      setTimeout(() => banner.classList.add('hidden'), 5000);
-    }
+    if (!banner) return;
+    banner.textContent = String(text == null ? '' : text);
+    banner.classList.remove('hidden');
+    clearTimeout(this._errorTimer);
+    this._errorTimer = setTimeout(() => banner.classList.add('hidden'), 7000);
   }
 }
