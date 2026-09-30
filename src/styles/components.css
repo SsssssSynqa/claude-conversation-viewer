@@ -1029,3 +1029,236 @@
   border-top: 1px solid var(--border);
   margin: 16px 0;
 }
+/* Manifest guide — shares the upload screen's card and theme surfaces. */
+.manifest-guide {
+  width: 100%;
+  max-width: 504px;
+}
+
+.manifest-guide:empty {
+  display: none;
+}
+
+.manifest-card {
+  padding: 20px;
+  border-radius: 16px;
+  background: var(--surface-raised);
+  box-shadow: var(--shadow);
+  color: var(--text-secondary);
+  text-align: left;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.manifest-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.manifest-header .manifest-header-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: var(--accent-bg);
+  color: var(--accent);
+}
+
+.manifest-heading {
+  flex: 1;
+  min-width: 0;
+}
+
+.manifest-title {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--text-primary);
+}
+
+.manifest-summary {
+  margin-top: 3px;
+  color: var(--text-muted);
+  font-size: 11px;
+}
+
+.manifest-dismiss {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  align-self: flex-start;
+  width: 32px;
+  height: 32px;
+  margin: -4px -4px 0 0;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.manifest-dismiss:hover {
+  background: var(--bg-input);
+  color: var(--text-primary);
+}
+
+.manifest-step-header {
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
+}
+
+.manifest-step-number {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.manifest-step-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.manifest-part-count {
+  margin-left: auto;
+  flex-shrink: 0;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.manifest-step-body {
+  margin-top: 5px;
+}
+
+.manifest-file-list {
+  margin-top: 12px;
+  padding: 0 12px;
+  border-radius: 10px;
+  background: var(--surface-soft);
+  list-style: none;
+}
+
+.manifest-file {
+  display: grid;
+  grid-template-columns: 16px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+}
+
+.manifest-file + .manifest-file {
+  border-top: 1px solid var(--border-strong);
+}
+
+.manifest-file-icon {
+  color: var(--text-muted);
+}
+
+.manifest-file-name {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-secondary);
+  overflow-wrap: anywhere;
+}
+
+.manifest-file-part {
+  display: block;
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+.manifest-file-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 32px;
+  padding: 4px 9px;
+  border-radius: 6px;
+  background: var(--accent-bg);
+  color: var(--text-secondary);
+  font-family: var(--font-family);
+  font-size: 11px;
+  font-weight: 500;
+  white-space: nowrap;
+  text-decoration: none;
+}
+
+.manifest-file-link:hover {
+  background: var(--bg-input);
+  color: var(--text-primary);
+}
+
+.manifest-link-unavailable {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.manifest-dismiss:focus-visible,
+.manifest-file-link:focus-visible {
+  outline: none;
+  background: var(--bg-input);
+  color: var(--text-primary);
+  box-shadow: inset 0 -2px var(--accent);
+}
+
+.manifest-import {
+  margin-top: 18px;
+}
+
+.manifest-empty {
+  margin-bottom: 18px;
+}
+
+.manifest-privacy {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border-strong);
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.manifest-privacy > span {
+  margin-top: 2px;
+}
+
+[data-theme="claude"] .manifest-card {
+  border-radius: var(--radius-lg);
+}
+
+[data-theme="claude"] .manifest-file-link {
+  background: var(--bg-input);
+}
+
+[data-theme="claude"] .manifest-file-link:hover,
+[data-theme="claude"] .manifest-file-link:focus-visible {
+  background: var(--bg-tertiary);
+}
+
+@media (max-width: 420px) {
+  .manifest-card {
+    padding: 16px;
+  }
+
+  .manifest-file-list {
+    padding: 0 10px;
+  }
+
+  .manifest-file {
+    gap: 8px;
+  }
+
+  .manifest-file-link {
+    padding: 4px 7px;
+  }
+}

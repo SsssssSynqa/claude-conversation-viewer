@@ -148,7 +148,7 @@ export class FileUpload {
     // Manifest guide slot (persistent, re-rendered on language change)
     this.manifestSlot = document.createElement('div');
     this.manifestSlot.id = 'manifest-guide';
-    this.manifestSlot.style.cssText = 'width:100%;max-width:504px;';
+    this.manifestSlot.className = 'manifest-guide';
     screen.appendChild(this.manifestSlot);
     this.renderManifestGuide();
 
@@ -507,74 +507,140 @@ export class FileUpload {
     const data = this.manifestData;
     if (!data) return;
 
-    const card = document.createElement('div');
-    card.className = 'banner';
-    card.style.cssText = 'margin-top:12px;background:var(--bg-card);border-radius:14px;padding:14px 16px;box-shadow:var(--shadow);text-align:left;font-size:12px;color:var(--text-secondary);line-height:1.5;';
+    const card = document.createElement('section');
+    card.className = 'manifest-card';
+    card.setAttribute('aria-labelledby', 'manifest-title');
 
     const header = document.createElement('div');
-    header.style.cssText = 'display:flex;align-items:center;justify-content:space-between;gap:10px;';
-    const title = document.createElement('div');
-    title.style.cssText = 'font-weight:600;color:var(--text-secondary);';
+    header.className = 'manifest-header';
+    const icon = document.createElement('span');
+    icon.className = 'manifest-header-icon';
+    icon.setAttribute('aria-hidden', 'true');
+    icon.appendChild(createIcon('file', 20));
+    header.appendChild(icon);
+    const heading = document.createElement('div');
+    heading.className = 'manifest-heading';
+    const title = document.createElement('h2');
+    title.id = 'manifest-title';
+    title.className = 'manifest-title';
     title.textContent = t('manifest.title');
-    header.appendChild(title);
+    heading.appendChild(title);
+    const summary = document.createElement('p');
+    summary.className = 'manifest-summary';
+    summary.textContent = t('manifest.totalFiles', { n: data.totalFiles });
+    heading.appendChild(summary);
+    header.appendChild(heading);
     const dismiss = document.createElement('button');
     dismiss.type = 'button';
-    dismiss.style.cssText = 'border:none;background:var(--bg-input);color:var(--text-secondary);border-radius:8px;padding:4px 10px;cursor:pointer;font-size:12px;flex-shrink:0;';
-    dismiss.textContent = t('manifest.dismiss');
+    dismiss.className = 'manifest-dismiss';
+    dismiss.setAttribute('aria-label', t('manifest.dismiss'));
+    dismiss.title = t('manifest.dismiss');
+    const closeIcon = createIcon('close', 16);
+    closeIcon.setAttribute('aria-hidden', 'true');
+    dismiss.appendChild(closeIcon);
     dismiss.addEventListener('click', () => this.setManifestData(null));
     header.appendChild(dismiss);
     card.appendChild(header);
 
-    const body = document.createElement('div');
-    body.style.cssText = 'margin-top:8px;';
-    body.textContent = t('manifest.body');
-    card.appendChild(body);
-
-    const counts = document.createElement('div');
-    counts.style.cssText = 'margin-top:8px;color:var(--text-muted);';
-    counts.textContent = t('manifest.partCount', { n: data.totalPartCount })
-      + ' · ' + t('manifest.totalFiles', { n: data.totalFiles });
-    card.appendChild(counts);
-
     if (data.conversationFiles && data.conversationFiles.length > 0) {
-      const listLabel = document.createElement('div');
-      listLabel.style.cssText = 'margin-top:8px;font-weight:500;color:var(--text-secondary);';
+      const download = document.createElement('div');
+      download.className = 'manifest-step';
+      const stepHeader = document.createElement('div');
+      stepHeader.className = 'manifest-step-header';
+      const stepNumber = document.createElement('span');
+      stepNumber.className = 'manifest-step-number';
+      stepNumber.textContent = '01';
+      stepHeader.appendChild(stepNumber);
+      const listLabel = document.createElement('h3');
+      listLabel.className = 'manifest-step-title';
       listLabel.textContent = t('manifest.files');
-      card.appendChild(listLabel);
+      stepHeader.appendChild(listLabel);
+      const counts = document.createElement('span');
+      counts.className = 'manifest-part-count';
+      counts.textContent = t('manifest.partCount', { n: data.totalPartCount });
+      stepHeader.appendChild(counts);
+      download.appendChild(stepHeader);
+      const body = document.createElement('p');
+      body.className = 'manifest-step-body';
+      body.textContent = t('manifest.body');
+      download.appendChild(body);
 
       const ul = document.createElement('ul');
-      ul.style.cssText = 'margin:4px 0 0;padding-left:18px;color:var(--text-muted);';
+      ul.className = 'manifest-file-list';
       for (const f of data.conversationFiles) {
         const li = document.createElement('li');
+        li.className = 'manifest-file';
+        const fileIcon = createIcon('zip', 16);
+        fileIcon.className = 'manifest-file-icon';
+        fileIcon.setAttribute('aria-hidden', 'true');
+        li.appendChild(fileIcon);
+        const fileInfo = document.createElement('span');
+        fileInfo.className = 'manifest-file-info';
         const nameSpan = document.createElement('span');
-        nameSpan.textContent = f.filename + (f.part ? ` (part ${f.part})` : '');
-        li.appendChild(nameSpan);
+        nameSpan.className = 'manifest-file-name';
+        nameSpan.textContent = f.filename;
+        fileInfo.appendChild(nameSpan);
+        const part = document.createElement('span');
+        part.className = 'manifest-file-part';
+        part.textContent = t('manifest.part', { n: f.part });
+        fileInfo.appendChild(part);
+        li.appendChild(fileInfo);
 
         // Per-file link, each URL validated independently.
         if (this.isSafeClaudeUrl(f.exportUrl)) {
-          li.appendChild(document.createTextNode(' '));
           const link = document.createElement('a');
+          link.className = 'manifest-file-link';
           link.href = f.exportUrl;
           link.target = '_blank';
           link.rel = 'noopener noreferrer';
-          link.style.cssText = 'color:var(--accent);text-decoration:none;font-weight:500;';
+          link.setAttribute('aria-label', t('manifest.openFile', { filename: f.filename }));
           link.textContent = t('manifest.openLink') + ' ↗';
           li.appendChild(link);
+        } else {
+          const unavailable = document.createElement('span');
+          unavailable.className = 'manifest-link-unavailable';
+          unavailable.textContent = t('manifest.noLink');
+          li.appendChild(unavailable);
         }
         ul.appendChild(li);
       }
-      card.appendChild(ul);
+      download.appendChild(ul);
+      card.appendChild(download);
+
+      const importStep = document.createElement('div');
+      importStep.className = 'manifest-step manifest-import';
+      const importHeader = document.createElement('div');
+      importHeader.className = 'manifest-step-header';
+      const importNumber = document.createElement('span');
+      importNumber.className = 'manifest-step-number';
+      importNumber.textContent = '02';
+      importHeader.appendChild(importNumber);
+      const importTitle = document.createElement('h3');
+      importTitle.className = 'manifest-step-title';
+      importTitle.textContent = t('manifest.importTitle');
+      importHeader.appendChild(importTitle);
+      importStep.appendChild(importHeader);
+      const importBody = document.createElement('p');
+      importBody.className = 'manifest-step-body';
+      importBody.textContent = t('manifest.importBody');
+      importStep.appendChild(importBody);
+      card.appendChild(importStep);
     } else {
       // Manifest with no conversation parts: explain, don't just show "0".
-      const none = document.createElement('div');
-      none.style.cssText = 'margin-top:8px;color:var(--text-muted);';
+      const none = document.createElement('p');
+      none.className = 'manifest-empty';
       none.textContent = t('manifest.none');
       card.appendChild(none);
     }
 
     const privacy = document.createElement('div');
-    privacy.style.cssText = 'margin-top:8px;color:var(--text-muted);font-size:11px;';
-    privacy.textContent = t('manifest.privacy') + ' ' + t('manifest.ignore');
+    privacy.className = 'manifest-privacy';
+    const shield = createIcon('shield', 14);
+    shield.setAttribute('aria-hidden', 'true');
+    privacy.appendChild(shield);
+    const privacyText = document.createElement('p');
+    privacyText.textContent = t('manifest.privacy');
+    privacy.appendChild(privacyText);
     card.appendChild(privacy);
 
     slot.appendChild(card);
