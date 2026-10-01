@@ -5,6 +5,7 @@
 
 import { state, saveExportCollection } from '../store/state.js';
 import { exportAsText, exportAsMarkdown, exportAsHTML, downloadFile, encodeUTF8 } from '../utils/export.js';
+import { resolveCollection, collectionConversations } from '../utils/collection.js';
 import { formatTimestamp, formatDate, formatLocalDateStamp } from '../utils/time.js';
 import { t } from '../i18n.js';
 import JSZip from 'jszip';
@@ -286,7 +287,11 @@ export class ExportPanel {
 
   _renderCollectionSection(section) {
     section.textContent = '';
-    const collection = state.get('exportCollection') || [];
+    const conversations = state.get('conversations') || [];
+    const resolution = resolveCollection(state.get('exportCollection') || [], conversations);
+    const collection = resolution.entries;
+    const available = resolution.availableCount;
+    const unavailable = resolution.unavailableCount;
 
     const titleRow = document.createElement('div');
     titleRow.style.cssText = 'display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;';
@@ -303,16 +308,22 @@ export class ExportPanel {
       exportBtn.className = 'neu-primary-btn';
       exportBtn.style.cssText = 'font-size:0.74rem;font-weight:600;padding:6px 10px;';
       exportBtn.textContent = t('export.exportCollection');
-      exportBtn.addEventListener('click', () => this._exportCollection());
+      exportBtn.disabled = available === 0;
+      if (available === 0) {
+        exportBtn.style.opacity = '0.5';
+        exportBtn.style.cursor = 'not-allowed';
+        exportBtn.title = t('export.collectionNoneAvailable');
+      }
+      exportBtn.addEventListener('click', () => { if (available > 0) this._exportCollection(); });
       btnGroup.appendChild(exportBtn);
 
       const clearBtn = document.createElement('button');
       clearBtn.className = 'neu-ghost-btn';
       clearBtn.style.cssText = 'font-size:0.74rem;padding:6px 10px;';
       clearBtn.textContent = t('export.clearCollection');
+      clearBtn.setAttribute('aria-label', t('export.clearCollectionAria'));
       clearBtn.addEventListener('click', () => {
-        state.set('exportCollection', []);
-        saveExportCollection();
+        this._removeCollectionItems(collection.map(item => item.key));
         this._renderCollectionSection(section);
       });
       btnGroup.appendChild(clearBtn);
@@ -330,16 +341,27 @@ export class ExportPanel {
       return;
     }
 
-    // Group by conversation
+    // Availability summary — visible whenever any entry cannot be resolved.
+    if (unavailable > 0) {
+      const summary = document.createElement('div');
+      summary.className = 'collection-availability-summary';
+      summary.setAttribute('role', 'status');
+      summary.textContent = t('export.collectionAvailability', { available, unavailable });
+      section.appendChild(summary);
+    }
+
+    // Group by conversation (unavailable entries grouped by their stored name).
     const grouped = new Map();
     for (const item of collection) {
-      if (!grouped.has(item.convUuid)) {
-        grouped.set(item.convUuid, {
-          convName: item.convName,
+      const res = resolution.byKey.get(item.key);
+      const groupKey = res && res.conv ? res.conv : ('missing:' + (item.convUuid || item.convName || ''));
+      if (!grouped.has(groupKey)) {
+        grouped.set(groupKey, {
+          convName: (res && res.conv ? res.conv.name : item.convName) || t('convList.unnamed'),
           items: [],
         });
       }
-      grouped.get(item.convUuid).items.push(item);
+      grouped.get(groupKey).items.push(item);
     }
 
     for (const [, group] of grouped) {
@@ -361,10 +383,14 @@ export class ExportPanel {
         const senderName = item.sender === 'human' ? (names.human || 'Human') : (names.assistant || 'Assistant');
 
         const info = document.createElement('div');
+        info.className = 'collection-entry-info';
         info.style.cssText = 'min-width:0;flex:1;';
 
+        const res = resolution.byKey.get(item.key);
+        const isAvailable = !!(res && res.msg);
+
         const senderSpan = document.createElement('span');
-        senderSpan.style.cssText = 'font-size:0.72rem;font-weight:600;color:' + (item.sender === 'human' ? 'var(--accent)' : 'var(--text-primary)') + ';margin-right:6px;';
+        senderSpan.style.cssText = 'font-size:0.72rem;font-weight:600;color:' + (isAvailable ? (item.sender === 'human' ? 'var(--accent)' : 'var(--text-primary)') : 'var(--text-muted)') + ';margin-right:6px;';
         senderSpan.textContent = senderName;
         info.appendChild(senderSpan);
 
@@ -373,15 +399,23 @@ export class ExportPanel {
         preview.textContent = item.preview;
         info.appendChild(preview);
 
+        if (!isAvailable) {
+          const status = document.createElement('span');
+          status.className = 'collection-unavailable-status';
+          status.style.cssText = 'font-size:0.68rem;color:var(--text-muted);opacity:0.85;margin-left:8px;';
+          status.textContent = t('export.collectionUnavailable');
+          info.appendChild(status);
+        }
+
         row.appendChild(info);
 
         const removeBtn = document.createElement('button');
+        removeBtn.className = 'collection-remove-btn';
         removeBtn.style.cssText = 'padding:2px 8px;border:none;background:transparent;color:var(--text-muted);cursor:pointer;font-size:0.75rem;';
         removeBtn.textContent = '\u2715';
+        removeBtn.setAttribute('aria-label', t('export.collectionRemove'));
         removeBtn.addEventListener('click', () => {
-          const coll = state.get('exportCollection').filter(c => c.key !== item.key);
-          state.set('exportCollection', coll);
-          saveExportCollection();
+          this._removeCollectionItems([item.key]);
           this._renderCollectionSection(section);
         });
         row.appendChild(removeBtn);
@@ -392,35 +426,45 @@ export class ExportPanel {
     }
   }
 
-  _exportCollection() {
-    const collection = state.get('exportCollection') || [];
-    if (collection.length === 0) return;
+  /** Remove collection entries by key and persist. */
+  _removeCollectionItems(keys) {
+    const remove = new Set(keys);
+    const coll = (state.get('exportCollection') || []).filter(c => !remove.has(c.key));
+    state.set('exportCollection', coll);
+    saveExportCollection();
+  }
 
+  _exportCollection() {
     const conversations = state.get('conversations') || [];
+    const resolution = resolveCollection(state.get('exportCollection') || [], conversations);
+
+    const available = this._availableCollection(resolution);
+    // Never download an empty output: an all-unavailable collection cannot export.
+    if (available.length === 0) return;
+
     const names = state.get('displayNames');
     const dateSuffix = formatLocalDateStamp();
 
-    // JSON format — export raw message data
+    // JSON format — resolved source messages only.
     if (this.format === 'json') {
-      const jsonData = this._buildCollectionData(collection, conversations);
+      const jsonData = this._buildCollectionData(resolution);
       downloadFile(JSON.stringify(jsonData, null, 2), `${t('export.collectionFile')}_${dateSuffix}.json`, 'application/json;charset=utf-8');
       return;
     }
 
+    const collectionConvs = this._buildCollectionAsConversations(resolution);
+
     // HTML format
     if (this.format === 'html') {
-      const fakeConvs = this._buildCollectionAsConversations(collection, conversations);
-      const content = exportAsHTML(fakeConvs, { ...this.options, displayNames: names });
+      const content = exportAsHTML(collectionConvs, { ...this.options, displayNames: names });
       downloadFile(content, `${t('export.collectionFile')}_${dateSuffix}.html`, 'text/html;charset=utf-8');
       return;
     }
 
     // Text and Markdown formats
     const isTxt = this.format === 'txt';
-    const collectionConvs = this._buildCollectionAsConversations(collection, conversations);
     const collectionTitle = t('export.collectionDocumentTitle');
     let output = isTxt ? `${collectionTitle}\n${'='.repeat(40)}\n\n` : `# ${collectionTitle}\n\n`;
-
     output += isTxt
       ? exportAsText(collectionConvs, { ...this.options, displayNames: names })
       : exportAsMarkdown(collectionConvs, { ...this.options, displayNames: names });
@@ -430,36 +474,23 @@ export class ExportPanel {
     downloadFile(output, `${t('export.collectionFile')}_${dateSuffix}.${ext}`, mime);
   }
 
-  _buildCollectionData(collection, conversations) {
-    const result = [];
-    const grouped = new Map();
-    for (const item of collection) {
-      if (!grouped.has(item.convUuid)) grouped.set(item.convUuid, []);
-      grouped.get(item.convUuid).push(item);
+  /** Flat list of resolved message objects for the whole collection. */
+  _availableCollection(resolution) {
+    const out = [];
+    for (const entry of resolution.ordered) {
+      const res = resolution.byKey.get(entry.key);
+      if (res && res.msg) out.push(res.msg);
     }
-    for (const [convUuid, items] of grouped) {
-      const conv = conversations.find(c => c.uuid === convUuid);
-      if (!conv) continue;
-      const msgs = items.sort((a, b) => a.msgIndex - b.msgIndex).map(item => conv.messages[item.msgIndex]).filter(Boolean);
-      result.push({ name: conv.name, uuid: conv.uuid, messages: msgs });
-    }
-    return result;
+    return out;
   }
 
-  _buildCollectionAsConversations(collection, conversations) {
-    const grouped = new Map();
-    for (const item of collection) {
-      if (!grouped.has(item.convUuid)) grouped.set(item.convUuid, []);
-      grouped.get(item.convUuid).push(item);
-    }
-    const result = [];
-    for (const [convUuid, items] of grouped) {
-      const conv = conversations.find(c => c.uuid === convUuid);
-      if (!conv) continue;
-      const msgs = items.sort((a, b) => a.msgIndex - b.msgIndex).map(item => conv.messages[item.msgIndex]).filter(Boolean);
-      result.push({ ...conv, messages: msgs, stats: { ...conv.stats, messageCount: msgs.length } });
-    }
-    return result;
+  _buildCollectionData(resolution) {
+    return collectionConversations(resolution, state.get('conversations') || [])
+      .map(conv => ({ name: conv.name, uuid: conv.uuid, messages: conv.messages }));
+  }
+
+  _buildCollectionAsConversations(resolution) {
+    return collectionConversations(resolution, state.get('conversations') || []);
   }
 
   _buildFilename(nameBase) {

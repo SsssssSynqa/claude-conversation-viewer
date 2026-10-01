@@ -827,12 +827,16 @@ export class StatsPanel {
         deepNightConvs.push({ name: conv.name, lateCount, uuid: conv.uuid });
       }
 
+      // 没有有效创建时间的对话（formatMonthKey 返回 'unknown'）不进月度走势，
+      // 否则拆出 NaN 年月会让 Intl.DateTimeFormat 抛错，整块统计面板画不出来。
       const mk = formatMonthKey(conv.createdAt);
-      if (!monthlyMap.has(mk)) monthlyMap.set(mk, { convCount: 0, humanChars: 0, assistantChars: 0 });
-      const m = monthlyMap.get(mk);
-      m.convCount++;
-      m.humanChars += conv.stats.humanChars;
-      m.assistantChars += conv.stats.assistantChars;
+      if (mk !== 'unknown') {
+        if (!monthlyMap.has(mk)) monthlyMap.set(mk, { convCount: 0, humanChars: 0, assistantChars: 0 });
+        const m = monthlyMap.get(mk);
+        m.convCount++;
+        m.humanChars += conv.stats.humanChars;
+        m.assistantChars += conv.stats.assistantChars;
+      }
     }
 
     // Day span

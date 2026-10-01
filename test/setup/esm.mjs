@@ -26,6 +26,22 @@ function resolveHook(specifier, context, nextResolve) {
   if (/\.(png|gif|woff2|svg)$/i.test(specifier)) {
     return { url: 'data:text/javascript,export default "";', shortCircuit: true };
   }
+  // CSS side-effect imports (e.g. highlight.js styles) are handled by Vite;
+  // stub them for node:test so components can be imported directly.
+  if (/\.css$/i.test(specifier)) {
+    return { url: 'data:text/javascript,', shortCircuit: true };
+  }
+  // DOMPurify needs a real browser DOM; stub it so component render paths can
+  // be exercised under node:test without a headless browser.
+  if (specifier === 'dompurify') {
+    return { url: 'data:text/javascript,export default { sanitize: (h) => String(h == null ? \'\' : h) };', shortCircuit: true };
+  }
+  // StatsPanel draws charts with canvas/matchMedia/html2canvas; the message and
+  // export tests never exercise it (MessageView only renders it as the empty
+  // state), so stand in a no-op panel instead of emulating a browser.
+  if (/(^|\/)StatsPanel\.js$/.test(specifier)) {
+    return { url: 'data:text/javascript,export class StatsPanel { renderInline() {} destroy() {} }', shortCircuit: true };
+  }
   return nextResolve(specifier, context);
 }
 
