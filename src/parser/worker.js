@@ -1,53 +1,55 @@
 /**
- * Web Worker for background JSON parsing.
- * Parses conversation JSON without blocking the UI thread.
- * Posts progress updates so the main thread can show Clawd animation progress.
+ * Web Worker for local conversation import.
+ *
+ * The main thread posts the selected File objects once:
+ *     { files: File[] }
+ *
+ * All local reading (File.text / arrayBuffer), ZIP decompression (JSZip) and
+ * JSON parsing happen here, off the UI thread, via the shared import core. The
+ * worker posts a manifest guide, progress updates, a done message, or an error
+ * carrying a stable code. It never performs network access.
  */
 
 import { parseConversation } from './claude.js';
+import { importSelectedFiles } from './import-core.js';
 
-self.onmessage = function (e) {
-  const { jsonString } = e.data;
+self.onmessage = async function (e) {
+  const { files } = e.data || {};
 
   try {
-    self.postMessage({ type: 'status', message: '正在解析 JSON...' });
+    self.postMessage({ type: 'status' });
 
-    const raw = JSON.parse(jsonString);
+    const result = await importSelectedFiles({
+      files,
+      parseConversation,
+      onProgress: (current, total) => {
+        self.postMessage({ type: 'progress', current, total });
+      },
+    });
 
-    if (!Array.isArray(raw)) {
-      self.postMessage({
-        type: 'error',
-        message: '数据格式不正确：期望一个对话数组',
-      });
+    if (result.type === 'manifest') {
+      self.postMessage({ type: 'manifest', manifest: result.manifest });
       return;
     }
 
-    const total = raw.length;
-    const conversations = [];
-
-    for (let i = 0; i < total; i++) {
-      const parsed = parseConversation(raw[i]);
-      if (parsed) {
-        conversations.push(parsed);
-      }
-
-      // Post progress every 5 conversations (avoid message flooding)
-      if (i % 5 === 0 || i === total - 1) {
-        self.postMessage({ type: 'progress', current: i + 1, total });
-      }
+    if (result.type === 'no_conversations') {
+      self.postMessage({ type: 'no_conversations', ignoredUnrelated: result.ignoredUnrelated });
+      return;
     }
 
-    // Sort by creation date, newest first
-    conversations.sort((a, b) => {
-      if (!a.createdAt || !b.createdAt) return 0;
-      return new Date(b.createdAt) - new Date(a.createdAt);
+    self.postMessage({
+      type: 'done',
+      conversations: result.conversations,
+      total: result.total,
+      duplicates: result.duplicates,
+      fileMeta: result.fileMeta,
+      ignoredUnrelated: result.ignoredUnrelated,
     });
-
-    self.postMessage({ type: 'done', conversations });
   } catch (err) {
     self.postMessage({
       type: 'error',
-      message: `解析失败: ${err.message}`,
+      code: (err && err.code) || 'parse_failed',
+      file: err && err.file,
     });
   }
 };
