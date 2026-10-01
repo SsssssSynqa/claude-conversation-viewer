@@ -19,9 +19,12 @@
 | 层级 | 字号 | 字重 | 用途 |
 |------|------|------|------|
 | Display | 28px (中文) / 30px (英文Claude) | 330 | 页面大标题 |
+| Workspace Title | 24px（窄屏对话标题 21.6px） | 400 | 对话、搜索、导出、统计标题 |
+| Reading Body | 16px（怀旧版用户气泡 15px） | 400 | 对话正文；怀旧版助手沿用 Anthropic Serif，行高 1.75 |
+| Navigation | 14px / 12px | 500 / 400 | 对话列表标题 / 日期和数量 |
 | Section Title | 13px | 600 (bold) | 卡片标题：显示名称设置、发现上次的数据缓存 |
 | Label | 12px | 500 | 字段标签：用户显示名、助手显示名 |
-| Body | 12px | 400 | 数据值：Synqa、91段对话、按钮文字 |
+| UI Body | 13–15px（上传页沿用 12px） | 400 | 工作区按钮、输入和数据值 |
 | Caption | 11-12px | 400 | 底部提示、署名 |
 
 ---
@@ -101,6 +104,12 @@
 | 署名到内容 | `min 80px` | flex spacer |
 | 署名底部 | `32px` | padding-bottom |
 
+### 工作区布局
+- 桌面怀旧版侧栏宽 `288px`；开灯/关灯版沿用 `300px` 与新拟态材质。
+- 对话标题和正文共用居中、最大 `800px` 的阅读栏；标题下集中排列模式、精选和导出操作，正文保留用户气泡右对齐和助手正文左对齐。
+- 搜索、导出、统计的面板容器最大 `1000px`；搜索/导出的 header、结果数量条和内容按同一组边界对齐。
+- 阅读区桌面左右留白 `32px`，窄屏 `16px`；控件换行，长工具内容在详情内滚动。
+
 ---
 
 ## 6. 圆角规范
@@ -129,6 +138,19 @@
 ### 主题切换
 - 选中状态：`box-shadow: var(--shadow-inset)` — 凹陷效果
 - 未选中：透明背景
+
+### 可交互控件语义
+- 切换/选项/菜单项用原生 `<button>`，并用 `aria-pressed` / `aria-checked` / `aria-expanded` 表达状态；**按钮**由 Enter/Space 触发。
+- 选择类开关由真实 `<input type="checkbox">` 驱动（视觉 box/switch `aria-hidden`）。复选框主要由 Space 切换（浏览器原生行为）；不要假设 Enter 能切换复选框。视觉选中态用填充/勾选与描边区分。
+- 焦点用 `:focus-visible`，随主题融入：胶囊/行类控件多用柔和填充与细内描边；阅读摘要、模式切换和导出选项用填充与底部细线；替换 outline 时保留可见焦点。
+- 消息操作在 hover / `:focus-within` 时显示，触屏保持可见；选择模式为复选框留出独立空间，不覆盖正文。
+- 弹出菜单（如快捷导出）用原生按钮项，Enter/Space 打开并进入首项，方向键/Home/End 导航；Escape 关闭并返回仍存在的触发按钮；点击外部或 Tab 离开时关闭并保留自然焦点。
+- 新增/变更 motion 遵循现有节奏，并在 `prefers-reduced-motion: reduce` 下停用。
+
+### 阅读区 thinking/tool 层级（怀旧版）
+- 保留轻盈的 inline summary 行（chevron + 摘要 + duration + 数量），点击展开 timeline。
+- timeline 每项为原生 `<details>`，可展开查看完整 thinking 文本、`toolInput`、配对 result 与独立 `tool_result`；长内容在受限高度内滚动/换行，不以截断作为唯一入口。
+- thinking 屏幕显示沿用现有 `desensitize` 处理，不表示或承诺全工具脱敏；渲染文案均使用安全 DOM/`textContent`。
 
 ---
 

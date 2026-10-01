@@ -30,7 +30,7 @@ export class StatsPanel {
     container.style.cssText = 'flex:1;overflow-y:auto;padding:32px 24px;';
     const inner = document.createElement('div');
     inner.className = 'stats-panel-inner';
-    inner.style.cssText = 'max-width:920px;margin:0 auto;';
+    inner.style.cssText = 'max-width:1000px;margin:0 auto;';
     this.buildStatsContent(inner, stats, conversations);
     container.appendChild(inner);
   }
@@ -64,7 +64,7 @@ export class StatsPanel {
 
     const title = document.createElement('h2');
     title.className = 'stats-title';
-    title.style.cssText = 'font-size:1rem;font-weight:800;color:var(--text-primary);display:flex;align-items:center;gap:10px;letter-spacing:0.5px;';
+    title.style.cssText = 'font-family:var(--font-display);font-size:1.5rem;font-weight:400;color:var(--text-primary);display:flex;align-items:center;gap:10px;';
     const mainDot = document.createElement('span');
     mainDot.style.cssText = 'width:10px;height:10px;border-radius:50%;background:var(--accent);box-shadow:inset 1px 1px 2px rgba(255,255,255,0.4),0 0 8px rgba(217,118,87,0.4);flex-shrink:0;';
     title.appendChild(mainDot);

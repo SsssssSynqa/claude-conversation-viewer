@@ -33,7 +33,6 @@ function applyTheme(theme) {
 
 const THEMES = ['dark', 'light', 'claude'];
 const THEME_ICON_NAMES = { dark: 'moon', light: 'sun', claude: 'flower' };
-const THEME_LABELS = { dark: t('theme.dark'), light: t('theme.light'), claude: t('theme.claude') };
 
 function cycleTheme() {
   const current = state.get('theme');
@@ -163,7 +162,8 @@ function renderMainView() {
   ];
 
   for (const nav of navItems) {
-    const pill = document.createElement('div');
+    const pill = document.createElement('button');
+    pill.type = 'button';
     pill.className = 'sidebar-pill pill-flat';
     pill.id = nav.id;
     const iconWrap = document.createElement('span');
@@ -174,6 +174,7 @@ function renderMainView() {
     labelSpan.className = 'sidebar-pill-label';
     labelSpan.textContent = nav.label;
     pill.appendChild(labelSpan);
+    pill.setAttribute('aria-label', nav.label);
     pill.addEventListener('click', nav.action);
     sidebarActions.appendChild(pill);
   }
@@ -224,9 +225,13 @@ function renderMainView() {
 
   for (let i = 0; i < themeOptions.length; i++) {
     const opt = themeOptions[i];
-    const optDiv = document.createElement('div');
+    const optDiv = document.createElement('button');
+    optDiv.type = 'button';
     optDiv.className = 'toggle-option' + (opt.theme === currentTheme ? ' active' : '');
     optDiv.dataset.theme = opt.theme;
+    const themeLabel = t('theme.' + opt.theme);
+    optDiv.setAttribute('aria-label', themeLabel);
+    optDiv.setAttribute('aria-pressed', opt.theme === currentTheme ? 'true' : 'false');
     const optIcon = opt.icon === 'spark' ? createSparkIcon(14, true) : createIcon(opt.icon, 16);
     optDiv.appendChild(optIcon);
     optDiv.addEventListener('click', () => {
@@ -245,7 +250,9 @@ function renderMainView() {
     if (track) {
       syncThemeThumb(t);
       track.querySelectorAll('.toggle-option').forEach(el => {
-        el.classList.toggle('active', el.dataset.theme === t);
+        const isActive = el.dataset.theme === t;
+        el.classList.toggle('active', isActive);
+        el.setAttribute('aria-pressed', isActive ? 'true' : 'false');
       });
     }
     // Re-render stats panel so ring charts pick up new theme shadows
@@ -304,33 +311,40 @@ function renderMainView() {
     const row = document.createElement('div');
     row.className = 'sidebar-toggle-row';
 
-    const labelText = document.createElement('span');
-    labelText.className = 'sidebar-toggle-label';
-    labelText.textContent = t.label;
-    row.appendChild(labelText);
-
-    // Neumorphic switch
-    const neuSwitch = document.createElement('div');
-    neuSwitch.className = 'neu-switch' + (state.get(t.key) ? ' active' : '');
-    const handle = document.createElement('div');
-    handle.className = 'switch-handle';
-    neuSwitch.appendChild(handle);
-
+    // Native checkbox drives state + keyboard + screen-reader checked status.
+    // The visible switch is a styled span; the whole row is a <label>.
     const input = document.createElement('input');
     input.type = 'checkbox';
     input.id = t.id;
+    input.className = 'neu-switch-input';
     input.checked = state.get(t.key);
-    input.style.display = 'none';
-    input.addEventListener('change', (e) => state.set(t.key, e.target.checked));
+    input.setAttribute('role', 'switch');
 
-    neuSwitch.addEventListener('click', () => {
-      input.checked = !input.checked;
-      input.dispatchEvent(new Event('change'));
-      neuSwitch.classList.toggle('active', input.checked);
+    const label = document.createElement('label');
+    label.className = 'sidebar-toggle-control';
+    label.setAttribute('for', t.id);
+
+    const labelText = document.createElement('span');
+    labelText.className = 'sidebar-toggle-label';
+    labelText.textContent = t.label;
+    label.appendChild(labelText);
+
+    // Neumorphic switch (visual only; interaction is the real checkbox)
+    const neuSwitch = document.createElement('span');
+    neuSwitch.className = 'neu-switch' + (state.get(t.key) ? ' active' : '');
+    neuSwitch.setAttribute('aria-hidden', 'true');
+    const handle = document.createElement('div');
+    handle.className = 'switch-handle';
+    neuSwitch.appendChild(handle);
+    label.appendChild(neuSwitch);
+
+    input.addEventListener('change', (e) => {
+      state.set(t.key, e.target.checked);
+      neuSwitch.classList.toggle('active', e.target.checked);
     });
 
-    row.appendChild(neuSwitch);
     row.appendChild(input);
+    row.appendChild(label);
     settingsContent.appendChild(row);
   }
 
@@ -472,11 +486,14 @@ function renderMainView() {
   if (langIdx > 0) langThumb.style.transform = `translateX(${langIdx * 100}%)`;
   for (let i = 0; i < langOptions.length; i++) {
     const lo = langOptions[i];
-    const loDiv = document.createElement('div');
+    const loDiv = document.createElement('button');
+    loDiv.type = 'button';
     loDiv.className = 'toggle-option' + (lo.lang === currentLang ? ' active' : '');
     loDiv.dataset.lang = lo.lang;
     loDiv.style.cssText = 'font-weight:700;letter-spacing:0.5px;font-size:13px;';
     loDiv.textContent = lo.label;
+    loDiv.setAttribute('aria-label', lo.lang === 'zh' ? '中文' : 'English');
+    loDiv.setAttribute('aria-pressed', lo.lang === currentLang ? 'true' : 'false');
     loDiv.addEventListener('click', () => {
       localStorage.setItem('cv-lang', lo.lang);
       state.set('lang', lo.lang);
@@ -582,6 +599,8 @@ function renderMainView() {
       const isActive = desktopId === activeId;
       el.classList.remove('pill-flat', 'pill-active');
       el.classList.add(isActive ? 'pill-active' : 'pill-flat');
+      if (isActive) el.setAttribute('aria-current', 'page');
+      else el.removeAttribute('aria-current');
     }
   }
   // Make it accessible for stats button action

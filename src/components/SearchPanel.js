@@ -45,11 +45,7 @@ export class SearchPanel {
     header.classList.add('content-constrained');
 
     const title = document.createElement('h2');
-    if (isClaude) {
-      title.style.cssText = 'display:none;';
-    } else {
-      title.style.cssText = 'font-size:1.15rem;font-weight:600;margin-bottom:16px;color:var(--text-primary);';
-    }
+    title.className = 'panel-page-title';
     title.textContent = t('search.title');
     header.appendChild(title);
 
@@ -63,8 +59,9 @@ export class SearchPanel {
     searchInput.placeholder = t('search.placeholder');
     searchInput.id = 'search-panel-input';
     searchInput.className = 'search-field';
+    searchInput.setAttribute('aria-label', t('search.title'));
     if (isClaude) {
-      searchInput.style.cssText = 'width:100%;padding:0;color:var(--text-primary);font-size:12px;line-height:17px;font-family:var(--font-family);background:transparent;border:none;outline:none;';
+      searchInput.style.cssText = 'width:100%;padding:0;color:var(--text-primary);font-size:15px;line-height:24px;font-family:var(--font-family);background:transparent;border:none;';
     } else {
       searchInput.style.cssText = 'flex:1;padding:14px 16px 14px 42px;color:var(--text-primary);font-size:0.95rem;font-family:var(--font-family);';
     }
@@ -90,7 +87,7 @@ export class SearchPanel {
     const inputWrapper = document.createElement('div');
     inputWrapper.className = 'search-input-shell';
     if (isClaude) {
-      inputWrapper.style.cssText = 'width:100%;max-width:506px;margin:0 auto;position:relative;background:#ffffff;border-radius:20px;border:1px solid transparent;box-shadow:rgba(0,0,0,0.035) 0px 3px 15px, rgba(31,30,29,0.15) 0px 0px 0px 0.5px;display:flex;flex-direction:column;padding:10.5px;gap:9px;box-sizing:content-box;';
+      inputWrapper.style.cssText = 'width:100%;position:relative;background:#ffffff;border-radius:20px;border:1px solid transparent;box-shadow:rgba(0,0,0,0.035) 0px 3px 15px, rgba(31,30,29,0.15) 0px 0px 0px 0.5px;display:flex;flex-direction:column;padding:16px;gap:12px;';
     } else {
       inputWrapper.style.cssText = 'flex:1;position:relative;box-shadow:var(--shadow-inset);';
     }
@@ -199,12 +196,12 @@ export class SearchPanel {
       { value: 'all', label: t('search.allRoles') },
       { value: 'human', label: t('search.humanOnly') },
       { value: 'assistant', label: t('search.aiOnly') },
-    ]);
-    roleSelect.addEventListener('change', () => {
-      this.filters.role = roleSelect.value;
+    ], t('search.allRoles'));
+    roleSelect.select.addEventListener('change', () => {
+      this.filters.role = roleSelect.select.value;
       this.doSearch();
     });
-    filterRow.appendChild(roleSelect);
+    filterRow.appendChild(roleSelect.shell);
 
     // Content type filter
     const typeSelect = this._createSelect('search-type', [
@@ -212,12 +209,12 @@ export class SearchPanel {
       { value: 'thinking', label: t('search.withThinking') },
       { value: 'tool', label: t('search.withToolUse') },
       { value: 'flag', label: t('search.withFlags') },
-    ]);
-    typeSelect.addEventListener('change', () => {
-      this.filters.contentType = typeSelect.value;
+    ], t('search.allTypes'));
+    typeSelect.select.addEventListener('change', () => {
+      this.filters.contentType = typeSelect.select.value;
       this.doSearch();
     });
-    filterRow.appendChild(typeSelect);
+    filterRow.appendChild(typeSelect.shell);
 
     // Clear filters button
     const clearBtn = document.createElement('button');
@@ -241,8 +238,8 @@ export class SearchPanel {
       this.currentQuery = '';
       dateFromInput.value = '';
       dateToInput.value = '';
-      roleSelect.value = 'all';
-      typeSelect.value = 'all';
+      roleSelect.select.value = 'all';
+      typeSelect.select.value = 'all';
       searchInput.value = '';
       this.results = [];
       this._renderResults(resultsInner, statsBar);
@@ -262,7 +259,7 @@ export class SearchPanel {
       color: var(--text-muted);
       flex-shrink: 0;
       display: none;
-      margin: 12px 0 0;
+      margin: 12px auto 0;
     `;
     statsBar.classList.add('content-constrained');
     container.appendChild(statsBar);
@@ -432,11 +429,15 @@ export class SearchPanel {
 
       // Individual results
       for (const r of group.results) {
-        const item = document.createElement('div');
+        const item = document.createElement('button');
+        item.type = 'button';
         item.className = 'search-result-item';
         item.style.cssText = `
           padding: 16px 18px;
           cursor: pointer;
+          text-align: left;
+          width: 100%;
+          font-family: var(--font-family);
         `;
 
         // Meta line: sender + time + badges
@@ -483,7 +484,7 @@ export class SearchPanel {
         // Snippet with highlighted match
         const snippetEl = document.createElement('div');
         snippetEl.className = 'search-result-snippet';
-        snippetEl.style.cssText = 'font-size:0.85rem;color:var(--text-secondary);line-height:1.5;word-break:break-word;';
+        snippetEl.style.cssText = 'font-size:0.9375rem;color:var(--text-secondary);line-height:1.65;word-break:break-word;';
 
         if (r.query) {
           const lowerSnippet = r.snippet.toLowerCase();
@@ -583,6 +584,7 @@ export class SearchPanel {
     input.type = 'date';
     input.id = id;
     input.className = 'search-filter-control';
+    if (placeholder) input.setAttribute('aria-label', placeholder);
     input.style.cssText = `
       padding: 10px 12px;
       background: var(--surface-inset);
@@ -595,10 +597,11 @@ export class SearchPanel {
     return input;
   }
 
-  _createSelect(id, options) {
+  _createSelect(id, options, ariaLabel) {
     const select = document.createElement('select');
     select.id = id;
     select.className = 'search-filter-control';
+    if (ariaLabel) select.setAttribute('aria-label', ariaLabel);
     select.style.cssText = `
       padding: 10px 12px;
       background: var(--surface-inset);
@@ -614,6 +617,15 @@ export class SearchPanel {
       option.textContent = opt.label;
       select.appendChild(option);
     }
-    return select;
+    // Wrap so the same chevron treatment works in every theme without
+    // fighting the inline surface (which may be a gradient token).
+    const shell = document.createElement('span');
+    shell.className = 'select-shell';
+    shell.appendChild(select);
+    const chevron = document.createElement('span');
+    chevron.className = 'select-chevron';
+    chevron.setAttribute('aria-hidden', 'true');
+    shell.appendChild(chevron);
+    return { shell, select };
   }
 }

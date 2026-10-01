@@ -24,10 +24,14 @@ export class MessageView {
     this.handleDocumentClick = (e) => {
       if (!this.activeExportDropdown) return;
       if (this.activeExportDropdown.wrapper.contains(e.target)) return;
-      this.activeExportDropdown.dropdown.classList.add('hidden');
-      this.activeExportDropdown = null;
+      this._closeExportDropdown();
+    };
+    this.handleDocumentKeydown = (e) => {
+      if (e.key !== 'Escape' || !this.activeExportDropdown) return;
+      this._closeExportDropdown(true);
     };
     document.addEventListener('click', this.handleDocumentClick);
+    document.addEventListener('keydown', this.handleDocumentKeydown);
     this.render();
     this.unsubscribers.push(
       state.on('currentConversationIndex', () => { this.selectedIndices.clear(); this.selectMode = false; this.renderConversation(); }),
@@ -51,6 +55,9 @@ export class MessageView {
   }
 
   renderEmpty() {
+    // Drop any open quick-export menu so no detached wrapper survives a re-render.
+    this._closeExportDropdown();
+    this._focusModeToggleAfterRender = false;
     this.container.textContent = '';
     this.container.classList.remove('stats-panel-shell');
     this.selectedIndices.clear();
@@ -67,6 +74,8 @@ export class MessageView {
   }
 
   renderConversation() {
+    // Drop any open quick-export menu before the DOM is replaced.
+    this._closeExportDropdown();
     const index = state.get('currentConversationIndex');
     const conversations = state.get('filteredConversations') || [];
     if (index < 0 || index >= conversations.length) { this.renderEmpty(); return; }
@@ -101,14 +110,12 @@ export class MessageView {
 
     const headerTop = document.createElement('div');
     headerTop.className = 'message-header-top';
-    headerTop.style.cssText = 'display:flex;justify-content:space-between;align-items:flex-start;gap:12px;';
 
     const titleSection = document.createElement('div');
     titleSection.className = 'message-title-section';
     titleSection.style.cssText = 'flex:1;min-width:0;';
     const titleEl = document.createElement('h2');
     titleEl.className = 'message-title';
-    titleEl.style.cssText = 'font-family:var(--font-display);font-size:1.2rem;font-weight:400;margin-bottom:4px;';
     titleEl.textContent = conv.name || t('msgView.unnamed');
     titleSection.appendChild(titleEl);
 
@@ -126,8 +133,12 @@ export class MessageView {
     const metaEl = document.createElement('div');
     metaEl.className = 'message-meta';
     metaEl.style.cssText = 'font-size:0.78rem;color:var(--text-muted);display:flex;gap:12px;flex-wrap:wrap;';
-    const statItems = [conv.stats.messageCount + t('msgView.msgCount'), (names.human || 'Human') + ': ' + conv.stats.humanChars.toLocaleString() + ' 字', (names.assistant || 'Assistant') + ': ' + conv.stats.assistantChars.toLocaleString() + ' 字'];
-    if (conv.stats.hasThinking) statItems.push(conv.stats.thinkingCount + ' 次思考');
+    const statItems = [
+      conv.stats.messageCount + ' ' + t('msgView.msgCount'),
+      (names.human || 'Human') + ': ' + t('msgView.characterCount', { n: conv.stats.humanChars.toLocaleString() }),
+      (names.assistant || 'Assistant') + ': ' + t('msgView.characterCount', { n: conv.stats.assistantChars.toLocaleString() }),
+    ];
+    if (conv.stats.hasThinking) statItems.push(conv.stats.thinkingCount + ' ' + t('msgView.thinkingCountUnit'));
     for (const s of statItems) { const sp = document.createElement('span'); sp.textContent = s; metaEl.appendChild(sp); }
     titleSection.appendChild(metaEl);
     headerTop.appendChild(titleSection);
@@ -135,22 +146,24 @@ export class MessageView {
     // Header buttons
     const headerBtns = document.createElement('div');
     headerBtns.className = 'message-header-actions';
-    headerBtns.style.cssText = 'display:flex;gap:8px;flex-shrink:0;align-items:center;flex-wrap:wrap;justify-content:flex-end;';
 
-    // Toggle switch — pill shape with sliding circle
-    const toggleOuter = document.createElement('div');
+    // Mode toggle — native switch button (keyboard operable, labelled + checked state)
+    const toggleOuter = document.createElement('button');
+    toggleOuter.type = 'button';
     toggleOuter.className = 'message-mode-toggle';
-    toggleOuter.style.cssText = 'display:flex;align-items:center;gap:8px;flex-shrink:0;cursor:pointer;';
+    toggleOuter.setAttribute('role', 'switch');
+    toggleOuter.setAttribute('aria-checked', this.selectMode ? 'true' : 'false');
+    toggleOuter.title = this.selectMode ? t('msgView.selectMode') : t('msgView.viewMode');
 
     const toggleLabel = document.createElement('span');
-    toggleLabel.style.cssText = 'font-size:0.75rem;color:var(--text-muted);user-select:none;';
+    toggleLabel.className = 'message-mode-toggle-label';
     toggleLabel.textContent = this.selectMode ? t('msgView.selectMode') : t('msgView.viewMode');
 
-    const toggleTrack = document.createElement('div');
-    toggleTrack.style.cssText = `width:44px;height:24px;border-radius:12px;position:relative;transition:background 0.2s;${this.selectMode ? 'background:var(--accent);' : 'background:var(--border-strong);'}`;
+    const toggleTrack = document.createElement('span');
+    toggleTrack.className = 'message-mode-toggle-track' + (this.selectMode ? ' active' : '');
 
-    const toggleThumb = document.createElement('div');
-    toggleThumb.style.cssText = `width:20px;height:20px;border-radius:50%;background:#fff;position:absolute;top:2px;transition:left 0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.2);${this.selectMode ? 'left:22px;' : 'left:2px;'}`;
+    const toggleThumb = document.createElement('span');
+    toggleThumb.className = 'message-mode-toggle-thumb';
     toggleTrack.appendChild(toggleThumb);
 
     toggleOuter.appendChild(toggleLabel);
@@ -158,6 +171,9 @@ export class MessageView {
     toggleOuter.addEventListener('click', () => {
       this.selectMode = !this.selectMode;
       if (!this.selectMode) this.selectedIndices.clear();
+      // The toggle is recreated by the re-render; remember to restore focus to
+      // the live replacement so keyboard users are not dropped onto <body>.
+      this._focusModeToggleAfterRender = true;
       this.renderConversation();
     });
     headerBtns.appendChild(toggleOuter);
@@ -168,39 +184,109 @@ export class MessageView {
     });
     headerBtns.appendChild(addAllBtn);
 
-    // Export dropdown
+    // Export dropdown — native trigger + native menu items with Escape/outside
+    // close and focus return to the (still-present) trigger.
     const exportWrapper = document.createElement('div');
-    exportWrapper.style.cssText = 'position:relative;';
+    exportWrapper.className = 'export-dropdown-wrapper';
     const exportBtn = this._headerBtn(t('msgView.exportThis'), 'export');
-    exportBtn.appendChild(document.createTextNode(' \u25BE'));
-    exportBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const willOpen = dropdown.classList.contains('hidden');
-      if (this.activeExportDropdown && this.activeExportDropdown.dropdown !== dropdown) {
-        this.activeExportDropdown.dropdown.classList.add('hidden');
-      }
-      dropdown.classList.toggle('hidden');
-      this.activeExportDropdown = willOpen ? { wrapper: exportWrapper, dropdown } : null;
-    });
-    exportWrapper.appendChild(exportBtn);
+    exportBtn.classList.add('export-dropdown-trigger');
+    exportBtn.setAttribute('aria-haspopup', 'menu');
+    exportBtn.setAttribute('aria-expanded', 'false');
+    const exportChevron = document.createElement('span');
+    exportChevron.className = 'export-dropdown-chevron';
+    exportChevron.setAttribute('aria-hidden', 'true');
+    exportChevron.textContent = '\u25BE';
+    exportBtn.appendChild(exportChevron);
 
     const dropdown = document.createElement('div');
     dropdown.className = 'export-dropdown hidden';
-    dropdown.style.cssText = 'position:absolute;right:0;top:100%;margin-top:4px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);box-shadow:var(--shadow);z-index:100;min-width:160px;overflow:hidden;';
-    for (const fmt of [{key:'md',label:'Markdown'},{key:'txt',label:'纯文本'},{key:'html',label:'HTML'},{key:'json',label:'JSON'}]) {
-      const item = document.createElement('div');
-      item.style.cssText = 'padding:8px 14px;cursor:pointer;font-size:0.82rem;color:var(--text-secondary);transition:background 0.15s;';
+    dropdown.setAttribute('role', 'menu');
+    dropdown.setAttribute('aria-label', t('msgView.exportThis'));
+
+    const menuItems = [];
+    const focusItem = (i) => {
+      if (menuItems.length === 0) return;
+      const idx = (i + menuItems.length) % menuItems.length;
+      const target = menuItems[idx];
+      if (target && typeof target.focus === 'function') target.focus();
+    };
+
+    // Single canonical open/close. Every close path funnels through
+    // this.activeExportDropdown so no detached wrapper survives a re-render.
+    const openMenu = (focusFirst) => {
+      if (this.activeExportDropdown && this.activeExportDropdown.dropdown !== dropdown) {
+        this._closeExportDropdown();
+      }
+      dropdown.classList.remove('hidden');
+      exportBtn.setAttribute('aria-expanded', 'true');
+      this.activeExportDropdown = { wrapper: exportWrapper, dropdown, trigger: exportBtn };
+      if (focusFirst) focusItem(0);
+    };
+    const closeMenu = (returnFocus) => {
+      if (!dropdown.classList.contains('hidden')) this._closeExportDropdown(returnFocus);
+    };
+
+    exportBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (dropdown.classList.contains('hidden')) openMenu(true);
+      else closeMenu(false);
+    });
+    exportBtn.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowDown' || e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        openMenu(true);
+      } else if (e.key === 'Escape') {
+        closeMenu(true);
+      }
+    });
+    dropdown.addEventListener('keydown', (e) => {
+      const current = menuItems.indexOf(globalThis.document.activeElement);
+      switch (e.key) {
+        case 'Escape':
+          e.preventDefault();
+          closeMenu(true);
+          break;
+        case 'ArrowDown':
+          e.preventDefault();
+          focusItem(current + 1);
+          break;
+        case 'ArrowUp':
+          e.preventDefault();
+          focusItem(current - 1);
+          break;
+        case 'Home':
+          e.preventDefault();
+          focusItem(0);
+          break;
+        case 'End':
+          e.preventDefault();
+          focusItem(menuItems.length - 1);
+          break;
+        case 'Tab':
+          // Let Tab move naturally, but never leave an open menu behind.
+          closeMenu(false);
+          break;
+        default:
+          break;
+      }
+    });
+
+    for (const fmt of [{key:'md',label:'Markdown'},{key:'txt',label:t('export.plainText')},{key:'html',label:'HTML'},{key:'json',label:'JSON'}]) {
+      const item = document.createElement('button');
+      item.type = 'button';
+      item.className = 'export-dropdown-item';
+      item.setAttribute('role', 'menuitem');
+      item.tabIndex = -1;
       item.textContent = fmt.label;
-      item.addEventListener('mouseenter', () => item.style.background = 'var(--bg-card-hover)');
-      item.addEventListener('mouseleave', () => item.style.background = '');
       item.addEventListener('click', (e) => {
         e.stopPropagation();
-        dropdown.classList.add('hidden');
-        this.activeExportDropdown = null;
+        closeMenu(true);
         this._quickExportConversation(conv, fmt.key);
       });
       dropdown.appendChild(item);
+      menuItems.push(item);
     }
+    exportWrapper.appendChild(exportBtn);
     exportWrapper.appendChild(dropdown);
     headerBtns.appendChild(exportWrapper);
 
@@ -211,7 +297,9 @@ export class MessageView {
     // ---- Messages ----
     const scrollContainer = document.createElement('div');
     scrollContainer.className = 'messages-scroll';
-    scrollContainer.style.cssText = 'flex:1;overflow-y:auto;padding:16px 0;';
+    const messagesContent = document.createElement('div');
+    messagesContent.className = 'messages-content';
+    scrollContainer.appendChild(messagesContent);
 
     let prevTimestamp = null;
 
@@ -229,7 +317,7 @@ export class MessageView {
           sep.style.cssText = 'text-align:center;padding:16px 0;color:var(--text-muted);font-size:0.8rem;';
           const hours = Math.floor(diffMinutes / 60);
           sep.textContent = '\u2014 ' + (hours > 24 ? Math.floor(hours / 24) + t('msgView.daysLater') : hours + t('msgView.hoursLater')) + ' \u2014';
-          scrollContainer.appendChild(sep);
+          messagesContent.appendChild(sep);
         }
       }
       prevTimestamp = msg.createdAt;
@@ -248,8 +336,10 @@ export class MessageView {
 
       // Selection checkbox (only in select mode)
       if (this.selectMode) {
+        msgEl.classList.add('message-selectable');
         const checkbox = document.createElement('input');
         checkbox.type = 'checkbox';
+        checkbox.setAttribute('aria-label', t('msgView.selectMessage', { n: mi + 1 }));
         checkbox.checked = this.selectedIndices.has(mi);
         checkbox.style.cssText = 'position:absolute;left:6px;top:14px;accent-color:var(--accent);cursor:pointer;z-index:2;';
         checkbox.addEventListener('change', () => {
@@ -325,11 +415,7 @@ export class MessageView {
 
       // ---- Message Footer: timestamp + action buttons ----
       const footer = document.createElement('div');
-      if (isClaude) {
-        footer.style.cssText = 'display:flex;justify-content:space-between;align-items:center;margin-top:4px;opacity:0;transition:opacity 0.15s;';
-      } else {
-        footer.style.cssText = 'display:flex;justify-content:space-between;align-items:center;margin-top:12px;opacity:0.55;transition:opacity 0.15s;';
-      }
+      footer.className = 'message-footer';
 
       const timeEl = document.createElement('span');
       timeEl.style.cssText = 'font-size:0.72rem;color:var(--text-muted);';
@@ -339,8 +425,8 @@ export class MessageView {
       const actionBtns = document.createElement('div');
       actionBtns.style.cssText = 'display:flex;gap:4px;';
 
-      actionBtns.appendChild(this._createActionBtn('复制', () => this._copyMessage(msg)));
-      actionBtns.appendChild(this._createActionBtn(isCollected ? '已精选' : '+精选', () => {
+      actionBtns.appendChild(this._createActionBtn(t('msgView.copy'), () => this._copyMessage(msg)));
+      actionBtns.appendChild(this._createActionBtn(isCollected ? t('msgView.collected') : t('msgView.collect'), () => {
         if (isCollected) return;
         this._addToCollection(conv, mi, msg);
         // Auto enter select mode and select this message
@@ -350,7 +436,7 @@ export class MessageView {
           this.renderConversation();
         }
       }, isCollected));
-      actionBtns.appendChild(this._createActionBtn('选择到这里', () => {
+      actionBtns.appendChild(this._createActionBtn(t('msgView.selectToHere'), () => {
         if (!this.selectMode) { this.selectMode = true; }
         this._selectToHere(mi, conv);
         this.renderConversation();
@@ -359,32 +445,29 @@ export class MessageView {
       footer.appendChild(actionBtns);
       msgEl.appendChild(footer);
 
-      // Show footer on hover
-      if (isClaude) {
-        msgEl.addEventListener('mouseenter', () => footer.style.opacity = '1');
-        msgEl.addEventListener('mouseleave', () => footer.style.opacity = '0');
-      } else {
-        msgEl.addEventListener('mouseenter', () => footer.style.opacity = '1');
-        msgEl.addEventListener('mouseleave', () => { if (!footer.dataset.pinned) footer.style.opacity = '0.55'; });
-      }
-
-      scrollContainer.appendChild(msgEl);
+      messagesContent.appendChild(msgEl);
     }
 
     this.container.appendChild(scrollContainer);
     if (this.selectMode) this._updateSelectionToolbar(conv);
     this._applyHighlightFromState();
+
+    // Restore keyboard focus to the recreated mode toggle after an explicit
+    // toggle activation (focus would otherwise fall back to <body>).
+    if (this._focusModeToggleAfterRender) {
+      this._focusModeToggleAfterRender = false;
+      const toggle = this.container.querySelector('.message-mode-toggle');
+      if (toggle && typeof toggle.focus === 'function') toggle.focus();
+    }
   }
 
   // ---- Header Button Helper ----
   _headerBtn(text, iconName, onClick) {
     const btn = document.createElement('button');
     btn.className = 'neu-ghost-btn';
-    btn.style.cssText = 'font-size:0.78rem;white-space:nowrap;transition:all 0.15s;display:flex;align-items:center;gap:4px;';
-    if (iconName) btn.appendChild(createIcon(iconName, 13));
+    btn.classList.add('message-header-btn');
+    if (iconName) btn.appendChild(createIcon(iconName, 15));
     btn.appendChild(document.createTextNode(' ' + text));
-    btn.addEventListener('mouseenter', () => { btn.style.borderColor = 'var(--accent)'; btn.style.color = 'var(--accent)'; });
-    btn.addEventListener('mouseleave', () => { if (!btn.dataset.active) { btn.style.borderColor = 'var(--border)'; btn.style.color = 'var(--text-secondary)'; }});
     if (onClick) btn.addEventListener('click', onClick);
     return btn;
   }
@@ -393,20 +476,11 @@ export class MessageView {
   _createActionBtn(text, onClick, active = false) {
     const btn = document.createElement('button');
     btn.className = 'neu-ghost-btn';
-    btn.style.cssText = 'padding:4px 10px;font-size:0.7rem;transition:all 0.15s;white-space:nowrap;';
+    btn.classList.add('message-action-btn');
     btn.textContent = text;
     if (active) {
       btn.dataset.active = 'true';
-      btn.style.color = 'var(--accent)';
-      btn.style.borderColor = 'var(--accent)';
     }
-    btn.addEventListener('mouseenter', () => { btn.style.borderColor = 'var(--accent)'; btn.style.color = 'var(--accent)'; });
-    btn.addEventListener('mouseleave', () => {
-      if (!btn.dataset.active) {
-        btn.style.borderColor = 'var(--border)';
-        btn.style.color = 'var(--text-muted)';
-      }
-    });
     btn.addEventListener('click', (e) => { e.stopPropagation(); onClick(); });
     return btn;
   }
@@ -628,14 +702,30 @@ export class MessageView {
     for (const unsubscribe of this.unsubscribers) unsubscribe();
     this.unsubscribers = [];
     document.removeEventListener('click', this.handleDocumentClick);
+    document.removeEventListener('keydown', this.handleDocumentKeydown);
+    this._closeExportDropdown();
+  }
+
+  /**
+   * Close the open quick-export dropdown, keeping aria-expanded in sync.
+   * Single canonical close used by Escape, outside-click, Tab, format
+   * selection and any future re-render/cleanup path.
+   * @param {boolean} [focusTrigger] - Return focus to the still-present trigger.
+   */
+  _closeExportDropdown(focusTrigger = false) {
+    if (!this.activeExportDropdown) return;
+    const { dropdown, trigger } = this.activeExportDropdown;
     this.activeExportDropdown = null;
+    dropdown.classList.add('hidden');
+    if (trigger) trigger.setAttribute('aria-expanded', 'false');
+    if (focusTrigger && trigger && trigger.isConnected !== false) trigger.focus();
   }
 
   // ---- Content Renderers ----
   renderTextBlock(parent, block) {
     const div = document.createElement('div');
     div.className = 'message-text';
-    div.style.cssText = 'line-height:1.7;word-break:break-word;';
+    div.style.cssText = 'word-break:break-word;';
     const safeHtml = renderMarkdown(desensitize(block.text));
     const template = document.createElement('template');
     template.innerHTML = safeHtml;
@@ -643,12 +733,46 @@ export class MessageView {
     parent.appendChild(div);
   }
 
-  /** Claude theme: timeline-style thinking/tool rendering */
+  /**
+   * Claude theme: lightweight inline summary + timeline for thinking/tool blocks.
+   *
+   * Hierarchy (kept deliberately airy, not a heavy admin card):
+   *   - summary row: chevron + summary label + duration + counts (native <button>)
+   *   - expanded timeline: one row per block (thinking / tool_use / tool_result)
+   *   - each row exposes its full payload through an on-demand native <details>
+   *
+   * Text is written with textContent only. Thinking text is run through the
+   * existing screen-display desensitize() the same way renderThinkingBlock does;
+   * this does not expand or claim any whole-tool redaction policy.
+   */
   _renderClaudeTimeline(parent, blocks) {
     const thinkingBlocks = blocks.filter(b => b.type === 'thinking');
     const toolBlocks = blocks.filter(b => b.type === 'tool_use' || b.type === 'tool_result');
+    const toolResultBlocks = blocks.filter(b => b.type === 'tool_result');
     const lastThinking = thinkingBlocks[thinkingBlocks.length - 1];
-    const summaryText = lastThinking?.summaries?.[0] || (toolBlocks.length > 0 ? toolBlocks[0].toolName : 'Thinking...');
+    const toolUseBlocks = toolBlocks.filter(b => b.type === 'tool_use');
+
+    // Duration comes straight from the parser's unified formatDuration.
+    const duration = lastThinking?.durationText || '';
+
+    // Summary fallback priority: explicit summary → desensitized thinking preview
+    // → first tool name → (standalone results only) a result label → generic label.
+    // Screen desensitization is applied to any thinking text that can surface here
+    // (same policy as the detail body). The fallback must reflect the actual
+    // content type so a results-only timeline is not mislabeled as "thinking".
+    const thinkingPreview = lastThinking
+      ? desensitize(lastThinking.thinking || lastThinking.summaries?.[0] || '')
+      : '';
+    const summaryText = lastThinking?.summaries?.[0]
+      ? desensitize(lastThinking.summaries[0])
+      : (thinkingPreview
+        || (toolUseBlocks.length > 0 ? (toolUseBlocks[0].toolName || t('msgView.toolFallback')) : '')
+        || (toolResultBlocks.length > 0 ? t('msgView.toolResultLabel') : '')
+        || t('msgView.thinkingFallback'));
+    // Keep the summary to a single readable line; full text lives in the timeline.
+    const summaryLine = String(summaryText).replace(/\s+/g, ' ').trim();
+    const summaryShort = summaryLine.length > 96 ? summaryLine.slice(0, 96).trimEnd() + '\u2026' : summaryLine;
+
     const ns = 'http://www.w3.org/2000/svg';
 
     // SVG helpers — icons from reference, sizes from claude.ai
@@ -660,6 +784,8 @@ export class MessageView {
       svg.setAttribute('stroke-width', '1.5');
       svg.setAttribute('stroke-linecap', 'round'); svg.setAttribute('stroke-linejoin', 'round');
       svg.style.display = 'block';
+      svg.setAttribute('aria-hidden', 'true');
+      svg.setAttribute('focusable', 'false');
       return svg;
     };
     const addPath = (svg, d) => { const p = document.createElementNS(ns, 'path'); p.setAttribute('d', d); svg.appendChild(p); };
@@ -676,71 +802,214 @@ export class MessageView {
     const wrapper = document.createElement('div');
     wrapper.style.cssText = 'margin:8px 0 4px;font-family:var(--font-anthropic-ui);';
 
-    // Summary button — 10.5px sans-serif, muted color (from claude.ai)
-    const summaryBtn = document.createElement('div');
-    summaryBtn.style.cssText = 'display:inline-flex;align-items:center;gap:4px;cursor:pointer;color:var(--text-muted);font-size:10.5px;line-height:1.4;padding:3px 6px;margin-left:-6px;border-radius:6px;transition:background 0.15s;user-select:none;';
-    summaryBtn.addEventListener('mouseenter', () => summaryBtn.style.background = 'rgba(0,0,0,0.04)');
-    summaryBtn.addEventListener('mouseleave', () => summaryBtn.style.background = 'none');
-
-    const summarySpan = document.createElement('span');
-    summarySpan.textContent = summaryText;
-    summaryBtn.appendChild(summarySpan);
+    // ---- Summary row: native button, keyboard operable, aria-expanded ----
+    const summaryBtn = document.createElement('button');
+    summaryBtn.type = 'button';
+    summaryBtn.className = 'timeline-summary';
+    summaryBtn.setAttribute('aria-expanded', 'false');
 
     const chevronWrap = document.createElement('span');
-    chevronWrap.style.cssText = 'display:inline-flex;flex-shrink:0;color:var(--text-muted);';
+    chevronWrap.className = 'timeline-chevron';
     chevronWrap.appendChild(makeChevronRight());
     summaryBtn.appendChild(chevronWrap);
+
+    const summarySpan = document.createElement('span');
+    summarySpan.className = 'timeline-summary-text';
+    summarySpan.textContent = summaryShort;
+    summaryBtn.appendChild(summarySpan);
+
+    const metaWrap = document.createElement('span');
+    metaWrap.className = 'timeline-summary-meta';
+    if (duration) {
+      const durEl = document.createElement('span');
+      durEl.className = 'timeline-duration';
+      durEl.textContent = duration;
+      metaWrap.appendChild(durEl);
+    }
+    const counts = [];
+    if (thinkingBlocks.length > 0) counts.push(thinkingBlocks.length + ' ' + t('msgView.thinkingCountUnit'));
+    if (toolUseBlocks.length > 0) counts.push(toolUseBlocks.length + ' ' + t('msgView.toolCountUnit'));
+    if (counts.length > 0) {
+      const countEl = document.createElement('span');
+      countEl.className = 'timeline-count';
+      countEl.textContent = counts.join(' \u00b7 ');
+      metaWrap.appendChild(countEl);
+    }
+    if (metaWrap.children.length > 0) summaryBtn.appendChild(metaWrap);
     wrapper.appendChild(summaryBtn);
 
-    // Timeline (initially hidden)
+    // ---- Timeline (initially hidden) ----
     const timeline = document.createElement('div');
-    timeline.style.cssText = 'margin-top:4px;padding-left:2px;display:none;flex-direction:column;';
+    timeline.className = 'timeline-body';
+    timeline.hidden = true;
 
     let isExpanded = false;
-    summaryBtn.addEventListener('click', () => {
-      isExpanded = !isExpanded;
-      timeline.style.display = isExpanded ? 'flex' : 'none';
+    const setExpanded = (next) => {
+      isExpanded = next;
+      timeline.hidden = !isExpanded;
+      summaryBtn.setAttribute('aria-expanded', isExpanded ? 'true' : 'false');
       chevronWrap.textContent = '';
       chevronWrap.appendChild(isExpanded ? makeChevronDown() : makeChevronRight());
-    });
+    };
+    summaryBtn.addEventListener('click', () => setExpanded(!isExpanded));
 
-    // Build items
+    // Build items — keep every payload visible on demand, never truncate as the
+    // only access path. Each item has a stable type title plus a short preview;
+    // the full payload lives in the expandable body.
     const items = [];
     for (const block of blocks) {
       if (block.type === 'thinking') {
-        items.push({ type: 'thinking', text: block.thinking || block.summaries?.[0] || 'Thinking...' });
+        const raw = block.thinking || block.summaries?.[0] || '';
+        const preview = desensitize(raw).replace(/\s+/g, ' ').trim();
+        items.push({ type: 'thinking', block, title: t('msgView.thinkingLabel'), preview });
       } else if (block.type === 'tool_use') {
-        items.push({ type: 'tool', text: block.toolName || 'Tool' });
+        items.push({
+          type: 'tool',
+          block,
+          title: block.toolName || t('msgView.toolFallback'),
+          preview: block.toolMessage ? String(block.toolMessage) : '',
+        });
       } else if (block.type === 'tool_result') {
-        items.push({ type: 'result', text: typeof block.result === 'string' ? block.result.substring(0, 80) : 'Result' });
+        const raw = typeof block.result === 'string' ? block.result : '';
+        items.push({
+          type: 'result',
+          block,
+          title: t('msgView.toolResultLabel'),
+          preview: raw.replace(/\s+/g, ' ').trim(),
+        });
       }
     }
 
-    const makeRow = (iconFn, text, showLine) => {
+    const makeRow = (iconName, item, showLine) => {
+      const { block, title: titleText, preview } = item;
       const row = document.createElement('div');
-      row.style.cssText = 'display:flex;gap:8px;align-items:stretch;';
+      row.className = 'timeline-row';
+      row.style.cssText = showLine ? '' : 'padding-bottom:0;';
       const iconCol = document.createElement('div');
-      iconCol.style.cssText = 'display:flex;flex-direction:column;align-items:center;width:16px;flex-shrink:0;padding-top:3px;color:var(--text-muted);';
-      iconCol.appendChild(iconFn());
+      iconCol.className = 'timeline-row-icon';
+      iconCol.appendChild(iconName === 'clock' ? makeClockIcon() : (iconName === 'check' ? makeDoneIcon() : makeToolIcon()));
       if (showLine) {
         const line = document.createElement('div');
-        line.style.cssText = 'width:1px;flex:1;margin:2px 0;background:rgba(31,30,29,0.15);min-height:4px;';
+        line.className = 'timeline-row-line';
         iconCol.appendChild(line);
       }
       row.appendChild(iconCol);
-      const textEl = document.createElement('div');
-      textEl.style.cssText = 'flex:1;padding-top:2px;' + (showLine ? 'padding-bottom:20px;' : '') + 'font-size:10.5px;line-height:1.4;color:var(--text-secondary);font-family:var(--font-anthropic-ui);';
-      textEl.textContent = text;
-      row.appendChild(textEl);
+
+      const details = document.createElement('details');
+      details.className = 'timeline-item';
+
+      const summary = document.createElement('summary');
+      summary.className = 'timeline-item-summary';
+
+      const marker = document.createElement('span');
+      marker.className = 'timeline-item-marker';
+      marker.setAttribute('aria-hidden', 'true');
+      marker.appendChild(makeChevronRight());
+      summary.appendChild(marker);
+
+      const title = document.createElement('span');
+      title.className = 'timeline-item-title';
+      title.textContent = titleText;
+      summary.appendChild(title);
+      if (preview) {
+        const sub = document.createElement('span');
+        sub.className = 'timeline-item-sub';
+        sub.textContent = preview;
+        summary.appendChild(sub);
+      }
+      details.appendChild(summary);
+
+      // Keep the chevron in sync with the native open/close state.
+      const syncMarker = () => {
+        marker.textContent = '';
+        marker.appendChild(details.open ? makeChevronDown() : makeChevronRight());
+      };
+      details.addEventListener('toggle', syncMarker);
+
+      const body = document.createElement('div');
+      body.className = 'timeline-item-body';
+      details.appendChild(body);
+
+      // Thinking → full reasoning text (screen desensitized like renderThinkingBlock).
+      if (block.type === 'thinking') {
+        const pre = document.createElement('div');
+        pre.className = 'timeline-detail-text';
+        pre.textContent = desensitize(block.thinking || block.summaries?.[0] || '');
+        body.appendChild(pre);
+      } else if (block.type === 'tool_use') {
+        let hasPayload = false;
+        // Full tool name (the summary title is ellipsized for narrow widths).
+        if (block.toolName) {
+          const nameRow = document.createElement('div');
+          nameRow.className = 'timeline-detail-name';
+          nameRow.textContent = block.toolName;
+          body.appendChild(nameRow);
+        }
+        if (block.toolMessage) {
+          const msg = document.createElement('div');
+          msg.className = 'timeline-detail-text';
+          msg.textContent = block.toolMessage;
+          body.appendChild(msg);
+          hasPayload = true;
+        }
+        if (block.toolInput && Object.keys(block.toolInput).length > 0) {
+          const label = document.createElement('div');
+          label.className = 'timeline-detail-label';
+          label.textContent = t('msgView.toolInputLabel');
+          body.appendChild(label);
+          const pre = document.createElement('pre');
+          pre.className = 'timeline-detail-pre';
+          pre.textContent = JSON.stringify(block.toolInput, null, 2);
+          body.appendChild(pre);
+          hasPayload = true;
+        }
+        if (block.result != null) {
+          const label = document.createElement('div');
+          label.className = 'timeline-detail-label';
+          label.textContent = t('msgView.toolResultLabel');
+          body.appendChild(label);
+          const pre = document.createElement('pre');
+          pre.className = 'timeline-detail-pre';
+          pre.textContent = typeof block.result === 'string' ? block.result : JSON.stringify(block.result, null, 2);
+          body.appendChild(pre);
+          hasPayload = true;
+        }
+        if (!hasPayload) {
+          const empty = document.createElement('div');
+          empty.className = 'timeline-detail-empty';
+          empty.textContent = t('msgView.toolNoInput');
+          body.appendChild(empty);
+        }
+      } else if (block.type === 'tool_result') {
+        const pre = document.createElement('pre');
+        pre.className = 'timeline-detail-pre';
+        pre.textContent = typeof block.result === 'string' ? block.result : JSON.stringify(block.result, null, 2);
+        body.appendChild(pre);
+      }
+
+      row.appendChild(details);
       return row;
     };
 
     for (let i = 0; i < items.length; i++) {
       const item = items[i];
-      const iconFn = item.type === 'thinking' ? makeClockIcon : makeToolIcon;
-      timeline.appendChild(makeRow(iconFn, item.text, true));
+      const iconName = item.type === 'thinking' ? 'clock' : 'tool';
+      timeline.appendChild(makeRow(iconName, item, true));
     }
-    timeline.appendChild(makeRow(makeDoneIcon, 'Done', false));
+    // Final "Done" marker row (no payload).
+    {
+      const row = document.createElement('div');
+      row.className = 'timeline-row timeline-row-done';
+      const iconCol = document.createElement('div');
+      iconCol.className = 'timeline-row-icon';
+      iconCol.appendChild(makeDoneIcon());
+      row.appendChild(iconCol);
+      const done = document.createElement('div');
+      done.className = 'timeline-done-text';
+      done.textContent = t('msgView.done');
+      row.appendChild(done);
+      timeline.appendChild(row);
+    }
 
     wrapper.appendChild(timeline);
     parent.appendChild(wrapper);
@@ -749,19 +1018,22 @@ export class MessageView {
   renderThinkingBlock(parent, block) {
     const details = document.createElement('details');
     details.className = 'thinking-block';
-    details.style.cssText = 'margin:8px 0;background:var(--thinking-bg);border:1px solid var(--thinking-border);border-radius:var(--radius-sm);overflow:hidden;';
     const summary = document.createElement('summary');
-    summary.style.cssText = 'padding:8px 12px;cursor:pointer;display:flex;align-items:center;gap:8px;font-size:0.85rem;color:var(--thinking-text);user-select:none;';
     summary.appendChild(createIcon('thought', 14));
     const label = document.createElement('span');
+    label.className = 'block-detail-title';
     label.style.fontWeight = '600';
-    label.textContent = '思考过程';
+    label.textContent = t('msgView.thinkingLabel');
     summary.appendChild(label);
     if (block.durationText) { const dur = document.createElement('span'); dur.className = 'badge badge-thinking'; dur.textContent = block.durationText; summary.appendChild(dur); }
-    if (block.summaries && block.summaries.length > 0) { const st = document.createElement('span'); st.style.cssText = 'color:var(--text-muted);font-size:0.8rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;'; st.textContent = '\u2014 ' + block.summaries[0]; summary.appendChild(st); }
+    if (block.summaries && block.summaries.length > 0) { const st = document.createElement('span'); st.className = 'block-detail-preview'; st.textContent = '\u2014 ' + desensitize(block.summaries[0]); summary.appendChild(st); }
+    const chevron = createIcon('chevronDown', 12);
+    chevron.className = 'block-detail-chevron';
+    chevron.setAttribute('aria-hidden', 'true');
+    summary.appendChild(chevron);
     details.appendChild(summary);
     const content = document.createElement('div');
-    content.style.cssText = 'padding:12px 16px;font-size:0.85rem;line-height:1.6;color:var(--text-secondary);white-space:pre-wrap;word-break:break-word;max-height:400px;overflow-y:auto;';
+    content.className = 'block-detail-content';
     content.textContent = desensitize(block.thinking);
     details.appendChild(content);
     parent.appendChild(details);
@@ -770,21 +1042,26 @@ export class MessageView {
   renderToolBlock(parent, block) {
     const details = document.createElement('details');
     details.className = 'tool-block';
-    details.style.cssText = 'margin:8px 0;background:var(--tool-bg);border:1px solid var(--tool-border);border-radius:var(--radius-sm);overflow:hidden;';
     const summary = document.createElement('summary');
-    summary.style.cssText = 'padding:8px 12px;cursor:pointer;font-size:0.85rem;color:var(--text-secondary);user-select:none;display:flex;align-items:center;gap:6px;';
     summary.appendChild(createIcon('tool', 14));
-    summary.appendChild(document.createTextNode(block.toolName || 'Tool'));
+    const name = document.createElement('span');
+    name.className = 'block-detail-title';
+    name.textContent = block.toolName || t('msgView.toolFallback');
+    summary.appendChild(name);
+    const chevron = createIcon('chevronDown', 12);
+    chevron.className = 'block-detail-chevron';
+    chevron.setAttribute('aria-hidden', 'true');
+    summary.appendChild(chevron);
     details.appendChild(summary);
     const content = document.createElement('div');
-    content.style.cssText = 'padding:12px 16px;font-size:0.8rem;';
+    content.className = 'block-detail-content';
     if (block.toolInput && Object.keys(block.toolInput).length > 0) {
-      const il = document.createElement('div'); il.style.cssText = 'font-weight:600;margin-bottom:4px;color:var(--text-muted);'; il.textContent = 'Input:'; content.appendChild(il);
-      const ip = document.createElement('pre'); ip.style.cssText = 'background:var(--code-bg);padding:8px;border-radius:4px;overflow-x:auto;font-family:var(--font-mono);font-size:0.8rem;color:var(--text-secondary);'; ip.textContent = JSON.stringify(block.toolInput, null, 2); content.appendChild(ip);
+      const il = document.createElement('div'); il.className = 'block-detail-label'; il.textContent = t('msgView.toolInputLabel'); content.appendChild(il);
+      const ip = document.createElement('pre'); ip.className = 'block-detail-pre'; ip.textContent = JSON.stringify(block.toolInput, null, 2); content.appendChild(ip);
     }
     if (block.result) {
-      const rl = document.createElement('div'); rl.style.cssText = 'font-weight:600;margin:8px 0 4px;color:var(--text-muted);'; rl.textContent = 'Result:'; content.appendChild(rl);
-      const rp = document.createElement('pre'); rp.style.cssText = 'background:var(--code-bg);padding:8px;border-radius:4px;overflow-x:auto;font-family:var(--font-mono);font-size:0.8rem;color:var(--text-secondary);max-height:200px;overflow-y:auto;'; rp.textContent = typeof block.result === 'string' ? block.result : JSON.stringify(block.result, null, 2); content.appendChild(rp);
+      const rl = document.createElement('div'); rl.className = 'block-detail-label'; rl.textContent = t('msgView.toolResultLabel'); content.appendChild(rl);
+      const rp = document.createElement('pre'); rp.className = 'block-detail-pre'; rp.textContent = typeof block.result === 'string' ? block.result : JSON.stringify(block.result, null, 2); content.appendChild(rp);
     }
     details.appendChild(content);
     parent.appendChild(details);
@@ -793,14 +1070,14 @@ export class MessageView {
   renderToolResultBlock(parent, block) {
     const div = document.createElement('div');
     div.className = 'tool-result-block';
-    div.style.cssText = 'margin:8px 0;background:var(--tool-bg);border:1px solid var(--tool-border);border-radius:var(--radius-sm);padding:12px 16px;';
     const label = document.createElement('div');
-    label.style.cssText = 'font-size:0.8rem;font-weight:600;color:var(--text-muted);margin-bottom:4px;display:flex;align-items:center;gap:6px;';
+    label.className = 'block-detail-label';
+    label.style.cssText = 'display:flex;align-items:center;gap:6px;';
     label.appendChild(createIcon('tool', 14));
-    label.appendChild(document.createTextNode('Tool Result'));
+    label.appendChild(document.createTextNode(t('msgView.toolResultLabel')));
     div.appendChild(label);
     const pre = document.createElement('pre');
-    pre.style.cssText = 'background:var(--code-bg);padding:8px;border-radius:4px;font-family:var(--font-mono);font-size:0.8rem;color:var(--text-secondary);max-height:200px;overflow:auto;';
+    pre.className = 'block-detail-pre';
     pre.textContent = typeof block.result === 'string' ? block.result : JSON.stringify(block.result, null, 2);
     div.appendChild(pre);
     parent.appendChild(div);
