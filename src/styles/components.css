@@ -431,10 +431,11 @@
 }
 
 .selection-toolbar {
-  position: absolute;
-  bottom: 10px;
-  left: 14px;
-  right: 14px;
+  /* Stay in the reader's flex flow: reserve space above mobile navigation
+     instead of covering messages or extending past the content width. */
+  flex-shrink: 0;
+  width: auto;
+  margin: 10px 14px;
   padding: 12px 14px !important;
   background: var(--surface-raised) !important;
   border-radius: 14px;
@@ -500,9 +501,7 @@
   }
 
   .selection-toolbar {
-    left: 8px;
-    right: 8px;
-    bottom: 8px;
+    margin: 8px;
     flex-wrap: wrap;
   }
 }

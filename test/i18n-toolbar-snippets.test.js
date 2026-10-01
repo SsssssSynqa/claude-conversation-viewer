@@ -30,7 +30,7 @@ const { t } = await import('../src/i18n.js');
 const { MessageView } = await import('../src/components/MessageView.js');
 const { SearchPanel } = await import('../src/components/SearchPanel.js');
 
-function buildConv() {
+function buildConv(assistantText = 'world') {
   return parseConversation({
     uuid: 'conv-i18n',
     name: 'i18n fixture',
@@ -44,7 +44,7 @@ function buildConv() {
       },
       {
         uuid: 'a-1', sender: 'assistant', created_at: '2026-10-01T00:00:10Z',
-        content: [{ type: 'text', text: 'world' }],
+        content: [{ type: 'text', text: assistantText }],
       },
     ],
   });
@@ -128,4 +128,54 @@ test('_cleanSnippet leaves plain prose untouched', () => {
   const panel = new SearchPanel();
   const plain = '月亮在 prompt 的尽头等她。The quick brown fox.';
   assert.equal(panel._cleanSnippet(plain), plain);
+});
+
+function searchText(text, query, role = 'all') {
+  const { root } = installDom();
+  const conv = buildConv(text);
+  state.set('conversations', [conv]);
+  state.set('lang', 'en');
+  const panel = new SearchPanel();
+  panel.render(root);
+  root.querySelector('#search-panel-input').value = query;
+  panel.filters.role = role;
+  panel.doSearch();
+  return root;
+}
+
+test('search results preserve and highlight identifiers in prose and code', () => {
+  for (const text of [
+    'Use user_id and foo_bar. Arithmetic: 2 * 3 = 6.',
+    'Use `user_id` and `foo_bar` in the request.',
+    '```python\nuser_id = get_user_id()\nfoo_bar = 2 * 3\n```',
+  ]) {
+    const root = searchText(text, 'user_id');
+    const snippet = root.querySelector('.search-result-snippet');
+    assert.ok(snippet.textContent.includes('foo_bar'), snippet.textContent);
+    assert.equal(snippet.querySelector('mark')?.textContent, 'user_id');
+  }
+});
+
+test('search cleans complete markdown before taking the context window', () => {
+  const text = '**' + 'before '.repeat(15) + 'needle after** and `code_with_underscores`';
+  const root = searchText(text, 'needle');
+  const snippet = root.querySelector('.search-result-snippet');
+  assert.equal(snippet.querySelector('mark')?.textContent, 'needle');
+  assert.ok(!snippet.textContent.includes('**'), snippet.textContent);
+  assert.ok(snippet.textContent.includes('code_with_underscores'), snippet.textContent);
+});
+
+test('literal markdown and link-address queries remain visible and highlighted', () => {
+  const text = '**bold** and [reference](https://example.invalid/reading_notes)';
+  for (const query of ['**', 'reading_notes']) {
+    const root = searchText(text, query);
+    const snippet = root.querySelector('.search-result-snippet');
+    assert.equal(snippet.querySelector('mark')?.textContent, query);
+  }
+});
+
+test('filter-only snippets keep code punctuation while cleaning prose markup', () => {
+  const root = searchText('## Heading\n**bold** and `user_id **literal** foo_bar`', '', 'assistant');
+  const snippet = root.querySelector('.search-result-snippet');
+  assert.equal(snippet.textContent, 'heading bold and user_id **literal** foo_bar');
 });

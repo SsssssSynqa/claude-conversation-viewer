@@ -5,7 +5,7 @@
 
 import { state, resetSidebarFilter } from '../store/state.js';
 import { formatTimestamp } from '../utils/time.js';
-import { escapeHtml } from '../utils/markdown.js';
+import { marked } from 'marked';
 import { t } from '../i18n.js';
 import { createIcon } from '../utils/icons.js';
 
@@ -323,14 +323,18 @@ export class SearchPanel {
           const idx = msg.searchText.indexOf(query);
           if (idx < 0) continue;
 
-          // Extract snippet with context
-          const fullText = msg.searchText;
-          const start = Math.max(0, idx - 40);
-          const end = Math.min(fullText.length, idx + query.length + 60);
-          let snippet = (start > 0 ? '...' : '') +
+          // Parse complete Markdown before slicing so code and paired markers
+          // cannot be mistaken for partial formatting at the window edges.
+          const cleaned = this._cleanSnippet(msg.searchText);
+          const cleanedIdx = cleaned.indexOf(query);
+          // Literal syntax/URL searches still need their raw match visible.
+          const fullText = cleanedIdx >= 0 ? cleaned : msg.searchText;
+          const matchIdx = cleanedIdx >= 0 ? cleanedIdx : idx;
+          const start = Math.max(0, matchIdx - 40);
+          const end = Math.min(fullText.length, matchIdx + query.length + 60);
+          const snippet = (start > 0 ? '...' : '') +
             fullText.substring(start, end) +
             (end < fullText.length ? '...' : '');
-          snippet = this._cleanSnippet(snippet);
 
           results.push({
             convIndex: ci,
@@ -347,7 +351,8 @@ export class SearchPanel {
           });
         } else if (!query && (role !== 'all' || contentType !== 'all' || dateFrom || dateTo)) {
           // Filter-only mode: show first 100 chars of message as snippet
-          const snippet = this._cleanSnippet(msg.searchText.substring(0, 100) + (msg.searchText.length > 100 ? '...' : ''));
+          const cleaned = this._cleanSnippet(msg.searchText);
+          const snippet = cleaned.substring(0, 100) + (cleaned.length > 100 ? '...' : '');
           results.push({
             convIndex: ci,
             msgIndex: mi,
@@ -378,21 +383,32 @@ export class SearchPanel {
   }
 
   /**
-   * Strip markdown syntax so a snippet reads as prose. Display-only: keyword
-   * matching and highlight offsets still use the raw searchText and query.
+   * Flatten Markdown tokens as text, preserving code and literal punctuation.
+   * This never renders HTML; result snippets are inserted with textContent.
    */
   _cleanSnippet(text) {
-    return text
-      .replace(/`{3,}\w*/g, ' ')          // code fences + language tag
-      .replace(/`([^`]*)`/g, '$1')        // inline code keeps its content
-      .replace(/`+/g, '')                 // unpaired backticks left by slicing
-      .replace(/(^|\s)#{1,6}\s+/g, '$1')  // heading markers
-      .replace(/(\*\*|__)([^*_]*?)\1/g, '$2')  // paired bold
-      .replace(/(\*|_)([^*_]*?)\1/g, '$2')     // paired italic
-      .replace(/[*_]{1,2}(?=\S)/g, '')    // unpaired markers left by slicing
-      .replace(/(^|\n)\s*(?:>\s?|[-*+]\s+|\d+\.\s+)/g, '$1')  // quote/list markers
-      .replace(/\s+/g, ' ')
-      .trim();
+    const flatten = tokens => tokens.map(token => {
+      switch (token.type) {
+        case 'list':
+          return token.items.map(item => flatten(item.tokens)).join(' ') + ' ';
+        case 'table':
+          return [token.header, ...token.rows]
+            .map(row => row.map(cell => flatten(cell.tokens)).join(' ')).join(' ') + ' ';
+        case 'paragraph':
+        case 'heading':
+        case 'blockquote':
+          return flatten(token.tokens) + ' ';
+        case 'code':
+          return token.text + ' ';
+        case 'space':
+        case 'br':
+        case 'hr':
+          return ' ';
+        default:
+          return token.tokens ? flatten(token.tokens) : (token.text || '');
+      }
+    }).join('');
+    return flatten(marked.lexer(text)).replace(/\s+/g, ' ').trim();
   }
 
   _renderResults(container, statsBar) {
