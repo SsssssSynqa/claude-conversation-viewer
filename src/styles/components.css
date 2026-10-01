@@ -216,6 +216,28 @@
   box-shadow: var(--shadow-sm);
 }
 
+/* Per-conversation export action: hover AND keyboard focus both get the
+   accent treatment (replaces the old JS mouseenter/mouseleave, which could
+   leave stale muted inline styles and gave no focus feedback). */
+.export-row-btn {
+  transition: color var(--transition-fast), background var(--transition-fast);
+}
+
+.export-row-btn:hover {
+  color: var(--accent);
+}
+
+.export-row-btn:focus-visible {
+  outline: none;
+  color: var(--accent);
+  box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--accent) 55%, transparent);
+}
+
+[data-theme="claude"] .export-row-btn:hover,
+[data-theme="claude"] .export-row-btn:focus-visible {
+  color: var(--text-primary);
+}
+
 .collection-group {
   background: var(--surface-soft);
   border-radius: 14px;

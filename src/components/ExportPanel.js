@@ -262,11 +262,9 @@ export class ExportPanel {
       item.appendChild(info);
 
       const btn = document.createElement('button');
-      btn.className = 'neu-ghost-btn';
+      btn.className = 'neu-ghost-btn export-row-btn';
       btn.style.cssText = 'font-size:0.8125rem;white-space:nowrap;flex-shrink:0;margin-left:10px;padding:5px 10px;';
       btn.textContent = t('export.exportBtn');
-      btn.addEventListener('mouseenter', () => { btn.style.borderColor = 'var(--accent)'; btn.style.color = 'var(--accent)'; });
-      btn.addEventListener('mouseleave', () => { btn.style.borderColor = 'var(--border)'; btn.style.color = 'var(--text-muted)'; });
       btn.addEventListener('click', () => this._doExport([conv]));
       item.appendChild(btn);
 

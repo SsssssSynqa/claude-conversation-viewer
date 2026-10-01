@@ -581,12 +581,12 @@ export class MessageView {
 
     const info = document.createElement('span');
     info.style.cssText = 'font-size:0.85rem;color:var(--text-primary);font-weight:600;';
-    info.textContent = '已选 ' + this.selectedIndices.size + ' 条';
+    info.textContent = t('msgView.selectedCount', { n: this.selectedIndices.size });
     toolbar.appendChild(info);
 
     toolbar.appendChild(Object.assign(document.createElement('div'), { style: 'flex:1;' }));
 
-    toolbar.appendChild(this._toolbarBtn('复制', () => {
+    toolbar.appendChild(this._toolbarBtn(t('msgView.copy'), () => {
       const sorted = [...this.selectedIndices].sort((a, b) => a - b);
       const names = state.get('displayNames');
       let text = '';
@@ -600,15 +600,15 @@ export class MessageView {
       navigator.clipboard.writeText(text.trim()).catch(() => {});
     }));
 
-    toolbar.appendChild(this._toolbarBtn('加入精选集', () => {
+    toolbar.appendChild(this._toolbarBtn(t('msgView.addToCollection'), () => {
       this._addMessagesToCollection(conv, [...this.selectedIndices]);
     }));
 
-    const exportBtn = this._toolbarBtn('导出选中', () => this._exportMessages(conv, [...this.selectedIndices].sort((a, b) => a - b).map(idx => conv.messages[idx])));
+    const exportBtn = this._toolbarBtn(t('msgView.exportSelected'), () => this._exportMessages(conv, [...this.selectedIndices].sort((a, b) => a - b).map(idx => conv.messages[idx])));
     exportBtn.style.background = 'var(--accent)'; exportBtn.style.color = '#fff'; exportBtn.style.borderColor = 'var(--accent)';
     toolbar.appendChild(exportBtn);
 
-    toolbar.appendChild(this._toolbarBtn('取消', () => { this.selectMode = false; this.selectedIndices.clear(); this.renderConversation(); }));
+    toolbar.appendChild(this._toolbarBtn(t('msgView.cancel'), () => { this.selectMode = false; this.selectedIndices.clear(); this.renderConversation(); }));
 
     this.container.appendChild(toolbar);
   }
