@@ -26,6 +26,16 @@ function resolveHook(specifier, context, nextResolve) {
   if (/\.(png|gif|woff2|svg)$/i.test(specifier)) {
     return { url: 'data:text/javascript,export default "";', shortCircuit: true };
   }
+  // CSS side-effect imports (e.g. highlight.js styles) are handled by Vite;
+  // stub them for node:test so components can be imported directly.
+  if (/\.css$/i.test(specifier)) {
+    return { url: 'data:text/javascript,', shortCircuit: true };
+  }
+  // DOMPurify needs a real browser DOM; stub it so component render paths can
+  // be exercised under node:test without a headless browser.
+  if (specifier === 'dompurify') {
+    return { url: 'data:text/javascript,export default { sanitize: (h) => String(h == null ? \'\' : h) };', shortCircuit: true };
+  }
   return nextResolve(specifier, context);
 }
 

@@ -3,6 +3,8 @@
  * Components subscribe to state changes via state.on('key', callback).
  * State mutations via state.set('key', value) trigger subscribers.
  */
+import { normalizeEntry, resolveCollection, createEntry, isSourceMessageId } from '../utils/collection.js';
+
 class Store {
   constructor(initial = {}) {
     this._state = { ...initial };
@@ -55,6 +57,8 @@ function loadDisplayNames() {
   return { human: 'Synqa', assistant: 'Sylux' };
 }
 
+const COLLECTION_KEY = 'cv-export-collection';
+
 export const state = new Store({
   conversations: [],
   filteredConversations: [],
@@ -93,16 +97,42 @@ export function saveDesensitizeWords(words) {
 function loadExportCollection() {
   try {
     const storage = getStorage();
-    const saved = storage ? storage.getItem('cv-export-collection') : null;
-    if (saved) return JSON.parse(saved);
+    const saved = storage ? storage.getItem(COLLECTION_KEY) : null;
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (Array.isArray(parsed)) return parsed.map(normalizeEntry).filter(Boolean);
+    }
   } catch (e) { /* ignore */ }
-  return []; // Array of { convUuid, convName, msgIndex, sender, preview, timestamp }
+  return []; // Array of normalized collection entries (see utils/collection.js)
 }
 
+/** Persist the current canonical collection. */
 export function saveExportCollection() {
-  const collection = state.get('exportCollection');
   const storage = getStorage();
-  if (storage) storage.setItem('cv-export-collection', JSON.stringify(collection));
+  if (!storage) return;
+  const collection = state.get('exportCollection') || [];
+  storage.setItem(COLLECTION_KEY, JSON.stringify(collection));
+}
+
+/**
+ * Promote reliable legacy matches to source UUIDs and persist the canonical
+ * collection after updating state. Unresolved entries remain intact. Consumers
+ * use the same resolver when displaying or exporting the collection.
+ *
+ * @param {Array} entries - raw persisted entries
+ * @returns {Array} the canonical collection now stored in state
+ */
+export function reconcileCollection(entries) {
+  const resolved = resolveCollection(entries, state.get('conversations') || []);
+  const normalized = resolved.entries.map(entry => {
+    const source = resolved.byKey.get(entry.key);
+    return source.msg && isSourceMessageId(source.msg.uuid)
+      ? createEntry(source.conv, source.msg, source.index, entry.convName)
+      : entry;
+  });
+  state.set('exportCollection', normalized);
+  saveExportCollection();
+  return normalized;
 }
 
 /**

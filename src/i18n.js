@@ -98,6 +98,7 @@ const zh = {
   'msgView.daysLater': ' 天后',
   'msgView.hoursLater': ' 小时后',
   'msgView.unnamed2': '未命名',
+  'msgView.collectUnavailable': '无法识别这段对话的来源，暂时无法加入精选集。',
 
   // SearchPanel
   'search.title': '搜索对话内容',
@@ -142,6 +143,11 @@ const zh = {
   'export.exportCollection': '导出精选集',
   'export.clearCollection': '清空',
   'export.collectionEmpty': '精选集为空。在对话中选择消息并点击"+精选"添加到这里。',
+  'export.collectionUnavailable': '来源暂不可用',
+  'export.collectionAvailability': '{{available}} 条可导出，{{unavailable}} 条来源暂不可用',
+  'export.collectionNoneAvailable': '没有可导出的消息：所有精选条目的来源暂不可用。',
+  'export.collectionRemove': '从精选集中移除',
+  'export.clearCollectionAria': '清空精选集',
 
   // StatsPanel
   'stats.title': '数据雕塑',
@@ -297,6 +303,7 @@ const en = {
   'msgView.daysLater': 'd later',
   'msgView.hoursLater': 'h later',
   'msgView.unnamed2': 'Untitled',
+  'msgView.collectUnavailable': 'This conversation has no identifiable source, so it cannot be collected yet.',
 
   // SearchPanel
   'search.title': 'Search Conversations',
@@ -341,6 +348,11 @@ const en = {
   'export.exportCollection': 'Export Collection',
   'export.clearCollection': 'Clear',
   'export.collectionEmpty': 'Collection is empty. Select messages in conversations and click "+Collect" to add here.',
+  'export.collectionUnavailable': 'Source unavailable',
+  'export.collectionAvailability': '{{available}} exportable, {{unavailable}} source unavailable',
+  'export.collectionNoneAvailable': 'Nothing to export: every collected item\'s source is unavailable.',
+  'export.collectionRemove': 'Remove from collection',
+  'export.clearCollectionAria': 'Clear collection',
 
   // StatsPanel
   'stats.title': 'Data Sculpture',

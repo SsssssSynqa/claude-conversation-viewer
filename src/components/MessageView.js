@@ -4,6 +4,7 @@
  */
 
 import { state, saveExportCollection } from '../store/state.js';
+import { resolveCollection, createEntry, identityForMessage } from '../utils/collection.js';
 import { renderMarkdown, escapeHtml } from '../utils/markdown.js';
 import { formatTimestamp, formatShortTime, formatDate, formatLocalDateStamp, getTimeDiffMinutes } from '../utils/time.js';
 import { desensitize } from '../utils/desensitize.js';
@@ -75,9 +76,19 @@ export class MessageView {
     const showThinking = state.get('showThinking');
     const showToolUse = state.get('showToolUse');
     const showFlags = state.get('showFlags');
-    const collection = state.get('exportCollection') || [];
-    const allMessageKeys = conv.messages.map((_, i) => conv.uuid + ':' + i);
-    const allInCollection = allMessageKeys.length > 0 && allMessageKeys.every(key => collection.some(item => item.key === key));
+    const allConversations = state.get('conversations') || [];
+    const resolution = resolveCollection(state.get('exportCollection') || [], allConversations);
+    const messageKeys = conv.messages.map((msg, i) => identityForMessage(conv, msg, i));
+    // Collected messages for THIS conversation, keyed by canonical identity so
+    // both freshly-added entries and evidence/legacy-resolved entries match.
+    const collectedKeys = new Set();
+    for (const entry of resolution.entries) {
+      const res = resolution.byKey.get(entry.key);
+      if (res && res.msg && res.conv === conv) {
+        collectedKeys.add(identityForMessage(res.conv, res.msg, res.index));
+      }
+    }
+    const allInCollection = messageKeys.length > 0 && messageKeys.every(key => key != null && collectedKeys.has(key));
 
     this.container.textContent = '';
     this.container.classList.remove('stats-panel-shell');
@@ -153,15 +164,7 @@ export class MessageView {
 
     // Add all to collection
     const addAllBtn = this._headerBtn(allInCollection ? t('msgView.addedToCollection') : t('msgView.addToCollection'), allInCollection ? 'check' : 'star', () => {
-      const collection = state.get('exportCollection') || [];
-      for (let i = 0; i < conv.messages.length; i++) {
-        const msg = conv.messages[i];
-        const key = conv.uuid + ':' + i;
-        if (collection.some(item => item.key === key)) continue;
-        collection.push({ key, convUuid: conv.uuid, convName: conv.name || t('msgView.unnamed2'), msgIndex: i, sender: msg.sender, preview: (msg.searchText || '').substring(0, 80), timestamp: msg.createdAt });
-      }
-      state.set('exportCollection', collection);
-      saveExportCollection();
+      this._addMessagesToCollection(conv, conv.messages.map((_, i) => i));
     });
     headerBtns.appendChild(addAllBtn);
 
@@ -214,8 +217,8 @@ export class MessageView {
 
     for (let mi = 0; mi < conv.messages.length; mi++) {
       const msg = conv.messages[mi];
-      const msgKey = conv.uuid + ':' + mi;
-      const isCollected = collection.some(item => item.key === msgKey);
+      const msgKey = identityForMessage(conv, msg, mi);
+      const isCollected = msgKey != null && collectedKeys.has(msgKey);
 
       // Time separator
       if (prevTimestamp && msg.createdAt) {
@@ -427,12 +430,69 @@ export class MessageView {
   }
 
   _addToCollection(conv, mi, msg) {
-    const collection = state.get('exportCollection') || [];
-    const key = conv.uuid + ':' + mi;
-    if (collection.some(item => item.key === key)) return;
-    collection.push({ key, convUuid: conv.uuid, convName: conv.name || t('msgView.unnamed2'), msgIndex: mi, sender: msg.sender, preview: (msg.searchText || '').substring(0, 80), timestamp: msg.createdAt });
-    state.set('exportCollection', collection);
-    saveExportCollection();
+    this._addMessagesToCollection(conv, [mi]);
+  }
+
+  /**
+   * Add one or more messages to the collection using the shared resolver for
+   * dedup and the canonical identity (conv uuid + source message uuid where
+   * present, else conversation key + conservative evidence). Returns the number
+   * actually added (0 when everything was already collected).
+   */
+  _addMessagesToCollection(conv, indices) {
+    const all = state.get('conversations') || [];
+    const current = state.get('exportCollection') || [];
+    // Existing keys + resolved targets, so we never add a duplicate of an
+    // already-collected message (including one added via evidence/legacy).
+    const resolved = resolveCollection(current, all);
+    const existingKeys = new Set();
+    const existingTargets = new Map();
+    for (const entry of resolved.entries) {
+      existingKeys.add(entry.key);
+      const res = resolved.byKey.get(entry.key);
+      if (res && res.msg) {
+        if (!existingTargets.has(res.conv)) existingTargets.set(res.conv, new Set());
+        existingTargets.get(res.conv).add(res.index);
+      }
+    }
+
+    const added = [];
+    let blocked = false;
+    for (const idx of indices) {
+      const msg = conv.messages[idx];
+      if (!msg) continue;
+      const entry = createEntry(conv, msg, idx, t('msgView.unnamed2'));
+      if (!entry) { blocked = true; continue; }
+      if (existingKeys.has(entry.key)) continue;
+      if (!existingTargets.has(conv)) existingTargets.set(conv, new Set());
+      if (existingTargets.get(conv).has(idx)) continue;
+      existingKeys.add(entry.key);
+      existingTargets.get(conv).add(idx);
+      added.push(entry);
+    }
+    if (added.length > 0) {
+      state.set('exportCollection', current.concat(added));
+      saveExportCollection();
+    }
+    if (blocked) this._showCollectNotice();
+    return added.length;
+  }
+
+  /**
+   * Show a brief, translated notice when a conversation has no usable source
+   * discriminator so its messages cannot be collected (rare: no uuid, name,
+   * timestamps or text anywhere). Avoids a silent no-op.
+   */
+  _showCollectNotice() {
+    const existing = this.container.querySelector('.collect-notice');
+    if (existing) return;
+    const notice = document.createElement('div');
+    notice.className = 'collect-notice';
+    notice.setAttribute('role', 'status');
+    notice.style.cssText = 'position:absolute;bottom:16px;left:50%;transform:translateX(-50%);z-index:60;padding:8px 14px;border-radius:10px;background:var(--surface-raised,var(--bg-card));color:var(--text-secondary);font-size:0.78rem;box-shadow:var(--shadow);';
+    notice.textContent = t('msgView.collectUnavailable');
+    this.container.appendChild(notice);
+    setTimeout(() => notice.remove(), 4000);
   }
 
   // ---- Selection Toolbar (bottom bar, only in select mode) ----
@@ -467,15 +527,7 @@ export class MessageView {
     }));
 
     toolbar.appendChild(this._toolbarBtn('加入精选集', () => {
-      const collection = state.get('exportCollection') || [];
-      for (const idx of this.selectedIndices) {
-        const msg = conv.messages[idx];
-        const key = conv.uuid + ':' + idx;
-        if (collection.some(item => item.key === key)) continue;
-        collection.push({ key, convUuid: conv.uuid, convName: conv.name || t('msgView.unnamed2'), msgIndex: idx, sender: msg.sender, preview: (msg.searchText || '').substring(0, 80), timestamp: msg.createdAt });
-      }
-      state.set('exportCollection', collection);
-      saveExportCollection();
+      this._addMessagesToCollection(conv, [...this.selectedIndices]);
     }));
 
     const exportBtn = this._toolbarBtn('导出选中', () => this._exportMessages(conv, [...this.selectedIndices].sort((a, b) => a - b).map(idx => conv.messages[idx])));

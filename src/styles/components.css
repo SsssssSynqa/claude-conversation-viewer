@@ -184,6 +184,43 @@
   background: color-mix(in srgb, var(--surface-soft) 80%, transparent);
 }
 
+/* Collection availability status (understated, read-only indicator) */
+.collection-entry-info,
+.collection-group-header {
+  overflow-wrap: anywhere;
+}
+
+.collection-availability-summary {
+  margin: 0 0 10px;
+  padding: 7px 12px;
+  border-radius: 10px;
+  background: var(--surface-soft);
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  line-height: 1.5;
+}
+
+.collection-unavailable-status {
+  display: inline-block;
+  padding: 1px 6px;
+  border-radius: 6px;
+  background: var(--surface-soft);
+  color: var(--text-muted);
+  font-size: 0.68rem;
+  opacity: 0.85;
+}
+
+.collection-remove-btn {
+  border-radius: 6px;
+  transition: background 0.15s, color 0.15s;
+}
+
+.collection-remove-btn:hover,
+.collection-remove-btn:focus-visible {
+  background: var(--surface-soft);
+  color: var(--text-secondary);
+}
+
 .message-header-card {
   margin-top: 14px;
   width: 100%;

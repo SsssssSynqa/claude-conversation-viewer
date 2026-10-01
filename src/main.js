@@ -6,7 +6,7 @@ import './themes/variables.css';
 import './styles/base.css';
 import './styles/components.css';
 import './styles/clawd.css';
-import { state, saveDesensitizeWords, saveExportCollection, resetSidebarFilter } from './store/state.js';
+import { state, saveDesensitizeWords, resetSidebarFilter, reconcileCollection } from './store/state.js';
 import { FileUpload } from './components/FileUpload.js';
 import { ConversationList } from './components/ConversationList.js';
 import { MessageView } from './components/MessageView.js';
@@ -656,12 +656,14 @@ function renderMainView() {
 
 // ---- Init ----
 state.on('conversations', (conversations) => {
+  // Reconcile saved entries with the loaded sources, preserving missing entries
+  // and persisting reliable legacy matches before rendering the collection.
+  // This runs BEFORE the render gate below, which can early-return on import.
+  reconcileCollection(state.get('exportCollection'));
   if (conversations.length > 0 && state.get('loading') === false) {
     state.set('highlightMessageIndex', null);
     state.set('currentConversationIndex', -1);
     state.set('viewMode', 'stats');
-    state.set('exportCollection', []);
-    saveExportCollection();
     resetSidebarFilter();
     renderMainView();
   }
