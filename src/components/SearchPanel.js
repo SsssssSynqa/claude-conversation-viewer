@@ -65,20 +65,6 @@ export class SearchPanel {
     } else {
       searchInput.style.cssText = 'flex:1;padding:14px 16px 14px 42px;color:var(--text-primary);font-size:0.95rem;font-family:var(--font-family);';
     }
-    searchInput.addEventListener('focus', () => {
-      if (isClaude) {
-        inputWrapper.style.boxShadow = 'rgba(0,0,0,0.075) 0px 3px 15px, rgba(31,30,29,0.25) 0px 0px 0px 0.5px';
-      } else {
-        inputWrapper.style.boxShadow = 'var(--ring-accent-soft)';
-      }
-    });
-    searchInput.addEventListener('blur', () => {
-      if (isClaude) {
-        inputWrapper.style.boxShadow = 'rgba(0,0,0,0.035) 0px 3px 15px, rgba(31,30,29,0.15) 0px 0px 0px 0.5px';
-      } else {
-        inputWrapper.style.boxShadow = 'var(--shadow-inset)';
-      }
-    });
     searchInput.addEventListener('input', () => {
       clearTimeout(this.searchTimer);
       this.searchTimer = setTimeout(() => this.doSearch(), 300);
@@ -87,9 +73,9 @@ export class SearchPanel {
     const inputWrapper = document.createElement('div');
     inputWrapper.className = 'search-input-shell';
     if (isClaude) {
-      inputWrapper.style.cssText = 'width:100%;position:relative;background:#ffffff;border-radius:20px;border:1px solid transparent;box-shadow:rgba(0,0,0,0.035) 0px 3px 15px, rgba(31,30,29,0.15) 0px 0px 0px 0.5px;display:flex;flex-direction:column;padding:16px;gap:12px;';
+      inputWrapper.style.cssText = 'width:100%;position:relative;background:#ffffff;border-radius:20px;border:1px solid transparent;display:flex;flex-direction:column;padding:16px;gap:12px;';
     } else {
-      inputWrapper.style.cssText = 'flex:1;position:relative;box-shadow:var(--shadow-inset);';
+      inputWrapper.style.cssText = 'flex:1;position:relative;';
     }
 
     if (isClaude) {

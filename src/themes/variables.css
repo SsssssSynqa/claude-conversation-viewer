@@ -100,7 +100,6 @@
   --surface-raised: #262a30;
   --surface-soft: rgba(255,255,255,0.015);
   --surface-inset: #23272d;
-  --ring-accent-soft: 0 0 0 1px rgba(227, 139, 104, 0.3), 0 0 0 6px rgba(227, 139, 104, 0.08);
   --sidebar-bg: #22252b;
   --sidebar-text: #d4dae3;
   --sidebar-hover: #2d3138;
@@ -149,7 +148,6 @@
   --surface-raised: linear-gradient(145deg, #f2ede6 0%, #e8e2d8 100%);
   --surface-soft: linear-gradient(145deg, rgba(255,255,255,0.55), rgba(255,255,255,0.12));
   --surface-inset: linear-gradient(145deg, #e0d9cf 0%, #ece7de 100%);
-  --ring-accent-soft: 0 0 0 1px rgba(207, 118, 86, 0.24), 0 0 0 6px rgba(207, 118, 86, 0.08);
   --sidebar-bg: #e8e2d9;
   --sidebar-text: #3e3934;
   --sidebar-hover: #f3ede5;
@@ -250,7 +248,6 @@
   --gradient-header: linear-gradient(135deg, #D97657 0%, #E89272 100%);
   --btn-primary-bg: #3B3B3B;
   --btn-primary-text: #fff;
-  --ring-accent-soft: 0 0 0 1px rgba(44, 132, 219, 0.3), 0 0 0 4px rgba(44, 132, 219, 0.08);
 
   /* Layout overrides */
   --content-max-width: 800px;

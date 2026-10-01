@@ -334,6 +334,32 @@ test('mode toggle is a switch and keeps focus on the live replacement after re-r
 
 // ---------------------------------------------------------------- search filters
 
+test('message selection survives re-render and clears without inline outlines', () => {
+  const { view, container } = mountClaude(buildConv());
+  view.selectMode = true;
+  view.renderConversation();
+  let block = container.querySelector('.message-block');
+  let checkbox = block.querySelector('input');
+  checkbox.checked = true;
+  checkbox.dispatchEvent({ type: 'change' });
+  assert.equal(view.selectedIndices.has(0), true);
+  assert.equal(block.classList.contains('message-selected'), true);
+  assert.equal(block.style.outline, undefined);
+
+  view.renderConversation();
+  block = container.querySelector('.message-block');
+  checkbox = block.querySelector('input');
+  assert.equal(checkbox.checked, true);
+  assert.equal(block.classList.contains('message-selected'), true);
+  assert.equal(block.style.outline, undefined);
+
+  checkbox.checked = false;
+  checkbox.dispatchEvent({ type: 'change' });
+  assert.equal(view.selectedIndices.size, 0);
+  assert.equal(block.classList.contains('message-selected'), false);
+  view.destroy();
+});
+
 test('search filter select stays a native select wrapped for a themed arrow', () => {
   const panel = new SearchPanel();
   const shell = panel._createSelect('search-role', [

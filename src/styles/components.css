@@ -87,6 +87,7 @@
 }
 
 .search-result-item {
+  color: var(--text-primary);
   background: var(--surface-raised);
   border-radius: 16px;
   box-shadow: var(--shadow-sm);
@@ -216,9 +217,7 @@
   box-shadow: var(--shadow-sm);
 }
 
-/* Per-conversation export action: hover AND keyboard focus both get the
-   accent treatment (replaces the old JS mouseenter/mouseleave, which could
-   leave stale muted inline styles and gave no focus feedback). */
+/* Export hover keeps its theme accent; keyboard focus uses a neutral fill. */
 .export-row-btn {
   transition: color var(--transition-fast), background var(--transition-fast);
 }
@@ -228,9 +227,8 @@
 }
 
 .export-row-btn:focus-visible {
-  outline: none;
-  color: var(--accent);
-  box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--accent) 55%, transparent);
+  color: var(--text-primary);
+  background: var(--bg-input);
 }
 
 [data-theme="claude"] .export-row-btn:hover,
@@ -400,6 +398,14 @@
 .message-block.message-selectable,
 [data-theme="claude"] .message-block.message-selectable {
   padding-left: 32px !important;
+}
+
+/* Selection and search arrival remain visible without enclosing the message. */
+.message-block.message-selected,
+.message-block.message-highlighted,
+[data-theme="claude"] .message-block.message-selected,
+[data-theme="claude"] .message-block.message-highlighted {
+  background: color-mix(in srgb, var(--text-primary) 6%, var(--bg-primary)) !important;
 }
 
 .message-action-btn[data-active="true"] {
@@ -1408,7 +1414,7 @@
   outline: none;
   background: var(--bg-input);
   color: var(--text-primary);
-  box-shadow: inset 0 -2px var(--accent);
+  box-shadow: inset 0 -2px var(--text-secondary);
 }
 
 .manifest-import {
@@ -1964,8 +1970,7 @@ details[open] > summary .block-detail-chevron {
 }
 
 .export-dropdown-item:focus-visible {
-  outline: none;
-  box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--accent) 55%, transparent);
+  background: var(--bg-input);
 }
 
 [data-theme="claude"] .export-dropdown {
@@ -2123,15 +2128,11 @@ details[open] > summary .block-detail-chevron {
   background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2373726c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
 }
 
-/* ---- Lightweight, theme-integrated focus for touched controls ----
-   Fill / underline that blends into the control instead of a heavy outline
-   on every element. Menu items use their own fine inset ring. */
+/* ---- Neutral focus fills; the baseline is owned by base.css ---- */
 .timeline-summary:focus-visible,
 .timeline-item-summary:focus-visible,
 .message-mode-toggle:focus-visible {
-  outline: none;
   background: var(--bg-input);
-  box-shadow: inset 0 -2px var(--text-secondary);
 }
 
 .export-option-input:focus-visible ~ .export-option-label {
@@ -2144,25 +2145,23 @@ details[open] > summary .block-detail-chevron {
   box-shadow: inset 0 -2px var(--text-secondary);
 }
 
-/* Softer inline focus for row-like controls. */
 .conversation-list-item:focus-visible,
-.search-result-item:focus-visible {
-  outline: none;
-  background: color-mix(in srgb, var(--accent) 10%, transparent);
-  box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--accent) 55%, transparent);
-}
-
-/* Selects/dates carry an inline inset shadow, so focus uses a light ring. */
+.search-result-item:focus-visible,
 .search-filter-control:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--accent) 60%, transparent);
-  outline-offset: 1px;
-  border-radius: 14px;
+  background: var(--bg-input);
 }
 
-[data-theme="claude"] .conversation-list-item:focus-visible,
-[data-theme="claude"] .search-result-item:focus-visible {
-  background: var(--accent-bg);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 45%, transparent);
+.search-input-shell:focus-within {
+  box-shadow: var(--shadow-inset), inset 0 -2px var(--text-secondary);
+}
+
+.search-field:focus-visible {
+  /* The enclosing search shell owns this input's visible focus marker. */
+  box-shadow: none !important;
+}
+
+[data-theme="claude"] .search-input-shell:focus-within {
+  box-shadow: inset 0 -2px var(--text-secondary);
 }
 
 @media (prefers-reduced-motion: reduce) {

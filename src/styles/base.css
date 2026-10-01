@@ -81,7 +81,7 @@ body {
 }
 
 [data-theme="claude"] .name-input-group input:focus {
-  box-shadow: inset 0 0 0 0.5px var(--accent);
+  box-shadow: inset 0 -2px var(--text-secondary);
 }
 
 @media (prefers-color-scheme: light) {
@@ -106,11 +106,11 @@ body {
   background: var(--accent);
 }
 
-/* Focus — subtle ring */
+/* A baseline inside underline, including buttons with inline surface shadows.
+   Component rules may add a neutral fill; focus never adds an outer frame. */
 :focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-  border-radius: var(--radius-sm);
+  outline: none;
+  box-shadow: inset 0 -2px currentColor !important;
 }
 
 /* Selection color */
@@ -334,7 +334,8 @@ body {
 }
 
 .name-input-group input:focus {
-  border-color: var(--accent);
+  border-color: transparent;
+  box-shadow: inset 0 -2px var(--text-secondary);
   outline: none;
 }
 
@@ -678,24 +679,13 @@ button {
 }
 
 .neu-switch-input:focus-visible + .sidebar-toggle-control .neu-switch {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
+  box-shadow: var(--shadow-inset), inset 0 -2px var(--text-secondary);
 }
 
-/* Lightweight, theme-integrated focus for the sidebar controls converted to
-   native buttons (nav pills / theme+lang options). A soft accent wash reads
-   better than a heavy ring on these rounded pills. */
+/* Sidebar focus uses the same neutral fill and baseline as other controls. */
 .sidebar-pill:focus-visible,
 .toggle-option:focus-visible {
-  outline: none;
-  background: color-mix(in srgb, var(--accent) 12%, transparent);
-  box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--accent) 55%, transparent);
-}
-
-[data-theme="claude"] .sidebar-pill:focus-visible,
-[data-theme="claude"] .toggle-option:focus-visible {
-  background: var(--accent-bg);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 45%, transparent);
+  background: var(--bg-input);
 }
 
 /* Sidebar name row */

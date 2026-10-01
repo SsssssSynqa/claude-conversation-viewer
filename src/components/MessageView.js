@@ -346,14 +346,11 @@ export class MessageView {
           if (checkbox.checked) this.selectedIndices.add(mi);
           else this.selectedIndices.delete(mi);
           this._updateSelectionToolbar(conv);
-          // Visual feedback
-          msgEl.style.outline = checkbox.checked ? '2px solid var(--accent)' : 'none';
-          msgEl.style.outlineOffset = '-2px';
+          msgEl.classList.toggle('message-selected', checkbox.checked);
         });
         msgEl.appendChild(checkbox);
         if (this.selectedIndices.has(mi)) {
-          msgEl.style.outline = '2px solid var(--accent)';
-          msgEl.style.outlineOffset = '-2px';
+          msgEl.classList.add('message-selected');
         }
       }
 
@@ -685,13 +682,10 @@ export class MessageView {
       if (!targetBlock) return;
 
       targetBlock.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      targetBlock.style.transition = 'box-shadow 0.3s, outline 0.3s';
-      targetBlock.style.outline = '2px solid var(--accent)';
-      targetBlock.style.boxShadow = '0 0 12px var(--accent-bg)';
+      targetBlock.classList.add('message-highlighted');
 
       setTimeout(() => {
-        targetBlock.style.outline = 'none';
-        targetBlock.style.boxShadow = 'none';
+        targetBlock.classList.remove('message-highlighted');
       }, 2500);
 
       state.set('highlightMessageIndex', null);
