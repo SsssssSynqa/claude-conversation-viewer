@@ -30,6 +30,9 @@ export class DomElement {
     this.multiple = false;
     this.accept = '';
     this.type = '';
+    this.open = false;
+    this.hidden = false;
+    this.tabIndex = 0;
   }
 
   set className(v) {
@@ -144,8 +147,22 @@ export class DomElement {
       for (const fn of globalThis.document.listeners.click || []) fn(ev);
     }
   }
+  dispatchEvent(ev) {
+    const type = ev && ev.type;
+    if (!type) return true;
+    const full = Object.assign({ target: this, currentTarget: this, stopPropagation() {}, preventDefault() {} }, ev);
+    let node = this;
+    while (node) {
+      for (const fn of (node.listeners && node.listeners[type]) || []) fn(full);
+      node = node.parentNode;
+    }
+    if (globalThis.document && globalThis.document.listeners[type]) {
+      for (const fn of globalThis.document.listeners[type]) fn(full);
+    }
+    return true;
+  }
   scrollIntoView() {}
-  focus() {}
+  focus() { if (globalThis.document) globalThis.document.activeElement = this; }
   getBoundingClientRect() { return { width: 0, height: 0, top: 0, left: 0 }; }
 }
 
@@ -155,6 +172,7 @@ export function installDom() {
   root.id = 'app';
   const document = {
     listeners: {},
+    activeElement: null,
     body: new DomElement('body'),
     documentElement: new DomElement('html'),
     createElement: (t) => new DomElement(t),

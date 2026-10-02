@@ -227,10 +227,9 @@ button.toggle-option {
 }
 
 :is([data-theme="light"], [data-theme="dark"]) .upload-zone:hover,
-:is([data-theme="light"], [data-theme="dark"]) .upload-zone.dragover,
-:is([data-theme="light"], [data-theme="dark"]) .upload-zone:focus-visible {
+:is([data-theme="light"], [data-theme="dark"]) .upload-zone.dragover {
   border-color: var(--accent);
-  box-shadow: var(--shadow), var(--ring-accent-soft);
+  box-shadow: var(--shadow);
   transform: translateY(-1px);
 }
 
@@ -291,7 +290,7 @@ button.toggle-option {
   padding-bottom: 12px !important;
   border: 0 !important;
   border-radius: 0;
-  background: transparent !important;
+  background: transparent;
   box-shadow: none;
 }
 
@@ -302,6 +301,10 @@ button.toggle-option {
   border-radius: 10px;
   background: var(--surface-inset);
   box-shadow: var(--shadow-inset);
+}
+
+:is([data-theme="light"], [data-theme="dark"]) .search-input-shell:focus-within {
+  box-shadow: var(--shadow-inset), inset 0 -2px var(--text-secondary);
 }
 
 :is([data-theme="light"], [data-theme="dark"]) .search-result-group,
@@ -392,41 +395,50 @@ button.toggle-option {
   border-bottom: 1px solid var(--separator-color) !important;
 }
 
-.messages-inner {
-  width: 100%;
-}
-
 :is([data-theme="light"], [data-theme="dark"]) .message-block {
   width: 100%;
-  max-width: none;
-  margin: 0 0 8px;
-  padding: 11px 14px !important;
-  border: 1px solid var(--border);
+  max-width: 74ch;
+  margin: 0 auto 8px;
+  padding: 11px 0 !important;
+  border: 0;
   border-radius: 12px;
   background: var(--surface-raised);
   box-shadow: var(--shadow-xs);
 }
 
-:is([data-theme="light"], [data-theme="dark"]) .message-block.message-human,
-:is([data-theme="light"], [data-theme="dark"]) .message-block.message-assistant {
-  width: 100%;
-  max-width: none;
-  margin-right: 0;
-  margin-left: 0;
-}
-
+/* User turns: the row is invisible; the bubble owns one light surface and
+   shrinks to its content, right-aligned, so a short message is not wrapped in
+   a full-width panel. */
 :is([data-theme="light"], [data-theme="dark"]) .message-block.message-human {
-  border-color: color-mix(in srgb, var(--accent) 22%, var(--border));
-  background: var(--message-human-bg) !important;
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
 }
-
+:is([data-theme="light"], [data-theme="dark"]) .message-block.message-human .message-bubble {
+  width: fit-content;
+  max-width: 100%;
+  margin-left: auto;
+  margin-right: 0;
+  padding: 9px 13px;
+  border: 1px solid color-mix(in srgb, var(--accent) 22%, var(--border));
+  border-radius: 14px;
+  background: var(--message-human-bg);
+}
+/* Metadata hugs the bubble edge, not the full-width row. */
+:is([data-theme="light"], [data-theme="dark"]) .message-block.message-human > :is(.message-sender, .message-footer) {
+  width: fit-content;
+  max-width: 100%;
+  margin-left: auto;
+  margin-right: 0;
+  text-align: right;
+}
 :is([data-theme="light"], [data-theme="dark"]) .message-block.message-assistant {
   border-color: transparent;
-  background: transparent !important;
+  background: transparent;
   box-shadow: none;
 }
 
-:is([data-theme="light"], [data-theme="dark"]) .message-block > :is(.message-sender, .message-bubble, .message-footer-actions) {
+:is([data-theme="light"], [data-theme="dark"]) .message-block > :is(.message-sender, .message-bubble, .message-footer) {
   width: min(100%, 74ch);
   margin-right: auto;
   margin-left: auto;
@@ -441,11 +453,6 @@ button.toggle-option {
   color: var(--text-secondary);
   font-size: 13px;
   line-height: 1.64;
-}
-
-:is([data-theme="light"], [data-theme="dark"]) .message-block:focus-within .message-footer-actions {
-  opacity: 1;
-  visibility: visible;
 }
 
 :is([data-theme="light"], [data-theme="dark"]) .time-separator {
@@ -725,8 +732,10 @@ button.toggle-option {
 }
 
 .stats-interactive-canvas:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 3px;
+  /* Neutral focus: a contained inner underline, never an outer accent frame
+     (matches the viewer's inline-focus contract in base.css). */
+  outline: none;
+  box-shadow: inset 0 -2px var(--text-secondary);
   border-radius: 9px;
 }
 
@@ -888,6 +897,8 @@ button.toggle-option {
     padding: 9px 10px !important;
     border-radius: 10px;
   }
+
+  :is([data-theme="light"], [data-theme="dark"]) .message-block.message-human .message-bubble { max-width: 100%; border-radius: 12px; }
 
   :is([data-theme="light"], [data-theme="dark"]) .message-block .message-text {
     font-size: 12.5px;

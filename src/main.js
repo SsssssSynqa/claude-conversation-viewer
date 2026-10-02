@@ -37,7 +37,6 @@ function applyTheme(theme) {
 
 const THEMES = ['dark', 'light', 'claude'];
 const THEME_ICON_NAMES = { dark: 'moon', light: 'sun', claude: 'flower' };
-const THEME_LABELS = { dark: t('theme.dark'), light: t('theme.light'), claude: t('theme.claude') };
 
 function enableRadioGroupKeyboard(track, selector, activate) {
   const options = () => [...track.querySelectorAll(selector)];
@@ -208,6 +207,7 @@ function renderMainView() {
     labelSpan.className = 'sidebar-pill-label';
     labelSpan.textContent = nav.label;
     pill.appendChild(labelSpan);
+    pill.setAttribute('aria-label', nav.label);
     pill.addEventListener('click', nav.action);
     sidebarActions.appendChild(pill);
   }
@@ -266,7 +266,7 @@ function renderMainView() {
     optDiv.className = 'toggle-option' + (opt.theme === currentTheme ? ' active' : '');
     optDiv.dataset.theme = opt.theme;
     optDiv.setAttribute('role', 'radio');
-    optDiv.setAttribute('aria-label', THEME_LABELS[opt.theme]);
+    optDiv.setAttribute('aria-label', t('theme.' + opt.theme));
     optDiv.setAttribute('aria-checked', opt.theme === currentTheme ? 'true' : 'false');
     const optIcon = opt.icon === 'spark' ? createSparkIcon(14, true) : createIcon(opt.icon, 16);
     optDiv.appendChild(optIcon);
@@ -352,31 +352,40 @@ function renderMainView() {
     const row = document.createElement('div');
     row.className = 'sidebar-toggle-row';
 
-    const labelText = document.createElement('span');
-    labelText.className = 'sidebar-toggle-label';
-    labelText.textContent = t.label;
-    row.appendChild(labelText);
-
-    // Neumorphic switch
-    const neuSwitch = document.createElement('label');
-    neuSwitch.className = 'neu-switch' + (state.get(t.key) ? ' active' : '');
-    neuSwitch.setAttribute('aria-label', t.label);
-    const handle = document.createElement('div');
-    handle.className = 'switch-handle';
-    neuSwitch.appendChild(handle);
-
+    // Native checkbox drives state + keyboard + screen-reader checked status.
+    // The visible switch is a styled span; the whole row is a <label>.
     const input = document.createElement('input');
     input.type = 'checkbox';
     input.id = t.id;
+    input.className = 'neu-switch-input';
     input.checked = state.get(t.key);
-    input.className = 'visually-hidden neu-switch-input';
-    input.setAttribute('aria-label', t.label);
+    input.setAttribute('role', 'switch');
+
+    const label = document.createElement('label');
+    label.className = 'sidebar-toggle-control';
+    label.setAttribute('for', t.id);
+
+    const labelText = document.createElement('span');
+    labelText.className = 'sidebar-toggle-label';
+    labelText.textContent = t.label;
+    label.appendChild(labelText);
+
+    // Neumorphic switch (visual only; interaction is the real checkbox)
+    const neuSwitch = document.createElement('span');
+    neuSwitch.className = 'neu-switch' + (state.get(t.key) ? ' active' : '');
+    neuSwitch.setAttribute('aria-hidden', 'true');
+    const handle = document.createElement('div');
+    handle.className = 'switch-handle';
+    neuSwitch.appendChild(handle);
+    label.appendChild(neuSwitch);
+
     input.addEventListener('change', (e) => {
       state.set(t.key, e.target.checked);
       neuSwitch.classList.toggle('active', e.target.checked);
     });
-    neuSwitch.appendChild(input);
-    row.appendChild(neuSwitch);
+
+    row.appendChild(input);
+    row.appendChild(label);
     settingsContent.appendChild(row);
   }
 

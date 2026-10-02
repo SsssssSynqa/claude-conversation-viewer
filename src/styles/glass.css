@@ -71,8 +71,16 @@
   background-image: var(--glass-sheen);
 }
 
+/* User turns carry their single light surface on the bubble itself (see
+   tactile.css); the full-width row stays transparent so a short message is
+   not wrapped in a page-wide panel. */
 [data-theme="light"] .message-block.message-human {
-  background-image: var(--glass-sheen) !important;
+  background: transparent;
+  background-image: none;
+}
+
+[data-theme="light"] .message-block.message-human .message-bubble {
+  background-image: var(--glass-sheen);
 }
 
 /* Fallback when backdrop-filter is unsupported: near-opaque surfaces. */
@@ -99,6 +107,14 @@
   }
 
   [data-theme="light"] .message-block {
+    background: rgba(255, 255, 255, 0.92);
+  }
+
+  [data-theme="light"] .message-block.message-human {
+    background: transparent;
+  }
+
+  [data-theme="light"] .message-block.message-human .message-bubble {
     background: rgba(255, 255, 255, 0.92);
   }
 }

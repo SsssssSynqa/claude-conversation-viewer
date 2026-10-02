@@ -37,7 +37,7 @@ export class StatsPanel {
     container.style.cssText = 'flex:1;overflow-y:auto;padding:32px 24px;';
     const inner = document.createElement('div');
     inner.className = 'stats-panel-inner';
-    inner.style.cssText = 'max-width:920px;margin:0 auto;';
+    inner.style.cssText = 'max-width:1000px;margin:0 auto;';
     this.buildStatsContent(inner, stats, conversations);
     container.appendChild(inner);
   }

@@ -81,7 +81,7 @@ body {
 }
 
 [data-theme="claude"] .name-input-group input:focus {
-  box-shadow: inset 0 0 0 0.5px var(--accent);
+  box-shadow: inset 0 -2px var(--text-secondary);
 }
 
 @media (prefers-color-scheme: light) {
@@ -106,11 +106,11 @@ body {
   background: var(--accent);
 }
 
-/* Focus — subtle ring */
+/* A baseline inside underline, including buttons with inline surface shadows.
+   Component rules may add a neutral fill; focus never adds an outer frame. */
 :focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-  border-radius: var(--radius-sm);
+  outline: none;
+  box-shadow: inset 0 -2px currentColor !important;
 }
 
 /* Selection color */
@@ -334,7 +334,8 @@ body {
 }
 
 .name-input-group input:focus {
-  border-color: var(--accent);
+  border-color: transparent;
+  box-shadow: inset 0 -2px var(--text-secondary);
   outline: none;
 }
 
@@ -559,6 +560,10 @@ button {
   color: var(--text-muted);
   transition: color 0.3s ease;
   height: 100%;
+  border: none;
+  background: transparent;
+  padding: 0;
+  font-family: var(--font-family);
 }
 .toggle-option.active {
   color: var(--accent);
@@ -637,6 +642,7 @@ button {
 
 /* Sidebar toggle row */
 .sidebar-toggle-row {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -646,6 +652,40 @@ button {
   font-size: 13px;
   color: var(--text-secondary);
   font-weight: 500;
+}
+
+/* Native checkbox drives the visible neumorphic switch (keyboard + SR intact).
+   Visually hidden but still focusable; the whole control is a <label>. */
+.neu-switch-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.sidebar-toggle-control {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  width: 100%;
+  justify-content: space-between;
+}
+
+.neu-switch-input:focus-visible + .sidebar-toggle-control .neu-switch {
+  box-shadow: var(--shadow-inset), inset 0 -2px var(--text-secondary);
+}
+
+/* Sidebar focus uses the same neutral fill and baseline as other controls. */
+.sidebar-pill:focus-visible,
+.toggle-option:focus-visible {
+  background: var(--bg-input);
 }
 
 /* Sidebar name row */
@@ -1213,10 +1253,10 @@ button {
   box-shadow: none;
   background: transparent;
   font-family: var(--font-anthropic-ui);
-  font-size: 0.82rem;
+  font-size: 0.875rem;
   font-weight: 400;
-  padding: 6px 10px;
-  min-height: auto;
+  padding: 8px 12px;
+  min-height: 38px;
 }
 
 [data-theme="claude"] .sidebar-pill.pill-flat {
@@ -1248,10 +1288,9 @@ button {
 }
 
 [data-theme="claude"] .conversation-list-item {
-  font-size: 0.82rem;
   font-weight: 400;
-  border-radius: 6px;
-  padding: 6px 10px;
+  border-radius: 8px;
+  padding: 10px 12px;
   color: var(--sidebar-text);
 }
 
@@ -1259,8 +1298,45 @@ button {
   background: var(--sidebar-hover);
 }
 
-[data-theme="claude"] .conversation-list-item.active {
+[data-theme="claude"] .conversation-list-item[aria-current="page"] {
   background: var(--sidebar-active);
+}
+
+.conversation-month {
+  padding: 16px 12px 6px;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.conversation-list-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  height: auto;
+  gap: 4px;
+  padding: 10px 12px;
+  margin: 3px 0;
+  overflow: hidden;
+}
+
+.conversation-title {
+  width: 100%;
+  color: var(--sidebar-text);
+  font-size: 0.875rem;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.conversation-meta {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex-wrap: wrap;
 }
 
 /* Claude theme: flat content area */

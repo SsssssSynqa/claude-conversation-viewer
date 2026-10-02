@@ -68,7 +68,7 @@
   --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
   --sidebar-width: 300px;
   --toolbar-height: 52px;
-  --content-max-width: 780px;
+  --content-max-width: 800px;
   /* Spacing scale */
   --space-xs: 4px;
   --space-sm: 8px;
@@ -76,7 +76,7 @@
   --space-lg: 24px;
   --space-xl: 32px;
   --space-2xl: 48px;
-  --panel-padding: 16px;
+  --panel-padding: 24px;
   --panel-gap: 14px;
   --surface-pressed-scale: 0.985;
 }
@@ -114,7 +114,6 @@
   --surface-raised: linear-gradient(145deg, #191d1b, #2e3430);
   --surface-soft: rgba(255, 255, 255, 0.02);
   --surface-inset: #191d1b;
-  --ring-accent-soft: 0 0 0 1px rgba(229, 125, 89, 0.38), 0 0 0 4px rgba(229, 125, 89, 0.07);
   --sidebar-bg: #212523;
   --sidebar-text: #d5dbd7;
   --sidebar-hover: #272c29;
@@ -188,7 +187,6 @@
   --surface-raised: rgba(255, 255, 255, 0.42);
   --surface-soft: rgba(255, 255, 255, 0.24);
   --surface-inset: rgba(255, 255, 255, 0.26);
-  --ring-accent-soft: 0 0 0 1px rgba(201, 95, 61, 0.34), 0 0 0 4px rgba(201, 95, 61, 0.07);
   --sidebar-bg: rgba(255, 255, 255, 0.36);
   --sidebar-text: #374039;
   --sidebar-hover: rgba(255, 255, 255, 0.48);
@@ -279,7 +277,7 @@
   --sidebar-text: #3d3d3a;
   --sidebar-hover: #f5f4ed;
   --sidebar-active: #f0eee6;
-  --sidebar-width: 260px;
+  --sidebar-width: 288px;
 
   /* Messages — claude.ai exact */
   --message-human-bg: #f0eee6;  /* bg-300 */
@@ -305,7 +303,6 @@
   --gradient-header: linear-gradient(135deg, #D97657 0%, #E89272 100%);
   --btn-primary-bg: #3B3B3B;
   --btn-primary-text: #fff;
-  --ring-accent-soft: 0 0 0 1px rgba(44, 132, 219, 0.3), 0 0 0 4px rgba(44, 132, 219, 0.08);
   /* Statistics colors only. Card borders/shadows continue using exact Claude tokens above. */
   --stats-human: #c86647;
   --stats-assistant: #5b7474;
@@ -321,7 +318,7 @@
   --stats-page-surface: var(--bg-primary);
 
   /* Layout overrides */
-  --content-max-width: 680px;
+  --content-max-width: 800px;
   --radius: 10px;
   --radius-sm: 6px;
   --radius-lg: 16px;

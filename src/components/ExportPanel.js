@@ -45,7 +45,7 @@ export class ExportPanel {
     header.classList.add('content-constrained');
 
     const title = document.createElement('h1');
-    title.style.cssText = 'font-size:1rem;font-weight:600;color:var(--text-primary);margin-bottom:10px;';
+    title.className = 'panel-page-title';
     title.textContent = t('export.title');
     header.appendChild(title);
 
@@ -55,12 +55,12 @@ export class ExportPanel {
 
     // Format selector
     const formatGroup = document.createElement('div');
-    formatGroup.className = 'export-toolbar-group';
-    formatGroup.style.cssText = 'display:flex;gap:4px;align-items:center;';
+    formatGroup.className = 'export-toolbar-group export-format-group';
     formatGroup.setAttribute('role', 'radiogroup');
     formatGroup.setAttribute('aria-label', t('export.format'));
     const formatLabel = document.createElement('span');
-    formatLabel.style.cssText = 'font-size:0.74rem;color:var(--text-muted);';
+    formatLabel.className = 'export-format-label';
+    formatLabel.style.cssText = 'font-size:0.8125rem;color:var(--text-muted);';
     formatLabel.textContent = t('export.format');
     formatGroup.appendChild(formatLabel);
 
@@ -71,14 +71,17 @@ export class ExportPanel {
       { value: 'json', label: 'JSON' },
     ];
     const formatButtons = [];
-    const selectFormat = (button) => {
-      this.format = button.dataset.format;
+    const syncFormatState = () => {
       formatButtons.forEach(candidate => {
-        const active = candidate === button;
+        const active = candidate.dataset.format === this.format;
         candidate.classList.toggle('active', active);
         candidate.setAttribute('aria-checked', active ? 'true' : 'false');
         candidate.tabIndex = active ? 0 : -1;
       });
+    };
+    const selectFormat = (button) => {
+      this.format = button.dataset.format;
+      syncFormatState();
     };
     for (const fmt of formats) {
       const btn = document.createElement('button');
@@ -88,12 +91,12 @@ export class ExportPanel {
       btn.setAttribute('role', 'radio');
       btn.setAttribute('aria-checked', fmt.value === this.format ? 'true' : 'false');
       btn.tabIndex = fmt.value === this.format ? 0 : -1;
-      btn.style.cssText = 'font-size:0.74rem;';
       btn.textContent = fmt.label;
       btn.addEventListener('click', () => selectFormat(btn));
       formatButtons.push(btn);
       formatGroup.appendChild(btn);
     }
+    syncFormatState();
     formatGroup.addEventListener('keydown', event => {
       if (!['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'].includes(event.key)) return;
       const current = Math.max(0, formatButtons.indexOf(document.activeElement));
@@ -108,9 +111,11 @@ export class ExportPanel {
     });
     configRow.appendChild(formatGroup);
 
-    // Options toggles (plain inline)
+    // Options toggles — native checkbox drives label/Space/checked; the visible
+    // box/label is styled to match the neumorphic toolbar. Wraps on narrow/
+    // English layouts instead of overflowing.
     const optionsRow = document.createElement('div');
-    optionsRow.style.cssText = 'display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:0 2px;';
+    optionsRow.className = 'export-options-row';
     const optToggles = [
       { key: 'includeThinking', label: t('export.includeThinking') },
       { key: 'includeToolUse', label: t('export.includeTools') },
@@ -119,15 +124,22 @@ export class ExportPanel {
     ];
     for (const opt of optToggles) {
       const label = document.createElement('label');
-      label.style.cssText = 'display:flex;align-items:center;gap:4px;font-size:0.76rem;color:var(--text-secondary);cursor:pointer;';
+      label.className = 'export-option';
       const input = document.createElement('input');
       input.type = 'checkbox';
+      input.className = 'export-option-input';
       input.checked = this.options[opt.key];
       input.setAttribute('aria-label', opt.label);
-      input.style.accentColor = 'var(--accent)';
       input.addEventListener('change', () => { this.options[opt.key] = input.checked; });
       label.appendChild(input);
-      label.appendChild(document.createTextNode(opt.label));
+      const box = document.createElement('span');
+      box.className = 'export-option-box';
+      box.setAttribute('aria-hidden', 'true');
+      label.appendChild(box);
+      const text = document.createElement('span');
+      text.className = 'export-option-label';
+      text.textContent = opt.label;
+      label.appendChild(text);
       optionsRow.appendChild(label);
     }
     configRow.appendChild(optionsRow);
@@ -141,33 +153,41 @@ export class ExportPanel {
 
     const prefixLabel = document.createElement('label');
     prefixLabel.style.cssText = 'font-size:0.75rem;color:var(--text-muted);';
+    prefixLabel.setAttribute('for', 'export-file-prefix');
     prefixLabel.textContent = t('export.filePrefix');
-    nameRow.appendChild(prefixLabel);
+    const prefixField = document.createElement('div');
+    prefixField.className = 'export-name-field';
+    prefixField.appendChild(prefixLabel);
+    nameRow.appendChild(prefixField);
 
     const prefixInput = document.createElement('input');
     prefixInput.type = 'text';
     prefixInput.id = 'export-file-prefix';
-    prefixLabel.htmlFor = prefixInput.id;
     prefixInput.placeholder = t('export.optional');
     prefixInput.className = 'export-mini-input';
-    prefixInput.style.cssText = 'padding:6px 8px;background:var(--surface-inset);box-shadow:var(--shadow-inset);border-radius:10px;color:var(--text-primary);font-size:0.76rem;width:92px;';
+    prefixInput.setAttribute('aria-label', t('export.filePrefix'));
+    prefixInput.style.cssText = 'padding:6px 8px;background:var(--surface-inset);box-shadow:var(--shadow-inset);border-radius:10px;color:var(--text-primary);font-size:0.8125rem;width:128px;';
     prefixInput.addEventListener('input', () => { this.options.filePrefix = prefixInput.value; });
-    nameRow.appendChild(prefixInput);
+    prefixField.appendChild(prefixInput);
 
     const suffixLabel = document.createElement('label');
+    suffixLabel.setAttribute('for', 'export-file-suffix');
     suffixLabel.style.cssText = 'font-size:0.75rem;color:var(--text-muted);';
     suffixLabel.textContent = t('export.fileSuffix');
-    nameRow.appendChild(suffixLabel);
+    const suffixField = document.createElement('div');
+    suffixField.className = 'export-name-field';
+    suffixField.appendChild(suffixLabel);
+    nameRow.appendChild(suffixField);
 
     const suffixInput = document.createElement('input');
     suffixInput.type = 'text';
     suffixInput.id = 'export-file-suffix';
-    suffixLabel.htmlFor = suffixInput.id;
     suffixInput.placeholder = t('export.optional');
     suffixInput.className = 'export-mini-input';
-    suffixInput.style.cssText = 'padding:6px 8px;background:var(--surface-inset);box-shadow:var(--shadow-inset);border-radius:10px;color:var(--text-primary);font-size:0.76rem;width:92px;';
+    suffixInput.setAttribute('aria-label', t('export.fileSuffix'));
+    suffixInput.style.cssText = 'padding:6px 8px;background:var(--surface-inset);box-shadow:var(--shadow-inset);border-radius:10px;color:var(--text-primary);font-size:0.8125rem;width:128px;';
     suffixInput.addEventListener('input', () => { this.options.fileSuffix = suffixInput.value; });
-    nameRow.appendChild(suffixInput);
+    suffixField.appendChild(suffixInput);
 
     header.appendChild(nameRow);
     container.appendChild(header);
@@ -250,12 +270,12 @@ export class ExportPanel {
       info.style.cssText = 'min-width:0;flex:1;';
 
       const name = document.createElement('div');
-      name.style.cssText = 'font-size:0.82rem;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:500;';
+      name.style.cssText = 'font-size:0.875rem;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:500;';
       name.textContent = conv.name || t('convList.unnamed');
       info.appendChild(name);
 
       const meta = document.createElement('div');
-      meta.style.cssText = 'font-size:0.7rem;color:var(--text-muted);margin-top:2px;';
+      meta.style.cssText = 'font-size:0.75rem;color:var(--text-muted);margin-top:2px;';
       const firstTs = conv.messages[0]?.createdAt;
       const lastTs = conv.messages[conv.messages.length - 1]?.createdAt;
       let metaText = t('export.msgCount', { n: conv.stats.messageCount });
@@ -268,11 +288,9 @@ export class ExportPanel {
       item.appendChild(info);
 
       const btn = document.createElement('button');
-      btn.className = 'neu-ghost-btn';
-      btn.style.cssText = 'font-size:0.72rem;white-space:nowrap;flex-shrink:0;margin-left:10px;padding:5px 10px;';
+      btn.className = 'neu-ghost-btn export-row-btn';
+      btn.style.cssText = 'font-size:0.8125rem;white-space:nowrap;flex-shrink:0;margin-left:10px;padding:5px 10px;';
       btn.textContent = t('export.exportBtn');
-      btn.addEventListener('mouseenter', () => { btn.style.borderColor = 'var(--accent)'; btn.style.color = 'var(--accent)'; });
-      btn.addEventListener('mouseleave', () => { btn.style.borderColor = 'var(--border)'; btn.style.color = 'var(--text-muted)'; });
       btn.addEventListener('click', () => this._doExport([conv]));
       item.appendChild(btn);
 
@@ -306,7 +324,7 @@ export class ExportPanel {
 
       const exportBtn = document.createElement('button');
       exportBtn.className = 'neu-primary-btn';
-      exportBtn.style.cssText = 'font-size:0.74rem;font-weight:600;padding:6px 10px;';
+      exportBtn.style.cssText = 'font-size:0.8125rem;font-weight:600;padding:6px 10px;';
       exportBtn.textContent = t('export.exportCollection');
       exportBtn.disabled = available === 0;
       if (available === 0) {
@@ -319,7 +337,7 @@ export class ExportPanel {
 
       const clearBtn = document.createElement('button');
       clearBtn.className = 'neu-ghost-btn';
-      clearBtn.style.cssText = 'font-size:0.74rem;padding:6px 10px;';
+      clearBtn.style.cssText = 'font-size:0.8125rem;padding:6px 10px;';
       clearBtn.textContent = t('export.clearCollection');
       clearBtn.setAttribute('aria-label', t('export.clearCollectionAria'));
       clearBtn.addEventListener('click', () => {
@@ -390,12 +408,12 @@ export class ExportPanel {
         const isAvailable = !!(res && res.msg);
 
         const senderSpan = document.createElement('span');
-        senderSpan.style.cssText = 'font-size:0.72rem;font-weight:600;color:' + (isAvailable ? (item.sender === 'human' ? 'var(--accent)' : 'var(--text-primary)') : 'var(--text-muted)') + ';margin-right:6px;';
+        senderSpan.style.cssText = 'font-size:0.8125rem;font-weight:600;color:' + (isAvailable ? (item.sender === 'human' ? 'var(--accent)' : 'var(--text-primary)') : 'var(--text-muted)') + ';margin-right:6px;';
         senderSpan.textContent = senderName;
         info.appendChild(senderSpan);
 
         const preview = document.createElement('span');
-        preview.style.cssText = 'font-size:0.72rem;color:var(--text-muted);';
+        preview.style.cssText = 'font-size:0.8125rem;color:var(--text-muted);';
         preview.textContent = item.preview;
         info.appendChild(preview);
 

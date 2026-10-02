@@ -5,7 +5,7 @@
 
 import { state, resetSidebarFilter } from '../store/state.js';
 import { formatTimestamp } from '../utils/time.js';
-import { escapeHtml } from '../utils/markdown.js';
+import { marked } from 'marked';
 import { t } from '../i18n.js';
 import { createIcon } from '../utils/icons.js';
 
@@ -46,11 +46,8 @@ export class SearchPanel {
     header.classList.add('content-constrained');
 
     const title = document.createElement('h1');
-    if (isClaude) {
-      title.style.cssText = 'display:none;';
-    } else {
-      title.style.cssText = 'font-size:1.15rem;font-weight:600;margin-bottom:16px;color:var(--text-primary);';
-    }
+    title.className = 'panel-page-title';
+    if (isClaude) title.style.cssText = 'display:none;';
     title.textContent = t('search.title');
     header.appendChild(title);
 
@@ -66,24 +63,10 @@ export class SearchPanel {
     searchInput.id = 'search-panel-input';
     searchInput.className = 'search-field';
     if (isClaude) {
-      searchInput.style.cssText = 'width:100%;padding:0;color:var(--text-primary);font-size:12px;line-height:17px;font-family:var(--font-family);background:transparent;border:none;outline:none;';
+      searchInput.style.cssText = 'width:100%;padding:0;color:var(--text-primary);font-size:15px;line-height:24px;font-family:var(--font-family);background:transparent;border:none;';
     } else {
       searchInput.style.cssText = 'flex:1;padding:14px 16px 14px 42px;color:var(--text-primary);font-size:0.95rem;font-family:var(--font-family);';
     }
-    searchInput.addEventListener('focus', () => {
-      if (isClaude) {
-        inputWrapper.style.boxShadow = 'rgba(0,0,0,0.075) 0px 3px 15px, rgba(31,30,29,0.25) 0px 0px 0px 0.5px';
-      } else {
-        inputWrapper.style.boxShadow = 'var(--ring-accent-soft)';
-      }
-    });
-    searchInput.addEventListener('blur', () => {
-      if (isClaude) {
-        inputWrapper.style.boxShadow = 'rgba(0,0,0,0.035) 0px 3px 15px, rgba(31,30,29,0.15) 0px 0px 0px 0.5px';
-      } else {
-        inputWrapper.style.boxShadow = 'var(--shadow-inset)';
-      }
-    });
     searchInput.addEventListener('input', () => {
       clearTimeout(this.searchTimer);
       this.searchTimer = setTimeout(() => this.doSearch(), 300);
@@ -92,9 +75,9 @@ export class SearchPanel {
     const inputWrapper = document.createElement('div');
     inputWrapper.className = 'search-input-shell';
     if (isClaude) {
-      inputWrapper.style.cssText = 'width:100%;max-width:506px;margin:0 auto;position:relative;background:#ffffff;border-radius:20px;border:1px solid transparent;box-shadow:rgba(0,0,0,0.035) 0px 3px 15px, rgba(31,30,29,0.15) 0px 0px 0px 0.5px;display:flex;flex-direction:column;padding:10.5px;gap:9px;box-sizing:content-box;';
+      inputWrapper.style.cssText = 'width:100%;position:relative;background:#ffffff;border-radius:20px;border:1px solid transparent;display:flex;flex-direction:column;padding:16px;gap:12px;';
     } else {
-      inputWrapper.style.cssText = 'flex:1;position:relative;box-shadow:var(--shadow-inset);';
+      inputWrapper.style.cssText = 'flex:1;position:relative;';
     }
 
     if (isClaude) {
@@ -202,11 +185,11 @@ export class SearchPanel {
       { value: 'human', label: t('search.humanOnly') },
       { value: 'assistant', label: t('search.aiOnly') },
     ], t('search.roleFilter'));
-    roleSelect.addEventListener('change', () => {
-      this.filters.role = roleSelect.value;
+    roleSelect.select.addEventListener('change', () => {
+      this.filters.role = roleSelect.select.value;
       this.doSearch();
     });
-    filterRow.appendChild(roleSelect);
+    filterRow.appendChild(roleSelect.shell);
 
     // Content type filter
     const typeSelect = this._createSelect('search-type', [
@@ -215,11 +198,11 @@ export class SearchPanel {
       { value: 'tool', label: t('search.withToolUse') },
       { value: 'flag', label: t('search.withFlags') },
     ], t('search.typeFilter'));
-    typeSelect.addEventListener('change', () => {
-      this.filters.contentType = typeSelect.value;
+    typeSelect.select.addEventListener('change', () => {
+      this.filters.contentType = typeSelect.select.value;
       this.doSearch();
     });
-    filterRow.appendChild(typeSelect);
+    filterRow.appendChild(typeSelect.shell);
 
     // Clear filters button
     const clearBtn = document.createElement('button');
@@ -243,8 +226,8 @@ export class SearchPanel {
       this.currentQuery = '';
       dateFromInput.value = '';
       dateToInput.value = '';
-      roleSelect.value = 'all';
-      typeSelect.value = 'all';
+      roleSelect.select.value = 'all';
+      typeSelect.select.value = 'all';
       searchInput.value = '';
       this.results = [];
       this._renderResults(resultsInner, statsBar);
@@ -264,7 +247,7 @@ export class SearchPanel {
       color: var(--text-muted);
       flex-shrink: 0;
       display: none;
-      margin: 12px 0 0;
+      margin: 12px auto 0;
     `;
     statsBar.classList.add('content-constrained');
     container.appendChild(statsBar);
@@ -328,11 +311,16 @@ export class SearchPanel {
           const idx = msg.searchText.indexOf(query);
           if (idx < 0) continue;
 
-          // Extract snippet with context
-          const fullText = msg.searchText;
-          const start = Math.max(0, idx - 40);
-          const end = Math.min(fullText.length, idx + query.length + 60);
-          let snippet = (start > 0 ? '...' : '') +
+          // Parse complete Markdown before slicing so code and paired markers
+          // cannot be mistaken for partial formatting at the window edges.
+          const cleaned = this._cleanSnippet(msg.searchText);
+          const cleanedIdx = cleaned.indexOf(query);
+          // Literal syntax/URL searches still need their raw match visible.
+          const fullText = cleanedIdx >= 0 ? cleaned : msg.searchText;
+          const matchIdx = cleanedIdx >= 0 ? cleanedIdx : idx;
+          const start = Math.max(0, matchIdx - 40);
+          const end = Math.min(fullText.length, matchIdx + query.length + 60);
+          const snippet = (start > 0 ? '...' : '') +
             fullText.substring(start, end) +
             (end < fullText.length ? '...' : '');
 
@@ -351,7 +339,8 @@ export class SearchPanel {
           });
         } else if (!query && (role !== 'all' || contentType !== 'all' || dateFrom || dateTo)) {
           // Filter-only mode: show first 100 chars of message as snippet
-          const snippet = msg.searchText.substring(0, 100) + (msg.searchText.length > 100 ? '...' : '');
+          const cleaned = this._cleanSnippet(msg.searchText);
+          const snippet = cleaned.substring(0, 100) + (cleaned.length > 100 ? '...' : '');
           results.push({
             convIndex: ci,
             msgIndex: mi,
@@ -379,6 +368,35 @@ export class SearchPanel {
 
   _messageHasToolContent(msg) {
     return msg.contentBlocks.some(b => b.type === 'tool_use' || b.type === 'tool_result');
+  }
+
+  /**
+   * Flatten Markdown tokens as text, preserving code and literal punctuation.
+   * This never renders HTML; result snippets are inserted with textContent.
+   */
+  _cleanSnippet(text) {
+    const flatten = tokens => tokens.map(token => {
+      switch (token.type) {
+        case 'list':
+          return token.items.map(item => flatten(item.tokens)).join(' ') + ' ';
+        case 'table':
+          return [token.header, ...token.rows]
+            .map(row => row.map(cell => flatten(cell.tokens)).join(' ')).join(' ') + ' ';
+        case 'paragraph':
+        case 'heading':
+        case 'blockquote':
+          return flatten(token.tokens) + ' ';
+        case 'code':
+          return token.text + ' ';
+        case 'space':
+        case 'br':
+        case 'hr':
+          return ' ';
+        default:
+          return token.tokens ? flatten(token.tokens) : (token.text || '');
+      }
+    }).join('');
+    return flatten(marked.lexer(text)).replace(/\s+/g, ' ').trim();
   }
 
   _renderResults(container, statsBar) {
@@ -440,6 +458,9 @@ export class SearchPanel {
         item.style.cssText = `
           padding: 16px 18px;
           cursor: pointer;
+          text-align: left;
+          width: 100%;
+          font-family: var(--font-family);
         `;
 
         // Meta line: sender + time + badges
@@ -486,7 +507,7 @@ export class SearchPanel {
         // Snippet with highlighted match
         const snippetEl = document.createElement('div');
         snippetEl.className = 'search-result-snippet';
-        snippetEl.style.cssText = 'font-size:0.85rem;color:var(--text-secondary);line-height:1.5;word-break:break-word;';
+        snippetEl.style.cssText = 'font-size:0.9375rem;color:var(--text-secondary);line-height:1.65;word-break:break-word;';
 
         if (r.query) {
           const lowerSnippet = r.snippet.toLowerCase();
@@ -619,6 +640,15 @@ export class SearchPanel {
       option.textContent = opt.label;
       select.appendChild(option);
     }
-    return select;
+    // Wrap so the same chevron treatment works in every theme without
+    // fighting the inline surface (which may be a gradient token).
+    const shell = document.createElement('span');
+    shell.className = 'select-shell';
+    shell.appendChild(select);
+    const chevron = document.createElement('span');
+    chevron.className = 'select-chevron';
+    chevron.setAttribute('aria-hidden', 'true');
+    shell.appendChild(chevron);
+    return { shell, select };
   }
 }

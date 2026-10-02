@@ -185,22 +185,9 @@
     align-self: center;
   }
 
-  :root .stats-word-card-grid > .stats-card.stats-word-card {
-    min-height: 112px !important;
-    flex-direction: row;
-    align-items: center !important;
-  }
-
-  :root .stats-word-card-grid > .stats-card > .stats-word-copy {
-    order: 1;
-  }
-
-  :root .stats-word-card-grid > .stats-card > [role="img"] {
-    order: 2;
-  }
-
   .stats-word-card .stats-card-value {
     font-size: clamp(17px, 5vw, 22px) !important;
+    white-space: nowrap;
   }
 
   .stats-word-card .stats-card-label {
