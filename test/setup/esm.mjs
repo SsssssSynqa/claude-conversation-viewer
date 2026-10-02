@@ -36,6 +36,12 @@ function resolveHook(specifier, context, nextResolve) {
   if (specifier === 'dompurify') {
     return { url: 'data:text/javascript,export default { sanitize: (h) => String(h == null ? \'\' : h) };', shortCircuit: true };
   }
+  // StatsPanel draws charts with canvas/matchMedia/html2canvas; the message and
+  // export tests never exercise it (MessageView only renders it as the empty
+  // state), so stand in a no-op panel instead of emulating a browser.
+  if (/(^|\/)StatsPanel\.js$/.test(specifier)) {
+    return { url: 'data:text/javascript,export class StatsPanel { renderInline() {} destroy() {} }', shortCircuit: true };
+  }
   return nextResolve(specifier, context);
 }
 

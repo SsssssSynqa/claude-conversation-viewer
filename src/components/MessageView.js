@@ -81,6 +81,7 @@ export class MessageView {
     if (index < 0 || index >= conversations.length) { this.renderEmpty(); return; }
 
     const conv = conversations[index];
+    this.container.scrollTop = 0;
     const names = state.get('displayNames');
     const showThinking = state.get('showThinking');
     const showToolUse = state.get('showToolUse');
@@ -105,7 +106,7 @@ export class MessageView {
 
     // ---- Header ----
     const header = document.createElement('div');
-    header.className = 'message-header-card';
+    header.className = 'message-header-card content-constrained';
     header.style.cssText = 'flex-shrink:0;';
 
     const headerTop = document.createElement('div');
@@ -114,7 +115,7 @@ export class MessageView {
     const titleSection = document.createElement('div');
     titleSection.className = 'message-title-section';
     titleSection.style.cssText = 'flex:1;min-width:0;';
-    const titleEl = document.createElement('h2');
+    const titleEl = document.createElement('h1');
     titleEl.className = 'message-title';
     titleEl.textContent = conv.name || t('msgView.unnamed');
     titleSection.appendChild(titleEl);
@@ -168,6 +169,7 @@ export class MessageView {
 
     toggleOuter.appendChild(toggleLabel);
     toggleOuter.appendChild(toggleTrack);
+    toggleOuter.setAttribute('aria-pressed', this.selectMode ? 'true' : 'false');
     toggleOuter.addEventListener('click', () => {
       this.selectMode = !this.selectMode;
       if (!this.selectMode) this.selectedIndices.clear();
@@ -235,6 +237,10 @@ export class MessageView {
       if (e.key === 'ArrowDown' || e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
         openMenu(true);
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        openMenu(false);
+        focusItem(menuItems.length - 1);
       } else if (e.key === 'Escape') {
         closeMenu(true);
       }
@@ -297,9 +303,9 @@ export class MessageView {
     // ---- Messages ----
     const scrollContainer = document.createElement('div');
     scrollContainer.className = 'messages-scroll';
-    const messagesContent = document.createElement('div');
-    messagesContent.className = 'messages-content';
-    scrollContainer.appendChild(messagesContent);
+    const messagesInner = document.createElement('div');
+    messagesInner.className = 'messages-inner content-constrained';
+    scrollContainer.appendChild(messagesInner);
 
     let prevTimestamp = null;
 
@@ -317,7 +323,7 @@ export class MessageView {
           sep.style.cssText = 'text-align:center;padding:16px 0;color:var(--text-muted);font-size:0.8rem;';
           const hours = Math.floor(diffMinutes / 60);
           sep.textContent = '\u2014 ' + (hours > 24 ? Math.floor(hours / 24) + t('msgView.daysLater') : hours + t('msgView.hoursLater')) + ' \u2014';
-          messagesContent.appendChild(sep);
+          messagesInner.appendChild(sep);
         }
       }
       prevTimestamp = msg.createdAt;
@@ -327,12 +333,7 @@ export class MessageView {
       const msgEl = document.createElement('div');
       msgEl.className = 'message-block ' + (isHuman ? 'message-human' : 'message-assistant');
       msgEl.dataset.msgIndex = mi;
-      // Claude theme: let CSS handle all styling (no inline bg)
-      if (isClaude) {
-        msgEl.style.cssText = 'position:relative;';
-      } else {
-        msgEl.style.cssText = 'position:relative;background:' + (isHuman ? 'var(--message-human-bg)' : 'var(--message-assistant-bg)') + ';';
-      }
+      msgEl.style.position = 'relative';
 
       // Selection checkbox (only in select mode)
       if (this.selectMode) {
@@ -361,7 +362,7 @@ export class MessageView {
         // Claude theme: no sender name for either human or assistant (matches official)
         senderEl.style.cssText = 'display:none;';
       } else {
-        senderEl.style.cssText = 'font-weight:600;font-size:0.85rem;margin-bottom:6px;display:flex;align-items:center;gap:6px;color:' + (isHuman ? 'var(--accent)' : 'var(--text-primary)') + ';';
+        senderEl.style.cssText = 'font-weight:600;font-size:0.85rem;margin-bottom:6px;display:flex;align-items:center;gap:6px;color:' + (isHuman ? 'var(--accent-ink)' : 'var(--text-primary)') + ';';
         senderEl.appendChild(createIcon(isHuman ? 'user' : 'bot', 14));
         senderEl.appendChild(document.createTextNode(isHuman ? (names.human || 'Human') : (names.assistant || 'Assistant')));
       }
@@ -442,7 +443,7 @@ export class MessageView {
       footer.appendChild(actionBtns);
       msgEl.appendChild(footer);
 
-      messagesContent.appendChild(msgEl);
+      messagesInner.appendChild(msgEl);
     }
 
     this.container.appendChild(scrollContainer);
@@ -486,7 +487,7 @@ export class MessageView {
     let text = '';
     for (const block of msg.contentBlocks) {
       if (block.type === 'text') text += block.text + '\n';
-      else if (block.type === 'thinking' && block.thinking) text += '\n[思考过程]\n' + block.thinking + '\n';
+      else if (block.type === 'thinking' && block.thinking) text += `\n[${t('msgView.thinking')}]\n${block.thinking}\n`;
     }
     navigator.clipboard.writeText(text.trim()).catch(() => {});
   }
@@ -626,7 +627,7 @@ export class MessageView {
     import('../utils/export.js').then(({ exportAsText, exportAsMarkdown, exportAsHTML, downloadFile }) => {
       const options = { includeThinking: state.get('showThinking'), includeToolUse: state.get('showToolUse'), includeFlags: state.get('showFlags'), displayNames: state.get('displayNames') };
       const dateSuffix = formatLocalDateStamp();
-      const nameBase = this._sanitizeFilename(conv.name || '对话');
+      const nameBase = this._sanitizeFilename(conv.name || t('msgView.fileConversation'));
       let content, filename, mimeType;
       switch (format) {
         case 'txt': content = exportAsText([conv], options); filename = `${nameBase}_${dateSuffix}.txt`; mimeType = 'text/plain;charset=utf-8'; break;
@@ -641,24 +642,24 @@ export class MessageView {
   _exportMessages(conv, messages) {
     import('../utils/export.js').then(({ downloadFile }) => {
       const names = state.get('displayNames');
-      let output = `# ${conv.name || '未命名对话'}（节选）\n\n`;
+      let output = `# ${conv.name || t('msgView.unnamed')} (${t('msgView.excerpt')})\n\n`;
       for (const msg of messages) {
         const sender = msg.sender === 'human' ? (names.human || 'Human') : (names.assistant || 'Assistant');
         output += `## ${sender} (${formatTimestamp(msg.createdAt)})\n\n`;
         for (const block of msg.contentBlocks) {
           if (block.type === 'text') output += this._toMarkdownCodeBlock(block.text) + '\n\n';
-          else if (block.type === 'thinking' && block.thinking) output += `> 思考过程\n\n${this._toMarkdownCodeBlock(block.thinking)}\n\n`;
+          else if (block.type === 'thinking' && block.thinking) output += `> ${t('msgView.thinking')}\n\n${this._toMarkdownCodeBlock(block.thinking)}\n\n`;
         }
         output += '---\n\n';
       }
       const dateSuffix = formatLocalDateStamp();
-      const safeName = this._sanitizeFilename(conv.name || '对话');
-      downloadFile(output, `${safeName}_节选_${dateSuffix}.md`, 'text/markdown;charset=utf-8');
+      const safeName = this._sanitizeFilename(conv.name || t('msgView.fileConversation'));
+      downloadFile(output, `${safeName}_${t('msgView.excerpt')}_${dateSuffix}.md`, 'text/markdown;charset=utf-8');
     });
   }
 
   _sanitizeFilename(name) {
-    return (name || '对话').replace(/[/\\?%*:|"<>]/g, '_').trim().slice(0, 120) || '对话';
+    return (name || t('msgView.fileConversation')).replace(/[/\\?%*:|"<>]/g, '_').trim().slice(0, 120) || t('msgView.fileConversation');
   }
 
   _toMarkdownCodeBlock(text) {
@@ -681,7 +682,10 @@ export class MessageView {
       const targetBlock = messageBlocks[msgIndex];
       if (!targetBlock) return;
 
-      targetBlock.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      targetBlock.scrollIntoView({
+        behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+        block: 'center',
+      });
       targetBlock.classList.add('message-highlighted');
 
       setTimeout(() => {
@@ -698,6 +702,7 @@ export class MessageView {
     document.removeEventListener('click', this.handleDocumentClick);
     document.removeEventListener('keydown', this.handleDocumentKeydown);
     this._closeExportDropdown();
+    this.statsPanel.destroy();
   }
 
   /**
@@ -762,7 +767,7 @@ export class MessageView {
       : (thinkingPreview
         || (toolUseBlocks.length > 0 ? (toolUseBlocks[0].toolName || t('msgView.toolFallback')) : '')
         || (toolResultBlocks.length > 0 ? t('msgView.toolResultLabel') : '')
-        || t('msgView.thinkingFallback'));
+        || t('msgView.thinking'));
     // Keep the summary to a single readable line; full text lives in the timeline.
     const summaryLine = String(summaryText).replace(/\s+/g, ' ').trim();
     const summaryShort = summaryLine.length > 96 ? summaryLine.slice(0, 96).trimEnd() + '\u2026' : summaryLine;
@@ -855,7 +860,7 @@ export class MessageView {
       if (block.type === 'thinking') {
         const raw = block.thinking || block.summaries?.[0] || '';
         const preview = desensitize(raw).replace(/\s+/g, ' ').trim();
-        items.push({ type: 'thinking', block, title: t('msgView.thinkingLabel'), preview });
+        items.push({ type: 'thinking', block, title: t('msgView.thinking'), preview });
       } else if (block.type === 'tool_use') {
         items.push({
           type: 'tool',
@@ -1017,7 +1022,7 @@ export class MessageView {
     const label = document.createElement('span');
     label.className = 'block-detail-title';
     label.style.fontWeight = '600';
-    label.textContent = t('msgView.thinkingLabel');
+    label.textContent = t('msgView.thinking');
     summary.appendChild(label);
     if (block.durationText) { const dur = document.createElement('span'); dur.className = 'badge badge-thinking'; dur.textContent = block.durationText; summary.appendChild(dur); }
     if (block.summaries && block.summaries.length > 0) { const st = document.createElement('span'); st.className = 'block-detail-preview'; st.textContent = '\u2014 ' + desensitize(block.summaries[0]); summary.appendChild(st); }

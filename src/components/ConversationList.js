@@ -45,6 +45,7 @@ export class ConversationList {
     this.searchInput.type = 'text';
     this.searchInput.className = 'history-search-input';
     this.searchInput.placeholder = t('convList.searchPlaceholder');
+    this.searchInput.setAttribute('aria-label', t('convList.searchPlaceholder'));
     this.searchInput.value = state.get('searchQuery') || '';
     this.searchInput.addEventListener('input', () => this.onSearch());
 
@@ -113,8 +114,8 @@ export class ConversationList {
         item.type = 'button';
         const isActive = index === currentIndex;
         item.className = 'conversation-list-item ' + (isClaude ? '' : 'sidebar-pill ' + (isActive ? 'pill-active' : 'pill-flat'));
+        if (isActive) item.setAttribute('aria-current', 'page');
         item.setAttribute('aria-label', conv.name || t('convList.unnamed'));
-        if (isActive) item.setAttribute('aria-current', 'true');
 
         // Title
         const titleEl = document.createElement('div');

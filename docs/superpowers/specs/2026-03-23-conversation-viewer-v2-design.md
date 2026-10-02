@@ -4,8 +4,8 @@
 
 Major overhaul of the Claude Conversation Viewer — a single-file HTML tool for viewing and managing Claude conversation exports. Originally built in 2025 as a 40KB single-file HTML, now being rebuilt with modular architecture, three themes, full thinking/COT support, enhanced search, statistics, and improved export.
 
-**GitHub**: `SsssssSynqa/claude-conversation-viewer`
-**Live**: GitHub Pages (existing deployment)
+**GitHub**: `HailSyner/claude-conversation-viewer`
+**Live**: <https://non-standard-protocol.space/claude-viewer/>
 **Data source**: Claude data export JSON (`conversations.json` from Settings > Data Export)
 
 ## Critical Bug Fix

@@ -1,14 +1,18 @@
 /**
  * Time formatting utilities.
  */
-import { t } from '../i18n.js';
+import { getLang, t } from '../i18n.js';
+
+function locale() {
+  return getLang() === 'en' ? 'en-US' : 'zh-CN';
+}
 
 export function formatTimestamp(iso) {
   if (!iso) return t('time.unknown');
   try {
     const date = new Date(iso);
     if (isNaN(date.getTime())) return t('time.unknown');
-    return date.toLocaleString('zh-CN', {
+    return date.toLocaleString(locale(), {
       year: 'numeric',
       month: '2-digit',
       day: '2-digit',
@@ -16,7 +20,7 @@ export function formatTimestamp(iso) {
       minute: '2-digit',
     });
   } catch (e) {
-    return '未知时间';
+    return t('time.unknown');
   }
 }
 
@@ -25,7 +29,7 @@ export function formatShortTime(iso) {
   try {
     const date = new Date(iso);
     if (isNaN(date.getTime())) return '';
-    return date.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
+    return date.toLocaleTimeString(locale(), { hour: '2-digit', minute: '2-digit' });
   } catch (e) {
     return '';
   }
@@ -36,7 +40,7 @@ export function formatDate(iso) {
   try {
     const date = new Date(iso);
     if (isNaN(date.getTime())) return '';
-    return date.toLocaleDateString('zh-CN', {
+    return date.toLocaleDateString(locale(), {
       year: 'numeric',
       month: 'long',
       day: 'numeric',

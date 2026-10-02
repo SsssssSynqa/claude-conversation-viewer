@@ -1,0 +1,33 @@
+{
+  "measuredAt": "2026-08-13",
+  "state": "cached conversations present; zh locale; upload screen scrollTop normalized to 0",
+  "beforeProduction": {
+    "desktop1440x1000": {
+      "light": { "paddingTop": 80, "gap": 12, "logoTop": 80, "uploadTop": 144, "nameConfigTop": 252.8 },
+      "dark": { "paddingTop": 80, "gap": 12, "logoTop": 80, "uploadTop": 144, "nameConfigTop": 252.8 },
+      "claude": { "paddingTop": 150, "gap": 16, "logoTop": 150, "uploadTop": 218, "nameConfigTop": 327.8 }
+    },
+    "mobile390x844": {
+      "light": { "paddingTop": 28, "gap": 12, "logoTop": 28, "uploadTop": 92, "nameConfigTop": 200.8 },
+      "dark": { "paddingTop": 28, "gap": 12, "logoTop": 28, "uploadTop": 92, "nameConfigTop": 200.8 },
+      "claude": { "paddingTop": 126.6, "gap": 16, "logoTop": 126.59, "uploadTop": 194.59, "nameConfigTop": 304.39 }
+    }
+  },
+  "afterLocalCachedState": {
+    "desktop1440x1000": {
+      "light": { "paddingTop": 150, "gap": 16, "logoTop": 150, "uploadTop": 218, "cacheTop": 330.8, "nameConfigTop": 415.3, "controlsTop": 580.55, "overflow": 0 },
+      "dark": { "paddingTop": 150, "gap": 16, "logoTop": 150, "uploadTop": 218, "cacheTop": 330.8, "nameConfigTop": 415.3, "controlsTop": 580.55, "overflow": 0 },
+      "claude": { "paddingTop": 150, "gap": 16, "logoTop": 150, "uploadTop": 218, "cacheTop": 328.8, "nameConfigTop": 413.3, "controlsTop": 584.3, "overflow": 0 }
+    },
+    "mobile390x844": {
+      "light": { "paddingTop": 126.6, "gap": 16, "logoTop": 126.59, "uploadTop": 194.59, "cacheTop": 307.39, "nameConfigTop": 408.91, "controlsTop": 653.39, "overflow": 0 },
+      "dark": { "paddingTop": 126.6, "gap": 16, "logoTop": 126.59, "uploadTop": 194.59, "cacheTop": 307.39, "nameConfigTop": 408.89, "controlsTop": 653.39, "overflow": 0 },
+      "claude": { "paddingTop": 126.6, "gap": 16, "logoTop": 126.59, "uploadTop": 194.59, "cacheTop": 305.39, "nameConfigTop": 406.89, "controlsTop": 647.89, "overflow": 0 }
+    }
+  },
+  "interpretation": {
+    "fixedInvariant": "The logo and upload-zone top coordinates now match exactly across all three themes at both tested viewport sizes.",
+    "expectedMaterialDelta": "Downstream blocks differ by 2-5.5px because light/dark use a visible 1px relief border and compact name-card padding while Claude keeps its frozen 0.5px shadow-border and original padding. This is component material/height, not a page top-anchor drift.",
+    "sourceContract": "tests/upload-geometry-contracts.test.mjs forbids light/dark and mobile theme layers from overriding upload-screen padding or gap."
+  }
+}

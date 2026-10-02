@@ -1,0 +1,29 @@
+{
+  "verifiedAt": "2026-08-13",
+  "fixture": "tests/fixtures/conversations.synthetic.json with explicit emoji coverage",
+  "viewportMapping": "Playwright host applied 0.75 browser zoom; requested 390/430/768 CSS widths were verified as actual innerWidth 391/429/768",
+  "themes": ["light", "dark", "claude"],
+  "widths": [390, 430, 768],
+  "sharedResults": {
+    "titleRowHeight": 36,
+    "saveButton": "36x36 icon-only, same row as title",
+    "coreMetricLayout": "2 columns, 58px cards",
+    "secondaryMetricLayout": "2 columns, 58px cards, placed before word-share cards",
+    "wordShareLayout": "2 columns, both percentage cards visible together; 112-117px cards with existing 96px mobile ring rendering preserved",
+    "thinkingLayout": "2x2, 58px cards",
+    "rhythmLayout": "weekday and monthly-frequency cards single-column; each 366px wide at 390",
+    "heatmap": "352px viewport into 978px fixed-size matrix at 390; horizontally scrollable and verified at scrollLeft 626 / max 626 after render",
+    "emoji": "section present; complete grapheme extraction verified; local DOM count 2, production-cache DOM count 6 after test data injection",
+    "wordTypography": "stats-font-ui in all themes",
+    "horizontalOverflow": 0
+  },
+  "tests": {
+    "sourceLogic": "22/22",
+    "dist": "3/3",
+    "npmAudit": "0 vulnerabilities (production and full dependency tree)",
+    "interactiveCharts": "3 focusable canvases; 17 / 25 / 17 accessible table rows including headers; ArrowRight + Enter exposes exact value and Escape closes tooltip",
+    "imageExport": "download completed as 数据雕塑_2026-08-13.png",
+    "englishMobile": "390px Claude: 0 horizontal overflow and 0 clipped labels/section titles/thinking values"
+  },
+  "acceptanceBoundary": "Automated and browser verification complete locally; final visual acceptance belongs to Synqa after production deployment."
+}

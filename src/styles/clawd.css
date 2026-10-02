@@ -139,3 +139,14 @@
   80% { transform: translateY(-20px); }
   100% { transform: translateY(-50px); opacity: 0; }
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .clawd-body,
+  .clawd-crab,
+  .clawd-crab::before,
+  .clawd-bubble,
+  .clawd-crab.done {
+    animation: none !important;
+    transition: none !important;
+  }
+}

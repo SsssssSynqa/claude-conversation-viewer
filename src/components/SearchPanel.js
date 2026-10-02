@@ -27,6 +27,7 @@ export class SearchPanel {
    */
   render(container) {
     clearTimeout(this.searchTimer);
+    container.scrollTop = 0;
     container.textContent = '';
     container.classList.remove('stats-panel-shell');
     container.classList.add('content-area', 'content-shell');
@@ -44,8 +45,9 @@ export class SearchPanel {
     }
     header.classList.add('content-constrained');
 
-    const title = document.createElement('h2');
+    const title = document.createElement('h1');
     title.className = 'panel-page-title';
+    if (isClaude) title.style.cssText = 'display:none;';
     title.textContent = t('search.title');
     header.appendChild(title);
 
@@ -57,9 +59,9 @@ export class SearchPanel {
     const searchInput = document.createElement('input');
     searchInput.type = 'text';
     searchInput.placeholder = t('search.placeholder');
+    searchInput.setAttribute('aria-label', t('search.placeholder'));
     searchInput.id = 'search-panel-input';
     searchInput.className = 'search-field';
-    searchInput.setAttribute('aria-label', t('search.title'));
     if (isClaude) {
       searchInput.style.cssText = 'width:100%;padding:0;color:var(--text-primary);font-size:15px;line-height:24px;font-family:var(--font-family);background:transparent;border:none;';
     } else {
@@ -182,7 +184,7 @@ export class SearchPanel {
       { value: 'all', label: t('search.allRoles') },
       { value: 'human', label: t('search.humanOnly') },
       { value: 'assistant', label: t('search.aiOnly') },
-    ], t('search.allRoles'));
+    ], t('search.roleFilter'));
     roleSelect.select.addEventListener('change', () => {
       this.filters.role = roleSelect.select.value;
       this.doSearch();
@@ -195,7 +197,7 @@ export class SearchPanel {
       { value: 'thinking', label: t('search.withThinking') },
       { value: 'tool', label: t('search.withToolUse') },
       { value: 'flag', label: t('search.withFlags') },
-    ], t('search.allTypes'));
+    ], t('search.typeFilter'));
     typeSelect.select.addEventListener('change', () => {
       this.filters.contentType = typeSelect.select.value;
       this.doSearch();
@@ -571,12 +573,12 @@ export class SearchPanel {
 
     const text = document.createElement('div');
     text.style.cssText = 'font-size:1rem;text-align:center;line-height:1.6;';
-    text.textContent = '输入关键词或设置筛选条件开始搜索';
+    text.textContent = t('search.startPrompt');
     empty.appendChild(text);
 
     const hint = document.createElement('div');
     hint.style.cssText = 'font-size:0.8rem;color:var(--text-muted);text-align:center;max-width:360px;line-height:1.5;opacity:0.7;';
-    hint.textContent = '支持按关键词、日期范围、发送角色和内容类型组合筛选。点击搜索结果可直接跳转到对应对话的对应位置。';
+    hint.textContent = t('search.startHint');
     empty.appendChild(hint);
 
     container.appendChild(empty);
@@ -594,7 +596,7 @@ export class SearchPanel {
 
     const text = document.createElement('div');
     text.style.cssText = 'font-size:0.95rem;text-align:center;';
-    text.textContent = '没有找到匹配的内容，试试换个关键词？';
+    text.textContent = t('search.tryAgain');
     empty.appendChild(text);
 
     container.appendChild(empty);
@@ -604,8 +606,8 @@ export class SearchPanel {
     const input = document.createElement('input');
     input.type = 'date';
     input.id = id;
+    input.setAttribute('aria-label', placeholder);
     input.className = 'search-filter-control';
-    if (placeholder) input.setAttribute('aria-label', placeholder);
     input.style.cssText = `
       padding: 10px 12px;
       background: var(--surface-inset);
@@ -621,8 +623,8 @@ export class SearchPanel {
   _createSelect(id, options, ariaLabel) {
     const select = document.createElement('select');
     select.id = id;
+    select.setAttribute('aria-label', ariaLabel);
     select.className = 'search-filter-control';
-    if (ariaLabel) select.setAttribute('aria-label', ariaLabel);
     select.style.cssText = `
       padding: 10px 12px;
       background: var(--surface-inset);

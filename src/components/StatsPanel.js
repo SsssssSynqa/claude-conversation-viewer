@@ -3,16 +3,21 @@
  */
 
 import { state, resetSidebarFilter } from '../store/state.js';
-import { drawLineChart, drawBarChart } from '../utils/charts.js';
+import { drawAreaComparisonChart, drawLineChart, drawRadialActivityChart } from '../utils/charts.js';
+import { mountInteractiveCanvasChart } from '../utils/chartInteraction.js';
 import { formatMonthKey, formatMonthLabel, formatTimestamp, formatLocalDateStamp, getHourOfDay } from '../utils/time.js';
 import html2canvas from 'html2canvas';
 import { desensitize } from '../utils/desensitize.js';
 import { createIcon } from '../utils/icons.js';
-import { t } from '../i18n.js';
+import { getLang, t } from '../i18n.js';
+import { extractEmojis } from '../utils/textStats.js';
 
 export class StatsPanel {
   constructor() {
     this.overlay = null;
+    this._chartControllers = [];
+    this._overlayTrigger = null;
+    this._overlayKeydown = null;
   }
 
   toggle() {
@@ -24,6 +29,8 @@ export class StatsPanel {
     const conversations = state.get('conversations') || [];
     if (conversations.length === 0) return;
     const stats = this.computeStats(conversations);
+    this._destroyCharts();
+    container.scrollTop = 0;
     container.textContent = '';
     container.classList.remove('content-shell');
     container.classList.add('content-area', 'stats-panel-shell');
@@ -39,19 +46,58 @@ export class StatsPanel {
     const conversations = state.get('conversations') || [];
     if (conversations.length === 0) return;
     const stats = this.computeStats(conversations);
+    this._destroyCharts();
     this.overlay = document.createElement('div');
+    this._overlayTrigger = document.activeElement;
+    this.overlay.setAttribute('role', 'dialog');
+    this.overlay.setAttribute('aria-modal', 'true');
+    this.overlay.setAttribute('aria-label', t('stats.title'));
     this.overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:900;overflow-y:auto;padding:40px 20px;';
     this.overlay.addEventListener('click', (e) => { if (e.target === this.overlay) this.hide(); });
     const panel = document.createElement('div');
     panel.className = 'stats-panel-overlay';
+    panel.tabIndex = -1;
     panel.style.cssText = 'max-width:860px;margin:0 auto;background:var(--bg-card);border-radius:var(--radius-lg);padding:32px;box-shadow:var(--shadow);';
     this.buildStatsContent(panel, stats, conversations);
     this.overlay.appendChild(panel);
     document.body.appendChild(this.overlay);
+    this._overlayKeydown = (event) => {
+      if (event.key === 'Escape') {
+        this.hide();
+        return;
+      }
+      if (event.key !== 'Tab') return;
+      const focusable = [...panel.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')]
+        .filter(element => !element.disabled && !element.hidden);
+      if (focusable.length === 0) {
+        event.preventDefault();
+        panel.focus();
+        return;
+      }
+      const first = focusable[0];
+      const last = focusable.at(-1);
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+    document.addEventListener('keydown', this._overlayKeydown);
+    panel.focus();
   }
 
   hide() {
-    if (this.overlay) { this.overlay.remove(); this.overlay = null; }
+    if (this._overlayKeydown) document.removeEventListener('keydown', this._overlayKeydown);
+    this._overlayKeydown = null;
+    if (this.overlay) {
+      this._destroyCharts();
+      this.overlay.remove();
+      this.overlay = null;
+    }
+    if (this._overlayTrigger?.isConnected) this._overlayTrigger.focus();
+    this._overlayTrigger = null;
   }
 
   buildStatsContent(parent, stats, conversations) {
@@ -60,28 +106,27 @@ export class StatsPanel {
     // Title row with screenshot button
     const titleRow = document.createElement('div');
     titleRow.className = 'stats-title-row';
-    titleRow.style.cssText = 'display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;';
 
-    const title = document.createElement('h2');
+    const title = document.createElement('h1');
     title.className = 'stats-title';
-    title.style.cssText = 'font-family:var(--font-display);font-size:1.5rem;font-weight:400;color:var(--text-primary);display:flex;align-items:center;gap:10px;';
     const mainDot = document.createElement('span');
-    mainDot.style.cssText = 'width:10px;height:10px;border-radius:50%;background:var(--accent);box-shadow:inset 1px 1px 2px rgba(255,255,255,0.4),0 0 8px rgba(217,118,87,0.4);flex-shrink:0;';
+    mainDot.className = 'stats-title-mark';
     title.appendChild(mainDot);
     title.appendChild(document.createTextNode(t('stats.title')));
     titleRow.appendChild(title);
 
     const screenshotBtn = document.createElement('button');
+    screenshotBtn.type = 'button';
     screenshotBtn.className = 'stats-screenshot-btn';
-    screenshotBtn.style.cssText = 'padding:6px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);background:transparent;color:var(--text-secondary);cursor:pointer;font-size:12px;transition:all 0.15s;white-space:nowrap;display:flex;align-items:center;gap:4px;';
     screenshotBtn.appendChild(createIcon('save', 14));
     screenshotBtn.appendChild(document.createTextNode(t('stats.saveImage')));
-    screenshotBtn.addEventListener('mouseenter', () => { screenshotBtn.style.borderColor = 'var(--accent)'; screenshotBtn.style.color = 'var(--accent)'; });
-    screenshotBtn.addEventListener('mouseleave', () => { screenshotBtn.style.borderColor = 'var(--border)'; screenshotBtn.style.color = 'var(--text-secondary)'; });
     screenshotBtn.addEventListener('click', async () => {
       screenshotBtn.textContent = t('stats.saving');
       screenshotBtn.disabled = true;
       try {
+        this._chartControllers.forEach(controller => controller.setExporting(true));
+        parent.classList.add('is-exporting');
+        await new Promise(resolve => requestAnimationFrame(resolve));
         const canvas = await html2canvas(parent, {
           backgroundColor: getComputedStyle(document.body).backgroundColor,
           scale: 2,
@@ -94,8 +139,11 @@ export class StatsPanel {
         screenshotBtn.textContent = t('stats.imageSaved');
         setTimeout(() => { screenshotBtn.textContent = ''; screenshotBtn.appendChild(createIcon('save', 14)); screenshotBtn.appendChild(document.createTextNode(t('stats.saveImage'))); screenshotBtn.disabled = false; }, 1500);
       } catch (e) {
-        screenshotBtn.textContent = '截图失败';
+        screenshotBtn.textContent = t('stats.captureFailed');
         setTimeout(() => { screenshotBtn.textContent = ''; screenshotBtn.appendChild(createIcon('save', 14)); screenshotBtn.appendChild(document.createTextNode(t('stats.saveImage'))); screenshotBtn.disabled = false; }, 1500);
+      } finally {
+        parent.classList.remove('is-exporting');
+        this._chartControllers.forEach(controller => controller.setExporting(false));
       }
     });
     titleRow.appendChild(screenshotBtn);
@@ -105,7 +153,6 @@ export class StatsPanel {
     // ---- Basic Stats Cards (floating directly on background, no outer wrapper) ----
     const cardsGrid = document.createElement('div');
     cardsGrid.className = 'stats-card-grid';
-    cardsGrid.style.cssText = 'display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:14px;';
 
     // Row 1: 4 basic counts (matching Figma layout)
     const row1Stats = [
@@ -115,23 +162,23 @@ export class StatsPanel {
       { label: t('stats.thinkingTime'), value: this.formatMs(stats.totalThinkingMs) },
     ];
 
-    for (const s of row1Stats) {
+    row1Stats.forEach((s, index) => {
       const card = this._neuCard();
-      card.classList.add('stats-metric-card');
+      card.classList.add('stats-metric-card', 'stats-primary-metric', `stats-primary-metric-${index + 1}`);
       const label = document.createElement('div');
       label.className = 'stats-card-label';
-      label.style.cssText = 'font-size:0.75rem;color:var(--text-muted);margin-bottom:8px;';
       label.textContent = s.label;
       card.appendChild(label);
       const val = document.createElement('div');
       val.className = 'stats-card-value';
-      val.style.cssText = 'font-size:1.8rem;font-weight:800;color:var(--text-primary);letter-spacing:-0.5px;';
       val.textContent = String(s.value);
       card.appendChild(val);
       cardsGrid.appendChild(card);
-    }
+    });
 
     // Row 2: 2 wider word count cards with percentage rings (span 2 cols each)
+    const wordCardsGrid = document.createElement('div');
+    wordCardsGrid.className = 'stats-word-card-grid';
     const totalChars = stats.totalAssistantChars + stats.totalHumanChars;
     const assistantPct = totalChars > 0 ? Math.round((stats.totalAssistantChars / totalChars) * 100) : 0;
     const humanPct = totalChars > 0 ? Math.round((stats.totalHumanChars / totalChars) * 100) : 0;
@@ -144,21 +191,15 @@ export class StatsPanel {
     for (const s of wordCountCards) {
       const card = this._neuCard();
       card.classList.add('stats-word-card');
-      card.style.gridColumn = 'span 2';
-      card.style.display = 'flex';
-      card.style.alignItems = 'center';
-      card.style.justifyContent = 'space-between';
 
       const textDiv = document.createElement('div');
       textDiv.className = 'stats-word-copy';
       const label = document.createElement('div');
       label.className = 'stats-card-label';
-      label.style.cssText = 'font-size:0.75rem;color:var(--text-muted);margin-bottom:8px;';
       label.textContent = s.label;
       textDiv.appendChild(label);
       const val = document.createElement('div');
       val.className = 'stats-card-value';
-      val.style.cssText = 'font-size:1.8rem;font-weight:800;color:var(--text-primary);letter-spacing:-0.5px;';
       val.textContent = s.value;
       textDiv.appendChild(val);
       card.appendChild(textDiv);
@@ -168,6 +209,8 @@ export class StatsPanel {
       const ringSize = isDark ? 150 : 140;
       const ringWrap = document.createElement('div');
       ringWrap.className = 'stats-ring';
+      ringWrap.setAttribute('role', 'img');
+      ringWrap.setAttribute('aria-label', `${s.label}: ${s.pct}%`);
       const grooveInset = isDark
         ? 'inset 6px 6px 12px rgba(0,0,0,0.42), inset -4px -4px 8px rgba(255,255,255,0.02)'
         : 'inset 5px 5px 10px rgba(163,177,198,0.28), inset -5px -5px 10px rgba(255,255,255,0.8)';
@@ -214,6 +257,7 @@ export class StatsPanel {
           stroke-dasharray="${circ}" stroke-dashoffset="${dashOffset}" filter="url(#glow-${uid})"
           transform="translate(${isDark ? '-1.5' : '-1.2'},${isDark ? '-1.5' : '-1.2'})" opacity="${isDark ? '0.5' : '0.65'}"/>
       </svg>`;
+      ringSvg.firstElementChild.setAttribute('aria-hidden', 'true');
       ringWrap.appendChild(ringSvg.firstElementChild);
 
       // Center hole
@@ -229,10 +273,13 @@ export class StatsPanel {
       ringWrap.appendChild(hole);
       card.appendChild(ringWrap);
 
-      cardsGrid.appendChild(card);
+      wordCardsGrid.appendChild(card);
     }
+    parent.appendChild(cardsGrid);
 
     // Row 3: 4 more stats
+    const secondaryGrid = document.createElement('div');
+    secondaryGrid.className = 'stats-secondary-grid';
     const row3Stats = [
       { label: t('stats.timeSpan'), value: stats.daySpan },
       { label: t('stats.longestStreak'), value: stats.longestStreak },
@@ -242,30 +289,28 @@ export class StatsPanel {
 
     for (const s of row3Stats) {
       const card = this._neuCard();
-      card.classList.add('stats-metric-card');
+      card.classList.add('stats-metric-card', 'stats-secondary-metric');
       const label = document.createElement('div');
       label.className = 'stats-card-label';
-      label.style.cssText = 'font-size:0.75rem;color:var(--text-muted);margin-bottom:8px;';
       label.textContent = s.label;
       card.appendChild(label);
       const val = document.createElement('div');
       val.className = 'stats-card-value';
-      val.style.cssText = 'font-size:1.8rem;font-weight:800;color:var(--text-primary);letter-spacing:-0.5px;';
       val.textContent = String(s.value);
       card.appendChild(val);
-      cardsGrid.appendChild(card);
+      secondaryGrid.appendChild(card);
     }
 
-    parent.appendChild(cardsGrid);
+    parent.appendChild(secondaryGrid);
+    parent.appendChild(wordCardsGrid);
 
     // ---- First & Last Conversation (cards float directly) ----
     if (stats.firstConv && stats.lastConv) {
       const milestoneRow = document.createElement('div');
       milestoneRow.className = 'stats-milestone-grid';
-      milestoneRow.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;';
 
-      milestoneRow.appendChild(this._milestoneCard(t('stats.firstConv'), stats.firstConv.name || '未命名', formatTimestamp(stats.firstConv.createdAt)));
-      milestoneRow.appendChild(this._milestoneCard(t('stats.latestConv'), stats.lastConv.name || '未命名', formatTimestamp(stats.lastConv.createdAt)));
+      milestoneRow.appendChild(this._milestoneCard(t('stats.firstConv'), stats.firstConv.name || t('stats.unnamed'), formatTimestamp(stats.firstConv.createdAt)));
+      milestoneRow.appendChild(this._milestoneCard(t('stats.latestConv'), stats.lastConv.name || t('stats.unnamed'), formatTimestamp(stats.lastConv.createdAt)));
 
       parent.appendChild(milestoneRow);
     }
@@ -275,33 +320,36 @@ export class StatsPanel {
       parent.appendChild(this._sectionTitle(t('stats.yearOverview')));
       const yearGrid = document.createElement('div');
       yearGrid.className = 'stats-year-grid';
-      yearGrid.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:14px;';
       for (const yr of stats.yearlyData) {
         const card = this._neuCard();
+        card.classList.add('stats-year-card');
         const yearLabel = document.createElement('div');
-        yearLabel.style.cssText = 'font-size:1.2rem;font-weight:700;color:var(--accent);margin-bottom:10px;';
+        yearLabel.className = 'stats-year-label';
         yearLabel.textContent = yr.year + t('stats.year');
         card.appendChild(yearLabel);
+        const yearData = document.createElement('div');
+        yearData.className = 'stats-year-data';
         const rows = [
           [t('stats.yearConvs'), yr.convCount],
           [t('stats.yearMsgs'), yr.msgCount.toLocaleString()],
           [t('stats.yearWords'), (yr.humanChars + yr.assistantChars).toLocaleString()],
-          [t('stats.yearDays'), yr.activeDays + ' 天'],
+          [t('stats.yearDays'), t('stats.days', { n: yr.activeDays })],
           [t('stats.yearThinking'), yr.thinkingCount.toLocaleString()],
         ];
         for (const [label, value] of rows) {
           const row = document.createElement('div');
-          row.style.cssText = 'display:flex;justify-content:space-between;font-size:0.8rem;padding:3px 0;';
+          row.className = 'stats-year-row';
           const l = document.createElement('span');
-          l.style.color = 'var(--text-muted)';
+          l.className = 'stats-year-key';
           l.textContent = label;
           row.appendChild(l);
           const v = document.createElement('span');
-          v.style.cssText = 'color:var(--text-primary);font-weight:500;';
+          v.className = 'stats-year-value';
           v.textContent = value;
           row.appendChild(v);
-          card.appendChild(row);
+          yearData.appendChild(row);
         }
+        card.appendChild(yearData);
         yearGrid.appendChild(card);
       }
       parent.appendChild(yearGrid);
@@ -335,7 +383,7 @@ export class StatsPanel {
       const name = document.createElement('span');
       name.className = 'stats-rank-name';
       name.style.cssText = 'color:var(--text-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;margin-right:12px;';
-      name.textContent = (i + 1) + '. ' + (conv.name || '未命名');
+      name.textContent = (i + 1) + '. ' + (conv.name || t('stats.unnamed'));
       item.appendChild(name);
       const count = document.createElement('span');
       count.className = 'stats-rank-count';
@@ -376,12 +424,12 @@ export class StatsPanel {
         const name = document.createElement('span');
         name.className = 'stats-rank-name';
         name.style.cssText = 'color:var(--text-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;margin-right:12px;';
-        name.textContent = '\uD83C\uDF19 ' + (item.name || '未命名');
+        name.textContent = '\uD83C\uDF19 ' + (item.name || t('stats.unnamed'));
         row.appendChild(name);
         const count = document.createElement('span');
         count.className = 'stats-rank-count';
         count.style.cssText = 'color:var(--text-muted);white-space:nowrap;';
-        count.textContent = item.lateCount + ' 条深夜消息';
+        count.textContent = t('stats.lateNightMessages', { n: item.lateCount });
         row.appendChild(count);
         nightCard.appendChild(row);
       }
@@ -391,49 +439,42 @@ export class StatsPanel {
     parent.appendChild(this._sectionTitle(t('stats.rhythm')));
     const rhythmSection = document.createElement('div');
     rhythmSection.className = 'stats-rhythm-section';
-    rhythmSection.style.cssText = 'margin-bottom:24px;';
 
     // ---- Weekday + Monthly Line Chart side by side ----
     const activityRow = document.createElement('div');
     activityRow.className = 'stats-activity-grid';
-    activityRow.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;';
 
-    // Weekday: neumorphic groove bars (slot track + pill inside)
+    // Weekday: horizontal meters make the seven-day comparison readable at a glance.
     const weekdayCard = this._neuCard();
     weekdayCard.classList.add('stats-chart-card');
-    weekdayCard.style.cssText += 'background:var(--surface-soft);box-shadow:var(--shadow-xs);';
     const weekdayTitle = document.createElement('div');
-    weekdayTitle.style.cssText = 'font-size:0.85rem;font-weight:600;color:var(--text-primary);margin-bottom:16px;';
-    weekdayTitle.textContent = '星期几最爱聊天';
+    weekdayTitle.className = 'stats-chart-title';
+    weekdayTitle.textContent = t('stats.favoriteWeekday');
     weekdayCard.appendChild(weekdayTitle);
     const weekdayBar = document.createElement('div');
     weekdayBar.className = 'stats-weekday-bars';
-    weekdayBar.style.cssText = 'display:flex;gap:22px;justify-content:center;height:170px;';
-    const weekdays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+    const weekdays = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'].map(day => t(`stats.weekday.${day}`));
     const maxWeekday = Math.max(...stats.weekdayActivity, 1);
-    const trackH = 140;
     for (let d = 0; d < 7; d++) {
       const col = document.createElement('div');
-      col.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:6px;';
-      // Groove track — Syner's neumorphic physics
-      const track = document.createElement('div');
-      track.style.cssText = `width:24px;height:${trackH}px;border-radius:20px;`
-        + 'background:var(--bg-card);box-shadow:var(--shadow-inset);'
-        + 'display:flex;align-items:flex-end;padding:4px;box-sizing:border-box;';
-      // Data pill — Syner's glossy capsule: diagonal gradient + outer shadow + inner highlight
-      const pct = Math.max(8, (stats.weekdayActivity[d] / maxWeekday) * 100);
-      const fill = document.createElement('div');
-      fill.style.cssText = `width:100%;height:${pct}%;border-radius:16px;transition:height 0.3s ease;`
-        + 'background:linear-gradient(145deg, #ea9d85, #D97657);'
-        + 'box-shadow:2px 2px 5px rgba(163,177,198,0.4),'
-        + 'inset 2px 2px 4px rgba(255,255,255,0.5);';
-      fill.title = stats.weekdayActivity[d] + ' 条消息';
-      track.appendChild(fill);
-      col.appendChild(track);
+      col.className = 'stats-weekday-column';
       const label = document.createElement('div');
-      label.style.cssText = 'font-size:0.65rem;color:var(--text-muted);';
+      label.className = 'stats-axis-label stats-weekday-label';
       label.textContent = weekdays[d];
       col.appendChild(label);
+      const track = document.createElement('div');
+      track.className = 'stats-weekday-track';
+      const pct = Math.max(5, (stats.weekdayActivity[d] / maxWeekday) * 100);
+      const fill = document.createElement('div');
+      fill.className = 'stats-weekday-fill';
+      fill.style.setProperty('--bar-scale', String(pct / 100));
+      fill.title = t('stats.messages', { n: stats.weekdayActivity[d] });
+      track.appendChild(fill);
+      col.appendChild(track);
+      const count = document.createElement('div');
+      count.className = 'stats-weekday-count';
+      count.textContent = stats.weekdayActivity[d].toLocaleString();
+      col.appendChild(count);
       weekdayBar.appendChild(col);
     }
     weekdayCard.appendChild(weekdayBar);
@@ -443,20 +484,36 @@ export class StatsPanel {
     if (stats.monthlyData.labels.length > 1) {
       const chartCard1 = this._neuCard();
       chartCard1.classList.add('stats-chart-card');
-      chartCard1.style.cssText += 'background:var(--surface-soft);box-shadow:var(--shadow-xs);';
       const chartTitle1 = document.createElement('div');
-      chartTitle1.style.cssText = 'font-size:0.85rem;font-weight:600;color:var(--text-primary);margin-bottom:12px;';
-      chartTitle1.textContent = '每月对话频率';
+      chartTitle1.className = 'stats-chart-title';
+      chartTitle1.textContent = t('stats.monthlyFrequency');
       chartCard1.appendChild(chartTitle1);
       const canvas1 = document.createElement('canvas');
       canvas1.className = 'stats-line-chart';
-      canvas1.style.cssText = 'width:100%;height:180px;';
-      chartCard1.appendChild(canvas1);
+      const stage1 = document.createElement('div');
+      stage1.className = 'stats-chart-stage';
+      stage1.appendChild(canvas1);
+      chartCard1.appendChild(stage1);
       activityRow.appendChild(chartCard1);
       rhythmSection.appendChild(activityRow);
-      requestAnimationFrame(() => {
-        drawLineChart(canvas1, { labels: stats.monthlyData.labels, values: stats.monthlyData.convCounts }, {});
+      const monthlyFrequencyController = mountInteractiveCanvasChart({
+        stage: stage1,
+        canvas: canvas1,
+        title: t('stats.monthlyFrequency'),
+        itemCount: stats.monthlyData.labels.length,
+        draw: activeIndex => drawLineChart(
+          canvas1,
+          { labels: stats.monthlyData.labels, values: stats.monthlyData.convCounts },
+          { color: this._cssVar('--stats-trend'), activeIndex },
+        ),
+        formatTooltip: index => ({
+          title: formatMonthLabel(stats.monthlyData.keys[index]),
+          lines: [{ label: t('stats.conversationCount'), value: t('stats.conversations', { n: stats.monthlyData.convCounts[index].toLocaleString() }) }],
+        }),
+        tableHeaders: [t('stats.month'), t('stats.conversationCount')],
+        tableRows: stats.monthlyData.keys.map((key, index) => [formatMonthLabel(key), t('stats.conversations', { n: stats.monthlyData.convCounts[index] })]),
       });
+      this._chartControllers.push(monthlyFrequencyController);
     } else {
       rhythmSection.appendChild(activityRow);
     }
@@ -465,36 +522,43 @@ export class StatsPanel {
     if (stats.hourlyActivity.some(v => v > 0)) {
       const hourCard = this._neuCard();
       hourCard.classList.add('stats-chart-card');
-      hourCard.style.cssText += 'background:var(--surface-soft);box-shadow:var(--shadow-xs);margin-bottom:14px;';
+      hourCard.classList.add('stats-hour-card');
       const hourTitle = document.createElement('div');
-      hourTitle.style.cssText = 'font-size:0.85rem;font-weight:600;color:var(--text-primary);margin-bottom:16px;';
-      hourTitle.textContent = '每日活跃时段';
+      hourTitle.className = 'stats-chart-title';
+      hourTitle.textContent = t('stats.hourlyActivity');
       hourCard.appendChild(hourTitle);
-      const heatmap = document.createElement('div');
-      heatmap.className = 'stats-hour-heatmap';
-      heatmap.style.cssText = 'display:grid;grid-template-columns:repeat(12,1fr);grid-template-rows:repeat(2,1fr);gap:4px;margin-bottom:8px;';
-      const maxHour = Math.max(...stats.hourlyActivity);
-      for (let h = 0; h < 24; h++) {
-        const cell = document.createElement('div');
-        const intensity = maxHour > 0 ? stats.hourlyActivity[h] / maxHour : 0;
-        cell.style.cssText = `aspect-ratio:1;border-radius:8px;background:var(--accent);opacity:${Math.max(0.06, intensity * 0.85)};transition:opacity 0.15s;`;
-        cell.title = `${h}:00 — ${stats.hourlyActivity[h]} 条消息`;
-        cell.addEventListener('mouseenter', () => cell.style.opacity = '1');
-        cell.addEventListener('mouseleave', () => cell.style.opacity = String(Math.max(0.06, intensity * 0.85)));
-        heatmap.appendChild(cell);
-      }
-      hourCard.appendChild(heatmap);
-      const hourLabels = document.createElement('div');
-      hourLabels.className = 'stats-hour-labels';
-      hourLabels.style.cssText = 'display:grid;grid-template-columns:repeat(12,1fr);gap:4px;';
-      for (let h = 0; h < 24; h += 2) {
-        const label = document.createElement('div');
-        label.style.cssText = 'text-align:center;font-size:0.6rem;color:var(--text-muted);';
-        label.textContent = h % 6 === 0 ? h + ':00' : '';
-        hourLabels.appendChild(label);
-      }
-      hourCard.appendChild(hourLabels);
+      const activityClock = document.createElement('canvas');
+      activityClock.className = 'stats-hour-clock';
+      const peakHour = stats.hourlyActivity.indexOf(Math.max(...stats.hourlyActivity));
+      const stage2 = document.createElement('div');
+      stage2.className = 'stats-chart-stage stats-hour-stage';
+      stage2.appendChild(activityClock);
+      hourCard.appendChild(stage2);
       rhythmSection.appendChild(hourCard);
+      const hourlyController = mountInteractiveCanvasChart({
+        stage: stage2,
+        canvas: activityClock,
+        title: t('stats.hourlyActivityPeak', { hour: peakHour }),
+        itemCount: 24,
+        draw: activeIndex => drawRadialActivityChart(activityClock, stats.hourlyActivity, {
+          color: this._cssVar('--stats-human'),
+          activeIndex,
+          markerNames: [t('stats.nightMarker'), t('stats.morningMarker'), t('stats.noonMarker'), t('stats.eveningMarker')],
+          peakLabel: t('stats.activePeak'),
+          currentLabel: t('stats.currentPeriod'),
+          valueFormatter: value => t('stats.messages', { n: value.toLocaleString() }),
+        }),
+        formatTooltip: hour => ({
+          title: `${String(hour).padStart(2, '0')}:00–${String((hour + 1) % 24).padStart(2, '0')}:00`,
+          lines: [{ label: t('stats.messageCount'), value: t('stats.messages', { n: stats.hourlyActivity[hour].toLocaleString() }) }],
+        }),
+        tableHeaders: [t('stats.period'), t('stats.messageCount')],
+        tableRows: stats.hourlyActivity.map((value, hour) => [
+          `${String(hour).padStart(2, '0')}:00–${String((hour + 1) % 24).padStart(2, '0')}:00`,
+          t('stats.messages', { n: value }),
+        ]),
+      });
+      this._chartControllers.push(hourlyController);
     }
 
     // ---- Monthly Word Count (own row) ----
@@ -502,68 +566,63 @@ export class StatsPanel {
 
       const chartCard2 = this._neuCard();
       chartCard2.classList.add('stats-chart-card');
-      chartCard2.style.cssText += 'background:var(--surface-soft);box-shadow:var(--shadow-xs);';
       const chartTitle2 = document.createElement('div');
-      chartTitle2.style.cssText = 'font-size:0.85rem;font-weight:600;color:var(--text-primary);margin-bottom:12px;';
-      chartTitle2.textContent = '每月字数';
+      chartTitle2.className = 'stats-chart-title';
+      chartTitle2.textContent = t('stats.monthlyWords');
       chartCard2.appendChild(chartTitle2);
 
-      // DOM neumorphic grouped bar chart — Syner's physics
-      const hVals = stats.monthlyData.humanChars;
-      const aVals = stats.monthlyData.assistantChars;
-      const maxWordVal = Math.max(...hVals, ...aVals, 1);
-      const barRow = document.createElement('div');
-      barRow.className = 'stats-monthly-bars';
-      barRow.style.cssText = 'display:flex;justify-content:space-between;align-items:flex-end;height:200px;padding:0 10px;';
-      const trackH = 170;
-      stats.monthlyData.labels.forEach((lbl, i) => {
-        const grp = document.createElement('div');
-        grp.className = 'stats-monthly-bar-group';
-        grp.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:6px;flex:1;';
-        const pair = document.createElement('div');
-        pair.style.cssText = 'display:flex;gap:4px;align-items:flex-end;justify-content:center;';
-        // Human (purple) track + pill
-        const t1 = document.createElement('div');
-        t1.style.cssText = `width:18px;height:${trackH}px;border-radius:9px;background:var(--bg-primary);`
-          + 'box-shadow:inset 3px 3px 6px rgba(163,177,198,0.5),inset -3px -3px 6px rgba(255,255,255,0.7);'
-          + 'display:flex;align-items:flex-end;padding:2px;box-sizing:border-box;';
-        const pct1 = Math.max(4, (hVals[i] / maxWordVal) * 100);
-        const f1 = document.createElement('div');
-        f1.style.cssText = `width:100%;height:${pct1}%;border-radius:7px;`
-          + 'background:linear-gradient(145deg,#9b8ff0,#7c6eea);'
-          + 'box-shadow:1px 1px 4px rgba(163,177,198,0.4),inset 1px 1px 2px rgba(255,255,255,0.5);';
-        f1.title = `${names.human || 'Human'}: ${hVals[i].toLocaleString()} 字`;
-        t1.appendChild(f1);
-        // Assistant (orange) track + pill
-        const t2 = document.createElement('div');
-        t2.style.cssText = `width:18px;height:${trackH}px;border-radius:9px;background:var(--bg-primary);`
-          + 'box-shadow:inset 3px 3px 6px rgba(163,177,198,0.5),inset -3px -3px 6px rgba(255,255,255,0.7);'
-          + 'display:flex;align-items:flex-end;padding:2px;box-sizing:border-box;';
-        const pct2 = Math.max(4, (aVals[i] / maxWordVal) * 100);
-        const f2 = document.createElement('div');
-        f2.style.cssText = `width:100%;height:${pct2}%;border-radius:7px;`
-          + 'background:linear-gradient(145deg,#ea9d85,#D97657);'
-          + 'box-shadow:1px 1px 4px rgba(163,177,198,0.4),inset 1px 1px 2px rgba(255,255,255,0.5);';
-        f2.title = `${names.assistant || 'Assistant'}: ${aVals[i].toLocaleString()} 字`;
-        t2.appendChild(f2);
-        pair.appendChild(t1);
-        pair.appendChild(t2);
-        grp.appendChild(pair);
-        const lab = document.createElement('div');
-        lab.style.cssText = 'font-size:0.65rem;color:var(--text-muted);white-space:nowrap;';
-        lab.textContent = lbl;
-        grp.appendChild(lab);
-        barRow.appendChild(grp);
-      });
-      chartCard2.appendChild(barRow);
+      const canvas2 = document.createElement('canvas');
+      canvas2.className = 'stats-comparison-chart';
+      const stage3 = document.createElement('div');
+      stage3.className = 'stats-chart-stage';
+      stage3.appendChild(canvas2);
+      chartCard2.appendChild(stage3);
       // Legend
       const legend = document.createElement('div');
       legend.className = 'stats-chart-legend';
-      legend.style.cssText = 'display:flex;justify-content:center;gap:16px;margin-top:8px;font-size:0.65rem;color:var(--text-muted);';
-      legend.innerHTML = `<span style="display:flex;align-items:center;gap:4px;"><span style="width:8px;height:8px;border-radius:50%;background:#7c6eea;display:inline-block;"></span>${names.human || 'Human'}</span>`
-        + `<span style="display:flex;align-items:center;gap:4px;"><span style="width:8px;height:8px;border-radius:50%;background:#D97657;display:inline-block;"></span>${names.assistant || 'Assistant'}</span>`;
+      for (const [className, label] of [
+        ['stats-legend-human', names.human || 'Human'],
+        ['stats-legend-assistant', names.assistant || 'Assistant'],
+      ]) {
+        const item = document.createElement('span');
+        const swatch = document.createElement('i');
+        swatch.className = `stats-legend-swatch ${className}`;
+        swatch.setAttribute('aria-hidden', 'true');
+        item.appendChild(swatch);
+        item.appendChild(document.createTextNode(label));
+        legend.appendChild(item);
+      }
       chartCard2.appendChild(legend);
       rhythmSection.appendChild(chartCard2);
+      const monthlyWordsData = {
+        labels: stats.monthlyData.labels,
+        series: [
+          { name: names.human || 'Human', values: stats.monthlyData.humanChars, color: this._cssVar('--stats-human') },
+          { name: names.assistant || 'Assistant', values: stats.monthlyData.assistantChars, color: this._cssVar('--stats-assistant') },
+        ],
+      };
+      const monthlyWordsController = mountInteractiveCanvasChart({
+        stage: stage3,
+        canvas: canvas2,
+        title: t('stats.monthlyWords'),
+        itemCount: stats.monthlyData.labels.length,
+        draw: activeIndex => drawAreaComparisonChart(canvas2, monthlyWordsData, { activeIndex }),
+        formatTooltip: index => ({
+          title: formatMonthLabel(stats.monthlyData.keys[index]),
+          lines: monthlyWordsData.series.map(series => ({
+            label: series.name,
+            value: t('stats.words', { n: series.values[index].toLocaleString() }),
+            color: series.color,
+          })),
+        }),
+        tableHeaders: [t('stats.month'), t('stats.wordsColumn', { name: names.human || 'Human' }), t('stats.wordsColumn', { name: names.assistant || 'Assistant' })],
+        tableRows: stats.monthlyData.keys.map((key, index) => [
+          formatMonthLabel(key),
+          t('stats.words', { n: stats.monthlyData.humanChars[index] }),
+          t('stats.words', { n: stats.monthlyData.assistantChars[index] }),
+        ]),
+      });
+      this._chartControllers.push(monthlyWordsController);
     }
     parent.appendChild(rhythmSection);
 
@@ -572,13 +631,13 @@ export class StatsPanel {
       const wordTitleRow = document.createElement('div');
       wordTitleRow.className = 'stats-word-title-row';
       wordTitleRow.style.cssText = 'display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;';
-      const wordTitle = this._sectionTitle('高频词');
+      const wordTitle = this._sectionTitle(t('stats.topWords'));
       wordTitle.style.marginBottom = '14px';
       wordTitleRow.appendChild(wordTitle);
 
       const resetBtn = document.createElement('button');
       resetBtn.style.cssText = 'padding:3px 10px;border:1px solid var(--border);border-radius:4px;background:transparent;color:var(--text-muted);cursor:pointer;font-size:0.7rem;';
-      resetBtn.textContent = '重置隐藏';
+      resetBtn.textContent = t('stats.resetHidden');
       resetBtn.addEventListener('click', () => {
         localStorage.removeItem('cv-hidden-words');
         const empty = new Set();
@@ -599,8 +658,8 @@ export class StatsPanel {
 
       const humanCol = document.createElement('div');
       const humanLabel = document.createElement('div');
-      humanLabel.style.cssText = 'font-size:0.8rem;font-weight:600;color:var(--accent);margin-bottom:8px;text-align:center;';
-      humanLabel.textContent = (names.human || 'Human') + ' 的高频词';
+      humanLabel.style.cssText = 'font-size:0.8rem;font-weight:600;color:var(--accent-ink);margin-bottom:8px;text-align:center;';
+      humanLabel.textContent = t('stats.personTopWords', { name: names.human || 'Human' });
       humanCol.appendChild(humanLabel);
       const humanCloudContainer = document.createElement('div');
       this._renderWordCloud(humanCloudContainer, stats.topHumanWords, stats.allHumanWords, 'word');
@@ -610,7 +669,7 @@ export class StatsPanel {
       const assistantCol = document.createElement('div');
       const assistantLabel = document.createElement('div');
       assistantLabel.style.cssText = 'font-size:0.8rem;font-weight:600;color:var(--text-primary);margin-bottom:8px;text-align:center;';
-      assistantLabel.textContent = (names.assistant || 'Assistant') + ' 的高频词';
+      assistantLabel.textContent = t('stats.personTopWords', { name: names.assistant || 'Assistant' });
       assistantCol.appendChild(assistantLabel);
       const assistantCloudContainer = document.createElement('div');
       this._renderWordCloud(assistantCloudContainer, stats.topAssistantWords, stats.allAssistantWords, 'word');
@@ -623,7 +682,7 @@ export class StatsPanel {
 
     // ---- Emoji Ranking (in a raised card) ----
     if (stats.topEmojis.length > 0) {
-      parent.appendChild(this._sectionTitle('常用 Emoji'));
+      parent.appendChild(this._sectionTitle(t('stats.commonEmoji')));
       const emojiCard = this._neuCard();
       emojiCard.classList.add('stats-emoji-card');
       emojiCard.style.marginBottom = '14px';
@@ -632,13 +691,13 @@ export class StatsPanel {
       emojiRow.style.cssText = 'display:flex;flex-wrap:wrap;gap:12px;';
       for (const e of stats.topEmojis.slice(0, 15)) {
         const item = document.createElement('div');
-        item.style.cssText = 'text-align:center;';
+        item.className = 'stats-emoji-item';
         const emoji = document.createElement('div');
-        emoji.style.cssText = 'font-size:1.8rem;';
+        emoji.className = 'stats-emoji-glyph';
         emoji.textContent = e.emoji;
         item.appendChild(emoji);
         const count = document.createElement('div');
-        count.style.cssText = 'font-size:0.7rem;color:var(--text-muted);';
+        count.className = 'stats-emoji-count';
         count.textContent = e.count;
         item.appendChild(count);
         emojiRow.appendChild(item);
@@ -649,27 +708,24 @@ export class StatsPanel {
 
     // ---- Thinking Stats (cards float directly in grid) ----
     if (stats.totalThinkingCount > 0) {
-      parent.appendChild(this._sectionTitle('思考统计'));
+      parent.appendChild(this._sectionTitle(t('stats.thinkingStats')));
       const thinkGrid = document.createElement('div');
       thinkGrid.className = 'stats-think-grid';
-      thinkGrid.style.cssText = 'display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:14px;';
       const thinkStats = [
-        { label: '总思考次数', value: stats.totalThinkingCount.toLocaleString() + ' 次' },
-        { label: '累计思考时间', value: this.formatMs(stats.totalThinkingMs) },
-        { label: '最长单次思考', value: this.formatMs(stats.longestThinkingMs) },
-        { label: '平均思考时间', value: this.formatMs(stats.totalThinkingCount > 0 ? Math.round(stats.totalThinkingMs / stats.totalThinkingCount) : 0) },
+        { label: t('stats.totalThinking'), value: t('stats.times', { n: stats.totalThinkingCount.toLocaleString() }) },
+        { label: t('stats.totalThinkingTime'), value: this.formatMs(stats.totalThinkingMs) },
+        { label: t('stats.longestThinking'), value: this.formatMs(stats.longestThinkingMs) },
+        { label: t('stats.averageThinking'), value: this.formatMs(stats.totalThinkingCount > 0 ? Math.round(stats.totalThinkingMs / stats.totalThinkingCount) : 0) },
       ];
       for (const s of thinkStats) {
         const card = this._neuCard();
         card.classList.add('stats-thinking-card');
         const label = document.createElement('div');
         label.className = 'stats-card-label';
-        label.style.cssText = 'font-size:0.75rem;color:var(--text-muted);margin-bottom:8px;';
         label.textContent = s.label;
         card.appendChild(label);
         const val = document.createElement('div');
         val.className = 'stats-thinking-value';
-        val.style.cssText = 'font-size:1.2rem;font-weight:600;color:var(--thinking-text);';
         val.textContent = s.value;
         card.appendChild(val);
         thinkGrid.appendChild(card);
@@ -679,7 +735,7 @@ export class StatsPanel {
 
     // ---- Title Word Cloud (in a raised card) ----
     if (stats.topTitleWords.length > 0) {
-      parent.appendChild(this._sectionTitle('对话标题高频词'));
+      parent.appendChild(this._sectionTitle(t('stats.titleTopWords')));
       const titleCard = this._neuCard();
       titleCard.classList.add('stats-title-cloud-card');
       titleCard.style.marginBottom = '14px';
@@ -753,7 +809,7 @@ export class StatsPanel {
           if (block.type === 'text' && block.text) {
             const words = this._extractWords(block.text);
             for (const w of words) freqMap.set(w, (freqMap.get(w) || 0) + 1);
-            const emojis = this._extractEmojis(block.text);
+            const emojis = extractEmojis(block.text);
             for (const e of emojis) emojiFreq.set(e, (emojiFreq.get(e) || 0) + 1);
           }
         }
@@ -771,12 +827,16 @@ export class StatsPanel {
         deepNightConvs.push({ name: conv.name, lateCount, uuid: conv.uuid });
       }
 
+      // 没有有效创建时间的对话（formatMonthKey 返回 'unknown'）不进月度走势，
+      // 否则拆出 NaN 年月会让 Intl.DateTimeFormat 抛错，整块统计面板画不出来。
       const mk = formatMonthKey(conv.createdAt);
-      if (!monthlyMap.has(mk)) monthlyMap.set(mk, { convCount: 0, humanChars: 0, assistantChars: 0 });
-      const m = monthlyMap.get(mk);
-      m.convCount++;
-      m.humanChars += conv.stats.humanChars;
-      m.assistantChars += conv.stats.assistantChars;
+      if (mk !== 'unknown') {
+        if (!monthlyMap.has(mk)) monthlyMap.set(mk, { convCount: 0, humanChars: 0, assistantChars: 0 });
+        const m = monthlyMap.get(mk);
+        m.convCount++;
+        m.humanChars += conv.stats.humanChars;
+        m.assistantChars += conv.stats.assistantChars;
+      }
     }
 
     // Day span
@@ -791,7 +851,11 @@ export class StatsPanel {
     // Monthly data
     const monthKeys = [...monthlyMap.keys()].sort();
     const monthlyData = {
-      labels: monthKeys.map(k => { const [, m] = k.split('-'); return parseInt(m) + '月'; }),
+      keys: monthKeys,
+      labels: monthKeys.map(key => {
+        const [year, month] = key.split('-').map(Number);
+        return new Intl.DateTimeFormat(getLang() === 'en' ? 'en-US' : 'zh-CN', { month: 'short' }).format(new Date(year, month - 1, 1));
+      }),
       convCounts: monthKeys.map(k => monthlyMap.get(k).convCount),
       humanChars: monthKeys.map(k => monthlyMap.get(k).humanChars),
       assistantChars: monthKeys.map(k => monthlyMap.get(k).assistantChars),
@@ -882,7 +946,7 @@ export class StatsPanel {
     if (visibleWords.length === 0) {
       const empty = document.createElement('span');
       empty.style.cssText = 'color:var(--text-muted);font-size:0.85rem;';
-      empty.textContent = '全部隐藏了，点击"重置隐藏"恢复';
+      empty.textContent = t('stats.allHidden');
       container.appendChild(empty);
       return;
     }
@@ -890,23 +954,26 @@ export class StatsPanel {
     const maxFreq = visibleWords[0].count;
     for (const word of visibleWords) {
       const tag = document.createElement('span');
+      tag.className = 'stats-word-token-wrap';
       tag.style.cssText = 'display:inline-flex;align-items:center;gap:2px;position:relative;';
 
       const size = type === 'title'
-        ? 0.8 + (word.count / maxFreq) * 2
-        : 0.7 + (word.count / maxFreq) * 1.6;
-      const opacity = 0.5 + (word.count / maxFreq) * 0.5;
-
+        ? 0.76 + (word.count / maxFreq) * 0.82
+        : 0.72 + (word.count / maxFreq) * 0.68;
       const text = document.createElement('span');
-      text.style.cssText = `font-size:${size}rem;color:var(--accent);opacity:${opacity};padding:2px 4px;cursor:default;transition:opacity 0.15s;`;
+      text.className = 'stats-word-token';
+      text.style.cssText = `font-size:${size}rem;padding:2px 4px;cursor:default;`;
       text.textContent = word.text;
-      text.title = word.count + ' 次';
+      text.title = t('stats.times', { n: word.count });
       tag.appendChild(text);
 
       // Delete button (visible on hover)
-      const delBtn = document.createElement('span');
-      delBtn.style.cssText = 'font-size:0.6rem;color:var(--text-muted);cursor:pointer;opacity:0;transition:opacity 0.15s;padding:0 2px;vertical-align:super;';
+      const delBtn = document.createElement('button');
+      delBtn.type = 'button';
+      delBtn.className = 'stats-word-remove';
+      delBtn.style.cssText = 'border:0;background:transparent;font:inherit;font-size:0.6rem;color:var(--text-muted);cursor:pointer;padding:0 2px;vertical-align:super;';
       delBtn.textContent = '\u2715';
+      delBtn.setAttribute('aria-label', t('stats.hideWord', { word: word.text }));
       delBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         const hidden = this._loadHiddenWords();
@@ -917,9 +984,6 @@ export class StatsPanel {
         this._renderWordCloud(container, refreshed, allWords, type);
       });
       tag.appendChild(delBtn);
-
-      tag.addEventListener('mouseenter', () => { text.style.opacity = '1'; delBtn.style.opacity = '1'; });
-      tag.addEventListener('mouseleave', () => { text.style.opacity = String(opacity); delBtn.style.opacity = '0'; });
 
       container.appendChild(tag);
     }
@@ -948,16 +1012,14 @@ export class StatsPanel {
   _neuCard() {
     const el = document.createElement('div');
     el.className = 'stats-card';
-    el.style.cssText = 'background:var(--bg-card);border-radius:var(--radius-lg);padding:16px 18px;text-align:left;box-shadow:var(--shadow);';
     return el;
   }
 
   _sectionTitle(text) {
-    const el = document.createElement('h3');
+    const el = document.createElement('h2');
     el.className = 'stats-section-title';
-    el.style.cssText = 'font-size:1rem;font-weight:800;margin-bottom:16px;margin-top:24px;color:var(--text-primary);display:flex;align-items:center;gap:10px;letter-spacing:0.5px;';
     const dot = document.createElement('span');
-    dot.style.cssText = 'width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 6px rgba(217,118,87,0.4);flex-shrink:0;';
+    dot.className = 'stats-section-mark';
     el.appendChild(dot);
     const span = document.createElement('span');
     span.textContent = text;
@@ -970,26 +1032,26 @@ export class StatsPanel {
     card.classList.add('stats-milestone-card');
     const labelEl = document.createElement('div');
     labelEl.className = 'stats-card-label';
-    labelEl.style.cssText = 'font-size:0.7rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;';
     labelEl.textContent = label;
     card.appendChild(labelEl);
     const nameEl = document.createElement('div');
     nameEl.className = 'stats-milestone-name';
-    nameEl.style.cssText = 'font-size:0.9rem;font-weight:600;color:var(--text-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;';
     nameEl.textContent = name;
     card.appendChild(nameEl);
     const timeEl = document.createElement('div');
     timeEl.className = 'stats-milestone-time';
-    timeEl.style.cssText = 'font-size:0.75rem;color:var(--text-muted);margin-top:2px;';
     timeEl.textContent = time;
     card.appendChild(timeEl);
     return card;
   }
 
+  _cssVar(name) {
+    return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  }
+
   _buildHeatmapCalendar(dateHeatmap) {
     const container = document.createElement('div');
     container.className = 'stats-heatmap-scroll';
-    container.style.cssText = 'overflow-x:auto;padding-bottom:4px;';
 
     const dates = Object.keys(dateHeatmap).sort();
     if (dates.length === 0) return container;
@@ -1005,10 +1067,11 @@ export class StatsPanel {
 
     // Outer wrapper with weekday labels on the left
     const wrapper = document.createElement('div');
-    wrapper.style.cssText = 'display:flex;gap:4px;';
+    wrapper.className = 'stats-calendar-layout';
 
     // Weekday labels column
     const weekdayLabels = document.createElement('div');
+    weekdayLabels.className = 'stats-calendar-weekdays';
     weekdayLabels.style.cssText = `display:flex;flex-direction:column;gap:${GAP}px;justify-content:flex-start;padding-top:${CELL + GAP + 2}px;flex-shrink:0;`;
     for (let d = 0; d < 7; d++) {
       const label = document.createElement('div');
@@ -1020,12 +1083,14 @@ export class StatsPanel {
 
     // Grid area (month labels + cells)
     const gridArea = document.createElement('div');
-    gridArea.style.cssText = 'display:flex;flex-direction:column;';
+    gridArea.className = 'stats-calendar-grid-area';
 
     // Month labels row
     const monthRow = document.createElement('div');
+    monthRow.className = 'stats-calendar-months';
     monthRow.style.cssText = `display:flex;gap:${GAP}px;margin-bottom:4px;`;
-    const monthNames = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+    const monthFormatter = new Intl.DateTimeFormat(getLang() === 'en' ? 'en-US' : 'zh-CN', { month: 'short' });
+    const monthNames = Array.from({ length: 12 }, (_, month) => monthFormatter.format(new Date(2024, month, 1)));
 
     // Pre-calculate weeks and their months
     const weeks = [];
@@ -1057,27 +1122,23 @@ export class StatsPanel {
 
     // Cell grid
     const grid = document.createElement('div');
-    grid.style.cssText = `display:flex;gap:${GAP}px;`;
+    grid.className = 'stats-calendar-grid';
+    grid.style.gap = `${GAP}px`;
 
     for (const week of weeks) {
       const weekCol = document.createElement('div');
-      weekCol.style.cssText = `display:flex;flex-direction:column;gap:${GAP}px;`;
+      weekCol.className = 'stats-calendar-week';
+      weekCol.style.gap = `${GAP}px`;
 
       for (const cell of week.cells) {
         const el = document.createElement('div');
         const intensity = cell.count / maxCount;
         // Neumorphic physics levels: 0=deep inset, 1-4=increasing raised
         const level = cell.count === 0 ? 0 : intensity < 0.25 ? 1 : intensity < 0.5 ? 2 : intensity < 0.75 ? 3 : 4;
-        const isDark = document.documentElement.dataset.theme === 'dark';
-        const cellStyles = {
-          0: `background:var(--bg-card);box-shadow:var(--shadow-inset);`,
-          1: `background:#f1cfc2;box-shadow:${isDark ? 'none' : 'inset 2px 2px 4px rgba(165,178,196,0.3),inset -2px -2px 4px rgba(255,255,255,0.6)'};${isDark ? 'background:#4a3530;' : ''}`,
-          2: `background:#e6aa95;box-shadow:none;${isDark ? 'background:#6b4a3e;' : ''}`,
-          3: `background:#df8a6f;box-shadow:2px 2px 4px rgba(165,178,196,0.3),-2px -2px 4px rgba(255,255,255,0.5);${isDark ? 'background:#8a5a45;box-shadow:2px 2px 4px rgba(0,0,0,0.3),-2px -2px 4px rgba(255,255,255,0.03);' : ''}`,
-          4: `background:var(--accent);box-shadow:3px 3px 5px rgba(165,178,196,0.4),-2px -2px 5px rgba(255,255,255,0.6);transform:scale(1.05);z-index:2;${isDark ? 'box-shadow:3px 3px 5px rgba(0,0,0,0.4),-2px -2px 5px rgba(255,255,255,0.03);' : ''}`,
-        };
-        el.style.cssText = `width:${CELL}px;height:${CELL}px;border-radius:4px;transition:transform 0.2s;position:relative;${cellStyles[level]}`;
-        el.title = cell.dayKey + ': ' + cell.count + ' 条消息';
+        el.className = `stats-calendar-cell stats-calendar-level-${level}`;
+        el.style.width = `${CELL}px`;
+        el.style.height = `${CELL}px`;
+        el.title = `${cell.dayKey}: ${t('stats.messages', { n: cell.count })}`;
         weekCol.appendChild(el);
       }
       grid.appendChild(weekCol);
@@ -1087,20 +1148,24 @@ export class StatsPanel {
 
     // Legend
     const legend = document.createElement('div');
+    legend.className = 'stats-calendar-legend';
     legend.style.cssText = 'display:flex;align-items:center;gap:4px;margin-top:12px;justify-content:flex-start;font-size:0.55rem;color:var(--text-muted);font-weight:600;padding-left:26px;';
-    legend.appendChild(document.createTextNode('Less'));
-    const legendColors = ['var(--bg-card)', '#f1cfc2', '#e6aa95', '#df8a6f', 'var(--accent)'];
-    const legendShadows = ['var(--shadow-inset)', 'none', 'none', '1px 1px 3px rgba(165,178,196,0.3)', '2px 2px 4px rgba(165,178,196,0.3)'];
+    legend.appendChild(document.createTextNode(t('stats.less')));
     for (let i = 0; i < 5; i++) {
       const box = document.createElement('div');
-      box.style.cssText = `width:12px;height:12px;border-radius:3px;background:${legendColors[i]};box-shadow:${legendShadows[i]};`;
+      box.className = `stats-calendar-legend-cell stats-calendar-level-${i}`;
       legend.appendChild(box);
     }
-    legend.appendChild(document.createTextNode('More'));
+    legend.appendChild(document.createTextNode(t('stats.more')));
     gridArea.appendChild(legend);
 
     wrapper.appendChild(gridArea);
     container.appendChild(wrapper);
+    if (matchMedia('(max-width: 768px)').matches) {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => { container.scrollLeft = container.scrollWidth; });
+      });
+    }
     return container;
   }
 
@@ -1125,21 +1190,17 @@ export class StatsPanel {
     return [...chinese, ...english];
   }
 
-  _extractEmojis(text) {
-    const emojiRegex = /(\p{Emoji_Presentation}|\p{Extended_Pictographic})/gu;
-    const matches = text.match(emojiRegex) || [];
-    return matches;
-  }
-
   formatMs(ms) {
     if (!ms || ms <= 0) return '0';
     if (ms < 1000) return ms + 'ms';
     const seconds = ms / 1000;
     if (seconds < 60) return seconds.toFixed(1) + 's';
     const minutes = Math.floor(seconds / 60);
-    if (minutes < 60) return minutes + '分' + Math.floor(seconds % 60) + '秒';
+    if (minutes < 60) return getLang() === 'en'
+      ? `${minutes}m ${Math.floor(seconds % 60)}s`
+      : `${minutes}分${Math.floor(seconds % 60)}秒`;
     const hours = Math.floor(minutes / 60);
-    return hours + '小时' + (minutes % 60) + '分';
+    return getLang() === 'en' ? `${hours}h ${minutes % 60}m` : `${hours}小时${minutes % 60}分`;
   }
 
   _getLocalDayKey(date) {
@@ -1147,5 +1208,15 @@ export class StatsPanel {
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
+  }
+
+  _destroyCharts() {
+    this._chartControllers.forEach(controller => controller.destroy());
+    this._chartControllers = [];
+  }
+
+  destroy() {
+    this._destroyCharts();
+    this.hide();
   }
 }

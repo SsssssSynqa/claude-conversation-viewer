@@ -10,7 +10,7 @@
  *   - The quick-export menu is a native, keyboard-operable menu (open, arrow /
  *     Home / End navigation, Escape return-to-trigger, outside close).
  *   - The view/select toggle is a real switch that keeps focus after re-render.
- *   - Export options are native checkboxes with format-button aria-pressed and
+ *   - Export options are native checkboxes with format-radio aria-checked and
  *     real accessible names on the naming inputs.
  *
  * Synthetic data only. Not a security proof — the DOM shim is a test stand-in.
@@ -275,6 +275,11 @@ test('quick-export menu is a native keyboard menu', () => {
   assert.equal(trigger.attributes['aria-expanded'], 'false', 'Escape closes the menu');
   assert.equal(view.activeExportDropdown, null, 'active dropdown cleared');
   assert.equal(globalThis.document.activeElement, trigger, 'Escape returns focus to trigger');
+
+  keydownOn(trigger, 'ArrowUp');
+  assert.equal(trigger.attributes['aria-expanded'], 'true', 'ArrowUp opens the menu');
+  assert.equal(globalThis.document.activeElement, items[items.length - 1], 'ArrowUp enters the last item');
+  view.destroy();
 });
 
 test('quick-export outside click closes without stealing the new target focus', () => {
@@ -398,18 +403,21 @@ test('export options are native checkboxes with real labels and default state', 
   assert.equal(panel.options.includeToolUse, true, 'change event updates the option value');
 });
 
-test('export format buttons expose aria-pressed and naming inputs have accessible names', () => {
+test('export format radios expose aria-checked and naming inputs have accessible names', () => {
   const panel = new ExportPanel();
   const container = globalThis.document.createElement('div');
   panel.render(container);
 
   const fmtBtns = findByClass(container, 'export-format-btn');
   assert.equal(fmtBtns.length, 4);
-  assert.equal(fmtBtns[0].attributes['aria-pressed'], 'true', 'default format is pressed');
+  assert.ok(fmtBtns.every(b => b.attributes['role'] === 'radio'), 'format buttons are radios');
+  assert.equal(fmtBtns[0].attributes['aria-checked'], 'true', 'default format is checked');
+  assert.equal(fmtBtns[0].tabIndex, 0, 'checked radio is the tab stop');
+  assert.equal(fmtBtns[1].tabIndex, -1, 'unchecked radio is not in the tab order');
   fmtBtns[1].click();
   assert.equal(panel.format, 'txt', 'clicking updates the format');
-  assert.equal(fmtBtns[1].attributes['aria-pressed'], 'true', 'new format pressed');
-  assert.equal(fmtBtns[0].attributes['aria-pressed'], 'false', 'old format unpressed');
+  assert.equal(fmtBtns[1].attributes['aria-checked'], 'true', 'new format checked');
+  assert.equal(fmtBtns[0].attributes['aria-checked'], 'false', 'old format unchecked');
 
   const prefix = findByClass(container, 'export-mini-input')[0];
   const suffix = findByClass(container, 'export-mini-input')[1];

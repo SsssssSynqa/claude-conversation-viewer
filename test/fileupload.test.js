@@ -45,7 +45,8 @@ class El {
     };
   }
   querySelector(sel) {
-    if (sel === 'input') return this.children.find(c => c.tagName === 'INPUT') || new El('input');
+    // Plain tag selectors (input, label, ...) resolve by tag name.
+    if (/^[a-z]+$/.test(sel)) return this.children.find(c => c.tagName === sel.toUpperCase()) || new El(sel);
     return this.findByClass(sel);
   }
   findByClass(cls) {

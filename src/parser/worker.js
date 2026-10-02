@@ -50,6 +50,7 @@ self.onmessage = async function (e) {
       type: 'error',
       code: (err && err.code) || 'parse_failed',
       file: err && err.file,
+      detail: err && !err.code ? (err instanceof Error ? err.message : String(err)) : undefined,
     });
   }
 };

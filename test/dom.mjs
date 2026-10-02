@@ -50,6 +50,17 @@ export class DomElement {
     return this._text + this.children.map(c => c.textContent).join('');
   }
 
+  // innerHTML is not parsed; setting it yields one placeholder child for the
+  // first tag so callers that read firstElementChild (e.g. inline SVG) work.
+  set innerHTML(v) {
+    this.children = [];
+    this._text = '';
+    const m = /<\s*([a-zA-Z][\w-]*)/.exec(String(v || ''));
+    if (m) this.appendChild(new DomElement(m[1]));
+  }
+  get innerHTML() { return ''; }
+  get firstElementChild() { return this.children.find(c => c && c.nodeType === 1) || null; }
+
   get classList() {
     const self = this;
     return {

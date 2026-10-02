@@ -1298,7 +1298,7 @@ button {
   background: var(--sidebar-hover);
 }
 
-[data-theme="claude"] .conversation-list-item[aria-current="true"] {
+[data-theme="claude"] .conversation-list-item[aria-current="page"] {
   background: var(--sidebar-active);
 }
 

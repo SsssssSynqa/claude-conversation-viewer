@@ -1,0 +1,4166 @@
+[
+  {
+    "uuid": "35064092-4c97-41f3-b7c1-893fd6ab0b7c",
+    "name": "布局验收对话 01",
+    "summary": "synthetic fixture",
+    "created_at": "2025-03-25T06:00:00Z",
+    "updated_at": "2025-03-25T08:00:00Z",
+    "account": {
+      "uuid": "synthetic-account"
+    },
+    "chat_messages": [
+      {
+        "uuid": "a2962db7-ec87-4d18-a1b2-71fa256f0475",
+        "text": "第 1 次测试对话的用户消息 1。请帮我整理今天的记录，并保留关键时间。🦊✨",
+        "content": [
+          {
+            "type": "text",
+          "text": "第 1 次测试对话的用户消息 1。请帮我整理今天的记录，并保留关键时间。🦊✨",
+            "start_timestamp": "2025-03-25T06:00:00Z",
+            "stop_timestamp": "2025-03-25T06:00:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2025-03-25T06:00:00Z",
+        "updated_at": "2025-03-25T06:00:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "3c892715-4300-42c4-af43-394f1b43ffa3",
+        "text": "这是第 1 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+        "content": [
+          {
+            "type": "thinking",
+            "thinking": "先梳理时间线，再检查信息层级。",
+            "start_timestamp": "2025-03-25T06:12:00Z",
+            "stop_timestamp": "2025-03-25T06:12:11Z",
+            "flags": null
+          },
+          {
+            "type": "text",
+            "text": "这是第 1 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+            "start_timestamp": "2025-03-25T06:12:00Z",
+            "stop_timestamp": "2025-03-25T06:12:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2025-03-25T06:12:00Z",
+        "updated_at": "2025-03-25T06:12:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "39f2a72a-426b-4210-a61a-3fc5088ff867",
+        "text": "第 1 次测试对话的用户消息 3。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 1 次测试对话的用户消息 3。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2025-03-25T06:24:00Z",
+            "stop_timestamp": "2025-03-25T06:24:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2025-03-25T06:24:00Z",
+        "updated_at": "2025-03-25T06:24:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "134a9bd1-d6d1-44f6-99db-e4fc654aea7f",
+        "text": "这是第 1 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。",
+        "content": [
+          {
+            "type": "text",
+            "text": "这是第 1 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。",
+            "start_timestamp": "2025-03-25T06:36:00Z",
+            "stop_timestamp": "2025-03-25T06:36:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2025-03-25T06:36:00Z",
+        "updated_at": "2025-03-25T06:36:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "e1271f78-5ea6-451f-b766-632a37644825",
+        "text": "第 1 次测试对话的用户消息 5。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 1 次测试对话的用户消息 5。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2025-03-25T06:48:00Z",
+            "stop_timestamp": "2025-03-25T06:48:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2025-03-25T06:48:00Z",
+        "updated_at": "2025-03-25T06:48:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "e4d27479-c24e-4aa4-b404-c4ee4d953b0f",
+        "text": "这是第 1 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`\n\n### 安全回归\n\n<img src=x onerror=\"window.__viewerXss=1\"> [unsafe](javascript:window.__viewerXss=2)",
+        "content": [
+          {
+            "type": "text",
+            "text": "这是第 1 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`\n\n### 安全回归\n\n<img src=x onerror=\"window.__viewerXss=1\"> [unsafe](javascript:window.__viewerXss=2)",
+            "start_timestamp": "2025-03-25T07:00:00Z",
+            "stop_timestamp": "2025-03-25T07:00:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2025-03-25T07:00:00Z",
+        "updated_at": "2025-03-25T07:00:00Z",
+        "attachments": [],
+        "files": []
+      }
+    ]
+  },
+  {
+    "uuid": "5612b010-4d63-4a64-a2f7-df4e7eb8db8f",
+    "name": "布局验收对话 02",
+    "summary": "synthetic fixture",
+    "created_at": "2025-04-13T09:00:00Z",
+    "updated_at": "2025-04-13T11:00:00Z",
+    "account": {
+      "uuid": "synthetic-account"
+    },
+    "chat_messages": [
+      {
+        "uuid": "58e8fd76-87ac-4d75-81f2-7897595bdcba",
+        "text": "第 2 次测试对话的用户消息 1。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 2 次测试对话的用户消息 1。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2025-04-13T09:00:00Z",
+            "stop_timestamp": "2025-04-13T09:00:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2025-04-13T09:00:00Z",
+        "updated_at": "2025-04-13T09:00:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "0fea480c-8da3-475e-b94c-257c592245d6",
+        "text": "这是第 2 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+        "content": [
+          {
+            "type": "thinking",
+            "thinking": "先梳理时间线，再检查信息层级。",
+            "start_timestamp": "2025-04-13T09:12:00Z",
+            "stop_timestamp": "2025-04-13T09:12:12Z",
+            "flags": null
+          },
+          {
+            "type": "text",
+            "text": "这是第 2 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+            "start_timestamp": "2025-04-13T09:12:00Z",
+            "stop_timestamp": "2025-04-13T09:12:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2025-04-13T09:12:00Z",
+        "updated_at": "2025-04-13T09:12:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "1f29ec4a-5687-4f48-9c97-9d2b0cefe203",
+        "text": "第 2 次测试对话的用户消息 3。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 2 次测试对话的用户消息 3。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2025-04-13T09:24:00Z",
+            "stop_timestamp": "2025-04-13T09:24:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2025-04-13T09:24:00Z",
+        "updated_at": "2025-04-13T09:24:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "29131198-f79f-464a-8674-e38a46656582",
+        "text": "这是第 2 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。",
+        "content": [
+          {
+            "type": "text",
+            "text": "这是第 2 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。",
+            "start_timestamp": "2025-04-13T09:36:00Z",
+            "stop_timestamp": "2025-04-13T09:36:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2025-04-13T09:36:00Z",
+        "updated_at": "2025-04-13T09:36:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "f41f6d60-de8a-4e08-91b8-968de015561b",
+        "text": "第 2 次测试对话的用户消息 5。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 2 次测试对话的用户消息 5。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2025-04-13T09:48:00Z",
+            "stop_timestamp": "2025-04-13T09:48:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2025-04-13T09:48:00Z",
+        "updated_at": "2025-04-13T09:48:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "4499ada3-1c36-4106-887e-e40be34491a4",
+        "text": "这是第 2 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+        "content": [
+          {
+            "type": "text",
+            "text": "这是第 2 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+            "start_timestamp": "2025-04-13T10:00:00Z",
+            "stop_timestamp": "2025-04-13T10:00:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2025-04-13T10:00:00Z",
+        "updated_at": "2025-04-13T10:00:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "d1492feb-b3f7-4cfa-a4e3-e0af31ccf8d5",
+        "text": "第 2 次测试对话的用户消息 7。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 2 次测试对话的用户消息 7。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2025-04-13T10:12:00Z",
+            "stop_timestamp": "2025-04-13T10:12:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2025-04-13T10:12:00Z",
+        "updated_at": "2025-04-13T10:12:00Z",
+        "attachments": [],
+        "files": []
+      }
+    ]
+  },
+  {
+    "uuid": "980848d9-4402-40da-ad69-d2770bba774a",
+    "name": "布局验收对话 03",
+    "summary": "synthetic fixture",
+    "created_at": "2025-05-02T12:00:00Z",
+    "updated_at": "2025-05-02T14:00:00Z",
+    "account": {
+      "uuid": "synthetic-account"
+    },
+    "chat_messages": [
+      {
+        "uuid": "86bcad0d-163d-42d6-a32f-19552a9f7bdd",
+        "text": "第 3 次测试对话的用户消息 1。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 3 次测试对话的用户消息 1。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2025-05-02T12:00:00Z",
+            "stop_timestamp": "2025-05-02T12:00:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2025-05-02T12:00:00Z",
+        "updated_at": "2025-05-02T12:00:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "a5c201ad-72c9-489c-b072-3aad8d6c94b3",
+        "text": "这是第 3 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+        "content": [
+          {
+            "type": "thinking",
+            "thinking": "先梳理时间线，再检查信息层级。",
+            "start_timestamp": "2025-05-02T12:12:00Z",
+            "stop_timestamp": "2025-05-02T12:12:13Z",
+            "flags": null
+          },
+          {
+            "type": "text",
+            "text": "这是第 3 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+            "start_timestamp": "2025-05-02T12:12:00Z",
+            "stop_timestamp": "2025-05-02T12:12:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2025-05-02T12:12:00Z",
+        "updated_at": "2025-05-02T12:12:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "62832ebd-22f6-4325-926c-f64d5b2aedce",
+        "text": "第 3 次测试对话的用户消息 3。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 3 次测试对话的用户消息 3。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2025-05-02T12:24:00Z",
+            "stop_timestamp": "2025-05-02T12:24:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2025-05-02T12:24:00Z",
+        "updated_at": "2025-05-02T12:24:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "e95ecf48-786b-466a-9160-8e337cee77b7",
+        "text": "这是第 3 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。",
+        "content": [
+          {
+            "type": "text",
+            "text": "这是第 3 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。",
+            "start_timestamp": "2025-05-02T12:36:00Z",
+            "stop_timestamp": "2025-05-02T12:36:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2025-05-02T12:36:00Z",
+        "updated_at": "2025-05-02T12:36:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "96d84a77-2634-4dd7-bf13-8a887466492e",
+        "text": "第 3 次测试对话的用户消息 5。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 3 次测试对话的用户消息 5。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2025-05-02T12:48:00Z",
+            "stop_timestamp": "2025-05-02T12:48:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2025-05-02T12:48:00Z",
+        "updated_at": "2025-05-02T12:48:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "35e41582-6fa0-463a-81bb-10b6d8989f66",
+        "text": "这是第 3 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+        "content": [
+          {
+            "type": "text",
+            "text": "这是第 3 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+            "start_timestamp": "2025-05-02T13:00:00Z",
+            "stop_timestamp": "2025-05-02T13:00:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2025-05-02T13:00:00Z",
+        "updated_at": "2025-05-02T13:00:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "5c3deea2-a537-425a-9fe2-7cfcea244c4c",
+        "text": "第 3 次测试对话的用户消息 7。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 3 次测试对话的用户消息 7。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2025-05-02T13:12:00Z",
+            "stop_timestamp": "2025-05-02T13:12:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2025-05-02T13:12:00Z",
+        "updated_at": "2025-05-02T13:12:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "ede26af3-4397-426a-8665-e761b3279027",
+        "text": "这是第 3 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。",
+        "content": [
+          {
+            "type": "thinking",
+            "thinking": "先梳理时间线，再检查信息层级。",
+            "start_timestamp": "2025-05-02T13:24:00Z",
+            "stop_timestamp": "2025-05-02T13:24:13Z",
+            "flags": null
+          },
+          {
+            "type": "text",
+            "text": "这是第 3 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。",
+            "start_timestamp": "2025-05-02T13:24:00Z",
+            "stop_timestamp": "2025-05-02T13:24:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2025-05-02T13:24:00Z",
+        "updated_at": "2025-05-02T13:24:00Z",
+        "attachments": [],
+        "files": []
+      }
+    ]
+  },
+  {
+    "uuid": "ec94e347-5ad9-4b34-8f14-eb65b0a5d4b1",
+    "name": "布局验收对话 04",
+    "summary": "synthetic fixture",
+    "created_at": "2025-05-21T15:00:00Z",
+    "updated_at": "2025-05-21T17:00:00Z",
+    "account": {
+      "uuid": "synthetic-account"
+    },
+    "chat_messages": [
+      {
+        "uuid": "7cdfbf32-83f8-4a41-98d5-098b1ef6c831",
+        "text": "第 4 次测试对话的用户消息 1。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 4 次测试对话的用户消息 1。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2025-05-21T15:00:00Z",
+            "stop_timestamp": "2025-05-21T15:00:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2025-05-21T15:00:00Z",
+        "updated_at": "2025-05-21T15:00:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "464262c6-d1a9-4619-9dcc-42177427faa1",
+        "text": "这是第 4 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+        "content": [
+          {
+            "type": "thinking",
+            "thinking": "先梳理时间线，再检查信息层级。",
+            "start_timestamp": "2025-05-21T15:12:00Z",
+            "stop_timestamp": "2025-05-21T15:12:14Z",
+            "flags": null
+          },
+          {
+            "type": "text",
+            "text": "这是第 4 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+            "start_timestamp": "2025-05-21T15:12:00Z",
+            "stop_timestamp": "2025-05-21T15:12:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2025-05-21T15:12:00Z",
+        "updated_at": "2025-05-21T15:12:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "ff7a2e1b-25f0-4650-844e-cd84bfbc10c1",
+        "text": "第 4 次测试对话的用户消息 3。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 4 次测试对话的用户消息 3。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2025-05-21T15:24:00Z",
+            "stop_timestamp": "2025-05-21T15:24:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2025-05-21T15:24:00Z",
+        "updated_at": "2025-05-21T15:24:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "a974ea02-4d75-49d9-855a-86fd0be4c3b5",
+        "text": "这是第 4 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。",
+        "content": [
+          {
+            "type": "text",
+            "text": "这是第 4 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。",
+            "start_timestamp": "2025-05-21T15:36:00Z",
+            "stop_timestamp": "2025-05-21T15:36:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2025-05-21T15:36:00Z",
+        "updated_at": "2025-05-21T15:36:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "88cbdcee-f1b2-4477-b1b3-4f37c4d516eb",
+        "text": "第 4 次测试对话的用户消息 5。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 4 次测试对话的用户消息 5。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2025-05-21T15:48:00Z",
+            "stop_timestamp": "2025-05-21T15:48:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2025-05-21T15:48:00Z",
+        "updated_at": "2025-05-21T15:48:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "16c2924a-0f4c-45d5-ac6b-10d948098da8",
+        "text": "这是第 4 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+        "content": [
+          {
+            "type": "text",
+            "text": "这是第 4 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+            "start_timestamp": "2025-05-21T16:00:00Z",
+            "stop_timestamp": "2025-05-21T16:00:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2025-05-21T16:00:00Z",
+        "updated_at": "2025-05-21T16:00:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "b31b67e6-5268-46e8-99b2-70773d22b179",
+        "text": "第 4 次测试对话的用户消息 7。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 4 次测试对话的用户消息 7。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2025-05-21T16:12:00Z",
+            "stop_timestamp": "2025-05-21T16:12:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2025-05-21T16:12:00Z",
+        "updated_at": "2025-05-21T16:12:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "241e0f0a-087b-4277-859b-95e14d94a10c",
+        "text": "这是第 4 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。",
+        "content": [
+          {
+            "type": "thinking",
+            "thinking": "先梳理时间线，再检查信息层级。",
+            "start_timestamp": "2025-05-21T16:24:00Z",
+            "stop_timestamp": "2025-05-21T16:24:14Z",
+            "flags": null
+          },
+          {
+            "type": "text",
+            "text": "这是第 4 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。",
+            "start_timestamp": "2025-05-21T16:24:00Z",
+            "stop_timestamp": "2025-05-21T16:24:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2025-05-21T16:24:00Z",
+        "updated_at": "2025-05-21T16:24:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "8d40d421-9c23-4aba-b0cd-d1bb328afca2",
+        "text": "第 4 次测试对话的用户消息 9。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 4 次测试对话的用户消息 9。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2025-05-21T16:36:00Z",
+            "stop_timestamp": "2025-05-21T16:36:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2025-05-21T16:36:00Z",
+        "updated_at": "2025-05-21T16:36:00Z",
+        "attachments": [],
+        "files": []
+      }
+    ]
+  },
+  {
+    "uuid": "b6e897a4-0387-44d3-b480-73614de7bba6",
+    "name": "布局验收对话 05",
+    "summary": "synthetic fixture",
+    "created_at": "2025-06-09T18:00:00Z",
+    "updated_at": "2025-06-09T20:00:00Z",
+    "account": {
+      "uuid": "synthetic-account"
+    },
+    "chat_messages": [
+      {
+        "uuid": "f4c83cfe-db2a-4817-82df-861882b0f26f",
+        "text": "第 5 次测试对话的用户消息 1。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 5 次测试对话的用户消息 1。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2025-06-09T18:00:00Z",
+            "stop_timestamp": "2025-06-09T18:00:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2025-06-09T18:00:00Z",
+        "updated_at": "2025-06-09T18:00:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "809f979f-d617-4c0e-a738-6adc5867b9bb",
+        "text": "这是第 5 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+        "content": [
+          {
+            "type": "thinking",
+            "thinking": "先梳理时间线，再检查信息层级。",
+            "start_timestamp": "2025-06-09T18:12:00Z",
+            "stop_timestamp": "2025-06-09T18:12:15Z",
+            "flags": null
+          },
+          {
+            "type": "text",
+            "text": "这是第 5 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+            "start_timestamp": "2025-06-09T18:12:00Z",
+            "stop_timestamp": "2025-06-09T18:12:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2025-06-09T18:12:00Z",
+        "updated_at": "2025-06-09T18:12:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "c7ac3ce1-3562-48fa-ab3d-8467cc05079b",
+        "text": "第 5 次测试对话的用户消息 3。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 5 次测试对话的用户消息 3。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2025-06-09T18:24:00Z",
+            "stop_timestamp": "2025-06-09T18:24:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2025-06-09T18:24:00Z",
+        "updated_at": "2025-06-09T18:24:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "d8bdffb8-6df6-4bca-9c95-039ea92c4ab0",
+        "text": "这是第 5 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。",
+        "content": [
+          {
+            "type": "text",
+            "text": "这是第 5 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。",
+            "start_timestamp": "2025-06-09T18:36:00Z",
+            "stop_timestamp": "2025-06-09T18:36:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2025-06-09T18:36:00Z",
+        "updated_at": "2025-06-09T18:36:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "202dec07-3c5e-4c72-b882-f31482d54680",
+        "text": "第 5 次测试对话的用户消息 5。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 5 次测试对话的用户消息 5。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2025-06-09T18:48:00Z",
+            "stop_timestamp": "2025-06-09T18:48:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2025-06-09T18:48:00Z",
+        "updated_at": "2025-06-09T18:48:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "716adf9c-6e27-4e5a-aa38-76bdef033932",
+        "text": "这是第 5 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+        "content": [
+          {
+            "type": "text",
+            "text": "这是第 5 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+            "start_timestamp": "2025-06-09T19:00:00Z",
+            "stop_timestamp": "2025-06-09T19:00:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2025-06-09T19:00:00Z",
+        "updated_at": "2025-06-09T19:00:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "937996be-0705-4225-8dc2-e82753c5d698",
+        "text": "第 5 次测试对话的用户消息 7。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 5 次测试对话的用户消息 7。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2025-06-09T19:12:00Z",
+            "stop_timestamp": "2025-06-09T19:12:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2025-06-09T19:12:00Z",
+        "updated_at": "2025-06-09T19:12:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "bb7f072c-673a-46d6-b5e8-b3d5501f601c",
+        "text": "这是第 5 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。",
+        "content": [
+          {
+            "type": "thinking",
+            "thinking": "先梳理时间线，再检查信息层级。",
+            "start_timestamp": "2025-06-09T19:24:00Z",
+            "stop_timestamp": "2025-06-09T19:24:15Z",
+            "flags": null
+          },
+          {
+            "type": "text",
+            "text": "这是第 5 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。",
+            "start_timestamp": "2025-06-09T19:24:00Z",
+            "stop_timestamp": "2025-06-09T19:24:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2025-06-09T19:24:00Z",
+        "updated_at": "2025-06-09T19:24:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "99bcf2df-7793-4793-bad7-e86b0df3b5ee",
+        "text": "第 5 次测试对话的用户消息 9。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 5 次测试对话的用户消息 9。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2025-06-09T19:36:00Z",
+            "stop_timestamp": "2025-06-09T19:36:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2025-06-09T19:36:00Z",
+        "updated_at": "2025-06-09T19:36:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "da8938f2-424f-44a1-bb31-b19a5343e7d1",
+        "text": "这是第 5 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+        "content": [
+          {
+            "type": "text",
+            "text": "这是第 5 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+            "start_timestamp": "2025-06-09T19:48:00Z",
+            "stop_timestamp": "2025-06-09T19:48:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2025-06-09T19:48:00Z",
+        "updated_at": "2025-06-09T19:48:00Z",
+        "attachments": [],
+        "files": []
+      }
+    ]
+  },
+  {
+    "uuid": "d4357297-b723-4fdb-846b-7e0210c57a87",
+    "name": "布局验收对话 06",
+    "summary": "synthetic fixture",
+    "created_at": "2025-06-28T21:00:00Z",
+    "updated_at": "2025-06-28T23:00:00Z",
+    "account": {
+      "uuid": "synthetic-account"
+    },
+    "chat_messages": [
+      {
+        "uuid": "ec01f076-181e-4882-94fa-d0cb53f5fbc7",
+        "text": "第 6 次测试对话的用户消息 1。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 6 次测试对话的用户消息 1。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2025-06-28T21:00:00Z",
+            "stop_timestamp": "2025-06-28T21:00:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2025-06-28T21:00:00Z",
+        "updated_at": "2025-06-28T21:00:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "9c362454-f728-49ea-8b23-0a7ed3697d9c",
+        "text": "这是第 6 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+        "content": [
+          {
+            "type": "thinking",
+            "thinking": "先梳理时间线，再检查信息层级。",
+            "start_timestamp": "2025-06-28T21:12:00Z",
+            "stop_timestamp": "2025-06-28T21:12:16Z",
+            "flags": null
+          },
+          {
+            "type": "text",
+            "text": "这是第 6 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+            "start_timestamp": "2025-06-28T21:12:00Z",
+            "stop_timestamp": "2025-06-28T21:12:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2025-06-28T21:12:00Z",
+        "updated_at": "2025-06-28T21:12:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "639a4ec5-f977-463c-afa0-770a50c72384",
+        "text": "第 6 次测试对话的用户消息 3。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 6 次测试对话的用户消息 3。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2025-06-28T21:24:00Z",
+            "stop_timestamp": "2025-06-28T21:24:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2025-06-28T21:24:00Z",
+        "updated_at": "2025-06-28T21:24:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "6d5e88ee-f391-489e-91b3-b891297f0ed6",
+        "text": "这是第 6 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。",
+        "content": [
+          {
+            "type": "text",
+            "text": "这是第 6 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。",
+            "start_timestamp": "2025-06-28T21:36:00Z",
+            "stop_timestamp": "2025-06-28T21:36:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2025-06-28T21:36:00Z",
+        "updated_at": "2025-06-28T21:36:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "d9feaab0-87a1-4869-b8f0-449df7b1b708",
+        "text": "第 6 次测试对话的用户消息 5。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 6 次测试对话的用户消息 5。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2025-06-28T21:48:00Z",
+            "stop_timestamp": "2025-06-28T21:48:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2025-06-28T21:48:00Z",
+        "updated_at": "2025-06-28T21:48:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "8c497b66-52fe-45cd-b66c-809badf44fc0",
+        "text": "这是第 6 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+        "content": [
+          {
+            "type": "text",
+            "text": "这是第 6 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+            "start_timestamp": "2025-06-28T22:00:00Z",
+            "stop_timestamp": "2025-06-28T22:00:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2025-06-28T22:00:00Z",
+        "updated_at": "2025-06-28T22:00:00Z",
+        "attachments": [],
+        "files": []
+      }
+    ]
+  },
+  {
+    "uuid": "45fe94e7-706e-430d-bc89-6de28c6ac8bd",
+    "name": "布局验收对话 07",
+    "summary": "synthetic fixture",
+    "created_at": "2025-07-18T00:00:00Z",
+    "updated_at": "2025-07-18T02:00:00Z",
+    "account": {
+      "uuid": "synthetic-account"
+    },
+    "chat_messages": [
+      {
+        "uuid": "1dc2a501-d5f1-49b3-855f-b6a37cc649a0",
+        "text": "第 7 次测试对话的用户消息 1。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 7 次测试对话的用户消息 1。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2025-07-18T00:00:00Z",
+            "stop_timestamp": "2025-07-18T00:00:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2025-07-18T00:00:00Z",
+        "updated_at": "2025-07-18T00:00:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "84b3096d-1e60-4bce-a104-b52e2db16bb7",
+        "text": "这是第 7 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+        "content": [
+          {
+            "type": "thinking",
+            "thinking": "先梳理时间线，再检查信息层级。",
+            "start_timestamp": "2025-07-18T00:12:00Z",
+            "stop_timestamp": "2025-07-18T00:12:17Z",
+            "flags": null
+          },
+          {
+            "type": "text",
+            "text": "这是第 7 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+            "start_timestamp": "2025-07-18T00:12:00Z",
+            "stop_timestamp": "2025-07-18T00:12:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2025-07-18T00:12:00Z",
+        "updated_at": "2025-07-18T00:12:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "40df6155-362f-4f66-a2d5-93a3b36d3181",
+        "text": "第 7 次测试对话的用户消息 3。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 7 次测试对话的用户消息 3。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2025-07-18T00:24:00Z",
+            "stop_timestamp": "2025-07-18T00:24:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2025-07-18T00:24:00Z",
+        "updated_at": "2025-07-18T00:24:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "9ed7671a-414f-4d3d-bcd8-003bd39fef04",
+        "text": "这是第 7 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。",
+        "content": [
+          {
+            "type": "text",
+            "text": "这是第 7 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。",
+            "start_timestamp": "2025-07-18T00:36:00Z",
+            "stop_timestamp": "2025-07-18T00:36:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2025-07-18T00:36:00Z",
+        "updated_at": "2025-07-18T00:36:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "99f32351-d8e9-472e-b2a0-0bfb5cedaeee",
+        "text": "第 7 次测试对话的用户消息 5。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 7 次测试对话的用户消息 5。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2025-07-18T00:48:00Z",
+            "stop_timestamp": "2025-07-18T00:48:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2025-07-18T00:48:00Z",
+        "updated_at": "2025-07-18T00:48:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "a0c4696c-ea6c-4299-8b22-65f6115217a2",
+        "text": "这是第 7 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+        "content": [
+          {
+            "type": "text",
+            "text": "这是第 7 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+            "start_timestamp": "2025-07-18T01:00:00Z",
+            "stop_timestamp": "2025-07-18T01:00:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2025-07-18T01:00:00Z",
+        "updated_at": "2025-07-18T01:00:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "a3595746-d3b5-41ba-8ad1-c6907dd69074",
+        "text": "第 7 次测试对话的用户消息 7。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 7 次测试对话的用户消息 7。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2025-07-18T01:12:00Z",
+            "stop_timestamp": "2025-07-18T01:12:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2025-07-18T01:12:00Z",
+        "updated_at": "2025-07-18T01:12:00Z",
+        "attachments": [],
+        "files": []
+      }
+    ]
+  },
+  {
+    "uuid": "9f53c636-47f6-4c72-902d-f5ba8680bb33",
+    "name": "布局验收对话 08",
+    "summary": "synthetic fixture",
+    "created_at": "2025-08-06T03:00:00Z",
+    "updated_at": "2025-08-06T05:00:00Z",
+    "account": {
+      "uuid": "synthetic-account"
+    },
+    "chat_messages": [
+      {
+        "uuid": "d68fbb85-93af-45d0-957f-7115d286c7e0",
+        "text": "第 8 次测试对话的用户消息 1。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 8 次测试对话的用户消息 1。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2025-08-06T03:00:00Z",
+            "stop_timestamp": "2025-08-06T03:00:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2025-08-06T03:00:00Z",
+        "updated_at": "2025-08-06T03:00:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "7b1d7df1-e9a6-4cde-80d2-47aef06795f2",
+        "text": "这是第 8 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+        "content": [
+          {
+            "type": "thinking",
+            "thinking": "先梳理时间线，再检查信息层级。",
+            "start_timestamp": "2025-08-06T03:12:00Z",
+            "stop_timestamp": "2025-08-06T03:12:18Z",
+            "flags": null
+          },
+          {
+            "type": "text",
+            "text": "这是第 8 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+            "start_timestamp": "2025-08-06T03:12:00Z",
+            "stop_timestamp": "2025-08-06T03:12:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2025-08-06T03:12:00Z",
+        "updated_at": "2025-08-06T03:12:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "282022dd-975b-4cc9-9c1e-29b05a42e75b",
+        "text": "第 8 次测试对话的用户消息 3。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 8 次测试对话的用户消息 3。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2025-08-06T03:24:00Z",
+            "stop_timestamp": "2025-08-06T03:24:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2025-08-06T03:24:00Z",
+        "updated_at": "2025-08-06T03:24:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "6a237371-f167-4bb4-8c2c-fac073f693f6",
+        "text": "这是第 8 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。",
+        "content": [
+          {
+            "type": "text",
+            "text": "这是第 8 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。",
+            "start_timestamp": "2025-08-06T03:36:00Z",
+            "stop_timestamp": "2025-08-06T03:36:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2025-08-06T03:36:00Z",
+        "updated_at": "2025-08-06T03:36:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "87a3c142-316a-4054-aaf8-592946f56e45",
+        "text": "第 8 次测试对话的用户消息 5。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 8 次测试对话的用户消息 5。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2025-08-06T03:48:00Z",
+            "stop_timestamp": "2025-08-06T03:48:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2025-08-06T03:48:00Z",
+        "updated_at": "2025-08-06T03:48:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "9255db57-527f-4f93-b869-2fba72306f58",
+        "text": "这是第 8 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+        "content": [
+          {
+            "type": "text",
+            "text": "这是第 8 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+            "start_timestamp": "2025-08-06T04:00:00Z",
+            "stop_timestamp": "2025-08-06T04:00:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2025-08-06T04:00:00Z",
+        "updated_at": "2025-08-06T04:00:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "4c9c4502-2c21-4923-a5c8-a3efdc765998",
+        "text": "第 8 次测试对话的用户消息 7。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 8 次测试对话的用户消息 7。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2025-08-06T04:12:00Z",
+            "stop_timestamp": "2025-08-06T04:12:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2025-08-06T04:12:00Z",
+        "updated_at": "2025-08-06T04:12:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "ceae5732-8e63-4b96-8d8b-cf02160cabd5",
+        "text": "这是第 8 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。",
+        "content": [
+          {
+            "type": "thinking",
+            "thinking": "先梳理时间线，再检查信息层级。",
+            "start_timestamp": "2025-08-06T04:24:00Z",
+            "stop_timestamp": "2025-08-06T04:24:18Z",
+            "flags": null
+          },
+          {
+            "type": "text",
+            "text": "这是第 8 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。",
+            "start_timestamp": "2025-08-06T04:24:00Z",
+            "stop_timestamp": "2025-08-06T04:24:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2025-08-06T04:24:00Z",
+        "updated_at": "2025-08-06T04:24:00Z",
+        "attachments": [],
+        "files": []
+      }
+    ]
+  },
+  {
+    "uuid": "2d46c40a-177e-4117-836b-fc1b8378f41c",
+    "name": "布局验收对话 09",
+    "summary": "synthetic fixture",
+    "created_at": "2025-08-24T06:00:00Z",
+    "updated_at": "2025-08-24T08:00:00Z",
+    "account": {
+      "uuid": "synthetic-account"
+    },
+    "chat_messages": [
+      {
+        "uuid": "3e1a453b-c0de-4eac-94b7-55e44c55423a",
+        "text": "第 9 次测试对话的用户消息 1。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 9 次测试对话的用户消息 1。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2025-08-24T06:00:00Z",
+            "stop_timestamp": "2025-08-24T06:00:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2025-08-24T06:00:00Z",
+        "updated_at": "2025-08-24T06:00:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "27fe689b-dbed-4c5c-bde5-9b705e8a1061",
+        "text": "这是第 9 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+        "content": [
+          {
+            "type": "thinking",
+            "thinking": "先梳理时间线，再检查信息层级。",
+            "start_timestamp": "2025-08-24T06:12:00Z",
+            "stop_timestamp": "2025-08-24T06:12:19Z",
+            "flags": null
+          },
+          {
+            "type": "text",
+            "text": "这是第 9 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+            "start_timestamp": "2025-08-24T06:12:00Z",
+            "stop_timestamp": "2025-08-24T06:12:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2025-08-24T06:12:00Z",
+        "updated_at": "2025-08-24T06:12:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "d9d2d2fb-ffae-47b3-94c3-575a9b981960",
+        "text": "第 9 次测试对话的用户消息 3。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 9 次测试对话的用户消息 3。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2025-08-24T06:24:00Z",
+            "stop_timestamp": "2025-08-24T06:24:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2025-08-24T06:24:00Z",
+        "updated_at": "2025-08-24T06:24:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "f9a0d8f2-c9ee-4c5e-8f1f-b5ef84dee707",
+        "text": "这是第 9 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。",
+        "content": [
+          {
+            "type": "text",
+            "text": "这是第 9 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。",
+            "start_timestamp": "2025-08-24T06:36:00Z",
+            "stop_timestamp": "2025-08-24T06:36:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2025-08-24T06:36:00Z",
+        "updated_at": "2025-08-24T06:36:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "f82fb154-49a6-49b9-9a7e-a46cb35844e1",
+        "text": "第 9 次测试对话的用户消息 5。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 9 次测试对话的用户消息 5。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2025-08-24T06:48:00Z",
+            "stop_timestamp": "2025-08-24T06:48:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2025-08-24T06:48:00Z",
+        "updated_at": "2025-08-24T06:48:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "3921c68d-1a44-4dc0-a53f-ee0f045efc43",
+        "text": "这是第 9 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+        "content": [
+          {
+            "type": "text",
+            "text": "这是第 9 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+            "start_timestamp": "2025-08-24T07:00:00Z",
+            "stop_timestamp": "2025-08-24T07:00:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2025-08-24T07:00:00Z",
+        "updated_at": "2025-08-24T07:00:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "55432b77-2262-4a74-a8fa-abc594551d38",
+        "text": "第 9 次测试对话的用户消息 7。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 9 次测试对话的用户消息 7。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2025-08-24T07:12:00Z",
+            "stop_timestamp": "2025-08-24T07:12:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2025-08-24T07:12:00Z",
+        "updated_at": "2025-08-24T07:12:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "f0c9b4db-ab7c-41b4-8f27-a5a0573bc551",
+        "text": "这是第 9 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。",
+        "content": [
+          {
+            "type": "thinking",
+            "thinking": "先梳理时间线，再检查信息层级。",
+            "start_timestamp": "2025-08-24T07:24:00Z",
+            "stop_timestamp": "2025-08-24T07:24:19Z",
+            "flags": null
+          },
+          {
+            "type": "text",
+            "text": "这是第 9 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。",
+            "start_timestamp": "2025-08-24T07:24:00Z",
+            "stop_timestamp": "2025-08-24T07:24:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2025-08-24T07:24:00Z",
+        "updated_at": "2025-08-24T07:24:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "afb1a772-258c-4014-acf1-36afdacc480e",
+        "text": "第 9 次测试对话的用户消息 9。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 9 次测试对话的用户消息 9。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2025-08-24T07:36:00Z",
+            "stop_timestamp": "2025-08-24T07:36:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2025-08-24T07:36:00Z",
+        "updated_at": "2025-08-24T07:36:00Z",
+        "attachments": [],
+        "files": []
+      }
+    ]
+  },
+  {
+    "uuid": "9db437fb-e774-4658-ad75-03b33744a5a8",
+    "name": "布局验收对话 10",
+    "summary": "synthetic fixture",
+    "created_at": "2025-09-12T09:00:00Z",
+    "updated_at": "2025-09-12T11:00:00Z",
+    "account": {
+      "uuid": "synthetic-account"
+    },
+    "chat_messages": [
+      {
+        "uuid": "90c3a394-8166-4c58-9df2-904b3c864516",
+        "text": "第 10 次测试对话的用户消息 1。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 10 次测试对话的用户消息 1。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2025-09-12T09:00:00Z",
+            "stop_timestamp": "2025-09-12T09:00:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2025-09-12T09:00:00Z",
+        "updated_at": "2025-09-12T09:00:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "89f41225-a4f3-456b-9e68-d187cd569431",
+        "text": "这是第 10 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+        "content": [
+          {
+            "type": "thinking",
+            "thinking": "先梳理时间线，再检查信息层级。",
+            "start_timestamp": "2025-09-12T09:12:00Z",
+            "stop_timestamp": "2025-09-12T09:12:20Z",
+            "flags": null
+          },
+          {
+            "type": "text",
+            "text": "这是第 10 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+            "start_timestamp": "2025-09-12T09:12:00Z",
+            "stop_timestamp": "2025-09-12T09:12:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2025-09-12T09:12:00Z",
+        "updated_at": "2025-09-12T09:12:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "e5351dbb-23cb-42d0-9823-5e70f339c086",
+        "text": "第 10 次测试对话的用户消息 3。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 10 次测试对话的用户消息 3。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2025-09-12T09:24:00Z",
+            "stop_timestamp": "2025-09-12T09:24:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2025-09-12T09:24:00Z",
+        "updated_at": "2025-09-12T09:24:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "760b1f93-3492-4217-a560-06f772cd3a61",
+        "text": "这是第 10 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。",
+        "content": [
+          {
+            "type": "text",
+            "text": "这是第 10 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。",
+            "start_timestamp": "2025-09-12T09:36:00Z",
+            "stop_timestamp": "2025-09-12T09:36:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2025-09-12T09:36:00Z",
+        "updated_at": "2025-09-12T09:36:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "cf1a8367-b840-494d-8ff7-a84a9a7293f0",
+        "text": "第 10 次测试对话的用户消息 5。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 10 次测试对话的用户消息 5。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2025-09-12T09:48:00Z",
+            "stop_timestamp": "2025-09-12T09:48:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2025-09-12T09:48:00Z",
+        "updated_at": "2025-09-12T09:48:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "03f7cca3-3dfe-4404-b7d1-909b0eefd88c",
+        "text": "这是第 10 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+        "content": [
+          {
+            "type": "text",
+            "text": "这是第 10 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+            "start_timestamp": "2025-09-12T10:00:00Z",
+            "stop_timestamp": "2025-09-12T10:00:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2025-09-12T10:00:00Z",
+        "updated_at": "2025-09-12T10:00:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "51e30bf0-00a2-4132-a7f2-57a56fb1e3ae",
+        "text": "第 10 次测试对话的用户消息 7。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 10 次测试对话的用户消息 7。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2025-09-12T10:12:00Z",
+            "stop_timestamp": "2025-09-12T10:12:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2025-09-12T10:12:00Z",
+        "updated_at": "2025-09-12T10:12:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "8bb685dc-3b98-4690-bbe3-0b267756f25f",
+        "text": "这是第 10 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。",
+        "content": [
+          {
+            "type": "thinking",
+            "thinking": "先梳理时间线，再检查信息层级。",
+            "start_timestamp": "2025-09-12T10:24:00Z",
+            "stop_timestamp": "2025-09-12T10:24:20Z",
+            "flags": null
+          },
+          {
+            "type": "text",
+            "text": "这是第 10 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。",
+            "start_timestamp": "2025-09-12T10:24:00Z",
+            "stop_timestamp": "2025-09-12T10:24:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2025-09-12T10:24:00Z",
+        "updated_at": "2025-09-12T10:24:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "18a8bbff-458f-4bf1-a190-03ad2b342d88",
+        "text": "第 10 次测试对话的用户消息 9。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 10 次测试对话的用户消息 9。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2025-09-12T10:36:00Z",
+            "stop_timestamp": "2025-09-12T10:36:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2025-09-12T10:36:00Z",
+        "updated_at": "2025-09-12T10:36:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "92d5696e-e45f-405e-9b4e-7b182949166e",
+        "text": "这是第 10 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+        "content": [
+          {
+            "type": "text",
+            "text": "这是第 10 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+            "start_timestamp": "2025-09-12T10:48:00Z",
+            "stop_timestamp": "2025-09-12T10:48:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2025-09-12T10:48:00Z",
+        "updated_at": "2025-09-12T10:48:00Z",
+        "attachments": [],
+        "files": []
+      }
+    ]
+  },
+  {
+    "uuid": "a89fc8b2-35d7-4889-af03-15fce9a52668",
+    "name": "布局验收对话 11",
+    "summary": "synthetic fixture",
+    "created_at": "2025-10-01T12:00:00Z",
+    "updated_at": "2025-10-01T14:00:00Z",
+    "account": {
+      "uuid": "synthetic-account"
+    },
+    "chat_messages": [
+      {
+        "uuid": "0cb8d8b4-3eca-4ece-a352-cbdab0d1b84e",
+        "text": "第 11 次测试对话的用户消息 1。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 11 次测试对话的用户消息 1。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2025-10-01T12:00:00Z",
+            "stop_timestamp": "2025-10-01T12:00:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2025-10-01T12:00:00Z",
+        "updated_at": "2025-10-01T12:00:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "b4d20ad1-0638-484d-ba27-3b72f2c7a4e0",
+        "text": "这是第 11 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+        "content": [
+          {
+            "type": "thinking",
+            "thinking": "先梳理时间线，再检查信息层级。",
+            "start_timestamp": "2025-10-01T12:12:00Z",
+            "stop_timestamp": "2025-10-01T12:12:21Z",
+            "flags": null
+          },
+          {
+            "type": "text",
+            "text": "这是第 11 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+            "start_timestamp": "2025-10-01T12:12:00Z",
+            "stop_timestamp": "2025-10-01T12:12:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2025-10-01T12:12:00Z",
+        "updated_at": "2025-10-01T12:12:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "e229de27-caad-454c-9136-25da7e2a6170",
+        "text": "第 11 次测试对话的用户消息 3。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 11 次测试对话的用户消息 3。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2025-10-01T12:24:00Z",
+            "stop_timestamp": "2025-10-01T12:24:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2025-10-01T12:24:00Z",
+        "updated_at": "2025-10-01T12:24:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "5927468f-103b-4e42-a1e3-6898983b57bd",
+        "text": "这是第 11 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。",
+        "content": [
+          {
+            "type": "text",
+            "text": "这是第 11 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。",
+            "start_timestamp": "2025-10-01T12:36:00Z",
+            "stop_timestamp": "2025-10-01T12:36:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2025-10-01T12:36:00Z",
+        "updated_at": "2025-10-01T12:36:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "69ae3026-a9c0-4545-87ec-16007ccc7dea",
+        "text": "第 11 次测试对话的用户消息 5。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 11 次测试对话的用户消息 5。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2025-10-01T12:48:00Z",
+            "stop_timestamp": "2025-10-01T12:48:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2025-10-01T12:48:00Z",
+        "updated_at": "2025-10-01T12:48:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "786b59c6-3408-4bf8-8dba-a1d84cf9db90",
+        "text": "这是第 11 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+        "content": [
+          {
+            "type": "text",
+            "text": "这是第 11 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+            "start_timestamp": "2025-10-01T13:00:00Z",
+            "stop_timestamp": "2025-10-01T13:00:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2025-10-01T13:00:00Z",
+        "updated_at": "2025-10-01T13:00:00Z",
+        "attachments": [],
+        "files": []
+      }
+    ]
+  },
+  {
+    "uuid": "f863692e-ec39-4504-a6d4-b95a1af19eed",
+    "name": "布局验收对话 12",
+    "summary": "synthetic fixture",
+    "created_at": "2025-10-20T15:00:00Z",
+    "updated_at": "2025-10-20T17:00:00Z",
+    "account": {
+      "uuid": "synthetic-account"
+    },
+    "chat_messages": [
+      {
+        "uuid": "0fce69ed-5a30-4f58-9f2e-b06d92cba471",
+        "text": "第 12 次测试对话的用户消息 1。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 12 次测试对话的用户消息 1。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2025-10-20T15:00:00Z",
+            "stop_timestamp": "2025-10-20T15:00:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2025-10-20T15:00:00Z",
+        "updated_at": "2025-10-20T15:00:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "47e29229-72fe-447d-888d-5bf63f26f237",
+        "text": "这是第 12 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+        "content": [
+          {
+            "type": "thinking",
+            "thinking": "先梳理时间线，再检查信息层级。",
+            "start_timestamp": "2025-10-20T15:12:00Z",
+            "stop_timestamp": "2025-10-20T15:12:22Z",
+            "flags": null
+          },
+          {
+            "type": "text",
+            "text": "这是第 12 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+            "start_timestamp": "2025-10-20T15:12:00Z",
+            "stop_timestamp": "2025-10-20T15:12:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2025-10-20T15:12:00Z",
+        "updated_at": "2025-10-20T15:12:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "34b82179-9dcb-4ef2-9b5a-7f9e30220443",
+        "text": "第 12 次测试对话的用户消息 3。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 12 次测试对话的用户消息 3。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2025-10-20T15:24:00Z",
+            "stop_timestamp": "2025-10-20T15:24:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2025-10-20T15:24:00Z",
+        "updated_at": "2025-10-20T15:24:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "40bc2277-560d-4c6c-9ad7-f35369b1639c",
+        "text": "这是第 12 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。",
+        "content": [
+          {
+            "type": "text",
+            "text": "这是第 12 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。",
+            "start_timestamp": "2025-10-20T15:36:00Z",
+            "stop_timestamp": "2025-10-20T15:36:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2025-10-20T15:36:00Z",
+        "updated_at": "2025-10-20T15:36:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "d08b1f6f-e829-41d7-b41f-1e37c97224fe",
+        "text": "第 12 次测试对话的用户消息 5。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 12 次测试对话的用户消息 5。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2025-10-20T15:48:00Z",
+            "stop_timestamp": "2025-10-20T15:48:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2025-10-20T15:48:00Z",
+        "updated_at": "2025-10-20T15:48:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "38fcb2ab-b99c-4f1b-9be9-0e70a56fdd75",
+        "text": "这是第 12 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+        "content": [
+          {
+            "type": "text",
+            "text": "这是第 12 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+            "start_timestamp": "2025-10-20T16:00:00Z",
+            "stop_timestamp": "2025-10-20T16:00:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2025-10-20T16:00:00Z",
+        "updated_at": "2025-10-20T16:00:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "2e723967-fe49-4ca0-aa40-a890efb2c937",
+        "text": "第 12 次测试对话的用户消息 7。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 12 次测试对话的用户消息 7。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2025-10-20T16:12:00Z",
+            "stop_timestamp": "2025-10-20T16:12:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2025-10-20T16:12:00Z",
+        "updated_at": "2025-10-20T16:12:00Z",
+        "attachments": [],
+        "files": []
+      }
+    ]
+  },
+  {
+    "uuid": "828c4bb4-2cf1-43c0-95eb-ee75e397a102",
+    "name": "布局验收对话 13",
+    "summary": "synthetic fixture",
+    "created_at": "2025-11-08T18:00:00Z",
+    "updated_at": "2025-11-08T20:00:00Z",
+    "account": {
+      "uuid": "synthetic-account"
+    },
+    "chat_messages": [
+      {
+        "uuid": "45a8225a-4234-44ba-a7b4-ad8cf931aaae",
+        "text": "第 13 次测试对话的用户消息 1。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 13 次测试对话的用户消息 1。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2025-11-08T18:00:00Z",
+            "stop_timestamp": "2025-11-08T18:00:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2025-11-08T18:00:00Z",
+        "updated_at": "2025-11-08T18:00:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "0420e3a1-0edf-4c6a-b0c7-f655b5390674",
+        "text": "这是第 13 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+        "content": [
+          {
+            "type": "thinking",
+            "thinking": "先梳理时间线，再检查信息层级。",
+            "start_timestamp": "2025-11-08T18:12:00Z",
+            "stop_timestamp": "2025-11-08T18:12:23Z",
+            "flags": null
+          },
+          {
+            "type": "text",
+            "text": "这是第 13 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+            "start_timestamp": "2025-11-08T18:12:00Z",
+            "stop_timestamp": "2025-11-08T18:12:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2025-11-08T18:12:00Z",
+        "updated_at": "2025-11-08T18:12:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "fecb6769-9d3e-4dc7-abfe-d26c390c3041",
+        "text": "第 13 次测试对话的用户消息 3。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 13 次测试对话的用户消息 3。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2025-11-08T18:24:00Z",
+            "stop_timestamp": "2025-11-08T18:24:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2025-11-08T18:24:00Z",
+        "updated_at": "2025-11-08T18:24:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "2e801609-1ee1-4d61-bff3-f2d8e44aee19",
+        "text": "这是第 13 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。",
+        "content": [
+          {
+            "type": "text",
+            "text": "这是第 13 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。",
+            "start_timestamp": "2025-11-08T18:36:00Z",
+            "stop_timestamp": "2025-11-08T18:36:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2025-11-08T18:36:00Z",
+        "updated_at": "2025-11-08T18:36:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "c44b67b9-b54d-48ad-9dc8-b062c519df1f",
+        "text": "第 13 次测试对话的用户消息 5。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 13 次测试对话的用户消息 5。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2025-11-08T18:48:00Z",
+            "stop_timestamp": "2025-11-08T18:48:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2025-11-08T18:48:00Z",
+        "updated_at": "2025-11-08T18:48:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "037e9d3c-d6d4-414d-905a-773d858e471e",
+        "text": "这是第 13 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+        "content": [
+          {
+            "type": "text",
+            "text": "这是第 13 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+            "start_timestamp": "2025-11-08T19:00:00Z",
+            "stop_timestamp": "2025-11-08T19:00:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2025-11-08T19:00:00Z",
+        "updated_at": "2025-11-08T19:00:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "f9a8a80b-f56e-4f2c-8c93-bcabc133cef3",
+        "text": "第 13 次测试对话的用户消息 7。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 13 次测试对话的用户消息 7。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2025-11-08T19:12:00Z",
+            "stop_timestamp": "2025-11-08T19:12:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2025-11-08T19:12:00Z",
+        "updated_at": "2025-11-08T19:12:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "c923e85b-e3e3-4b98-837b-4621d2de66ff",
+        "text": "这是第 13 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。",
+        "content": [
+          {
+            "type": "thinking",
+            "thinking": "先梳理时间线，再检查信息层级。",
+            "start_timestamp": "2025-11-08T19:24:00Z",
+            "stop_timestamp": "2025-11-08T19:24:23Z",
+            "flags": null
+          },
+          {
+            "type": "text",
+            "text": "这是第 13 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。",
+            "start_timestamp": "2025-11-08T19:24:00Z",
+            "stop_timestamp": "2025-11-08T19:24:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2025-11-08T19:24:00Z",
+        "updated_at": "2025-11-08T19:24:00Z",
+        "attachments": [],
+        "files": []
+      }
+    ]
+  },
+  {
+    "uuid": "00221553-aa6b-4349-99a5-b31e77af318c",
+    "name": "布局验收对话 14",
+    "summary": "synthetic fixture",
+    "created_at": "2025-11-27T21:00:00Z",
+    "updated_at": "2025-11-27T23:00:00Z",
+    "account": {
+      "uuid": "synthetic-account"
+    },
+    "chat_messages": [
+      {
+        "uuid": "5e01a997-2fd4-4355-86ac-76b4eb9e2686",
+        "text": "第 14 次测试对话的用户消息 1。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 14 次测试对话的用户消息 1。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2025-11-27T21:00:00Z",
+            "stop_timestamp": "2025-11-27T21:00:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2025-11-27T21:00:00Z",
+        "updated_at": "2025-11-27T21:00:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "491cf01f-ec1a-46ba-bd8a-7e84a4baec29",
+        "text": "这是第 14 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+        "content": [
+          {
+            "type": "thinking",
+            "thinking": "先梳理时间线，再检查信息层级。",
+            "start_timestamp": "2025-11-27T21:12:00Z",
+            "stop_timestamp": "2025-11-27T21:12:24Z",
+            "flags": null
+          },
+          {
+            "type": "text",
+            "text": "这是第 14 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+            "start_timestamp": "2025-11-27T21:12:00Z",
+            "stop_timestamp": "2025-11-27T21:12:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2025-11-27T21:12:00Z",
+        "updated_at": "2025-11-27T21:12:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "e1b7bfc6-a775-4a7c-9032-fe1ee9091f73",
+        "text": "第 14 次测试对话的用户消息 3。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 14 次测试对话的用户消息 3。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2025-11-27T21:24:00Z",
+            "stop_timestamp": "2025-11-27T21:24:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2025-11-27T21:24:00Z",
+        "updated_at": "2025-11-27T21:24:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "36b85864-510a-4a64-bc25-6a01e4475c6b",
+        "text": "这是第 14 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。",
+        "content": [
+          {
+            "type": "text",
+            "text": "这是第 14 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。",
+            "start_timestamp": "2025-11-27T21:36:00Z",
+            "stop_timestamp": "2025-11-27T21:36:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2025-11-27T21:36:00Z",
+        "updated_at": "2025-11-27T21:36:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "7129eef8-8812-45f1-bdb3-65a5d0c2eaef",
+        "text": "第 14 次测试对话的用户消息 5。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 14 次测试对话的用户消息 5。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2025-11-27T21:48:00Z",
+            "stop_timestamp": "2025-11-27T21:48:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2025-11-27T21:48:00Z",
+        "updated_at": "2025-11-27T21:48:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "b62824e1-7590-4207-8ab4-5951427cab2b",
+        "text": "这是第 14 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+        "content": [
+          {
+            "type": "text",
+            "text": "这是第 14 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+            "start_timestamp": "2025-11-27T22:00:00Z",
+            "stop_timestamp": "2025-11-27T22:00:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2025-11-27T22:00:00Z",
+        "updated_at": "2025-11-27T22:00:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "38ae422b-172e-4042-b5ed-90c177f51516",
+        "text": "第 14 次测试对话的用户消息 7。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 14 次测试对话的用户消息 7。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2025-11-27T22:12:00Z",
+            "stop_timestamp": "2025-11-27T22:12:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2025-11-27T22:12:00Z",
+        "updated_at": "2025-11-27T22:12:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "14452f3a-0b70-409c-b886-f5f352712ef7",
+        "text": "这是第 14 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。",
+        "content": [
+          {
+            "type": "thinking",
+            "thinking": "先梳理时间线，再检查信息层级。",
+            "start_timestamp": "2025-11-27T22:24:00Z",
+            "stop_timestamp": "2025-11-27T22:24:24Z",
+            "flags": null
+          },
+          {
+            "type": "text",
+            "text": "这是第 14 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。",
+            "start_timestamp": "2025-11-27T22:24:00Z",
+            "stop_timestamp": "2025-11-27T22:24:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2025-11-27T22:24:00Z",
+        "updated_at": "2025-11-27T22:24:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "119f5b16-f95b-403a-9a01-b548fa21128a",
+        "text": "第 14 次测试对话的用户消息 9。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 14 次测试对话的用户消息 9。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2025-11-27T22:36:00Z",
+            "stop_timestamp": "2025-11-27T22:36:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2025-11-27T22:36:00Z",
+        "updated_at": "2025-11-27T22:36:00Z",
+        "attachments": [],
+        "files": []
+      }
+    ]
+  },
+  {
+    "uuid": "34957614-373c-4183-bb78-73535f3cd0a7",
+    "name": "布局验收对话 15",
+    "summary": "synthetic fixture",
+    "created_at": "2025-12-17T00:00:00Z",
+    "updated_at": "2025-12-17T02:00:00Z",
+    "account": {
+      "uuid": "synthetic-account"
+    },
+    "chat_messages": [
+      {
+        "uuid": "7a99e2a8-e3f3-4482-9973-b5861c356be5",
+        "text": "第 15 次测试对话的用户消息 1。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 15 次测试对话的用户消息 1。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2025-12-17T00:00:00Z",
+            "stop_timestamp": "2025-12-17T00:00:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2025-12-17T00:00:00Z",
+        "updated_at": "2025-12-17T00:00:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "3baafe28-68fa-434e-bc3f-d3e8cf54a9ec",
+        "text": "这是第 15 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+        "content": [
+          {
+            "type": "thinking",
+            "thinking": "先梳理时间线，再检查信息层级。",
+            "start_timestamp": "2025-12-17T00:12:00Z",
+            "stop_timestamp": "2025-12-17T00:12:25Z",
+            "flags": null
+          },
+          {
+            "type": "text",
+            "text": "这是第 15 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+            "start_timestamp": "2025-12-17T00:12:00Z",
+            "stop_timestamp": "2025-12-17T00:12:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2025-12-17T00:12:00Z",
+        "updated_at": "2025-12-17T00:12:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "bc3baaea-18b5-47c4-8c19-43f6e0404402",
+        "text": "第 15 次测试对话的用户消息 3。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 15 次测试对话的用户消息 3。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2025-12-17T00:24:00Z",
+            "stop_timestamp": "2025-12-17T00:24:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2025-12-17T00:24:00Z",
+        "updated_at": "2025-12-17T00:24:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "3c4f1030-c258-4bd2-b463-7a3bcfa5c002",
+        "text": "这是第 15 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。",
+        "content": [
+          {
+            "type": "text",
+            "text": "这是第 15 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。",
+            "start_timestamp": "2025-12-17T00:36:00Z",
+            "stop_timestamp": "2025-12-17T00:36:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2025-12-17T00:36:00Z",
+        "updated_at": "2025-12-17T00:36:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "9daa6fb2-f5df-4d12-b357-7e1c90db0915",
+        "text": "第 15 次测试对话的用户消息 5。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 15 次测试对话的用户消息 5。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2025-12-17T00:48:00Z",
+            "stop_timestamp": "2025-12-17T00:48:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2025-12-17T00:48:00Z",
+        "updated_at": "2025-12-17T00:48:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "ab0aef16-54f2-44fd-9d45-6ba5a59d2333",
+        "text": "这是第 15 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+        "content": [
+          {
+            "type": "text",
+            "text": "这是第 15 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+            "start_timestamp": "2025-12-17T01:00:00Z",
+            "stop_timestamp": "2025-12-17T01:00:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2025-12-17T01:00:00Z",
+        "updated_at": "2025-12-17T01:00:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "78851bb1-3b1f-4ca4-83c8-88a11e4c761e",
+        "text": "第 15 次测试对话的用户消息 7。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 15 次测试对话的用户消息 7。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2025-12-17T01:12:00Z",
+            "stop_timestamp": "2025-12-17T01:12:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2025-12-17T01:12:00Z",
+        "updated_at": "2025-12-17T01:12:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "ff68a504-0da2-4972-8dd1-9b20b0927462",
+        "text": "这是第 15 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。",
+        "content": [
+          {
+            "type": "thinking",
+            "thinking": "先梳理时间线，再检查信息层级。",
+            "start_timestamp": "2025-12-17T01:24:00Z",
+            "stop_timestamp": "2025-12-17T01:24:25Z",
+            "flags": null
+          },
+          {
+            "type": "text",
+            "text": "这是第 15 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。",
+            "start_timestamp": "2025-12-17T01:24:00Z",
+            "stop_timestamp": "2025-12-17T01:24:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2025-12-17T01:24:00Z",
+        "updated_at": "2025-12-17T01:24:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "9b3644f0-a964-47c6-965b-7967b20df8bd",
+        "text": "第 15 次测试对话的用户消息 9。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 15 次测试对话的用户消息 9。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2025-12-17T01:36:00Z",
+            "stop_timestamp": "2025-12-17T01:36:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2025-12-17T01:36:00Z",
+        "updated_at": "2025-12-17T01:36:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "bfdeea43-112a-4cd4-bec5-2f1ffd556247",
+        "text": "这是第 15 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+        "content": [
+          {
+            "type": "text",
+            "text": "这是第 15 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+            "start_timestamp": "2025-12-17T01:48:00Z",
+            "stop_timestamp": "2025-12-17T01:48:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2025-12-17T01:48:00Z",
+        "updated_at": "2025-12-17T01:48:00Z",
+        "attachments": [],
+        "files": []
+      }
+    ]
+  },
+  {
+    "uuid": "ff2fcdd1-50d8-484a-9c63-4a4c7a021dd9",
+    "name": "布局验收对话 16",
+    "summary": "synthetic fixture",
+    "created_at": "2026-01-05T03:00:00Z",
+    "updated_at": "2026-01-05T05:00:00Z",
+    "account": {
+      "uuid": "synthetic-account"
+    },
+    "chat_messages": [
+      {
+        "uuid": "bfb8b03f-52de-443e-8797-7428bedf94b9",
+        "text": "第 16 次测试对话的用户消息 1。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 16 次测试对话的用户消息 1。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2026-01-05T03:00:00Z",
+            "stop_timestamp": "2026-01-05T03:00:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2026-01-05T03:00:00Z",
+        "updated_at": "2026-01-05T03:00:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "a2935273-3d3c-49c8-9db2-e6b7ea162114",
+        "text": "这是第 16 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+        "content": [
+          {
+            "type": "thinking",
+            "thinking": "先梳理时间线，再检查信息层级。",
+            "start_timestamp": "2026-01-05T03:12:00Z",
+            "stop_timestamp": "2026-01-05T03:12:26Z",
+            "flags": null
+          },
+          {
+            "type": "text",
+            "text": "这是第 16 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+            "start_timestamp": "2026-01-05T03:12:00Z",
+            "stop_timestamp": "2026-01-05T03:12:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2026-01-05T03:12:00Z",
+        "updated_at": "2026-01-05T03:12:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "0491ea81-08ad-40dc-927c-fe77ac277ab0",
+        "text": "第 16 次测试对话的用户消息 3。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 16 次测试对话的用户消息 3。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2026-01-05T03:24:00Z",
+            "stop_timestamp": "2026-01-05T03:24:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2026-01-05T03:24:00Z",
+        "updated_at": "2026-01-05T03:24:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "67781465-a19c-4a5d-8a0a-984d96be35de",
+        "text": "这是第 16 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。",
+        "content": [
+          {
+            "type": "text",
+            "text": "这是第 16 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。",
+            "start_timestamp": "2026-01-05T03:36:00Z",
+            "stop_timestamp": "2026-01-05T03:36:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2026-01-05T03:36:00Z",
+        "updated_at": "2026-01-05T03:36:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "6698b075-9f53-4495-97d6-6943f09e6eac",
+        "text": "第 16 次测试对话的用户消息 5。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 16 次测试对话的用户消息 5。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2026-01-05T03:48:00Z",
+            "stop_timestamp": "2026-01-05T03:48:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2026-01-05T03:48:00Z",
+        "updated_at": "2026-01-05T03:48:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "7e02ae22-7231-4e02-b338-1885a98260c1",
+        "text": "这是第 16 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+        "content": [
+          {
+            "type": "text",
+            "text": "这是第 16 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+            "start_timestamp": "2026-01-05T04:00:00Z",
+            "stop_timestamp": "2026-01-05T04:00:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2026-01-05T04:00:00Z",
+        "updated_at": "2026-01-05T04:00:00Z",
+        "attachments": [],
+        "files": []
+      }
+    ]
+  },
+  {
+    "uuid": "490e9fad-df37-41fd-8804-b4b2159ab797",
+    "name": "布局验收对话 17",
+    "summary": "synthetic fixture",
+    "created_at": "2026-01-23T06:00:00Z",
+    "updated_at": "2026-01-23T08:00:00Z",
+    "account": {
+      "uuid": "synthetic-account"
+    },
+    "chat_messages": [
+      {
+        "uuid": "03525187-06ea-44f9-b17d-340ba0ffe3eb",
+        "text": "第 17 次测试对话的用户消息 1。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 17 次测试对话的用户消息 1。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2026-01-23T06:00:00Z",
+            "stop_timestamp": "2026-01-23T06:00:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2026-01-23T06:00:00Z",
+        "updated_at": "2026-01-23T06:00:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "adc0365d-5873-4171-8cc9-5cc7cde92284",
+        "text": "这是第 17 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+        "content": [
+          {
+            "type": "thinking",
+            "thinking": "先梳理时间线，再检查信息层级。",
+            "start_timestamp": "2026-01-23T06:12:00Z",
+            "stop_timestamp": "2026-01-23T06:12:27Z",
+            "flags": null
+          },
+          {
+            "type": "text",
+            "text": "这是第 17 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+            "start_timestamp": "2026-01-23T06:12:00Z",
+            "stop_timestamp": "2026-01-23T06:12:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2026-01-23T06:12:00Z",
+        "updated_at": "2026-01-23T06:12:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "4fedec0d-51dd-4a5c-9d88-2515034125ff",
+        "text": "第 17 次测试对话的用户消息 3。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 17 次测试对话的用户消息 3。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2026-01-23T06:24:00Z",
+            "stop_timestamp": "2026-01-23T06:24:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2026-01-23T06:24:00Z",
+        "updated_at": "2026-01-23T06:24:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "ea0caa9c-0254-4de8-8457-0dd1495a089c",
+        "text": "这是第 17 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。",
+        "content": [
+          {
+            "type": "text",
+            "text": "这是第 17 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。",
+            "start_timestamp": "2026-01-23T06:36:00Z",
+            "stop_timestamp": "2026-01-23T06:36:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2026-01-23T06:36:00Z",
+        "updated_at": "2026-01-23T06:36:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "121daf21-acfc-4f6d-9878-953b33a36eb3",
+        "text": "第 17 次测试对话的用户消息 5。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 17 次测试对话的用户消息 5。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2026-01-23T06:48:00Z",
+            "stop_timestamp": "2026-01-23T06:48:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2026-01-23T06:48:00Z",
+        "updated_at": "2026-01-23T06:48:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "2ddd2008-bed5-4b08-a95e-dedba9932da1",
+        "text": "这是第 17 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+        "content": [
+          {
+            "type": "text",
+            "text": "这是第 17 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+            "start_timestamp": "2026-01-23T07:00:00Z",
+            "stop_timestamp": "2026-01-23T07:00:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2026-01-23T07:00:00Z",
+        "updated_at": "2026-01-23T07:00:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "170c3b4e-0da7-4852-a4f6-ec7b3e1c09b2",
+        "text": "第 17 次测试对话的用户消息 7。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 17 次测试对话的用户消息 7。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2026-01-23T07:12:00Z",
+            "stop_timestamp": "2026-01-23T07:12:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2026-01-23T07:12:00Z",
+        "updated_at": "2026-01-23T07:12:00Z",
+        "attachments": [],
+        "files": []
+      }
+    ]
+  },
+  {
+    "uuid": "e7b453fc-0e9c-4b6b-bc47-67a58d96d856",
+    "name": "布局验收对话 18",
+    "summary": "synthetic fixture",
+    "created_at": "2026-02-11T09:00:00Z",
+    "updated_at": "2026-02-11T11:00:00Z",
+    "account": {
+      "uuid": "synthetic-account"
+    },
+    "chat_messages": [
+      {
+        "uuid": "38878903-3ead-4235-9809-98e077657b9e",
+        "text": "第 18 次测试对话的用户消息 1。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 18 次测试对话的用户消息 1。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2026-02-11T09:00:00Z",
+            "stop_timestamp": "2026-02-11T09:00:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2026-02-11T09:00:00Z",
+        "updated_at": "2026-02-11T09:00:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "57951791-9d32-4cdf-8b41-c640c9e9a7df",
+        "text": "这是第 18 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+        "content": [
+          {
+            "type": "thinking",
+            "thinking": "先梳理时间线，再检查信息层级。",
+            "start_timestamp": "2026-02-11T09:12:00Z",
+            "stop_timestamp": "2026-02-11T09:12:28Z",
+            "flags": null
+          },
+          {
+            "type": "text",
+            "text": "这是第 18 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+            "start_timestamp": "2026-02-11T09:12:00Z",
+            "stop_timestamp": "2026-02-11T09:12:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2026-02-11T09:12:00Z",
+        "updated_at": "2026-02-11T09:12:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "1c08df4c-af00-4175-86f8-3275aaccdc1a",
+        "text": "第 18 次测试对话的用户消息 3。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 18 次测试对话的用户消息 3。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2026-02-11T09:24:00Z",
+            "stop_timestamp": "2026-02-11T09:24:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2026-02-11T09:24:00Z",
+        "updated_at": "2026-02-11T09:24:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "056c315a-4681-49db-89fa-4f21b07b82de",
+        "text": "这是第 18 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。",
+        "content": [
+          {
+            "type": "text",
+            "text": "这是第 18 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。",
+            "start_timestamp": "2026-02-11T09:36:00Z",
+            "stop_timestamp": "2026-02-11T09:36:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2026-02-11T09:36:00Z",
+        "updated_at": "2026-02-11T09:36:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "f1937fd3-94af-4366-b1d1-da9ea96036d0",
+        "text": "第 18 次测试对话的用户消息 5。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 18 次测试对话的用户消息 5。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2026-02-11T09:48:00Z",
+            "stop_timestamp": "2026-02-11T09:48:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2026-02-11T09:48:00Z",
+        "updated_at": "2026-02-11T09:48:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "725232ce-1c41-4b78-af96-5021471a17e0",
+        "text": "这是第 18 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+        "content": [
+          {
+            "type": "text",
+            "text": "这是第 18 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+            "start_timestamp": "2026-02-11T10:00:00Z",
+            "stop_timestamp": "2026-02-11T10:00:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2026-02-11T10:00:00Z",
+        "updated_at": "2026-02-11T10:00:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "b1225c42-43e6-454a-a973-0301f7478690",
+        "text": "第 18 次测试对话的用户消息 7。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 18 次测试对话的用户消息 7。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2026-02-11T10:12:00Z",
+            "stop_timestamp": "2026-02-11T10:12:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2026-02-11T10:12:00Z",
+        "updated_at": "2026-02-11T10:12:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "c76dd0cb-c520-459f-810c-663c13ff8e25",
+        "text": "这是第 18 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。",
+        "content": [
+          {
+            "type": "thinking",
+            "thinking": "先梳理时间线，再检查信息层级。",
+            "start_timestamp": "2026-02-11T10:24:00Z",
+            "stop_timestamp": "2026-02-11T10:24:28Z",
+            "flags": null
+          },
+          {
+            "type": "text",
+            "text": "这是第 18 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。",
+            "start_timestamp": "2026-02-11T10:24:00Z",
+            "stop_timestamp": "2026-02-11T10:24:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2026-02-11T10:24:00Z",
+        "updated_at": "2026-02-11T10:24:00Z",
+        "attachments": [],
+        "files": []
+      }
+    ]
+  },
+  {
+    "uuid": "9b99e529-8e29-4269-a5e4-2c58cb27e425",
+    "name": "布局验收对话 19",
+    "summary": "synthetic fixture",
+    "created_at": "2026-03-02T12:00:00Z",
+    "updated_at": "2026-03-02T14:00:00Z",
+    "account": {
+      "uuid": "synthetic-account"
+    },
+    "chat_messages": [
+      {
+        "uuid": "057a836e-3eac-42b2-bbf8-571cb0c53d75",
+        "text": "第 19 次测试对话的用户消息 1。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 19 次测试对话的用户消息 1。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2026-03-02T12:00:00Z",
+            "stop_timestamp": "2026-03-02T12:00:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2026-03-02T12:00:00Z",
+        "updated_at": "2026-03-02T12:00:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "95dd3eb4-7f8d-40f4-a89d-c63694da6594",
+        "text": "这是第 19 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+        "content": [
+          {
+            "type": "thinking",
+            "thinking": "先梳理时间线，再检查信息层级。",
+            "start_timestamp": "2026-03-02T12:12:00Z",
+            "stop_timestamp": "2026-03-02T12:12:29Z",
+            "flags": null
+          },
+          {
+            "type": "text",
+            "text": "这是第 19 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+            "start_timestamp": "2026-03-02T12:12:00Z",
+            "stop_timestamp": "2026-03-02T12:12:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2026-03-02T12:12:00Z",
+        "updated_at": "2026-03-02T12:12:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "45474cd7-b01e-4fee-a5ff-0ff9abfef225",
+        "text": "第 19 次测试对话的用户消息 3。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 19 次测试对话的用户消息 3。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2026-03-02T12:24:00Z",
+            "stop_timestamp": "2026-03-02T12:24:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2026-03-02T12:24:00Z",
+        "updated_at": "2026-03-02T12:24:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "c3d16835-040b-4b30-8b22-3c85d12a6abf",
+        "text": "这是第 19 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。",
+        "content": [
+          {
+            "type": "text",
+            "text": "这是第 19 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。",
+            "start_timestamp": "2026-03-02T12:36:00Z",
+            "stop_timestamp": "2026-03-02T12:36:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2026-03-02T12:36:00Z",
+        "updated_at": "2026-03-02T12:36:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "318cf048-4acc-4b6f-8747-a1de0f34e44e",
+        "text": "第 19 次测试对话的用户消息 5。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 19 次测试对话的用户消息 5。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2026-03-02T12:48:00Z",
+            "stop_timestamp": "2026-03-02T12:48:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2026-03-02T12:48:00Z",
+        "updated_at": "2026-03-02T12:48:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "68c12f34-6ff7-481e-a7cd-17b7de1d25d7",
+        "text": "这是第 19 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+        "content": [
+          {
+            "type": "text",
+            "text": "这是第 19 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+            "start_timestamp": "2026-03-02T13:00:00Z",
+            "stop_timestamp": "2026-03-02T13:00:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2026-03-02T13:00:00Z",
+        "updated_at": "2026-03-02T13:00:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "7ca71380-8651-42d5-8148-431ae2d22ad2",
+        "text": "第 19 次测试对话的用户消息 7。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 19 次测试对话的用户消息 7。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2026-03-02T13:12:00Z",
+            "stop_timestamp": "2026-03-02T13:12:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2026-03-02T13:12:00Z",
+        "updated_at": "2026-03-02T13:12:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "68eb04fa-fb80-4a1d-a9b5-a182276f2b1c",
+        "text": "这是第 19 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。",
+        "content": [
+          {
+            "type": "thinking",
+            "thinking": "先梳理时间线，再检查信息层级。",
+            "start_timestamp": "2026-03-02T13:24:00Z",
+            "stop_timestamp": "2026-03-02T13:24:29Z",
+            "flags": null
+          },
+          {
+            "type": "text",
+            "text": "这是第 19 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。",
+            "start_timestamp": "2026-03-02T13:24:00Z",
+            "stop_timestamp": "2026-03-02T13:24:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2026-03-02T13:24:00Z",
+        "updated_at": "2026-03-02T13:24:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "853d72d7-ae5e-4d6e-be84-605e564b8196",
+        "text": "第 19 次测试对话的用户消息 9。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 19 次测试对话的用户消息 9。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2026-03-02T13:36:00Z",
+            "stop_timestamp": "2026-03-02T13:36:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2026-03-02T13:36:00Z",
+        "updated_at": "2026-03-02T13:36:00Z",
+        "attachments": [],
+        "files": []
+      }
+    ]
+  },
+  {
+    "uuid": "b6e8efa9-ad66-4899-8606-48c9a97943ef",
+    "name": "布局验收对话 20",
+    "summary": "synthetic fixture",
+    "created_at": "2026-03-21T15:00:00Z",
+    "updated_at": "2026-03-21T17:00:00Z",
+    "account": {
+      "uuid": "synthetic-account"
+    },
+    "chat_messages": [
+      {
+        "uuid": "e6b8f011-398e-4fa6-a928-fabfb13f33d7",
+        "text": "第 20 次测试对话的用户消息 1。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 20 次测试对话的用户消息 1。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2026-03-21T15:00:00Z",
+            "stop_timestamp": "2026-03-21T15:00:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2026-03-21T15:00:00Z",
+        "updated_at": "2026-03-21T15:00:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "897e5d35-2f1d-4d13-b0fb-5f6780085aa6",
+        "text": "这是第 20 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+        "content": [
+          {
+            "type": "thinking",
+            "thinking": "先梳理时间线，再检查信息层级。",
+            "start_timestamp": "2026-03-21T15:12:00Z",
+            "stop_timestamp": "2026-03-21T15:12:30Z",
+            "flags": null
+          },
+          {
+            "type": "text",
+            "text": "这是第 20 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+            "start_timestamp": "2026-03-21T15:12:00Z",
+            "stop_timestamp": "2026-03-21T15:12:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2026-03-21T15:12:00Z",
+        "updated_at": "2026-03-21T15:12:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "1fecea24-1573-404b-b01c-875e595dfc7a",
+        "text": "第 20 次测试对话的用户消息 3。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 20 次测试对话的用户消息 3。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2026-03-21T15:24:00Z",
+            "stop_timestamp": "2026-03-21T15:24:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2026-03-21T15:24:00Z",
+        "updated_at": "2026-03-21T15:24:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "937c3a03-8915-4287-8177-d54ec6641fbe",
+        "text": "这是第 20 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。",
+        "content": [
+          {
+            "type": "text",
+            "text": "这是第 20 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。",
+            "start_timestamp": "2026-03-21T15:36:00Z",
+            "stop_timestamp": "2026-03-21T15:36:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2026-03-21T15:36:00Z",
+        "updated_at": "2026-03-21T15:36:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "95c5fe7c-148e-43af-a49e-e04c8f3fc2d5",
+        "text": "第 20 次测试对话的用户消息 5。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 20 次测试对话的用户消息 5。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2026-03-21T15:48:00Z",
+            "stop_timestamp": "2026-03-21T15:48:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2026-03-21T15:48:00Z",
+        "updated_at": "2026-03-21T15:48:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "74ddcd4c-9f64-480f-8e95-81ac94082bbe",
+        "text": "这是第 20 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+        "content": [
+          {
+            "type": "text",
+            "text": "这是第 20 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+            "start_timestamp": "2026-03-21T16:00:00Z",
+            "stop_timestamp": "2026-03-21T16:00:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2026-03-21T16:00:00Z",
+        "updated_at": "2026-03-21T16:00:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "c56e314c-392d-4449-b648-f378e4ea8dde",
+        "text": "第 20 次测试对话的用户消息 7。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 20 次测试对话的用户消息 7。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2026-03-21T16:12:00Z",
+            "stop_timestamp": "2026-03-21T16:12:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2026-03-21T16:12:00Z",
+        "updated_at": "2026-03-21T16:12:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "d00c1b53-4ed3-4ef3-a604-a382aa032152",
+        "text": "这是第 20 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。",
+        "content": [
+          {
+            "type": "thinking",
+            "thinking": "先梳理时间线，再检查信息层级。",
+            "start_timestamp": "2026-03-21T16:24:00Z",
+            "stop_timestamp": "2026-03-21T16:24:30Z",
+            "flags": null
+          },
+          {
+            "type": "text",
+            "text": "这是第 20 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。",
+            "start_timestamp": "2026-03-21T16:24:00Z",
+            "stop_timestamp": "2026-03-21T16:24:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2026-03-21T16:24:00Z",
+        "updated_at": "2026-03-21T16:24:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "a140fb7e-aba5-44db-89b8-d9430053a8ae",
+        "text": "第 20 次测试对话的用户消息 9。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 20 次测试对话的用户消息 9。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2026-03-21T16:36:00Z",
+            "stop_timestamp": "2026-03-21T16:36:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2026-03-21T16:36:00Z",
+        "updated_at": "2026-03-21T16:36:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "8fb625c2-be5b-4300-bd11-0d4092deab25",
+        "text": "这是第 20 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+        "content": [
+          {
+            "type": "text",
+            "text": "这是第 20 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+            "start_timestamp": "2026-03-21T16:48:00Z",
+            "stop_timestamp": "2026-03-21T16:48:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2026-03-21T16:48:00Z",
+        "updated_at": "2026-03-21T16:48:00Z",
+        "attachments": [],
+        "files": []
+      }
+    ]
+  },
+  {
+    "uuid": "6c5e755f-0a59-4ac5-a308-24165161f8c7",
+    "name": "布局验收对话 21",
+    "summary": "synthetic fixture",
+    "created_at": "2026-04-09T18:00:00Z",
+    "updated_at": "2026-04-09T20:00:00Z",
+    "account": {
+      "uuid": "synthetic-account"
+    },
+    "chat_messages": [
+      {
+        "uuid": "a7f5eeb0-41fe-4e72-b5d6-e1a73eb0244b",
+        "text": "第 21 次测试对话的用户消息 1。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 21 次测试对话的用户消息 1。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2026-04-09T18:00:00Z",
+            "stop_timestamp": "2026-04-09T18:00:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2026-04-09T18:00:00Z",
+        "updated_at": "2026-04-09T18:00:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "2a8b2f4a-6161-4050-ae89-70800c20e0de",
+        "text": "这是第 21 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+        "content": [
+          {
+            "type": "thinking",
+            "thinking": "先梳理时间线，再检查信息层级。",
+            "start_timestamp": "2026-04-09T18:12:00Z",
+            "stop_timestamp": "2026-04-09T18:12:31Z",
+            "flags": null
+          },
+          {
+            "type": "text",
+            "text": "这是第 21 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+            "start_timestamp": "2026-04-09T18:12:00Z",
+            "stop_timestamp": "2026-04-09T18:12:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2026-04-09T18:12:00Z",
+        "updated_at": "2026-04-09T18:12:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "58a2e10c-b0d7-433e-9607-a317099c6c1c",
+        "text": "第 21 次测试对话的用户消息 3。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 21 次测试对话的用户消息 3。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2026-04-09T18:24:00Z",
+            "stop_timestamp": "2026-04-09T18:24:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2026-04-09T18:24:00Z",
+        "updated_at": "2026-04-09T18:24:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "2cf7f785-c714-4cd4-8095-f064df8d6184",
+        "text": "这是第 21 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。",
+        "content": [
+          {
+            "type": "text",
+            "text": "这是第 21 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。",
+            "start_timestamp": "2026-04-09T18:36:00Z",
+            "stop_timestamp": "2026-04-09T18:36:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2026-04-09T18:36:00Z",
+        "updated_at": "2026-04-09T18:36:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "2c4cfcfb-2b85-44e3-ada7-58c35bf914b2",
+        "text": "第 21 次测试对话的用户消息 5。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 21 次测试对话的用户消息 5。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2026-04-09T18:48:00Z",
+            "stop_timestamp": "2026-04-09T18:48:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2026-04-09T18:48:00Z",
+        "updated_at": "2026-04-09T18:48:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "c347f842-e95c-47ca-a050-2ceafb67c672",
+        "text": "这是第 21 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+        "content": [
+          {
+            "type": "text",
+            "text": "这是第 21 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+            "start_timestamp": "2026-04-09T19:00:00Z",
+            "stop_timestamp": "2026-04-09T19:00:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2026-04-09T19:00:00Z",
+        "updated_at": "2026-04-09T19:00:00Z",
+        "attachments": [],
+        "files": []
+      }
+    ]
+  },
+  {
+    "uuid": "b39ab2ac-1257-4545-930c-2a6f4d6cac54",
+    "name": "布局验收对话 22",
+    "summary": "synthetic fixture",
+    "created_at": "2026-04-28T21:00:00Z",
+    "updated_at": "2026-04-28T23:00:00Z",
+    "account": {
+      "uuid": "synthetic-account"
+    },
+    "chat_messages": [
+      {
+        "uuid": "530c5a9d-57b0-4507-b4c4-1acf0dad3f61",
+        "text": "第 22 次测试对话的用户消息 1。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 22 次测试对话的用户消息 1。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2026-04-28T21:00:00Z",
+            "stop_timestamp": "2026-04-28T21:00:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2026-04-28T21:00:00Z",
+        "updated_at": "2026-04-28T21:00:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "a28ae49a-a92b-417f-a343-3b7e769959cb",
+        "text": "这是第 22 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+        "content": [
+          {
+            "type": "thinking",
+            "thinking": "先梳理时间线，再检查信息层级。",
+            "start_timestamp": "2026-04-28T21:12:00Z",
+            "stop_timestamp": "2026-04-28T21:12:32Z",
+            "flags": null
+          },
+          {
+            "type": "text",
+            "text": "这是第 22 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+            "start_timestamp": "2026-04-28T21:12:00Z",
+            "stop_timestamp": "2026-04-28T21:12:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2026-04-28T21:12:00Z",
+        "updated_at": "2026-04-28T21:12:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "182cb64f-db31-4928-8106-fa3e1e72bee3",
+        "text": "第 22 次测试对话的用户消息 3。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 22 次测试对话的用户消息 3。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2026-04-28T21:24:00Z",
+            "stop_timestamp": "2026-04-28T21:24:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2026-04-28T21:24:00Z",
+        "updated_at": "2026-04-28T21:24:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "1d621d56-1308-4a32-bceb-2cd8ccced89a",
+        "text": "这是第 22 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。",
+        "content": [
+          {
+            "type": "text",
+            "text": "这是第 22 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。",
+            "start_timestamp": "2026-04-28T21:36:00Z",
+            "stop_timestamp": "2026-04-28T21:36:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2026-04-28T21:36:00Z",
+        "updated_at": "2026-04-28T21:36:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "44536129-80bb-4a12-b75a-f88277483651",
+        "text": "第 22 次测试对话的用户消息 5。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 22 次测试对话的用户消息 5。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2026-04-28T21:48:00Z",
+            "stop_timestamp": "2026-04-28T21:48:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2026-04-28T21:48:00Z",
+        "updated_at": "2026-04-28T21:48:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "5523094d-d9e9-431d-99cc-c726de6116e7",
+        "text": "这是第 22 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+        "content": [
+          {
+            "type": "text",
+            "text": "这是第 22 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+            "start_timestamp": "2026-04-28T22:00:00Z",
+            "stop_timestamp": "2026-04-28T22:00:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2026-04-28T22:00:00Z",
+        "updated_at": "2026-04-28T22:00:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "e0885911-7d53-484a-9206-939d6c7ad858",
+        "text": "第 22 次测试对话的用户消息 7。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 22 次测试对话的用户消息 7。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2026-04-28T22:12:00Z",
+            "stop_timestamp": "2026-04-28T22:12:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2026-04-28T22:12:00Z",
+        "updated_at": "2026-04-28T22:12:00Z",
+        "attachments": [],
+        "files": []
+      }
+    ]
+  },
+  {
+    "uuid": "9005140e-1838-4313-9faf-f85ec2b433b1",
+    "name": "布局验收对话 23",
+    "summary": "synthetic fixture",
+    "created_at": "2026-05-18T00:00:00Z",
+    "updated_at": "2026-05-18T02:00:00Z",
+    "account": {
+      "uuid": "synthetic-account"
+    },
+    "chat_messages": [
+      {
+        "uuid": "fe592d23-cdfd-4bd3-be94-c4a153b6e934",
+        "text": "第 23 次测试对话的用户消息 1。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 23 次测试对话的用户消息 1。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2026-05-18T00:00:00Z",
+            "stop_timestamp": "2026-05-18T00:00:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2026-05-18T00:00:00Z",
+        "updated_at": "2026-05-18T00:00:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "b6b37c3a-6568-4d36-a5b6-ff6e4139f565",
+        "text": "这是第 23 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+        "content": [
+          {
+            "type": "thinking",
+            "thinking": "先梳理时间线，再检查信息层级。",
+            "start_timestamp": "2026-05-18T00:12:00Z",
+            "stop_timestamp": "2026-05-18T00:12:33Z",
+            "flags": null
+          },
+          {
+            "type": "text",
+            "text": "这是第 23 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+            "start_timestamp": "2026-05-18T00:12:00Z",
+            "stop_timestamp": "2026-05-18T00:12:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2026-05-18T00:12:00Z",
+        "updated_at": "2026-05-18T00:12:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "491caf06-efdc-4dd6-a851-4bc8fb2dfeaa",
+        "text": "第 23 次测试对话的用户消息 3。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 23 次测试对话的用户消息 3。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2026-05-18T00:24:00Z",
+            "stop_timestamp": "2026-05-18T00:24:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2026-05-18T00:24:00Z",
+        "updated_at": "2026-05-18T00:24:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "26de5a56-a1e1-40af-b095-05b2be09aba2",
+        "text": "这是第 23 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。",
+        "content": [
+          {
+            "type": "text",
+            "text": "这是第 23 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。",
+            "start_timestamp": "2026-05-18T00:36:00Z",
+            "stop_timestamp": "2026-05-18T00:36:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2026-05-18T00:36:00Z",
+        "updated_at": "2026-05-18T00:36:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "0fa61539-6a2d-4ae4-afa6-568aab766842",
+        "text": "第 23 次测试对话的用户消息 5。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 23 次测试对话的用户消息 5。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2026-05-18T00:48:00Z",
+            "stop_timestamp": "2026-05-18T00:48:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2026-05-18T00:48:00Z",
+        "updated_at": "2026-05-18T00:48:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "bb4310b4-783a-4bd2-af45-34dcca9ce4c7",
+        "text": "这是第 23 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+        "content": [
+          {
+            "type": "text",
+            "text": "这是第 23 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+            "start_timestamp": "2026-05-18T01:00:00Z",
+            "stop_timestamp": "2026-05-18T01:00:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2026-05-18T01:00:00Z",
+        "updated_at": "2026-05-18T01:00:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "98346a46-1b49-4a06-a20d-6337c3aea15b",
+        "text": "第 23 次测试对话的用户消息 7。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 23 次测试对话的用户消息 7。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2026-05-18T01:12:00Z",
+            "stop_timestamp": "2026-05-18T01:12:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2026-05-18T01:12:00Z",
+        "updated_at": "2026-05-18T01:12:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "66091933-b1d5-469a-be24-9481dbd9f3ba",
+        "text": "这是第 23 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。",
+        "content": [
+          {
+            "type": "thinking",
+            "thinking": "先梳理时间线，再检查信息层级。",
+            "start_timestamp": "2026-05-18T01:24:00Z",
+            "stop_timestamp": "2026-05-18T01:24:33Z",
+            "flags": null
+          },
+          {
+            "type": "text",
+            "text": "这是第 23 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。",
+            "start_timestamp": "2026-05-18T01:24:00Z",
+            "stop_timestamp": "2026-05-18T01:24:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2026-05-18T01:24:00Z",
+        "updated_at": "2026-05-18T01:24:00Z",
+        "attachments": [],
+        "files": []
+      }
+    ]
+  },
+  {
+    "uuid": "d0061229-bd85-49f7-a886-5d2602531550",
+    "name": "布局验收对话 24",
+    "summary": "synthetic fixture",
+    "created_at": "2026-06-06T03:00:00Z",
+    "updated_at": "2026-06-06T05:00:00Z",
+    "account": {
+      "uuid": "synthetic-account"
+    },
+    "chat_messages": [
+      {
+        "uuid": "b8e68b0a-9f47-4fdf-9567-d4508085a0b7",
+        "text": "第 24 次测试对话的用户消息 1。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 24 次测试对话的用户消息 1。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2026-06-06T03:00:00Z",
+            "stop_timestamp": "2026-06-06T03:00:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2026-06-06T03:00:00Z",
+        "updated_at": "2026-06-06T03:00:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "346761a0-2d55-4635-b67d-309761736887",
+        "text": "这是第 24 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+        "content": [
+          {
+            "type": "thinking",
+            "thinking": "先梳理时间线，再检查信息层级。",
+            "start_timestamp": "2026-06-06T03:12:00Z",
+            "stop_timestamp": "2026-06-06T03:12:34Z",
+            "flags": null
+          },
+          {
+            "type": "text",
+            "text": "这是第 24 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+            "start_timestamp": "2026-06-06T03:12:00Z",
+            "stop_timestamp": "2026-06-06T03:12:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2026-06-06T03:12:00Z",
+        "updated_at": "2026-06-06T03:12:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "10b3b88f-0563-4333-b1bf-cc8a563ebe26",
+        "text": "第 24 次测试对话的用户消息 3。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 24 次测试对话的用户消息 3。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2026-06-06T03:24:00Z",
+            "stop_timestamp": "2026-06-06T03:24:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2026-06-06T03:24:00Z",
+        "updated_at": "2026-06-06T03:24:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "65f6e69d-00ac-4de9-a429-f9147432202e",
+        "text": "这是第 24 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。",
+        "content": [
+          {
+            "type": "text",
+            "text": "这是第 24 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。",
+            "start_timestamp": "2026-06-06T03:36:00Z",
+            "stop_timestamp": "2026-06-06T03:36:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2026-06-06T03:36:00Z",
+        "updated_at": "2026-06-06T03:36:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "66779c3b-63f5-4dc8-99a6-eb60808730d8",
+        "text": "第 24 次测试对话的用户消息 5。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 24 次测试对话的用户消息 5。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2026-06-06T03:48:00Z",
+            "stop_timestamp": "2026-06-06T03:48:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2026-06-06T03:48:00Z",
+        "updated_at": "2026-06-06T03:48:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "f582a91b-09aa-4804-9cea-baf0dc0b45c7",
+        "text": "这是第 24 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+        "content": [
+          {
+            "type": "text",
+            "text": "这是第 24 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。\n\n## 小标题\n\n- 第一项\n- 第二项\n\n`const verified = true;`",
+            "start_timestamp": "2026-06-06T04:00:00Z",
+            "stop_timestamp": "2026-06-06T04:00:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2026-06-06T04:00:00Z",
+        "updated_at": "2026-06-06T04:00:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "1e1da63b-4454-4691-a5ad-fb9d0ce1d052",
+        "text": "第 24 次测试对话的用户消息 7。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 24 次测试对话的用户消息 7。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2026-06-06T04:12:00Z",
+            "stop_timestamp": "2026-06-06T04:12:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2026-06-06T04:12:00Z",
+        "updated_at": "2026-06-06T04:12:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "468afe0b-6856-4cb2-b50d-853cb797b0d6",
+        "text": "这是第 24 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。",
+        "content": [
+          {
+            "type": "thinking",
+            "thinking": "先梳理时间线，再检查信息层级。",
+            "start_timestamp": "2026-06-06T04:24:00Z",
+            "stop_timestamp": "2026-06-06T04:24:34Z",
+            "flags": null
+          },
+          {
+            "type": "text",
+            "text": "这是第 24 次对话的测试回复。\n\n我会把信息分成清晰的层级，并验证布局、长文本换行与导出。",
+            "start_timestamp": "2026-06-06T04:24:00Z",
+            "stop_timestamp": "2026-06-06T04:24:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "assistant",
+        "created_at": "2026-06-06T04:24:00Z",
+        "updated_at": "2026-06-06T04:24:00Z",
+        "attachments": [],
+        "files": []
+      },
+      {
+        "uuid": "29c3dbf9-1075-4618-b9a2-c25e97e86cba",
+        "text": "第 24 次测试对话的用户消息 9。请帮我整理今天的记录，并保留关键时间。",
+        "content": [
+          {
+            "type": "text",
+            "text": "第 24 次测试对话的用户消息 9。请帮我整理今天的记录，并保留关键时间。",
+            "start_timestamp": "2026-06-06T04:36:00Z",
+            "stop_timestamp": "2026-06-06T04:36:00Z",
+            "flags": null,
+            "citations": []
+          }
+        ],
+        "sender": "human",
+        "created_at": "2026-06-06T04:36:00Z",
+        "updated_at": "2026-06-06T04:36:00Z",
+        "attachments": [],
+        "files": []
+      }
+    ]
+  }
+]
